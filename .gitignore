@@ -1,0 +1,11 @@
+.vs/
+*.ipch
+*.suo
+*.pch
+*.user
+*.userosscache
+*.sln.docstates
+
+Intermediate/
+Saved/
+DerivedDataCache/
