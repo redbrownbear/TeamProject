@@ -14,6 +14,9 @@
 
 #include "Data/MonsterTableRow.h"
 
+#include "Kismet/KismetMathLibrary.h"
+
+
 // Sets default values
 AMonster::AMonster()
 {
@@ -26,7 +29,7 @@ AMonster::AMonster()
 	MovementComponent = CreateDefaultSubobject<UAdvancedFloatingPawnMovement>(TEXT("MovementComponent"));
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
-	CollisionComponent->SetCollisionProfileName(CollisionProfileName::Monster);
+	//CollisionComponent->SetCollisionProfileName(CollisionProfileName::Monster);
 
 	CollisionComponent->SetCanEverAffectNavigation(false);
 	RootComponent = CollisionComponent;
@@ -63,6 +66,26 @@ void AMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	const float Speed = UKismetMathLibrary::VSizeXY(MovementComponent->Velocity);
+
+	if (AMonsterAIController* MonsterAIController = Cast<AMonsterAIController>(GetController()))
+	{
+		if (UMonsterFSMComponent* MonsterFSMComponent = Cast<UMonsterFSMComponent>(MonsterAIController->GetComponentByClass(UMonsterFSMComponent::StaticClass())))
+		{
+			if (FMath::IsNearlyZero(Speed))
+			{
+				MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Idle);
+			}
+			else if (FMath::IsNearlyEqual(Speed, MonsterData->WalkMovementMaxSpeed))
+			{
+				MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Walk);
+			}
+			else if (FMath::IsNearlyEqual(Speed, MonsterData->RunMovementMaxSpeed))
+			{
+				MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Run);
+			}
+		}
+	}
 }
 
 UMonsterFSMComponent* AMonster::GetFSMComponent() const

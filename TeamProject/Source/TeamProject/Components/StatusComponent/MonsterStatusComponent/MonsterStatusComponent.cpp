@@ -3,3 +3,8 @@
 
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
+UMonsterStatusComponent::UMonsterStatusComponent()
+{
+	PrimaryComponentTick.bCanEverTick = false;
+	// ...
+}

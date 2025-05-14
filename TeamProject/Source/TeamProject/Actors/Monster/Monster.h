@@ -13,6 +13,7 @@ class UAISenseConfig_Sight;
 class UAdvancedFloatingPawnMovement;
 class UMonsterFSMComponent;
 class USphereComponent;
+class APatrolPath;
 
 struct FMonsterTableRow;
 
@@ -33,7 +34,7 @@ public:
 protected:
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UMonsterStatusComponent> StatusComponent;
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(EditAnywhere)
     TObjectPtr<USphereComponent> CollisionComponent;
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
@@ -65,4 +66,9 @@ protected:
     virtual void PostInitializeComponents() override;
     virtual void OnConstruction(const FTransform& Transform);
 
+protected:
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<APatrolPath> PatrolPath;
+public:
+    APatrolPath* GetPatrolPath() const { return PatrolPath; }
 };

@@ -12,4 +12,9 @@ class TEAMPROJECT_API UMonsterStatusComponent : public UStatusComponent
 {
 	GENERATED_BODY()
 	
+public:
+	// Sets default values for this component's properties
+	UMonsterStatusComponent();
+
+
 };

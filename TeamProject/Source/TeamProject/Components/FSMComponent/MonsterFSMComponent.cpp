@@ -2,6 +2,14 @@
 
 
 #include "Components/FSMComponent/MonsterFSMComponent.h"
+#include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
+
+#include "Actors/Monster/Monster.h"
+#include "Actors/PatrolPath/PatrolPath.h"
+#include "Actors/Controller/AIController/Monster/MonsterAIController.h"
+
+#include "Navigation/PathFollowingComponent.h"
+
 
 UMonsterFSMComponent::UMonsterFSMComponent()
 {
@@ -13,6 +21,26 @@ UMonsterFSMComponent::UMonsterFSMComponent()
 void UMonsterFSMComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	switch (eGroupType)
+	{
+	case EMonsterGroupType::Patrol:
+		ChangeState(EMonsterState::Patrol);
+		break;
+	case EMonsterGroupType::TreasureBox:
+		ChangeState(EMonsterState::Idle);
+		break;
+	case EMonsterGroupType::Alone:
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::BeginPlay // No GroupType"));
+		check(false);
+		break;
+	case EMonsterGroupType::End:
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::BeginPlay // No GroupType"));
+		check(false);
+		break;
+	default:
+		break;
+	}
 }
 
 
@@ -26,6 +54,13 @@ void UMonsterFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 void UMonsterFSMComponent::HandleState(float DeltaTime)
 {
+	if (!Owner)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // No Owner"));
+		check(false);
+		return;
+	}
+
 	switch (eCurrentState)
 	{
 	case EMonsterState::Idle:
@@ -76,6 +111,7 @@ void UMonsterFSMComponent::UpdateIdle(float DeltaTime)
 	if (eGroupType == EMonsterGroupType::Patrol)
 	{
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdateIdle // This Monster is PatrolGroup, not TreasureBoxGroup"));
+		check(false);
 	}
 }
 
@@ -85,6 +121,41 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 	if (eGroupType == EMonsterGroupType::TreasureBox)
 	{
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdatePatrol // This Monster is TreasureBoxGroup, not PatrolGroup"));
+		check(false);
+	}
+
+
+	// 목표 위치 구하기
+	FVector Location = FVector();
+
+	if (APatrolPath* PatrolPath = Owner->GetPatrolPath())
+	{
+		Location = PatrolPath->GetSplinePointLocation(CurrentPatrolIndex);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdatePatrol // No PatrolPath"));
+		check(false);
+	}
+
+	// 이동 
+	MoveToLocation(Location);
+
+
+	// 다음 PatrolIndex 구하기
+	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
+
+	if (bIsNear)
+	{
+		++CurrentPatrolIndex;
+
+		if (APatrolPath* PatrolPath = Owner->GetPatrolPath())
+		{
+			if (CurrentPatrolIndex >= PatrolPath->GetSplineMaxIndex())
+			{
+				CurrentPatrolIndex = 0;
+			}
+		}
 	}
 }
 
@@ -108,4 +179,23 @@ void UMonsterFSMComponent::UpdateAlert(float DeltaTime)
 void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 {
 	// Chase and Attack Player;
+}
+
+void UMonsterFSMComponent::MoveToLocation(const FVector& InLocation)
+{
+
+	if (AAIController* AIController = Cast<AAIController>(Owner->GetController()))
+	{
+		FAIMoveRequest MoveRequest;
+		MoveRequest.SetGoalLocation(InLocation);
+		MoveRequest.SetAcceptanceRadius(50.f);
+
+		FNavPathSharedPtr NavPath;
+		AIController->MoveTo(MoveRequest, &NavPath);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::MoveToLocation // No AIController"));
+		check(false);
+	}
 }

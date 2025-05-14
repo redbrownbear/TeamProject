@@ -14,6 +14,11 @@ AMonsterAIController::AMonsterAIController()
 void AMonsterAIController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (MonsterFSMComponent)
+	{
+		MonsterFSMComponent->SetOwner(Cast<AMonster>(GetPawn()));
+	}
 }
 
 void AMonsterAIController::Tick(float DeltaTime)

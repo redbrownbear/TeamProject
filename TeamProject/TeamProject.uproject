@@ -1,13 +1,18 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.4",
+	"EngineAssociation": "{6BDEDB6D-480E-1A94-FE97-EEA1178DD6B0}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
 		{
 			"Name": "TeamProject",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"CoreUObject",
+				"AIModule"
+			]
 		}
 	],
 	"Plugins": [
