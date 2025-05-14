@@ -32,14 +32,13 @@ protected:
 protected:
 	EMonsterState			eCurrentState;
 	EMonsterGroupType		eGroupType;
-	EMonsterMovementState	eMovementState;
+
 public:
 	EMonsterState GetMonsterState() const { return eCurrentState; }
 	EMonsterGroupType GetMonsterGroupType() const { return eGroupType; }
-	EMonsterMovementState GetMonsterMovementState() const { return eMovementState; }
+
 	void SetMonsterState(EMonsterState NewState) { eCurrentState = NewState; }	
 	void SetMonsterGroupType(EMonsterGroupType NewGroupType) { eGroupType = NewGroupType; }	
-	void SetMonsterMovementState(EMonsterMovementState NewMovementState) { eMovementState = NewMovementState; }
 
 protected:
 	float SuspicionGauge = 0.0f;

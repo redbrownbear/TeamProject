@@ -38,12 +38,3 @@ enum class EMonsterState : uint8
     Dance,
     End,
 };
-
-UENUM()
-enum class EMonsterMovementState : uint8
-{
-	Idle = 0,
-	Walk,
-	Run,
-	End,
-};

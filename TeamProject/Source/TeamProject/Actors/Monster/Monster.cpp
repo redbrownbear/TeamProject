@@ -68,24 +68,24 @@ void AMonster::Tick(float DeltaTime)
 
 	const float Speed = UKismetMathLibrary::VSizeXY(MovementComponent->Velocity);
 
-	if (AMonsterAIController* MonsterAIController = Cast<AMonsterAIController>(GetController()))
-	{
-		if (UMonsterFSMComponent* MonsterFSMComponent = Cast<UMonsterFSMComponent>(MonsterAIController->GetComponentByClass(UMonsterFSMComponent::StaticClass())))
-		{
-			if (FMath::IsNearlyZero(Speed))
-			{
-				MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Idle);
-			}
-			else if (FMath::IsNearlyEqual(Speed, MonsterData->WalkMovementMaxSpeed))
-			{
-				MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Walk);
-			}
-			else if (FMath::IsNearlyEqual(Speed, MonsterData->RunMovementMaxSpeed))
-			{
-				MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Run);
-			}
-		}
-	}
+	//if (AMonsterAIController* MonsterAIController = Cast<AMonsterAIController>(GetController()))
+	//{
+	//	if (UMonsterFSMComponent* MonsterFSMComponent = Cast<UMonsterFSMComponent>(MonsterAIController->GetComponentByClass(UMonsterFSMComponent::StaticClass())))
+	//	{
+	//		if (FMath::IsNearlyZero(Speed))
+	//		{
+	//			MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Idle);
+	//		}
+	//		else if (FMath::IsNearlyEqual(Speed, MonsterData->WalkMovementMaxSpeed))
+	//		{
+	//			MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Walk);
+	//		}
+	//		else if (FMath::IsNearlyEqual(Speed, MonsterData->RunMovementMaxSpeed))
+	//		{
+	//			MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Run);
+	//		}
+	//	}
+	//}
 }
 
 UMonsterFSMComponent* AMonster::GetFSMComponent() const

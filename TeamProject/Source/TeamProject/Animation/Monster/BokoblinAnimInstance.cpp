@@ -30,10 +30,14 @@ void UBokoblinAnimInstance::NativeInitializeAnimation()
 void UBokoblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
+	if (AMonster* Monster = Cast<AMonster>(TryGetPawnOwner()))
+	{
+		FSMComponent = Cast<UBokoblinFSMComponent>(Monster->GetFSMComponent());
+	}
+
 	if (!FSMComponent) return;
 
 	const EMonsterState eMonsterState = FSMComponent->GetMonsterState();
-
 	switch (eMonsterState)
 	{
 	case EMonsterState::Idle:
