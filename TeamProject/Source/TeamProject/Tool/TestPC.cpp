@@ -1,22 +1,52 @@
 #include "Tool/TestPC.h"
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
+#include "InputMappingContext.h"
 
-void ATestPC::CheckItemAndTriggerAction()
+void ATestPC::BeginPlay()
 {
-    /*if (!ItemDataTable) { return; }
+	Super::BeginPlay();
 
-    static const FString ContextString(TEXT("Item Action"));
+	// IMC 등록
+	if (APlayerController* PC = Cast<APlayerController>(this))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(IMC_Inventory, 0); // 인벤토리 창
+			Subsystem->AddMappingContext(IMC_Cook, 1);
+		}
+	}
+}
 
-    for (const auto& RowName : ItemDataTable->GetRowNames())
-    {
-        const FItemData* Item = ItemDataTable->FindRow<FItemData>(RowName, ContextString);
+void ATestPC::SetupInputComponent()
+{
+	Super::SetupInputComponent();
 
-        if (Item && Item->ItemID == "WindBoots")
-        {
-            AMyCharacter* MyChar = Cast<AMyCharacter>(GetPawn());
-            if (MyChar)
-            {
-                MyChar->SetMovementSpeedBoost(true);
-            }
-        }
-    }*/
+	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(InputComponent);
+	ensure(EnhancedInput);
+
+	// 요리 모션
+	EnhancedInput->BindAction(OpenInventory, ETriggerEvent::Triggered, this, &ATestPC::OnPressedE);
+	EnhancedInput->BindAction(StartCooking, ETriggerEvent::Triggered, this, &ATestPC::OnPressedQ);
+
+}
+
+void ATestPC::OnPressedE()
+{
+	ShowInventory(true);
+}
+
+void ATestPC::OnPressedQ()
+{
+	ATestCharacter* MyChar = Cast<ATestCharacter>(GetPawn());
+	if (MyChar)
+	{
+		//MyChar->StartCooking();
+	}
+}
+
+void ATestPC::ShowInventory(bool bShow)
+{
+	// Create Inventory UI 
 }
