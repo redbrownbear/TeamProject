@@ -1,42 +1,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
-#include "Misc/FSM.h"
+#include "NPC/NpcFSMComponent.h"
 #include "KoroguFSMComponent.generated.h"
 
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class TEAMPROJECT_API UKoroguFSMComponent : public UActorComponent
+UCLASS()
+class TEAMPROJECT_API UKoroguFSMComponent : public UNpcFSMComponent
 {
 	GENERATED_BODY()
-
-public:	
-	UKoroguFSMComponent();
-
-protected:
-	virtual void BeginPlay() override;
-
-public:	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-protected:
-	EKoroguState       eCurrentState;
-public:
-	EKoroguState GetMonsterState() const { return eCurrentState; }
-	void SetMonsterState(EKoroguState NewState) { eCurrentState = NewState; }
-
-protected:
-	float SuspicionGauge = 0.0f;
-	float MaxSuspicionGauge = 100.0f;
 
 private:
 	void HandleState(float DeltaTime);
 
 protected:
-	void ChangeState(EKoroguState NewState);
+	void ChangeState(ENpcState NewState);
 
-	virtual void UpdateIdle(float DeltaTime);
-	virtual void UpdatePatrol(float DeltaTime);
+	virtual void UpdateIdle(float DeltaTime) override;
+	virtual void UpdatePatrol(float DeltaTime) override;
+	virtual void UpdateTalk(float DeltaTime) override;
 	virtual void UpdateHide(float DeltaTime);
+	virtual void UpdatePlay(float DeltaTime); // 술래잡기: 상황 봐서 여유되면 추가
 };

@@ -8,15 +8,17 @@
 
 namespace CollisionProfileName
 {
-    static inline FName Monster = TEXT("Korogu");
-    static inline FName MonsterProjectile = TEXT("KoroguProjectile");
+    static inline FName NPC = TEXT("NPC");
+    static inline FName NPCProjectile = TEXT("NPCProjectile");
     static inline FName MapMesh = TEXT("MapMesh");
 }
 
 UENUM()
-enum class EKoroguState : uint8
+enum class ENpcState : uint8
 {
     Idle = 0,
     Patrol,
+    Talk,
     Hide,
+    Play, // 술래잡기: 상황 봐서 여유되면 추가
 };
