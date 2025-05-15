@@ -4,6 +4,8 @@
 #include "Actors/Object/CampFire.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+#include "Misc/Utils.h"
+
 
 // Sets default values
 ACampFire::ACampFire()
@@ -24,6 +26,8 @@ ACampFire::ACampFire()
     {
         UE_LOG(LogTemp, Error, TEXT("ACampFire::ACampFire // No FireWood StaticMeshAsset"));
     }
+    StaticMeshComponent->SetRelativeScale3D(FVector(DEFAULT_MESH_SCALE));
+
 
     NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
 
@@ -38,6 +42,8 @@ ACampFire::ACampFire()
     {
         UE_LOG(LogTemp, Error, TEXT("ACampFire::ACampFire // No Fire NiagaraAsset"));
     }
+
+    NiagaraComponent->SetupAttachment(RootComponent);
 
     // 
     //NiagaraComponent->SetAsset();

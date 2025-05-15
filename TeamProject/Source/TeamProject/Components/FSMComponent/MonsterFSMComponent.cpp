@@ -140,6 +140,14 @@ void UMonsterFSMComponent::UpdateIdle(float DeltaTime)
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdateIdle // This Monster is PatrolGroup, not TreasureBoxGroup"));
 		check(false);
 	}
+
+	if (eCurrentState == EMonsterState::Idle)
+	{
+
+	}
+
+
+
 }
 
 void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
@@ -170,7 +178,7 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 
 
 	// 다음 PatrolIndex 구하기
-	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 100.f);
 
 	if (bIsNear)
 	{
