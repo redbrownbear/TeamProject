@@ -1,8 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Kismet/GameplayStatics.h"
-
 #include "GameMode/UITestGameMode.h"
 
 #include "SubSystem//UI/UIManager.h"
@@ -14,6 +12,7 @@ void AUITestGameMode::BeginPlay()
     Super::BeginPlay();
 
     CreatePopup();
+    CreateInven();
 }
 
 void AUITestGameMode::CreatePopup()
@@ -25,6 +24,15 @@ void AUITestGameMode::CreatePopup()
     }
 }
 
+void AUITestGameMode::CreateInven()
+{
+    APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+    if (PC)
+    {
+        FInputActionBinding& Bind = PC->InputComponent->BindAction("OpenInven", IE_Pressed, this, &AUITestGameMode::OnOpenInven);
+    }
+}
+
 void AUITestGameMode::OnOpenPopup()
 {
     UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
@@ -32,13 +40,39 @@ void AUITestGameMode::OnOpenPopup()
 
     if (UIManager)
     {
-        UTestPopupUI* NewUI = UIManager->CreatePopup(GetWorld());
+        FString Path = TEXT("/Game/UIBluePrint/BP_TestPopup.BP_TestPopup_C");
+        TSubclassOf<UTestPopupUI> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
+
+        UTestPopupUI* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
         if (NewUI)
         {
             FText Title = FText::FromString(TEXT("Hi"));
             FText Main = FText::FromString(TEXT("Welcome"));
 
             NewUI->SetPopupText(Title, Main);
+        }
+        else
+        {
+            check(NewUI);
+        }
+    }
+}
+
+void AUITestGameMode::OnOpenInven()
+{
+    UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+    check(UIManager);
+
+    if (UIManager)
+    {
+        //Inventory
+        FString Path = TEXT("/Game/UIBluePrint/BP_InvenLayout.BP_InvenLayout_C");
+        TSubclassOf<UInventory> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
+
+        UInventory* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
+        if (!NewUI)
+        {
+            check(NewUI);
         }
     }
 }

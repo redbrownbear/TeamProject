@@ -20,4 +20,7 @@ public:
 	void CreatePopup();
 	void OnOpenPopup();
 
+	void CreateInven();
+	void OnOpenInven();
+
 };

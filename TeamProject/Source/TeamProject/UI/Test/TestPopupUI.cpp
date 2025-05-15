@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Kismet/GameplayStatics.h"
 
 #include "SubSystem/UI/UIManager.h"
 #include "UI/Test/TestPopupUI.h"
@@ -34,7 +33,7 @@ void UTestPopupUI::ClosePopup()
 
 	if (UIManager)
 	{
-		UIManager->RemovePopup(this);
+		UIManager->RemoveUI(this);
 	}
 }
 

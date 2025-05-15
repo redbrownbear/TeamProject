@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "UI/Base/BaseUI.h"
 #include "UI/Test/TestPopupUI.h"
+#include "UI/Inven/Inventory.h"
 
 #include "UIManager.generated.h"
 
@@ -18,21 +20,26 @@ class TEAMPROJECT_API UUIManager : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
-//UI 생성
-public:
-    UTestPopupUI* CreatePopup(UWorld* World);
-
-//UI 제거
-public:
-    void RemovePopup(UTestPopupUI* PopupUI);
 
 //---건들지 말기
 private:
+    virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+    //UI 생성
+public:
     template <typename T>
-    T* CreateUI(UWorld* World, TSubclassOf<UBaseUI> UIClass)
+    T* CreateUI(UWorld* World, TSubclassOf<T> UIClass)
     {
         if (!World || !UIClass)
             return nullptr;
+
+        for (UBaseUI* UI : CreatedUIs)
+        {
+            if (UI && UI->IsA(UIClass))
+            {
+                return nullptr;
+            }
+        }
 
         T* NewUI = CreateWidget<T>(World, UIClass);
         if (NewUI)
@@ -42,7 +49,7 @@ private:
             CreatedUIs.Add(NewUI);
         }
         return NewUI;
-    };
+    }
 
     void RemoveUI(UBaseUI* TargetUI)
     {
@@ -60,17 +67,10 @@ private:
                 break;
             }
         }
-    }
-
-    virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+    };
 //---건들지 말기
-
 
 private:
     UPROPERTY()
     TArray<UBaseUI*> CreatedUIs;
-
-    //UI모임
-    UPROPERTY()
-    TSubclassOf<UTestPopupUI> PopupUIBPClass;
 };
