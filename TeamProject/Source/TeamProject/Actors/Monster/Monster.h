@@ -14,6 +14,7 @@ class UAdvancedFloatingPawnMovement;
 class UMonsterFSMComponent;
 class USphereComponent;
 class APatrolPath;
+class ACampFire;
 
 struct FMonsterTableRow;
 
@@ -71,4 +72,8 @@ protected:
     TObjectPtr<APatrolPath> PatrolPath;
 public:
     APatrolPath* GetPatrolPath() const { return PatrolPath; }
+
+protected:
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<ACampFire> CampFire;
 };

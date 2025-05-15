@@ -5,7 +5,7 @@
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
 #include "Actors/Monster/Monster.h"
-#include "Actors/PatrolPath/PatrolPath.h"
+#include "Actors/Object/PatrolPath.h"
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 
 #include "Navigation/PathFollowingComponent.h"
