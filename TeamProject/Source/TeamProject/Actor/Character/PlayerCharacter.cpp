@@ -3,6 +3,9 @@
 
 #include "Actor/Character/PlayerCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Camera/CameraComponent.h"
 #include "Engine/SkeletalMesh.h"
 
 // Sets default values
@@ -11,8 +14,30 @@ APlayerCharacter::APlayerCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+
+
 	FVector Scale = FVector(45.f, 45.f, 45.f);
 	FVector Locate = FVector(0.f, 0.f, -41.f);
+
+
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->TargetArmLength = 500.f;
+
+	{
+		SpringArm->SetupAttachment(RootComponent);
+		SpringArm->ProbeSize = 5.0;
+		SpringArm->bUsePawnControlRotation = true;
+		SpringArm->bInheritRoll = false;
+	}
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(SpringArm);
+
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	Movement->RotationRate = FRotator(0.0, 720.0, 0.0);
+	Movement->bOrientRotationToMovement = true;
+	
+
 	Head = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HEAD"));
 	Head->SetupAttachment(RootComponent);
 	Head->SetRelativeLocation(Locate);
@@ -28,6 +53,10 @@ APlayerCharacter::APlayerCharacter()
 	mMesh->SetupAttachment(RootComponent);
 	mMesh->SetRelativeScale3D(Scale);
 	mMesh->SetRelativeLocation(Locate);
+	
+	UCapsuleComponent* CC = GetCapsuleComponent();
+	CC->SetCapsuleRadius(20.f);
+	CC->SetCapsuleHalfHeight(41.f);
 	
 
 
@@ -50,6 +79,8 @@ APlayerCharacter::APlayerCharacter()
 	RWeapon->SetupAttachment(RootComponent);
 	RWeapon->SetRelativeLocation(FVector(0.f, 0.f, -41.f));
 	RWeapon->SetRelativeScale3D(Scale);
+
+	bUseControllerRotationYaw = false;
 }
 
 // Called when the game starts or when spawned

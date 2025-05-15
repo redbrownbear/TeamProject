@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Camera/CameraComponent.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -31,12 +34,22 @@ public:
 	virtual void OnConstruction(const FTransform& Transform);
 
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpringArm")
+	TObjectPtr<USpringArmComponent> SpringArm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	TObjectPtr<UCameraComponent> Camera;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> Head;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> Lower;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> LWeapon;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> RWeapon;
 
