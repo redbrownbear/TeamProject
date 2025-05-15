@@ -114,14 +114,22 @@ void AMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	SkeletalMeshComponent->SetRelativeScale3D(MonsterData->MeshTransform.GetScale3D());
 	SkeletalMeshComponent->SetRelativeLocation(FVector(0.0, 0.0, -MonsterData->CollisionSphereRadius));
 
-	CollisionComponent->SetSphereRadius(MonsterData->CollisionSphereRadius);
-	CollisionComponent->SetCollisionProfileName(CollisionProfileName::Monster);
-	CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
-	CollisionComponent->RegisterComponent();
+	if (CollisionComponent)
+	{
+		CollisionComponent->SetSphereRadius(MonsterData->CollisionSphereRadius);
+		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Monster);
+		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+		CollisionComponent->RegisterComponent();
+	}
 
 	MovementComponent->MaxSpeed = MonsterData->WalkMovementMaxSpeed;
 
 	AIControllerClass = MonsterData->AIControllerClass;
+
+	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
+	{
+		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
+	}
 }
 
 void AMonster::PostDuplicate(EDuplicateMode::Type DuplicateMode)

@@ -38,7 +38,7 @@ public:
 	EMonsterGroupType GetMonsterGroupType() const { return eGroupType; }
 
 	void SetMonsterState(EMonsterState NewState) { eCurrentState = NewState; }	
-	void SetMonsterGroupType(EMonsterGroupType NewGroupType) { eGroupType = NewGroupType; }	
+	void SetMonsterGroupType(EMonsterGroupType NewGroupType);
 
 protected:
 	float SuspicionGauge = 0.0f;

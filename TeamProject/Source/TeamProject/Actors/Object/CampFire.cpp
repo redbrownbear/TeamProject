@@ -4,7 +4,6 @@
 #include "Actors/Object/CampFire.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
-#include "Misc/Utils.h"
 
 // Sets default values
 ACampFire::ACampFire()
@@ -26,10 +25,7 @@ ACampFire::ACampFire()
         UE_LOG(LogTemp, Error, TEXT("ACampFire::ACampFire // No FireWood StaticMeshAsset"));
     }
 
-    StaticMeshComponent->SetRelativeScale3D(FVector(DEFAULT_MESH_SCALE, DEFAULT_MESH_SCALE, DEFAULT_MESH_SCALE));
-
     NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
-    NiagaraComponent->SetupAttachment(RootComponent);
 
     static ConstructorHelpers::FObjectFinder<UNiagaraSystem> FireAsset
     { TEXT("/Script/Niagara.NiagaraSystem'/Game/Vefects/Free_Fire/Shared/Particles/NS_Fire_Floor_01_Simple.NS_Fire_Floor_01_Simple'") };
@@ -42,6 +38,11 @@ ACampFire::ACampFire()
     {
         UE_LOG(LogTemp, Error, TEXT("ACampFire::ACampFire // No Fire NiagaraAsset"));
     }
+
+    // 
+    //NiagaraComponent->SetAsset();
+
+
 }
 
 // Called when the game starts or when spawned

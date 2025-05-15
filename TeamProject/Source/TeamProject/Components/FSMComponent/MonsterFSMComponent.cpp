@@ -52,6 +52,33 @@ void UMonsterFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	HandleState(DeltaTime);
 }
 
+void UMonsterFSMComponent::SetMonsterGroupType(EMonsterGroupType NewGroupType)
+{
+	eGroupType = NewGroupType;
+
+	switch (eGroupType)
+	{
+	case EMonsterGroupType::Patrol:
+		if (EMonsterState::Idle == eCurrentState)
+		{
+			ChangeState(EMonsterState::Patrol);
+		}
+		break;
+	case EMonsterGroupType::TreasureBox:
+		if (EMonsterState::Patrol == eCurrentState)
+		{
+			ChangeState(EMonsterState::Idle);
+		}
+		break;
+	case EMonsterGroupType::Alone:
+		break;
+	case EMonsterGroupType::End:
+		break;
+	default:
+		break;
+	}
+}
+
 void UMonsterFSMComponent::HandleState(float DeltaTime)
 {
 	if (!Owner)
