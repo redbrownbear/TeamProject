@@ -4,9 +4,15 @@ using UnrealBuildTool;
 
 public class TeamProject : ModuleRules
 {
+<<<<<<< HEAD
     public TeamProject(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+=======
+	public TeamProject(ReadOnlyTargetRules Target) : base(Target)
+	{
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+>>>>>>> upstream/main
 
         PublicDependencyModuleNames.AddRange(new string[]
         {
@@ -15,7 +21,11 @@ public class TeamProject : ModuleRules
             "MoviePlayer", "AIModule", "Paper2D", "RenderCore", "RHI", /*"Graphics",*/
         });
 
+<<<<<<< HEAD
         PrivateDependencyModuleNames.AddRange(new string[] { });
+=======
+        PrivateDependencyModuleNames.AddRange(new string[] {  });
+>>>>>>> upstream/main
 
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
