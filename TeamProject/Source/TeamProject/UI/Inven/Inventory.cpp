@@ -1,14 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SubSystem//UI/UIManager.h"
 #include "UI/Inven/Inventory.h"
 
 
 void UInventory::OnCreated()
 {
     Super::OnCreated();
+
     InitUI();
+
+    UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
+    check(InvenManager);
+
+    if (InvenManager)
+    {
+        InvenManager->OnInventoryUpdated.AddDynamic(this, &UInventory::RefreshInventory);
+    }
 
     APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
     if (PC)
@@ -20,16 +28,8 @@ void UInventory::OnCreated()
 void UInventory::InitUI()
 {
     //Scroll 불러오기
-    InvenScroll = Cast<UUserWidget>(GetWidgetFromName(TEXT("InvenScroll")));
+    InvenScroll = Cast<UInventoryScroll>(GetWidgetFromName(TEXT("InvenScroll")));
     if (!InvenScroll)
-    {
-        check(false);
-        return;
-    }
-
-    //Slot 불러오기
-    InvenSlot = Cast<UUserWidget>(GetWidgetFromName(TEXT("InvenSlot")));
-    if (!InvenSlot)
     {
         check(false);
         return;
@@ -48,4 +48,9 @@ void UInventory::CloseInven()
     {
         UIManager->RemoveUI(this);
     }
+}
+
+void UInventory::RefreshInventory(FItemData ItemData)
+{
+
 }

@@ -1,10 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameMode/UITestGameMode.h"
-
-#include "SubSystem//UI/UIManager.h"
+#include "SubSystem/UI/UIManager.h"
+#include "SubSystem/UI/InventoryManager.h"
 #include "UI/Test/TestPopupUI.h"
+#include "UI/Inven/Inventory.h"
+
+#include "GameMode/UITestGameMode.h"
 
 
 void AUITestGameMode::BeginPlay()
@@ -29,7 +31,8 @@ void AUITestGameMode::CreateInven()
     APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
     if (PC)
     {
-        FInputActionBinding& Bind = PC->InputComponent->BindAction("OpenInven", IE_Pressed, this, &AUITestGameMode::OnOpenInven);
+        FInputActionBinding& Bind1 = PC->InputComponent->BindAction("OpenInven", IE_Pressed, this, &AUITestGameMode::OnOpenInven);
+        FInputActionBinding& Bind2 = PC->InputComponent->BindAction("CreateItem", IE_Pressed, this, &AUITestGameMode::CreateItem);
     }
 }
 
@@ -74,5 +77,24 @@ void AUITestGameMode::OnOpenInven()
         {
             check(NewUI);
         }
+    }
+}
+
+void AUITestGameMode::CreateItem()
+{
+    UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
+    check(InvenManager);
+
+    if(InvenManager)
+    {
+        if (DataTableRowHandle.IsNull()) { return; }
+        FItemData* Data = DataTableRowHandle.GetRow<FItemData>(TEXT("testItem"));
+        if (!Data) { ensure(false); return; }
+
+        FItemData Item;
+        Item.Name = Data->Name;
+        Item.Icon = Data->Icon;
+
+        InvenManager->AddItem(Item);
     }
 }

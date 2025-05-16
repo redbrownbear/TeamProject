@@ -16,6 +16,8 @@ class TEAMPROJECT_API AUITestGameMode : public AGameModeBase
 	
 	virtual void BeginPlay() override;
 
+
+	//전부테스트용
 public:
 	void CreatePopup();
 	void OnOpenPopup();
@@ -23,4 +25,10 @@ public:
 	void CreateInven();
 	void OnOpenInven();
 
+	void CreateItem();
+
+
+protected:
+	UPROPERTY(EditAnywhere, meta = (RowType = "/Script/TeamProject.ItemDataTable"))
+	FDataTableRowHandle DataTableRowHandle;
 };

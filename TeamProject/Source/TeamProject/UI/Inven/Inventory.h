@@ -3,11 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UI/Base/BaseUI.h"
 
-#include "Components/TextBlock.h"
-#include "Components/Image.h"
-#include "Components/Button.h"
+#include "SubSystem/UI/UIManager.h"
+#include "SubSystem/UI/InventoryManager.h"
+#include "UI/Inven/InventoryScroll.h"
 
 #include "Inventory.generated.h"
 
@@ -26,12 +25,13 @@ private:
 	void InitUI();
 	void CloseInven();
 
+private:
+	void RefreshInventory(FItemData ItemData);
+
 
 private:
-	UPROPERTY()
-	UUserWidget* InvenScroll;
-	UPROPERTY()
-	UUserWidget* InvenSlot;
+	UPROPERTY(meta = (BindWidget))
+	UInventoryScroll* InvenScroll;
 
 private:
 	UPROPERTY(meta = (BindWidget))

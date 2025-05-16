@@ -6,9 +6,8 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "UI/Base/BaseUI.h"
 #include "UI/Test/TestPopupUI.h"
-#include "UI/Inven/Inventory.h"
+#include "UI/Base/BaseUI.h"
 
 #include "UIManager.generated.h"
 
