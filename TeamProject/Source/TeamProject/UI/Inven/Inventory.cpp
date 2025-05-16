@@ -3,6 +3,9 @@
 
 #include "UI/Inven/Inventory.h"
 
+#include "SubSystem/UI/UIManager.h"
+#include "SubSystem/UI/InventoryManager.h"
+
 
 void UInventory::OnCreated()
 {
@@ -28,12 +31,7 @@ void UInventory::OnCreated()
 void UInventory::InitUI()
 {
     //Scroll 불러오기
-    InvenScroll = Cast<UInventoryScroll>(GetWidgetFromName(TEXT("InvenScroll")));
-    if (!InvenScroll)
-    {
-        check(false);
-        return;
-    }
+    check(BP_InvenScroll); // BindWidget이 잘 됐는지 확인
 }
 
 void UInventory::CloseInven()
@@ -50,7 +48,7 @@ void UInventory::CloseInven()
     }
 }
 
-void UInventory::RefreshInventory(FItemData ItemData)
+void UInventory::RefreshInventory(const FItemData& ItemData)
 {
-
+    BP_InvenScroll->AddItemSlot(ItemData);
 }

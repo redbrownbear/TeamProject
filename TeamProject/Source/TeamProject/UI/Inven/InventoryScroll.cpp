@@ -3,39 +3,74 @@
 
 #include "UI/Inven/InventoryScroll.h"
 
+#include "SubSystem/UI/InventoryManager.h"
+
 void UInventoryScroll::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    ScrollBox = Cast<UScrollBox>(GetWidgetFromName(TEXT("ItemScrollBox")));
-    check(ScrollBox);
+    InitializePool(100);//미리 100개의 아이콘을 만들어 놓는다.
+    check(ItemWrapBox);
+}
 
+void UInventoryScroll::InitializePool(int32 PreloadCount)
+{
+    for (int32 i = 0; i < PreloadCount; ++i)
+    {
+        UInventorySlot* PoolSlot = CreateWidget<UInventorySlot>(GetWorld(), SlotWidgetClass);
+        PoolSlot->RemoveFromParent();
+        PooledSlots.Add(PoolSlot);
+    }
+}
+
+void UInventoryScroll::AddItemSlot(const FItemData& NewItem)
+{
+    if (!SlotWidgetClass) 
+        return;
+
+    UInventorySlot* NewSlot = nullptr;
+
+    if (PooledSlots.Num() > 0)
+    {
+        NewSlot = PooledSlots.Pop();
+    }
+    else
+    {
+        NewSlot = CreateWidget<UInventorySlot>(this, SlotWidgetClass);
+    }
+
+    if (!NewSlot) 
+        return;
+
+    NewSlot->SetItemData(NewItem);
+    ItemWrapBox->AddChildToWrapBox(NewSlot);
+    ActiveSlots.Add(NewSlot);
 }
 
 void UInventoryScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
 {
-    int32 NumToUpdate = FMath::Min(NewItemList.Num(), SlotPool.Num());
-
-    // 1. 기존 슬롯 재사용 + 데이터 초기화
-    for (int32 i = 0; i < NumToUpdate; ++i)
+    for (UInventorySlot* ActiveSlot : ActiveSlots)
     {
-        SlotPool[i]->SetVisibility(ESlateVisibility::Visible);
-        SlotPool[i]->InitSlot(NewItemList[i]);
+        ActiveSlot->RemoveFromParent();
+        PooledSlots.Add(ActiveSlot);
     }
+    ActiveSlots.Empty();
 
-    // 2. 슬롯 부족 시 새로 생성 및 추가
-    for (int32 i = NumToUpdate; i < NewItemList.Num(); ++i)
+    for (const FItemData& Item : NewItemList)
     {
-        UInventorySlot* NewSlot = CreateWidget<UInventorySlot>(GetWorld(), SlotWidgetClass);
-        NewSlot->InitSlot(NewItemList[i]);
-        SlotPool.Add(NewSlot);
-        ScrollBox->AddChild(NewSlot);
-    }
+        UInventorySlot* NewSlot = nullptr;
 
-    // 3. 남는 슬롯 숨기기
-    for (int32 i = NewItemList.Num(); i < SlotPool.Num(); ++i)
-    {
-        SlotPool[i]->SetVisibility(ESlateVisibility::Collapsed);
-    }
+        if (PooledSlots.Num() > 0)
+        {
+            NewSlot = PooledSlots.Pop();
+        }
+        else
+        {
+            NewSlot = CreateWidget<UInventorySlot>(GetWorld(), SlotWidgetClass);
+        }
 
+        NewSlot->SetItemData(Item);
+        ItemWrapBox->AddChildToWrapBox(NewSlot);
+        ActiveSlots.Add(NewSlot);
+    }
 }

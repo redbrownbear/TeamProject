@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 
-#include "SubSystem/UI/UIManager.h"
-#include "SubSystem/UI/InventoryManager.h"
+#include "Components/TextBlock.h"
+#include "Components/Image.h"
+#include "Data/ItemDataRow.h"
+
 #include "UI/Inven/InventoryScroll.h"
 
+#include "UI/Base/BaseUI.h"
 #include "Inventory.generated.h"
 
 /**
@@ -26,12 +29,13 @@ private:
 	void CloseInven();
 
 private:
-	void RefreshInventory(FItemData ItemData);
+	UFUNCTION()
+	void RefreshInventory(const FItemData& ItemData);
 
 
 private:
 	UPROPERTY(meta = (BindWidget))
-	UInventoryScroll* InvenScroll;
+	UInventoryScroll* BP_InvenScroll;
 
 private:
 	UPROPERTY(meta = (BindWidget))

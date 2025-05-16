@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-#include "Kismet/GameplayStatics.h"
 
-#include "UI/Test/TestPopupUI.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/Base/BaseUI.h"
 
 #include "UIManager.generated.h"
+
+
 
 /**
  * 

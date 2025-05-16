@@ -3,12 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
 
-#include "SubSystem/UI/InventoryManager.h"
+#include "Components/TextBlock.h"
+#include "Components/Image.h"
+#include "Components/Button.h"
+#include "Components/ScrollBox.h"
+#include "Components/WrapBox.h"
+#include "Data/ItemDataRow.h"
+
 #include "UI/Inven/InventorySlot.h"
 
-#include "Blueprint/UserWidget.h"
 #include "InventoryScroll.generated.h"
+
 
 /**
  * 
@@ -20,18 +27,27 @@ class TEAMPROJECT_API UInventoryScroll : public UUserWidget
 
 protected:
 	virtual void NativeConstruct() override;
+	
+	void InitializePool(int32 PreloadCount);
+
 
 public:
+	void AddItemSlot(const FItemData& NewItem);
 	void UpdateSlots(const TArray<FItemData>& NewItemList);
 
-private:
-	UPROPERTY(EditAnywhere)
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UInventorySlot> SlotWidgetClass;
+
+private:
 	UPROPERTY(meta = (BindWidget))
-	UScrollBox* ScrollBox;
+	UWrapBox* ItemWrapBox;
 
 	UPROPERTY()
-	TArray<UInventorySlot*> SlotPool;
+	TArray<UInventorySlot*> ActiveSlots;
+
+	UPROPERTY()
+	TArray<UInventorySlot*> PooledSlots;
 
 
 };

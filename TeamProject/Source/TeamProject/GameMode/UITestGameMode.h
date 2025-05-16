@@ -29,6 +29,6 @@ public:
 
 
 protected:
-	UPROPERTY(EditAnywhere, meta = (RowType = "/Script/TeamProject.ItemDataTable"))
-	FDataTableRowHandle DataTableRowHandle;
+	UPROPERTY(EditDefaultsOnly)
+	UDataTable* ItemDataTable;
 };

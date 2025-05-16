@@ -42,7 +42,7 @@ void AUITestGameMode::OnOpenPopup()
 
     if (UIManager)
     {
-        FString Path = TEXT("/Game/UIBluePrint/BP_TestPopup.BP_TestPopup_C");
+        FString Path = TEXT("/Game/BluePrint/UI/BP_TestPopup.BP_TestPopup_C");
         TSubclassOf<UTestPopupUI> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
 
         UTestPopupUI* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
@@ -68,7 +68,7 @@ void AUITestGameMode::OnOpenInven()
     if (UIManager)
     {
         //Inventory
-        FString Path = TEXT("/Game/UIBluePrint/BP_InvenLayout.BP_InvenLayout_C");
+        FString Path = TEXT("/Game/BluePrint/UI/BP_InvenLayout.BP_InvenLayout_C");
         TSubclassOf<UInventory> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
 
         UInventory* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
@@ -86,14 +86,15 @@ void AUITestGameMode::CreateItem()
 
     if(InvenManager)
     {
-        if (DataTableRowHandle.IsNull()) { return; }
-        FItemData* Data = DataTableRowHandle.GetRow<FItemData>(TEXT("testItem"));
-        if (!Data) { ensure(false); return; }
+        const FItemData* RowData = ItemDataTable->FindRow<FItemData>(FName("testItem"), TEXT("LookupItem"));
+  
+        if (RowData)
+        {     
+            FItemData Item;
+            Item = *RowData;
 
-        FItemData Item;
-        Item.Name = Data->Name;
-        Item.Icon = Data->Icon;
-
-        InvenManager->AddItem(Item);
+            InvenManager->AddItem(Item);
+                     
+        }
     }
 }

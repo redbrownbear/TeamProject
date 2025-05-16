@@ -5,15 +5,11 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 
-#include "DataTable/ItemData.h"
-#include "Components/TextBlock.h"
-#include "Components/Image.h"
-#include "Components/Button.h"
-#include "Components/ScrollBox.h"
+#include "Data/ItemDataRow.h"
 
 #include "InventoryManager.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, FItemData, ItemData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, const FItemData&, ItemData);
 /**
  * 
  */

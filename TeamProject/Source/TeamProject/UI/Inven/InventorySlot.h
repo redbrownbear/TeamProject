@@ -5,9 +5,13 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 
-#include "SubSystem/UI/InventoryManager.h"
+#include "Components/TextBlock.h"
+#include "Components/Image.h"
+#include "Components/Button.h"
+#include "Data/ItemDataRow.h"
 
 #include "InventorySlot.generated.h"
+
 
 /**
  * 
@@ -21,12 +25,11 @@ protected:
 	virtual void NativeConstruct() override;
 	
 public:
-	void InitSlot(const FItemData& Item);
-
+	void SetItemData(const FItemData& Item);
 
 private:
 	UPROPERTY(meta = (BindWidget))
-	UImage* ItemIcon;
+	UImage* Icon;
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* ItemCount;
+	UTextBlock* Amount;
 };
