@@ -12,6 +12,9 @@ class TEAMPROJECT_API AFurikoController : public ANpcController
 public:
 	AFurikoController();
 
+protected:
 	virtual void BeginPlay() override;
 
+protected:
+	void SetFocus(); // 시선 처리 함수
 };

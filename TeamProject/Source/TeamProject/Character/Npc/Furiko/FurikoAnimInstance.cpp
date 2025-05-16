@@ -15,9 +15,7 @@ void UFurikoAnimInstance::NativeInitializeAnimation()
 		return;
 	}
 	else if (!Pawn) { return; }
-
-	/*AKorogu* Korogu = Cast<AKorogu>(Pawn);
-	FSMComponent = Cast<UKoroguFSMComponent>(Korogu->GetFSMComponent());*/
+	
 }
 
 void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
