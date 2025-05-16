@@ -4,14 +4,12 @@
 #include "GameFramework/Pawn.h"
 #include "Controller/Npc/NpcController.h"
 
-#include "Components/SphereComponent.h"
-//#include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
-//#include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
-#include "Component/Npc/NpcFSMComponent.h"
-
-#include "Perception/AIPerceptionComponent.h"
-#include "Perception/AISenseConfig_Sight.h"
 #include "Npc.generated.h"
+
+class UBoxComponent;
+class USkeletalMeshComponent;
+class UAdvancedFloatingPawnMovement;
+class UNpcFSMComponent;
 
 UCLASS()
 class TEAMPROJECT_API ANpc : public APawn
@@ -34,12 +32,38 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
-	/*UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UMonsterStatusComponent> StatusComponent;*/
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USphereComponent> CollisionComponent;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	TObjectPtr<UBoxComponent> CollisionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
-	/*UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UAdvancedFloatingPawnMovement> MovementComponent;*/
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
+	TObjectPtr<USkeletalMeshComponent> FaceMeshComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
+	TObjectPtr<USkeletalMeshComponent> HairMeshComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
+	TObjectPtr<USkeletalMeshComponent> NoseMeshComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM")
+	TObjectPtr<UNpcFSMComponent> FSMComponent;
+
+public:
+	UNpcFSMComponent* GetFSMComponent() const;
+
+protected:
+	// 오버랩 상태
+	UPROPERTY()
+	bool bPlayerInRange = false;
+
+	// 오버랩 함수
+	UFUNCTION()
+	void OnPlayerInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	// 키 입력 함수
+	void OnTalkKeyPressed();
 };

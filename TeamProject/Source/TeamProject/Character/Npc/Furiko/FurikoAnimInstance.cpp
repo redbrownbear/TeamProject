@@ -1,4 +1,5 @@
 #include "FurikoAnimInstance.h"
+#include "Character/Npc/Npc.h"
 
 UFurikoAnimInstance::UFurikoAnimInstance()
 {
@@ -15,7 +16,10 @@ void UFurikoAnimInstance::NativeInitializeAnimation()
 		return;
 	}
 	else if (!Pawn) { return; }
-	
+
+	ANpc* Npc = Cast<ANpc>(Pawn);
+	FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
+
 }
 
 void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -23,26 +27,33 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	if (!FSMComponent) return;
 
-	//const EKoroguState eKoroguState = FSMComponent->GetKoroguState();
+	if (APawn* Pawn = TryGetPawnOwner())
+	{
+		Speed = Pawn->GetVelocity().Size2D(); 
+	}
+	eCurrentState = FSMComponent->GetNpcState(); 
 
 	switch (eCurrentState)
 	{
 	case ENpcState::Idle:
-		bIsIdle = true;
+		bIsSit = false;
+		bIsStand = false;
 		bIsWalk = false;
 		bIsRun = false;
 		bIsTalk = false;
 		bIsHide = false;		
 		break;
-	case ENpcState::Patrol:
-		bIsIdle = false;
-		bIsWalk = true;
-		bIsRun = false;
+	case ENpcState::Stroll:
+		bIsSit = false;
+		bIsStand = false;
+		bIsWalk = false;
+		bIsRun = true;
 		bIsTalk = false;
 		bIsHide = false;
 		break;
 	case ENpcState::Hide:
-		bIsIdle = false;
+		bIsSit = false;
+		bIsStand = false;
 		bIsWalk = false;
 		bIsRun = false;
 		bIsTalk = false;

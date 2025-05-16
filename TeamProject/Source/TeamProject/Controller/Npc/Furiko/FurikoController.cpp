@@ -1,10 +1,25 @@
 #include "FurikoController.h"
-#include "Component/Npc/Furiko/FurikoFSMComponent.h"
+#include "Components/Npc/Furiko/FurikoFSMComponent.h"
+#include "Character/Npc/Npc.h"
 
 AFurikoController::AFurikoController()
     : ANpcController()
+{	
+    FurikoFSMComponent = CreateDefaultSubobject<UFurikoFSMComponent>(TEXT("FurikoFSMComponent"));
+
+    // 맵에 있는 StrollPath 자동 탐색
+    /*for (TActorIterator<AStrollPath> It(GetWorld()); It; ++It)
+    {
+        StrollPathActor = *It;
+        break;
+    }*/
+}
+
+void AFurikoController::Tick(float DeltaTime)
 {
-	NpcFSMComponent = CreateDefaultSubobject<UFurikoFSMComponent>(TEXT("NpcFSMComponent"));
+    Super::Tick(DeltaTime);    
+
+    
 }
 
 void AFurikoController::BeginPlay()
@@ -13,12 +28,12 @@ void AFurikoController::BeginPlay()
 
     if (GetPawn())
     {
-        NpcFSMComponent = GetPawn()->FindComponentByClass<UFurikoFSMComponent>();
+        FurikoFSMComponent = GetPawn()->FindComponentByClass<UFurikoFSMComponent>();
     }
+
 }
 
-void AFurikoController::SetFocus()
+void AFurikoController::Hide()
 {
-    // 1. 무작위로 움직이다 플레이어의 콜리전이 오버랩되면 플레이어로 시선 고정
-    // 2. 콜리전 오버랩이 풀리면 다시 정면
+    // @TODO 랜덤한 장소로 이동
 }

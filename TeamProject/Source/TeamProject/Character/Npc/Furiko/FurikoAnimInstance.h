@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "Component/Npc/Furiko/FurikoFSMComponent.h"
+#include "Components/Npc/Furiko/FurikoFSMComponent.h"
 #include "FurikoAnimInstance.generated.h"
 
 /**
@@ -27,12 +27,16 @@ protected:
 	ENpcState eCurrentState;
 
 protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Movement")
+	float Speed = 0.0f;
 	UPROPERTY(BlueprintReadOnly)
-	bool bIsIdle = true;
+	bool bIsSit = true;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsStand = false;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsWalk = false;
 	UPROPERTY(BlueprintReadOnly)
-	bool bIsRun = false; // 술래잡기: 상황 봐서 여유되면 추가
+	bool bIsRun = false; 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsTalk = false;
 	UPROPERTY(BlueprintReadOnly)
