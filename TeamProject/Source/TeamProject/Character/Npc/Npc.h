@@ -2,12 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "NpcController.h"
+#include "Controller/Npc/NpcController.h"
 
 #include "Components/SphereComponent.h"
 //#include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 //#include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
-#include "NPCFSMComponent.h"
+#include "Component/Npc/NpcFSMComponent.h"
 
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"

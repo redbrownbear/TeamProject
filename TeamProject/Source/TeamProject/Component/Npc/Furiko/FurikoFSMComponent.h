@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NPC/NpcFSMComponent.h"
+#include "Component/NPC/NpcFSMComponent.h"
 #include "FurikoFSMComponent.generated.h"
 
 UCLASS()

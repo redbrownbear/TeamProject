@@ -1,6 +1,6 @@
 #include "NpcController.h"
-#include "Npc.h"
-#include "NpcFSMComponent.h"
+#include "Character/Npc/Npc.h"
+#include "Component/Npc/NpcFSMComponent.h"
 
 ANpcController::ANpcController()
 {

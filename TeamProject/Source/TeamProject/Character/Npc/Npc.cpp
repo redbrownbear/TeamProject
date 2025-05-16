@@ -1,4 +1,4 @@
-#include "NPC/Npc.h"
+#include "Npc.h"
 
 // Sets default values
 ANpc::ANpc()
