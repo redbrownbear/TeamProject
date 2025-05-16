@@ -48,6 +48,9 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> Lower;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+	TObjectPtr<USkeletalMeshComponent> Upper;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> LWeapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
@@ -55,5 +58,5 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	UAnimMontage* Lsword_Attack_Dash_MTG;
+	UAnimMontage* Sword_Attack_Charge_L_MTG;
 };

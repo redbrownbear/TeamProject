@@ -42,7 +42,7 @@ APlayerCharacter::APlayerCharacter()
 	
 
 	{
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/CharacterResourceTest/Player/Armor/Head/Armor_230_Head.Armor_230_Head'")) };
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/Armor/Head/Armor_230_Head.Armor_230_Head'")) };
 		Head = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HEAD"));
 		Head->SetSkeletalMeshAsset(Smesh.Object);
 		Head->SetupAttachment(RootComponent);
@@ -52,7 +52,7 @@ APlayerCharacter::APlayerCharacter()
 	}
 
 	{
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/CharacterResourceTest/Player/Armor/Lower/Armor_230_Lower.Armor_230_Lower'")) };
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/Armor/Lower/Armor_230_Lower.Armor_230_Lower'")) };
 		Lower = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Lower"));
 		Lower->SetupAttachment(RootComponent);
 		Lower->SetRelativeLocation(Locate);
@@ -61,14 +61,23 @@ APlayerCharacter::APlayerCharacter()
 	}
 
 	{
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/CharacterResourceTest/Player/Armor/Upper/Armor_230_Upper.Armor_230_Upper'")) };
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/Armor/Upper/Armor_230_Upper.Armor_230_Upper'")) };
+		Upper = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Upper"));
+		Upper->SetupAttachment(RootComponent);
+		Upper->SetRelativeLocation(Locate);
+		Upper->SetRelativeScale3D(Scale);
+		Upper->SetSkeletalMeshAsset(Smesh.Object);
+	}
+
+	{
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/Armor/ArmorMix/ArmorMix.ArmorMix'")) };
 		USkeletalMeshComponent* mMesh = GetMesh();
 		mMesh->SetupAttachment(RootComponent);
-		mMesh->SetRelativeScale3D(Scale);
 		mMesh->SetRelativeLocation(Locate);
 		mMesh->SetSkeletalMeshAsset(Smesh.Object);
-		ConstructorHelpers::FClassFinder<UAnimInstance> Anim{ (TEXT("/Script/Engine.AnimBlueprint'/Game/CharacterResourceTest/BPP_Anim.BPP_Anim_C'")) };
+		ConstructorHelpers::FClassFinder<UAnimInstance> Anim{ (TEXT("/Script/Engine.AnimBlueprint'/Game/Armor/BP_PlayerAnimInstance.BP_PlayerAnimInstance_C'")) };
 		mMesh->SetAnimInstanceClass(Anim.Class);
+		mMesh->SetRelativeScale3D(Scale);
 	}
 	{
 		UCapsuleComponent* CC = GetCapsuleComponent();
@@ -78,12 +87,12 @@ APlayerCharacter::APlayerCharacter()
 	}
 
 
-	{
-		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/CharacterResourceTest/Animation/Sword/MTG_Lsword_Attack_Dash.MTG_Lsword_Attack_Dash'"));
+	{	
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Armor/Animation/Sword_Attack/Sword_Attack_Charge_L_Montage.Sword_Attack_Charge_L_Montage'"));
 
 		if (Asset.Object)
 		{
-			Lsword_Attack_Dash_MTG = Asset.Object;
+			Sword_Attack_Charge_L_MTG = Asset.Object;
 		}
 		else
 		{
@@ -93,14 +102,13 @@ APlayerCharacter::APlayerCharacter()
 	{
 		LWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LWeapon"));
 		LWeapon->SetupAttachment(RootComponent);
-		LWeapon->SetRelativeLocation(FVector(0.f, 0.f, -41.f));
+		
 		LWeapon->SetRelativeScale3D(Scale);
 
 		RWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RWeapon"));
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/CharacterResourceTest/Sword/Weapon_Sword_003.Weapon_Sword_003'"));
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Resource/Sword/Weapon_Sword_003.Weapon_Sword_003'"));
 		RWeapon->SetSkeletalMeshAsset(Asset.Object);
-		RWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_Right"));
-		RWeapon->SetRelativeRotation(FRotator(0, 180, 0));
+		RWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_R"));
 	}
 
 	bUseControllerRotationYaw = false;
@@ -136,7 +144,7 @@ void APlayerCharacter::OnConstruction(const FTransform& Transform)
 	LWeapon->SetLeaderPoseComponent(mMesh);
 	Head->SetLeaderPoseComponent(mMesh);
 	Lower->SetLeaderPoseComponent(mMesh);
-
+	Upper->SetLeaderPoseComponent(mMesh);
 
 }
 
