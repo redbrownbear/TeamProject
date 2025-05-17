@@ -24,7 +24,7 @@ APlayerCharacter::APlayerCharacter()
 	{
 		SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 		SpringArm->SetupAttachment(RootComponent);
-		SpringArm->TargetArmLength = 500.f;
+		SpringArm->TargetArmLength = 400.f;
 
 		{
 			SpringArm->SetupAttachment(RootComponent);
