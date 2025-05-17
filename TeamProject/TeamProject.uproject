@@ -9,7 +9,10 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"Engine"
+				"Engine",
+				"UMG",
+				"CoreUObject",
+				"AIModule"
 			]
 		}
 	],
@@ -20,10 +23,6 @@
 			"TargetAllowList": [
 				"Editor"
 			]
-		},
-		{
-			"Name": "SkeletalMerging",
-			"Enabled": true
 		}
 	]
 }
