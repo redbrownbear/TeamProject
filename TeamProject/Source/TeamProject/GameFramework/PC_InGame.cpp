@@ -1,9 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GameFramework/PC_InGame.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
+#include "Actor/Character/PlayerCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 
 APC_InGame::APC_InGame()
@@ -43,7 +44,8 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Triggered, this, &ThisClass::OnMove);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LookMouse,
 		ETriggerEvent::Triggered, this, &ThisClass::OnLook);
-
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Attack,
+		ETriggerEvent::Started, this, &ThisClass::TryAttack);
 
 }
 
@@ -66,6 +68,15 @@ void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 
 	AddYawInput(ActionValue.X);
 	AddPitchInput(ActionValue.Y);
+}
+
+void APC_InGame::TryAttack(const FInputActionValue& InputActionValue)
+{
+	APawn* PlayerPawn = GetPawn();
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
+	
+	PlayerCharacter->Play_Sword_Attack();
+
 }
 
 

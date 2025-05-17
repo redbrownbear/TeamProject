@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_LookMouse = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_Attack = nullptr;
+
 	void CheckValid() const
 	{
 		check(IMC);
@@ -52,7 +55,7 @@ protected:
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
 	void OnLook(const FInputActionValue& InputActionValue);
-
+	void TryAttack(const FInputActionValue& InputActionValue);
 
 public:
 	UPROPERTY(EditAnywhere)

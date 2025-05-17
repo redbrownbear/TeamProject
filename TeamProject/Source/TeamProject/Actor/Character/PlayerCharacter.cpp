@@ -92,13 +92,27 @@ APlayerCharacter::APlayerCharacter()
 
 		if (Asset.Object)
 		{
-			Sword_Attack_Charge_L_MTG = Asset.Object;
+			Arr_Sword_Attack_MTG.Add(Asset.Object);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("No IMC_Character"));
+			UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
 		}
 	}
+
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Armor/Animation/Sword_Attack/Sword_Attack_Charge_Montage.Sword_Attack_Charge_Montage'"));
+
+		if (Asset.Object)
+		{
+			Arr_Sword_Attack_MTG.Add(Asset.Object);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+		}
+	}
+
 	{
 		LWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LWeapon"));
 		LWeapon->SetupAttachment(RootComponent);
@@ -146,5 +160,17 @@ void APlayerCharacter::OnConstruction(const FTransform& Transform)
 	Lower->SetLeaderPoseComponent(mMesh);
 	Upper->SetLeaderPoseComponent(mMesh);
 
+}
+
+void APlayerCharacter::Play_Sword_Attack()
+{
+	if (UAnimInstance* AnimInst = GetMesh()->GetAnimInstance())
+	{
+
+		if (Arr_Sword_Attack_MTG[1])
+		{
+			AnimInst->Montage_Play(Arr_Sword_Attack_MTG[1]);
+		}
+	}
 }
 

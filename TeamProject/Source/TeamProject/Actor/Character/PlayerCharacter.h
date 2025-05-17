@@ -33,6 +33,13 @@ public:
 	// 에디터에서 엑터의 변경마다 호출되는 함수
 	virtual void OnConstruction(const FTransform& Transform);
 
+	
+	// 칼 휘두르는 몽타주 실행
+
+	void Play_Sword_Attack();
+
+
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpringArm")
@@ -58,5 +65,5 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	UAnimMontage* Sword_Attack_Charge_L_MTG;
+	TArray<UAnimMontage*> Arr_Sword_Attack_MTG;
 };
