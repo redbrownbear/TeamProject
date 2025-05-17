@@ -1,18 +1,12 @@
 #include "FurikoController.h"
-#include "Components/Npc/Furiko/FurikoFSMComponent.h"
+#include "Components/FSM/Npc/Furiko/FurikoFSMComponent.h"
 #include "Character/Npc/Npc.h"
 
 AFurikoController::AFurikoController()
     : ANpcController()
 {	
     FurikoFSMComponent = CreateDefaultSubobject<UFurikoFSMComponent>(TEXT("FurikoFSMComponent"));
-
-    // 맵에 있는 StrollPath 자동 탐색
-    /*for (TActorIterator<AStrollPath> It(GetWorld()); It; ++It)
-    {
-        StrollPathActor = *It;
-        break;
-    }*/
+    
 }
 
 void AFurikoController::Tick(float DeltaTime)
@@ -35,5 +29,5 @@ void AFurikoController::BeginPlay()
 
 void AFurikoController::Hide()
 {
-    // @TODO 랜덤한 장소로 이동
+    // @TODO
 }

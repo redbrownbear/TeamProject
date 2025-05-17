@@ -1,8 +1,9 @@
-#include "FurikoAnimInstance.h"
+ï»¿#include "FurikoAnimInstance.h"
 #include "Character/Npc/Npc.h"
 
 UFurikoAnimInstance::UFurikoAnimInstance()
-{
+	:Super()
+{	
 }
 
 void UFurikoAnimInstance::NativeInitializeAnimation()
@@ -12,7 +13,7 @@ void UFurikoAnimInstance::NativeInitializeAnimation()
 	APawn* Pawn = TryGetPawnOwner();
 	if (GIsEditor && FApp::IsGame() && !Pawn)
 	{
-		checkf(false, TEXT("UGPMarioAnimInstance¸¦ »ç¿ëÇÏ·Á¸é ¼ÒÀ¯±ÇÀÚ°¡ PawnÀÌ¿©¾ß ÇÕ´Ï´Ù."));
+		checkf(false, TEXT("UGPMarioAnimInstanceë¥¼ ì‚¬ìš©í•˜ë ¤ë©´ ì†Œìœ ê¶Œìê°€ Pawnì´ì—¬ì•¼ í•©ë‹ˆë‹¤."));
 		return;
 	}
 	else if (!Pawn) { return; }
@@ -25,13 +26,24 @@ void UFurikoAnimInstance::NativeInitializeAnimation()
 void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-	if (!FSMComponent) return;
+
+	if (ANpc* Npc = Cast<ANpc>(TryGetPawnOwner()))
+	{
+		FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
+	}
+
+	if (!FSMComponent) { return; }
 
 	if (APawn* Pawn = TryGetPawnOwner())
 	{
 		Speed = Pawn->GetVelocity().Size2D(); 
 	}
 	eCurrentState = FSMComponent->GetNpcState(); 
+
+	UE_LOG(LogTemp, Warning, TEXT("AnimInstance // Speed: %.1f | State: %d | bIsRun: %s"),
+		Speed,
+		static_cast<uint8>(eCurrentState),
+		bIsRun ? TEXT("true") : TEXT("false"));
 
 	switch (eCurrentState)
 	{

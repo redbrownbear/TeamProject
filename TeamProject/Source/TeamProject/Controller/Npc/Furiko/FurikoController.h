@@ -22,12 +22,12 @@ protected:
 	virtual void BeginPlay() override;
 
 protected:
-	void Hide(); // ¼û¹Ù²ÀÁú 
+	void Hide(); 
 
 protected:
 	UPROPERTY()
 	TObjectPtr<UFurikoFSMComponent> FurikoFSMComponent;
 
 private:
-	bool bPlayHide = false; // ¼û¹Ù²ÀÁú
+	bool bPlayHide = false; 
 };

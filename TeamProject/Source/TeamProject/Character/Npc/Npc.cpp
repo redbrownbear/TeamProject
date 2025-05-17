@@ -2,8 +2,7 @@
 #include "Controller/Npc/NpcController.h"
 #include "Components/BoxComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "GameFramework/FloatingPawnMovement.h"
-#include "Components/Npc/NpcFSMComponent.h"
+#include "Components/FSM/Npc/NpcFSMComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 
@@ -13,25 +12,27 @@ ANpc::ANpc()
 	PrimaryActorTick.bCanEverTick = true;
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	// �浹
 	CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
 	SetRootComponent(CollisionComponent);
 
-	// �޽�
-	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Furiko"));
-	SkeletalMeshComponent->SetupAttachment(CollisionComponent);
+	BodyMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Body"));
+	BodyMeshComponent->SetupAttachment(CollisionComponent);
 
 	FaceMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Face"));
-	FaceMeshComponent->SetupAttachment(SkeletalMeshComponent);
+	FaceMeshComponent->SetupAttachment(BodyMeshComponent);
 
 	HairMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Hair"));
-	HairMeshComponent->SetupAttachment(SkeletalMeshComponent);
+	HairMeshComponent->SetupAttachment(BodyMeshComponent);
 
 	NoseMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Nose"));
-	NoseMeshComponent->SetupAttachment(SkeletalMeshComponent);
+	NoseMeshComponent->SetupAttachment(BodyMeshComponent);
 
 	// FSM 
-	FSMComponent = CreateDefaultSubobject<UNpcFSMComponent>(TEXT("FSMComponent"));
+	NpcFSMComponent = CreateDefaultSubobject<UNpcFSMComponent>(TEXT("NpcFSMComponent"));
+
+	// Movement
+	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+	MovementComponent->UpdatedComponent = CollisionComponent; // 충돌 기준 컴포넌트 설정
 }
 
 void ANpc::BeginPlay()
@@ -58,9 +59,9 @@ UNpcFSMComponent* ANpc::GetFSMComponent() const
 {
 	if (ANpcController* NpcController = Cast<ANpcController>(GetController()))
 	{
-		if (UNpcFSMComponent* NpcFSMComponent = Cast<UNpcFSMComponent>(NpcController->GetComponentByClass(UNpcFSMComponent::StaticClass())))
+		if (UNpcFSMComponent* FSMComponent = Cast<UNpcFSMComponent>(NpcController->GetComponentByClass(UNpcFSMComponent::StaticClass())))
 		{
-			return NpcFSMComponent;
+			return FSMComponent;
 		}
 	}
 
@@ -78,11 +79,11 @@ void ANpc::OnPlayerInteract(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 void ANpc::OnTalkKeyPressed()
 {
-	if (bPlayerInRange && FSMComponent)
+	if (bPlayerInRange && NpcFSMComponent)
 	{
-		if (FSMComponent->GetNpcState() == ENpcState::Stroll)
+		if (NpcFSMComponent->GetNpcState() == ENpcState::Stroll)
 		{
-			FSMComponent->SetNpcState(ENpcState::Talk);
+			NpcFSMComponent->SetNpcState(ENpcState::Talk);
 		}
 	}
 }

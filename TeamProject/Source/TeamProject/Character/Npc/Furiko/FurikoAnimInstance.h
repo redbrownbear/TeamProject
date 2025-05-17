@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "Components/Npc/Furiko/FurikoFSMComponent.h"
+#include "Components/Fsm/Npc/Furiko/FurikoFSMComponent.h"
 #include "FurikoAnimInstance.generated.h"
 
 /**

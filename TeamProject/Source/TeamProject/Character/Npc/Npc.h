@@ -3,12 +3,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Controller/Npc/NpcController.h"
-
+#include "GameFramework/FloatingPawnMovement.h"
 #include "Npc.generated.h"
 
 class UBoxComponent;
 class USkeletalMeshComponent;
-class UAdvancedFloatingPawnMovement;
 class UNpcFSMComponent;
 
 UCLASS()
@@ -36,7 +35,7 @@ protected:
 	TObjectPtr<UBoxComponent> CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
-	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
+	TObjectPtr<USkeletalMeshComponent> BodyMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
 	TObjectPtr<USkeletalMeshComponent> FaceMeshComponent;
@@ -48,22 +47,25 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> NoseMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM")
-	TObjectPtr<UNpcFSMComponent> FSMComponent;
+	TObjectPtr<UNpcFSMComponent> NpcFSMComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+	TObjectPtr<UFloatingPawnMovement> MovementComponent;
 
 public:
 	UNpcFSMComponent* GetFSMComponent() const;
 
 protected:
-	// ¿À¹ö·¦ »óÅÂ
+	// ìƒí˜¸ì‘ìš© ê°€ëŠ¥ ë³€ìˆ˜
 	UPROPERTY()
 	bool bPlayerInRange = false;
 
-	// ¿À¹ö·¦ ÇÔ¼ö
+	// ìƒí˜¸ì‘ìš© 
 	UFUNCTION()
 	void OnPlayerInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 		const FHitResult& SweepResult);
 
-	// Å° ÀÔ·Â ÇÔ¼ö
+	// ëŒ€í™” UI
 	void OnTalkKeyPressed();
 };
