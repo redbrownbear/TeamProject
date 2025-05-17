@@ -2,6 +2,7 @@
 #include "Controller/Npc/NpcController.h"
 #include "Character/Npc/Npc.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 UNpcFSMComponent::UNpcFSMComponent()
 {
@@ -12,15 +13,28 @@ void UNpcFSMComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	Owner = Cast<ANpc>(GetOwner());
 	if (!Owner)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::BeginPlay - Owner is null"));
+		UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::BeginPlay - Owner is not ANpc"));
 		return;
 	}
 
 	if (!StrollPathActor)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No StrollPathActor"));
+	}
+
+	if (!Owner->GetStrollPath())
+	{
+		TArray<AActor*> FoundPaths;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AStrollPath::StaticClass(), FoundPaths);
+
+		if (FoundPaths.Num() > 0)
+		{
+			AStrollPath* FoundPath = Cast<AStrollPath>(FoundPaths[0]);
+			Owner->SetStrollPath(FoundPath); 
+		}
 	}
 }
 
@@ -74,24 +88,38 @@ void UNpcFSMComponent::UpdateIdle(float DeltaTime)
 void UNpcFSMComponent::UpdateStroll(float DeltaTime)
 {
 	if (!Owner || !StrollPathActor) return;
+	
+	// 목표 위치 구하기
+	FVector Location = FVector();
 
-	const FVector Current = Owner->GetActorLocation();
-	const FVector Target = StrollPathActor->GetSplinePointLocation(CurrentStrollIndex);
-
-	MoveToLocation(Target);
-
-	if (FVector::Dist(Current, Target) <= AcceptanceRadius)
+	if (AStrollPath* StrollPath = Owner->GetStrollPath())
 	{
-		CurrentStrollIndex = (CurrentStrollIndex + 1) % StrollPathActor->GetSplineMaxIndex();
+		Location = StrollPath->GetSplinePointLocation(CurrentStrollIndex);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::UpdateStroll // No StrollPath"));
+		check(false);
 	}
 
-	//E_LOG(LogTemp, Warning, TEXT("UNpcFSMComponent::UpdateStroll // %f %f %f"), Current.X, Current.Y, Current.Z);
+	// 이동 
+	MoveToLocation(Location);
 
-	/*UE_LOG(LogTemp, Warning, TEXT("Target: %s, Current: %s, Dist: %.1f"),
-		*Target.ToString(),
-		*Current.ToString(),
-		FVector::Dist(Current, Target));*/
+	// 다음 PatrolIndex 구하기
+	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
 
+	if (bIsNear)
+	{
+		++CurrentStrollIndex;
+
+		if (AStrollPath* StrollPath = Owner->GetStrollPath())
+		{
+			if (CurrentStrollIndex >= StrollPath->GetSplineMaxIndex())
+			{
+				CurrentStrollIndex = 0;
+			}
+		}
+	}
 
 	if (NpcController->bTalk) 
 	{
@@ -118,6 +146,7 @@ void UNpcFSMComponent::MoveToLocation(const FVector& InLocation)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("NpcFSMComponent::MoveToLocation // No AIController"));
+		UE_LOG(LogTemp, Error, TEXT("NpcFSMComponent::MoveToLocation // No NpcController"));
+		check(false);
 	}
 }

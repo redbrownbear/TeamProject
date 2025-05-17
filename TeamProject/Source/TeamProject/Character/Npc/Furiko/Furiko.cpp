@@ -8,6 +8,8 @@ AFuriko::AFuriko()
 {		
 	// FSM 
 	FurikoFSMComponent = CreateDefaultSubobject<UFurikoFSMComponent>(TEXT("FurikoFSMComponent"));
+
+	NpcFSMComponent = nullptr;
 }
 
 UFurikoFSMComponent* AFuriko::GetFSMComponent() const

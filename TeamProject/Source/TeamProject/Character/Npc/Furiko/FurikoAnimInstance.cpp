@@ -20,7 +20,6 @@ void UFurikoAnimInstance::NativeInitializeAnimation()
 
 	ANpc* Npc = Cast<ANpc>(Pawn);
 	FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
-
 }
 
 void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -40,10 +39,10 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 	eCurrentState = FSMComponent->GetNpcState(); 
 
-	UE_LOG(LogTemp, Warning, TEXT("AnimInstance // Speed: %.1f | State: %d | bIsRun: %s"),
+	/*UE_LOG(LogTemp, Warning, TEXT("AnimInstance // Speed: %.1f | State: %d | bIsRun: %s"),
 		Speed,
 		static_cast<uint8>(eCurrentState),
-		bIsRun ? TEXT("true") : TEXT("false"));
+		bIsRun ? TEXT("true") : TEXT("false"));*/
 
 	switch (eCurrentState)
 	{

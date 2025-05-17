@@ -1,16 +1,18 @@
 #include "FurikoFSMComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Character/Npc/Npc.h"
 
 void UFurikoFSMComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Owner = Cast<ANpc>(GetOwner());
 	if (!Owner)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UFurikoFSMComponent::BeginPlay - Owner is not ANpc"));
-		return;
+		Owner = Cast<ANpc>(GetOwner()); 
+		if (!Owner)
+		{
+			UE_LOG(LogTemp, Error, TEXT("UFurikoFSMComponent::BeginPlay - Owner is null even after fallback"));
+			return;
+		}
 	}
 
 	FurikoController = Cast<AFurikoController>(Owner->GetController());
@@ -19,14 +21,6 @@ void UFurikoFSMComponent::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("UFurikoFSMComponent::BeginPlay - Controller is not AFurikoController"));
 	}
 
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AStrollPath::StaticClass(), FoundActors);
-	if (FoundActors.Num() > 0)
-	{
-		StrollPathActor = Cast<AStrollPath>(FoundActors[0]);
-	}
-
-	SetNpcState(ENpcState::Stroll);
 }
 
 void UFurikoFSMComponent::HandleState(float DeltaTime)

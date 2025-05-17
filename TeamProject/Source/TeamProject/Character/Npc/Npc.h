@@ -55,6 +55,14 @@ protected:
 public:
 	UNpcFSMComponent* GetFSMComponent() const;
 
+	AStrollPath* GetStrollPath() const { return StrollPath; }
+
+	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
+
+protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<AStrollPath> StrollPath;
+
 protected:
 	// 상호작용 가능 변수
 	UPROPERTY()
