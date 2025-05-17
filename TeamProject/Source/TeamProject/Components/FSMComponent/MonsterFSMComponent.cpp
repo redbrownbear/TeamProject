@@ -170,7 +170,8 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdatePatrol // No PatrolPath"));
-		check(false);
+		//check(false);
+		return;
 	}
 
 	// 이동 
@@ -178,7 +179,7 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 
 
 	// 다음 PatrolIndex 구하기
-	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 100.f);
+	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
 
 	if (bIsNear)
 	{

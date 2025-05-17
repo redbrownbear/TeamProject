@@ -13,5 +13,11 @@ UCLASS()
 class TEAMPROJECT_API AMoriblinAIController : public AMonsterAIController
 {
 	GENERATED_BODY()
-	
+
+public:
+	AMoriblinAIController();
+	virtual void Tick(float DeltaTime) override;
+
+protected:
+	virtual void BeginPlay() override;
 };

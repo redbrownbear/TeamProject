@@ -112,7 +112,7 @@ void AMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	SkeletalMeshComponent->SetSkeletalMesh(MonsterData->SkeletalMesh);
 	SkeletalMeshComponent->SetAnimClass(MonsterData->AnimClass);
 	SkeletalMeshComponent->SetRelativeScale3D(MonsterData->MeshTransform.GetScale3D());
-	SkeletalMeshComponent->SetRelativeLocation(FVector(0.0, 0.0, -MonsterData->CollisionSphereRadius));
+	//SkeletalMeshComponent->SetRelativeLocation(FVector(0.0, 0.0, -MonsterData->CollisionSphereRadius));
 
 	if (CollisionComponent)
 	{

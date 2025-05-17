@@ -22,7 +22,7 @@ public:
 
 protected:
 	UPROPERTY()
-	UBokoblinFSMComponent* FSMComponent = nullptr;
+	TObjectPtr<UBokoblinFSMComponent> FSMComponent = nullptr;
 
 protected:
 	UPROPERTY(BlueprintReadOnly) 
