@@ -28,12 +28,15 @@ FVector AStrollPath::GetSplinePointLocation(int32 InIndex)
 
 int32 AStrollPath::GetSplineMaxIndex() const
 {
-	if (!SplineComponent)
+	/*if (!SplineComponent)
 	{
 		UE_LOG(LogTemp, Error, TEXT("AStrollPath::SplineComponent is nullptr!"));
 		return 0;
 	}
 
-	return SplineComponent->GetNumberOfSplinePoints();
+	return SplineComponent->GetNumberOfSplinePoints();*/
+
+	const int32 NumPoints = SplineComponent->GetNumberOfSplinePoints();
+	return NumPoints;
 }
 

@@ -1,6 +1,6 @@
 #include "FurikoController.h"
 #include "Components/FSM/Npc/Furiko/FurikoFSMComponent.h"
-#include "Character/Npc/Npc.h"
+#include "Character/Npc/Furiko/Furiko.h"
 
 AFurikoController::AFurikoController()
     : ANpcController()
@@ -20,11 +20,10 @@ void AFurikoController::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (GetPawn())
+    /*if (GetPawn())
     {
-        FurikoFSMComponent = GetPawn()->FindComponentByClass<UFurikoFSMComponent>();
-    }
-
+        FurikoFSMComponent->SetOwner(Cast<AFuriko>(GetPawn()));
+    }*/
 }
 
 void AFurikoController::Hide()

@@ -11,6 +11,14 @@ void UFurikoAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	APawn* Pawn = TryGetPawnOwner();
+	if (Pawn)
+	{
+		if (ANpc* Npc = Cast<ANpc>(Pawn))
+		{
+			FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
+		}
+	}
+
 	if (GIsEditor && FApp::IsGame() && !Pawn)
 	{
 		checkf(false, TEXT("UGPMarioAnimInstance를 사용하려면 소유권자가 Pawn이여야 합니다."));
@@ -18,31 +26,30 @@ void UFurikoAnimInstance::NativeInitializeAnimation()
 	}
 	else if (!Pawn) { return; }
 
-	ANpc* Npc = Cast<ANpc>(Pawn);
-	FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
 }
 
 void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (ANpc* Npc = Cast<ANpc>(TryGetPawnOwner()))
-	{
-		FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
-	}
+	//if (ANpc* Npc = Cast<ANpc>(TryGetPawnOwner()))
+	//{
+	//	FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
+	//}
 
 	if (!FSMComponent) { return; }
 
-	if (APawn* Pawn = TryGetPawnOwner())
+	/*if (APawn* Pawn = TryGetPawnOwner())
 	{
-		Speed = Pawn->GetVelocity().Size2D(); 
-	}
-	eCurrentState = FSMComponent->GetNpcState(); 
+		Speed = Pawn->GetVelocity().Size2D(); // AFuriko::Tick() 에서 구현?
+	} */
 
-	/*UE_LOG(LogTemp, Warning, TEXT("AnimInstance // Speed: %.1f | State: %d | bIsRun: %s"),
+	UE_LOG(LogTemp, Warning, TEXT("AnimInstance // Speed: %.1f | State: %d | bIsRun: %s"),
 		Speed,
 		static_cast<uint8>(eCurrentState),
-		bIsRun ? TEXT("true") : TEXT("false"));*/
+		bIsRun ? TEXT("true") : TEXT("false"));
+
+	eCurrentState = FSMComponent->GetNpcState();
 
 	switch (eCurrentState)
 	{

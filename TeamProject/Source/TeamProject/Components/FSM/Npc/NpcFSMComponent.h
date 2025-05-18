@@ -8,7 +8,7 @@
 UENUM()
 enum class ENpcState : uint8
 {
-	Idle,
+	Idle = 0,
 	Sit,
 	Stand,
 	Walk,
@@ -19,7 +19,7 @@ enum class ENpcState : uint8
 };
 
 class ANpc;
-class ANpcController;
+//class ANpcController;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TEAMPROJECT_API UNpcFSMComponent : public UActorComponent
@@ -47,6 +47,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<AStrollPath> StrollPathActor;
 
+	/*UPROPERTY()
+	ANpcController* NpcController = nullptr;*/
+
 protected:
 	ENpcState       eCurrentState;
 
@@ -71,7 +74,4 @@ private:
 	int32 CurrentStrollIndex = 0;
 	float AcceptanceRadius = 50.0f;
 
-private:
-	UPROPERTY()
-	ANpcController* NpcController = nullptr;
 };

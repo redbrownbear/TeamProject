@@ -27,9 +27,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 	TObjectPtr<UBoxComponent> CollisionComponent;
@@ -46,9 +43,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
 	TObjectPtr<USkeletalMeshComponent> NoseMeshComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM")
-	TObjectPtr<UNpcFSMComponent> NpcFSMComponent;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	TObjectPtr<UFloatingPawnMovement> MovementComponent;
 
@@ -60,13 +54,16 @@ public:
 	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
 
 protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr <UNpcFSMComponent> NpcFSMComponent;
+
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<AStrollPath> StrollPath;
 
 protected:
-	// 상호작용 가능 변수
-	UPROPERTY()
-	bool bPlayerInRange = false;
+	//// 상호작용 가능 변수
+	//UPROPERTY()
+	//bool bPlayerInRange = false;
 
 	// 상호작용 
 	UFUNCTION()
