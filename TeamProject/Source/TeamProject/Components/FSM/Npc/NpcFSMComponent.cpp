@@ -7,25 +7,27 @@
 UNpcFSMComponent::UNpcFSMComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+	eCurrentState = ENpcState::Stroll;
 }
 
 void UNpcFSMComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Owner = Cast<ANpc>(GetOwner());
+	/*Owner = Cast<ANpc>(GetOwner());
 	if (!Owner)
 	{
 		UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::BeginPlay - Owner is not ANpc"));
 		return;
-	}
+	}*/
 
-	if (!StrollPathActor)
+	/*if (!StrollPathActor)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No StrollPathActor"));
-	}
+	}*/
 
-	if (!Owner->GetStrollPath())
+	/*if (!Owner->GetStrollPath())
 	{
 		TArray<AActor*> FoundPaths;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AStrollPath::StaticClass(), FoundPaths);
@@ -35,13 +37,14 @@ void UNpcFSMComponent::BeginPlay()
 			AStrollPath* FoundPath = Cast<AStrollPath>(FoundPaths[0]);
 			Owner->SetStrollPath(FoundPath); 
 		}
-	}
+	}*/
 }
 
 void UNpcFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (!Owner) {return;}
 	HandleState(DeltaTime);
 }
 
@@ -89,10 +92,10 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 
 void UNpcFSMComponent::UpdateIdle(float DeltaTime)
 {
-	if (Owner->GetStrollPath())
+	/*if (Owner->GetStrollPath())
 	{
 		UpdateStroll(DeltaTime);
-	}
+	}*/
 }
 
 void UNpcFSMComponent::UpdateStroll(float DeltaTime)

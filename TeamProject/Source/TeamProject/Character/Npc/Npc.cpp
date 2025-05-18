@@ -4,6 +4,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/FSM/Npc/NpcFSMComponent.h"
 
+#include "GameFramework/FloatingPawnMovement.h"
 #include "Kismet/KismetMathLibrary.h"
 
 ANpc::ANpc()
@@ -37,7 +38,7 @@ ANpc::ANpc()
 void ANpc::BeginPlay()
 {
 	Super::BeginPlay();
-		
+			
 }
 
 // Called every frame
@@ -45,25 +46,23 @@ void ANpc::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	const float Speed = UKismetMathLibrary::VSizeXY(MovementComponent->Velocity);
+	//const float Speed = UKismetMathLibrary::VSizeXY(MovementComponent->Velocity);
 }
 
 UNpcFSMComponent* ANpc::GetFSMComponent() const
 {
-	/*if (ANpcController* NpcController = Cast<ANpcController>(GetController()))
+	if (ANpcController* NpcController = Cast<ANpcController>(GetController()))
 	{
 		if (UNpcFSMComponent* FSMComponent = Cast<UNpcFSMComponent>(NpcController->GetComponentByClass(UNpcFSMComponent::StaticClass())))
 		{
 			return FSMComponent;
 		}
-	}*/
-
-	if (UNpcFSMComponent* FSMComponent = Cast<UNpcFSMComponent>(GetComponentByClass(UNpcFSMComponent::StaticClass())))
-	{
-		return FSMComponent;
 	}
 
+	//if (NpcFSMComponent) { return NpcFSMComponent; }
+
 	return nullptr;
+
 
 }
 

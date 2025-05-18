@@ -82,11 +82,11 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 {
 	Super::UpdateTalk(DeltaTime);
 
-	if (FurikoController->bPlayHide)
+	/*if (FurikoController->bPlayHide)
 	{
 		FurikoController->bTalk = false;
 		SetNpcState(ENpcState::Hide);
-	}
+	}*/
 
 }
 

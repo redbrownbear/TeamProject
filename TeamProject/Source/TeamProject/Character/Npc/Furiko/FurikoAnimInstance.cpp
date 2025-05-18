@@ -1,5 +1,6 @@
 ﻿#include "FurikoAnimInstance.h"
 #include "Character/Npc/Npc.h"
+#include "Components/FSM/Npc/NpcFSMComponent.h"
 
 UFurikoAnimInstance::UFurikoAnimInstance()
 	:Super()
@@ -11,13 +12,13 @@ void UFurikoAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	APawn* Pawn = TryGetPawnOwner();
-	if (Pawn)
+	/*if (Pawn)
 	{
 		if (ANpc* Npc = Cast<ANpc>(Pawn))
 		{
 			FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
 		}
-	}
+	}*/
 
 	if (GIsEditor && FApp::IsGame() && !Pawn)
 	{
@@ -26,23 +27,25 @@ void UFurikoAnimInstance::NativeInitializeAnimation()
 	}
 	else if (!Pawn) { return; }
 
+	ANpc* Npc = Cast<ANpc>(Pawn);
+	FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
 }
 
 void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	//if (ANpc* Npc = Cast<ANpc>(TryGetPawnOwner()))
-	//{
-	//	FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
-	//}
+	if (ANpc* Npc = Cast<ANpc>(TryGetPawnOwner()))
+	{
+		FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
+	}
 
 	if (!FSMComponent) { return; }
 
-	/*if (APawn* Pawn = TryGetPawnOwner())
+	if (APawn* Pawn = TryGetPawnOwner())
 	{
-		Speed = Pawn->GetVelocity().Size2D(); // AFuriko::Tick() 에서 구현?
-	} */
+		Speed = Pawn->GetVelocity().Size2D(); // ANpc::Tick() 에서 구현?
+	} 
 
 	UE_LOG(LogTemp, Warning, TEXT("AnimInstance // Speed: %.1f | State: %d | bIsRun: %s"),
 		Speed,
@@ -54,6 +57,7 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	switch (eCurrentState)
 	{
 	case ENpcState::Idle:
+		bIsIdle = true;
 		bIsSit = false;
 		bIsStand = false;
 		bIsWalk = false;
@@ -62,6 +66,7 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsHide = false;		
 		break;
 	case ENpcState::Stroll:
+		bIsIdle = false;
 		bIsSit = false;
 		bIsStand = false;
 		bIsWalk = false;
@@ -70,6 +75,7 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsHide = false;
 		break;
 	case ENpcState::Hide:
+		bIsIdle = false;
 		bIsSit = false;
 		bIsStand = false;
 		bIsWalk = false;

@@ -3,12 +3,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Controller/Npc/NpcController.h"
-#include "GameFramework/FloatingPawnMovement.h"
 #include "Npc.generated.h"
 
 class UBoxComponent;
 class USkeletalMeshComponent;
 class UNpcFSMComponent;
+class UFloatingPawnMovement;
 
 UCLASS()
 class TEAMPROJECT_API ANpc : public APawn
@@ -55,7 +55,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr <UNpcFSMComponent> NpcFSMComponent;
+	TObjectPtr<UNpcFSMComponent> NpcFSMComponent;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<AStrollPath> StrollPath;

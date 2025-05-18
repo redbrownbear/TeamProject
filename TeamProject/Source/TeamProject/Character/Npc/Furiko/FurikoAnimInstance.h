@@ -30,7 +30,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Movement")
 	float Speed = 0.0f;
 	UPROPERTY(BlueprintReadOnly)
-	bool bIsSit = true;
+	bool bIsIdle = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsSit = false;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsStand = false;
 	UPROPERTY(BlueprintReadOnly)
