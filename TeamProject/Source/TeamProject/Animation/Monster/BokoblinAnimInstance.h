@@ -39,4 +39,6 @@ protected:
 	bool bIsEat = false;
 	UPROPERTY(BlueprintReadOnly) 
 	bool bIsDance = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsToDance = false;
 };

@@ -53,6 +53,8 @@ protected:
 	void ChangeState(EMonsterState NewState);
 
 	virtual void UpdateIdle(float DeltaTime);
+	virtual void UpdateDance(float DeltaTime);
+	virtual void UpdateToDance(float DeltaTime);
 	virtual void UpdatePatrol(float DeltaTime);
 	virtual void UpdateSuspicious(float DeltaTime);
 	virtual void UpdateAlert(float DeltaTime);
@@ -60,4 +62,5 @@ protected:
 
 protected:
 	void MoveToLocation(const FVector& InLocation);
+	void StopMove();
 };

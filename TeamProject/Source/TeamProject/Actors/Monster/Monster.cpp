@@ -174,3 +174,220 @@ void AMonster::OnConstruction(const FTransform& Transform)
 	SetData(DataTableRowHandle);
 	SetActorTransform(Transform);
 }
+
+void AMonster::PlayMontage(MONSTER_MONTAGE _InEnum, bool bIsLoop)
+{
+	UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
+
+	if (!MonsterData) return;
+
+	UAnimMontage* TempAnimMontage = nullptr;
+	switch (_InEnum)
+	{
+	case MONSTER_MONTAGE::ATTACK:
+		TempAnimMontage = MonsterData->AttackMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_BIG:
+		TempAnimMontage = MonsterData->AttackBigMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_SPEAR:
+		TempAnimMontage = MonsterData->AttackSpearMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_SWORD:
+		TempAnimMontage = MonsterData->AttackSwordMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_LSWORD:
+		TempAnimMontage = MonsterData->AttackLSwordMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_THROW:
+		TempAnimMontage = MonsterData->AttackThrowMontage;
+		break;
+	case MONSTER_MONTAGE::JUMP_START:
+		TempAnimMontage = MonsterData->JumpStartMontage;
+		break;
+	case MONSTER_MONTAGE::JUMP_END:
+		TempAnimMontage = MonsterData->JumpEndMontage;
+		break;
+	case MONSTER_MONTAGE::DAMAGE:
+		TempAnimMontage = MonsterData->DamageMontage;
+		break;
+	case MONSTER_MONTAGE::ANGRY:
+		TempAnimMontage = MonsterData->AngryMontage;
+		break;
+	case MONSTER_MONTAGE::BOW_START:
+		TempAnimMontage = MonsterData->BowStartMontage;
+		break;
+	case MONSTER_MONTAGE::BOW_END:
+		TempAnimMontage = MonsterData->BowEndMontage;
+		break;
+	case MONSTER_MONTAGE::THROW:
+		TempAnimMontage = MonsterData->ThrowMontage;
+		break;
+	case MONSTER_MONTAGE::DANCE_START:
+		TempAnimMontage = MonsterData->DanceStartMontage;
+		break;
+	case MONSTER_MONTAGE::DANCE_END:
+		TempAnimMontage = MonsterData->DanceEndMontage;
+		break;
+	case MONSTER_MONTAGE::WEAPON_CATCH:
+		TempAnimMontage = MonsterData->WeaponCatchMontage;
+		break;
+	case MONSTER_MONTAGE::FIND:
+		TempAnimMontage = MonsterData->FindMontage;
+		break;
+	case MONSTER_MONTAGE::END:
+		TempAnimMontage = nullptr;
+		break;
+	default:
+		break;
+	}
+
+	if (TempAnimMontage && !AnimInstance->Montage_IsPlaying(TempAnimMontage))
+	{
+		if (bIsLoop)
+		{
+			AnimInstance->Montage_Play(TempAnimMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+		}
+		else
+		{
+			AnimInstance->Montage_Play(TempAnimMontage);
+		}
+	}
+}
+
+bool AMonster::IsMontage(MONSTER_MONTAGE _InEnum)
+{
+	if (!MonsterData) return false;
+
+	UAnimMontage* TempAnimMontage = nullptr;
+	switch (_InEnum)
+	{
+	case MONSTER_MONTAGE::ATTACK:
+		TempAnimMontage = MonsterData->AttackMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_BIG:
+		TempAnimMontage = MonsterData->AttackBigMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_SPEAR:
+		TempAnimMontage = MonsterData->AttackSpearMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_SWORD:
+		TempAnimMontage = MonsterData->AttackSwordMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_LSWORD:
+		TempAnimMontage = MonsterData->AttackLSwordMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_THROW:
+		TempAnimMontage = MonsterData->AttackThrowMontage;
+		break;
+	case MONSTER_MONTAGE::JUMP_START:
+		TempAnimMontage = MonsterData->JumpStartMontage;
+		break;
+	case MONSTER_MONTAGE::JUMP_END:
+		TempAnimMontage = MonsterData->JumpEndMontage;
+		break;
+	case MONSTER_MONTAGE::DAMAGE:
+		TempAnimMontage = MonsterData->DamageMontage;
+		break;
+	case MONSTER_MONTAGE::ANGRY:
+		TempAnimMontage = MonsterData->AngryMontage;
+		break;
+	case MONSTER_MONTAGE::BOW_START:
+		TempAnimMontage = MonsterData->BowStartMontage;
+		break;
+	case MONSTER_MONTAGE::BOW_END:
+		TempAnimMontage = MonsterData->BowEndMontage;
+		break;
+	case MONSTER_MONTAGE::THROW:
+		TempAnimMontage = MonsterData->ThrowMontage;
+		break;
+	case MONSTER_MONTAGE::DANCE_START:
+		TempAnimMontage = MonsterData->DanceStartMontage;
+		break;
+	case MONSTER_MONTAGE::DANCE_END:
+		TempAnimMontage = MonsterData->DanceEndMontage;
+		break;
+	case MONSTER_MONTAGE::WEAPON_CATCH:
+		TempAnimMontage = MonsterData->WeaponCatchMontage;
+		break;
+	case MONSTER_MONTAGE::FIND:
+		TempAnimMontage = MonsterData->FindMontage;
+		break;
+	case MONSTER_MONTAGE::END:
+		TempAnimMontage = nullptr;
+		break;
+	default:
+		break;
+	}
+
+	return TempAnimMontage ? true : false;
+}
+
+bool AMonster::IsPlayingMontage(MONSTER_MONTAGE _InEnum)
+{
+	if (!MonsterData) return false;
+	UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
+
+	UAnimMontage* TempAnimMontage = nullptr;
+	switch (_InEnum)
+	{
+	case MONSTER_MONTAGE::ATTACK:
+		TempAnimMontage = MonsterData->AttackMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_BIG:
+		TempAnimMontage = MonsterData->AttackBigMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_SPEAR:
+		TempAnimMontage = MonsterData->AttackSpearMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_SWORD:
+		TempAnimMontage = MonsterData->AttackSwordMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_LSWORD:
+		TempAnimMontage = MonsterData->AttackLSwordMontage;
+		break;
+	case MONSTER_MONTAGE::ATTACK_THROW:
+		TempAnimMontage = MonsterData->AttackThrowMontage;
+		break;
+	case MONSTER_MONTAGE::JUMP_START:
+		TempAnimMontage = MonsterData->JumpStartMontage;
+		break;
+	case MONSTER_MONTAGE::JUMP_END:
+		TempAnimMontage = MonsterData->JumpEndMontage;
+		break;
+	case MONSTER_MONTAGE::DAMAGE:
+		TempAnimMontage = MonsterData->DamageMontage;
+		break;
+	case MONSTER_MONTAGE::ANGRY:
+		TempAnimMontage = MonsterData->AngryMontage;
+		break;
+	case MONSTER_MONTAGE::BOW_START:
+		TempAnimMontage = MonsterData->BowStartMontage;
+		break;
+	case MONSTER_MONTAGE::BOW_END:
+		TempAnimMontage = MonsterData->BowEndMontage;
+		break;
+	case MONSTER_MONTAGE::THROW:
+		TempAnimMontage = MonsterData->ThrowMontage;
+		break;
+	case MONSTER_MONTAGE::DANCE_START:
+		TempAnimMontage = MonsterData->DanceStartMontage;
+		break;
+	case MONSTER_MONTAGE::DANCE_END:
+		TempAnimMontage = MonsterData->DanceEndMontage;
+		break;
+	case MONSTER_MONTAGE::WEAPON_CATCH:
+		TempAnimMontage = MonsterData->WeaponCatchMontage;
+		break;
+	case MONSTER_MONTAGE::FIND:
+		TempAnimMontage = MonsterData->FindMontage;
+		break;
+	case MONSTER_MONTAGE::END:
+		TempAnimMontage = nullptr;
+		break;
+	default:
+		break;
+	}
+
+	return AnimInstance->Montage_IsPlaying(nullptr);
+}

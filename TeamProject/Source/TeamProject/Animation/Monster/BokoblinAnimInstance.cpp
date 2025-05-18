@@ -38,70 +38,46 @@ void UBokoblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!FSMComponent) return;
 
 	const EMonsterState eMonsterState = FSMComponent->GetMonsterState();
+
+	bIsIdle = false;
+	bIsWalk = false;
+	bIsRun = false;
+	bIsSearch = false;
+	bIsFire = false;
+	bIsEat = false;
+	bIsDance = false;
+	bIsToDance = false;
+
 	switch (eMonsterState)
 	{
 	case EMonsterState::Idle:
 		bIsIdle = true;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsSearch = false;
-		bIsFire = false;
-		bIsEat = false;
-		bIsDance = false;
 		break;
 	case EMonsterState::Patrol:
-		bIsIdle = false;
 		bIsWalk = true;
-		bIsRun = false;
-		bIsSearch = false;
-		bIsFire = false;
-		bIsEat = false;
-		bIsDance = false;
 		break;
 	case EMonsterState::Suspicious:
-		bIsIdle = false;
-		bIsWalk = false;
-		bIsRun = false;
 		bIsSearch = true;
-		bIsFire = false;
-		bIsEat = false;
-		bIsDance = false;
 		break;
-
 	case EMonsterState::Fire:
-		bIsIdle = false;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsSearch = false;
 		bIsFire = true;
-		bIsEat = false;
-		bIsDance = false;
 		break;
 	case EMonsterState::Eat:
-		bIsIdle = false;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsSearch = false;
-		bIsFire = false;
 		bIsEat = true;
-		bIsDance = false;
 		break;
 	case EMonsterState::Dance:
-		bIsIdle = false;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsSearch = false;
-		bIsFire = false;
-		bIsEat = false;
 		bIsDance = true;
 		break;
-	case EMonsterState::End:
+	case EMonsterState::ToDance:
+		bIsToDance = true;
 		break;
 	case EMonsterState::Alert:
 		break;
 	case EMonsterState::Combat:
 		break;
 	case EMonsterState::Dead:
+		break;
+	case EMonsterState::End:
 		break;
 	default:
 		break;	

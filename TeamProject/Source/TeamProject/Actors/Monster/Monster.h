@@ -76,4 +76,13 @@ public:
 protected:
     UPROPERTY(EditAnywhere)
     TObjectPtr<ACampFire> CampFire;
+public:
+    ACampFire* GetCampFire() const { return CampFire; }
+
+public:
+    void PlayMontage(MONSTER_MONTAGE _InEnum, bool bIsLoop = false);
+    bool IsMontage(MONSTER_MONTAGE _InEnum);
+    bool IsPlayingMontage(MONSTER_MONTAGE _InEnum);
+
+
 };

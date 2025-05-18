@@ -7,6 +7,7 @@
 #include "Actors/Monster/Monster.h"
 #include "Actors/Object/PatrolPath.h"
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
+#include "Actors/Object/CampFire.h"
 
 #include "Navigation/PathFollowingComponent.h"
 
@@ -105,6 +106,12 @@ void UMonsterFSMComponent::HandleState(float DeltaTime)
 	case EMonsterState::Combat:
 		UpdateCombat(DeltaTime);
 		break;
+	case EMonsterState::Dance:
+		UpdateDance(DeltaTime);
+		break;
+	case EMonsterState::ToDance:
+		UpdateToDance(DeltaTime);
+		break;
 	default:
 		break;
 	}
@@ -112,6 +119,34 @@ void UMonsterFSMComponent::HandleState(float DeltaTime)
 
 void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 {
+	const EMonsterState PrevState = eCurrentState;
+	switch (PrevState)
+	{
+	case EMonsterState::Idle:
+		break;
+	case EMonsterState::Patrol:
+		break;
+	case EMonsterState::Suspicious:
+		break;
+	case EMonsterState::Alert:
+		break;
+	case EMonsterState::Combat:
+		break;
+	case EMonsterState::Dead:
+		break;
+	case EMonsterState::Fire:
+		break;
+	case EMonsterState::Eat:
+		break;
+	case EMonsterState::Dance:
+		break;
+	case EMonsterState::End:
+		break;
+	default:
+		break;
+	}
+
+
 	if (eCurrentState == NewState) { return; }
 	switch (NewState)
 	{
@@ -122,9 +157,13 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Suspicious:
 		break;
 	case EMonsterState::Alert:
-		// Play Alert Montage;
+		Owner->PlayMontage(MONSTER_MONTAGE::FIND);
 		break;
 	case EMonsterState::Combat:
+		Owner->PlayMontage(MONSTER_MONTAGE::ANGRY);
+		break;
+	case EMonsterState::Dance:
+		Owner->PlayMontage(MONSTER_MONTAGE::DANCE_START);
 		break;
 	default:
 		break;
@@ -141,13 +180,37 @@ void UMonsterFSMComponent::UpdateIdle(float DeltaTime)
 		check(false);
 	}
 
-	if (eCurrentState == EMonsterState::Idle)
+
+	ChangeState(EMonsterState::ToDance);
+}
+
+void UMonsterFSMComponent::UpdateDance(float DeltaTime)
+{
+	if (AActor* CampFireActor = Owner->GetCampFire())
 	{
+		const FVector CampFireLocation = CampFireActor->GetActorLocation();
 
+		FVector Direction = CampFireLocation - Owner->GetActorLocation();
+		Direction.Normalize();
+		SmoothRotateActorToDirection(Owner, Direction, DeltaTime);
 	}
+}
 
+void UMonsterFSMComponent::UpdateToDance(float DeltaTime)
+{
+	if (AActor* CampFireActor = Owner->GetCampFire())
+	{
+		const FVector CampFireLocation = CampFireActor->GetActorLocation();
 
+		MoveToLocation(CampFireLocation);
 
+		float fDistance = FVector::Dist(Owner->GetActorLocation(), CampFireLocation);
+		if (fDistance < MONSTER_CAMPFIRE_MIN_LENGTH)
+		{
+			StopMove();
+			ChangeState(EMonsterState::Dance);
+		}
+	}
 }
 
 void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
@@ -232,6 +295,19 @@ void UMonsterFSMComponent::MoveToLocation(const FVector& InLocation)
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::MoveToLocation // No AIController"));
+		check(false);
+	}
+}
+
+void UMonsterFSMComponent::StopMove()
+{
+	if (AAIController* AIController = Cast<AAIController>(Owner->GetController()))
+	{
+		AIController->StopMovement();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::StopMove // No AIController"));
 		check(false);
 	}
 }
