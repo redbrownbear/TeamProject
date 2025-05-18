@@ -20,9 +20,6 @@
 // Sets default values
 AMonster::AMonster()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -109,11 +106,6 @@ void AMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	if (!Data) { return; }
 	MonsterData = Data;
 
-	SkeletalMeshComponent->SetSkeletalMesh(MonsterData->SkeletalMesh);
-	SkeletalMeshComponent->SetAnimClass(MonsterData->AnimClass);
-	SkeletalMeshComponent->SetRelativeScale3D(MonsterData->MeshTransform.GetScale3D());
-	//SkeletalMeshComponent->SetRelativeLocation(FVector(0.0, 0.0, -MonsterData->CollisionSphereRadius));
-
 	if (CollisionComponent)
 	{
 		CollisionComponent->SetSphereRadius(MonsterData->CollisionSphereRadius);
@@ -122,6 +114,22 @@ void AMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		CollisionComponent->RegisterComponent();
 	}
 
+	SkeletalMeshComponent->SetSkeletalMesh(MonsterData->SkeletalMesh);
+	SkeletalMeshComponent->SetAnimClass(MonsterData->AnimClass);
+	SkeletalMeshComponent->SetRelativeScale3D(MonsterData->MeshTransform.GetScale3D());
+
+	// 모리블린 전용 오프셋
+	if (TEXT("Moriblin_Patrol") == DataTableRowHandle.RowName.ToString()
+		|| TEXT("Moriblin_TreasureBox") == DataTableRowHandle.RowName.ToString())
+	{
+		SkeletalMeshComponent->SetRelativeLocation(FVector(0.0, 0.0, -1.5f * MonsterData->CollisionSphereRadius));
+	}
+	else
+	{
+		SkeletalMeshComponent->SetRelativeLocation(FVector(0.0, 0.0, -MonsterData->CollisionSphereRadius));
+	}
+
+	
 	MovementComponent->MaxSpeed = MonsterData->WalkMovementMaxSpeed;
 
 	AIControllerClass = MonsterData->AIControllerClass;
