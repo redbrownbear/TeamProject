@@ -38,28 +38,41 @@ public: // FSM
 	EMonsterGroupType eMonsterGroupType = EMonsterGroupType::TreasureBox;
 
 
-//public: // Animation
-//	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
-//	UAnimMontage* DamageMontage = nullptr;
-//	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
-//	UAnimMontage* DeadMontage = nullptr;
-//	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
-//	UAnimMontage* AttackMontage = nullptr;
-//	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
-//	UAnimMontage* RushMontage = nullptr;
-//	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
-//	UAnimMontage* FindMontage = nullptr;
-//	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
-//	UAnimMontage* KyoroKyoroMontage = nullptr;
-//	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
-//	UAnimMontage* GuardMontage = nullptr;
-//	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
-//	UAnimMontage* LaughMontage = nullptr;
-//	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
-//	UAnimMontage* CatchNoMontage = nullptr;
-//	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
-//	UAnimMontage* ThrowMontage = nullptr;
-
+public: // Animation
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* AttackMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* AttackBigMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* AttackSpearMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* AttackSwordMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* AttackLSwordMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* AttackThrowMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* JumpStartMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* JumpEndMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* DamageMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* AngryMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* BowStartMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* BowEndMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ThrowMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* DanceStartMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* DanceEndMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* WeaponCatchMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* FindMontage = nullptr;
 
 
 public:

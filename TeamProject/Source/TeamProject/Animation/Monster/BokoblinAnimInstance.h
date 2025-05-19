@@ -22,7 +22,7 @@ public:
 
 protected:
 	UPROPERTY()
-	UBokoblinFSMComponent* FSMComponent = nullptr;
+	TObjectPtr<UBokoblinFSMComponent> FSMComponent = nullptr;
 
 protected:
 	UPROPERTY(BlueprintReadOnly) 
@@ -39,4 +39,6 @@ protected:
 	bool bIsEat = false;
 	UPROPERTY(BlueprintReadOnly) 
 	bool bIsDance = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsToDance = false;
 };
