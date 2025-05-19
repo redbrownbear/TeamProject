@@ -4,9 +4,11 @@ using UnrealBuildTool;
 
 public class TeamProject : ModuleRules
 {
-	public TeamProject(ReadOnlyTargetRules Target) : base(Target)
-	{
-		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+    public TeamProject(ReadOnlyTargetRules Target) : base(Target)
+    {
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
         PublicDependencyModuleNames.AddRange(new string[]
         {
@@ -14,8 +16,6 @@ public class TeamProject : ModuleRules
             "InputCore", "EnhancedInput", "UMG",
             "MoviePlayer", "AIModule", "Paper2D", "RenderCore", "RHI", "Niagara", "MediaAssets"/*"Graphics",*/
         });
-
-        PrivateDependencyModuleNames.AddRange(new string[] {  });
 
         // Uncomment if you are using Slate UI
         // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
@@ -29,6 +29,5 @@ public class TeamProject : ModuleRules
         {
             this.Name
         });
-
     }
 }
