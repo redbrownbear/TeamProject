@@ -1,25 +1,25 @@
 #include "FurikoFSMComponent.h"
-#include "Character/Npc/Npc.h"
+#include "Character/Npc/Furiko/Furiko.h"
 
 void UFurikoFSMComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!Owner)
+	/*if (!Owner)
 	{
-		Owner = Cast<ANpc>(GetOwner()); 
+		Owner = Cast<AFuriko>(GetOwner()); 
 		if (!Owner)
 		{
 			UE_LOG(LogTemp, Error, TEXT("UFurikoFSMComponent::BeginPlay - Owner is null even after fallback"));
 			return;
 		}
-	}
+	}*/
 
-	FurikoController = Cast<AFurikoController>(Owner->GetController());
-	if (!FurikoController)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UFurikoFSMComponent::BeginPlay - Controller is not AFurikoController"));
-	}
+	//FurikoController = Cast<AFurikoController>(Owner->GetController());
+	//if (!FurikoController)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("UFurikoFSMComponent::BeginPlay - Controller is not AFurikoController"));
+	//}
 
 }
 
@@ -82,11 +82,11 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 {
 	Super::UpdateTalk(DeltaTime);
 
-	if (FurikoController->bPlayHide)
+	/*if (FurikoController->bPlayHide)
 	{
 		FurikoController->bTalk = false;
 		SetNpcState(ENpcState::Hide);
-	}
+	}*/
 
 }
 

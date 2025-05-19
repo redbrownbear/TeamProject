@@ -1,11 +1,11 @@
 #include "FurikoController.h"
 #include "Components/FSM/Npc/Furiko/FurikoFSMComponent.h"
-#include "Character/Npc/Npc.h"
+//#include "Character/Npc/Furiko/Furiko.h"
 
 AFurikoController::AFurikoController()
     : ANpcController()
 {	
-    FurikoFSMComponent = CreateDefaultSubobject<UFurikoFSMComponent>(TEXT("FurikoFSMComponent"));
+    NpcFSMComponent = CreateDefaultSubobject<UFurikoFSMComponent>(TEXT("FurikoFSMComponent"));
     
 }
 
@@ -20,14 +20,5 @@ void AFurikoController::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (GetPawn())
-    {
-        FurikoFSMComponent = GetPawn()->FindComponentByClass<UFurikoFSMComponent>();
-    }
-
 }
 
-void AFurikoController::Hide()
-{
-    // @TODO
-}

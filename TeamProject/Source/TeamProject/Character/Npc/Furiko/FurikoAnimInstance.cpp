@@ -1,5 +1,6 @@
 ﻿#include "FurikoAnimInstance.h"
 #include "Character/Npc/Npc.h"
+#include "Components/FSM/Npc/NpcFSMComponent.h"
 
 UFurikoAnimInstance::UFurikoAnimInstance()
 	:Super()
@@ -11,6 +12,14 @@ void UFurikoAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	APawn* Pawn = TryGetPawnOwner();
+	/*if (Pawn)
+	{
+		if (ANpc* Npc = Cast<ANpc>(Pawn))
+		{
+			FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
+		}
+	}*/
+
 	if (GIsEditor && FApp::IsGame() && !Pawn)
 	{
 		checkf(false, TEXT("UGPMarioAnimInstance를 사용하려면 소유권자가 Pawn이여야 합니다."));
@@ -35,18 +44,20 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (APawn* Pawn = TryGetPawnOwner())
 	{
-		Speed = Pawn->GetVelocity().Size2D(); 
-	}
-	eCurrentState = FSMComponent->GetNpcState(); 
+		Speed = Pawn->GetVelocity().Size2D(); // ANpc::Tick() 에서 구현?
+	} 
 
-	/*UE_LOG(LogTemp, Warning, TEXT("AnimInstance // Speed: %.1f | State: %d | bIsRun: %s"),
+	UE_LOG(LogTemp, Warning, TEXT("AnimInstance // Speed: %.1f | State: %d | bIsRun: %s"),
 		Speed,
 		static_cast<uint8>(eCurrentState),
-		bIsRun ? TEXT("true") : TEXT("false"));*/
+		bIsRun ? TEXT("true") : TEXT("false"));
+
+	eCurrentState = FSMComponent->GetNpcState();
 
 	switch (eCurrentState)
 	{
 	case ENpcState::Idle:
+		bIsIdle = true;
 		bIsSit = false;
 		bIsStand = false;
 		bIsWalk = false;
@@ -55,6 +66,7 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsHide = false;		
 		break;
 	case ENpcState::Stroll:
+		bIsIdle = false;
 		bIsSit = false;
 		bIsStand = false;
 		bIsWalk = false;
@@ -63,6 +75,7 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsHide = false;
 		break;
 	case ENpcState::Hide:
+		bIsIdle = false;
 		bIsSit = false;
 		bIsStand = false;
 		bIsWalk = false;

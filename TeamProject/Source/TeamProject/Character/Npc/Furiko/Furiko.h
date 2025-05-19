@@ -17,10 +17,12 @@ class TEAMPROJECT_API AFuriko : public ANpc
 public:
 	AFuriko();
 	
+	virtual void Tick(float Deltatime) override;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM")
 	TObjectPtr<UFurikoFSMComponent> FurikoFSMComponent;
 
 public:
-	UFurikoFSMComponent* GetFSMComponent() const;
+	UFurikoFSMComponent* GetFSMComponent() const { return FurikoFSMComponent; }
 };

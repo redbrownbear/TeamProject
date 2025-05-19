@@ -3,8 +3,8 @@
 
 #include "Actors/Controller/AIController/Monster/BokoblinAIController.h"
 #include "Components/FSMComponent/BokoblinFSMComponent.h"
+
 ABokoblinAIController::ABokoblinAIController()
-	: AMonsterAIController()
 {
 	MonsterFSMComponent = CreateDefaultSubobject<UBokoblinFSMComponent>(TEXT("BokoblinFSMComponent"));
 }

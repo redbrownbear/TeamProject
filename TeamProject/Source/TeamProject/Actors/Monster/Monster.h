@@ -14,6 +14,7 @@ class UAdvancedFloatingPawnMovement;
 class UMonsterFSMComponent;
 class USphereComponent;
 class APatrolPath;
+class ACampFire;
 
 struct FMonsterTableRow;
 
@@ -71,4 +72,17 @@ protected:
     TObjectPtr<APatrolPath> PatrolPath;
 public:
     APatrolPath* GetPatrolPath() const { return PatrolPath; }
+
+protected:
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<ACampFire> CampFire;
+public:
+    ACampFire* GetCampFire() const { return CampFire; }
+
+public:
+    void PlayMontage(MONSTER_MONTAGE _InEnum, bool bIsLoop = false);
+    bool IsMontage(MONSTER_MONTAGE _InEnum);
+    bool IsPlayingMontage(MONSTER_MONTAGE _InEnum);
+
+
 };
