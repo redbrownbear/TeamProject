@@ -14,6 +14,15 @@ void AUITestGameMode::BeginPlay()
 
     CreatePopup();
     CreateInven();
+
+    APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+    if (PC)
+    {
+        PC->bShowMouseCursor = true;
+
+        FInputModeGameAndUI InputMode;
+        PC->SetInputMode(InputMode);
+    }
 }
 
 void AUITestGameMode::CreatePopup()
