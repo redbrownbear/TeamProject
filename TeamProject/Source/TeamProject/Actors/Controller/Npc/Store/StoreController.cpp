@@ -15,4 +15,5 @@ void AStoreController::Tick(float DeltaTime)
 void AStoreController::BeginPlay()
 {
 	Super::BeginPlay();
+
 }

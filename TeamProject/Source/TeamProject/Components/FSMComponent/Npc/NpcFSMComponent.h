@@ -20,7 +20,7 @@ enum class ENpcState : uint8
 };
 
 class ANpc;
-//class ANpcController;
+class APlayerCharacter;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TEAMPROJECT_API UNpcFSMComponent : public UActorComponent
@@ -28,6 +28,7 @@ class TEAMPROJECT_API UNpcFSMComponent : public UActorComponent
 	GENERATED_BODY()
 
 	friend class ANpc;
+	friend class APC_InGame;
 
 public:
 	UNpcFSMComponent();
@@ -40,10 +41,14 @@ public:
 
 public:
 	void SetOwner(ANpc* InOwner) { Owner = InOwner; }
+	void SetPlayer(APlayerCharacter* InPlayer) { Player = InPlayer; }
 
 protected:
 	UPROPERTY()
 	TObjectPtr<ANpc> Owner = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<APlayerCharacter> Player = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<AStrollPath> StrollPathActor;	

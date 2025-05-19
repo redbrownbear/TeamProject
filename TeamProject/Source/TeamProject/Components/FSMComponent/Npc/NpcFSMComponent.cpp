@@ -7,7 +7,6 @@ UNpcFSMComponent::UNpcFSMComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	eCurrentState = ENpcState::Stroll;
 }
 
 void UNpcFSMComponent::BeginPlay()
@@ -46,8 +45,7 @@ void UNpcFSMComponent::HandleState(float DeltaTime)
 	default:
 		break;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("eCurrentState = %s"), *UEnum::GetValueAsString(eCurrentState));
+	
 }
 
 void UNpcFSMComponent::ChangeState(ENpcState NewState)
@@ -85,39 +83,7 @@ void UNpcFSMComponent::UpdateStroll(float DeltaTime)
 		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Stroll'"));
 		return;
 	}
-
-	//// 목표 위치 구하기
-	//FVector Location = FVector();
-
-	//if (AStrollPath* StrollPath = Owner->GetStrollPath())
-	//{
-	//	Location = StrollPath->GetSplinePointLocation(CurrentStrollIndex);	
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::UpdateStroll // No StrollPath"));
-	//	check(false);
-	//}
-
-	//// 이동 
-	//MoveToLocation(Location);
-
-	//// 다음 PatrolIndex 구하기
-	//const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 300.f);
-
-
-	//if (bIsNear)
-	//{
-	//	++CurrentStrollIndex;
-
-	//	if (AStrollPath* StrollPath = Owner->GetStrollPath())
-	//	{
-	//		if (CurrentStrollIndex >= StrollPath->GetSplineMaxIndex())
-	//		{
-	//			CurrentStrollIndex = 0;
-	//		}
-	//	}
-	//}
+	
 }
 
 void UNpcFSMComponent::UpdateTalk(float DeltaTime)
@@ -129,6 +95,8 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 	}
 	// Play Npc Talk Animation
 	// Play Player Talk Animation
+	 
+	// 	
 }
 
 void UNpcFSMComponent::MoveToLocation(const FVector& InLocation)

@@ -77,7 +77,6 @@ UNpcFSMComponent* ANpc::GetFSMComponent() const
 
 	return nullptr;
 
-
 }
 
 void ANpc::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -110,10 +109,10 @@ void ANpc::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 
 void ANpc::OnTalkKeyPressed()
 {
-	if (bPlayerInRange && NpcFSMComponent.Get())
+	if (bPlayerInRange && IsValid(NpcFSMComponent))
 	{
 		NpcFSMComponent->ChangeState(ENpcState::Talk);
-		// Delete Interact UI And Create Talk UI
+		// Delete Interact UI And Create Talk UI		
 	}
 }
 

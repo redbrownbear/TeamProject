@@ -7,7 +7,9 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 
-#include "Actors/Npc/Npc.h" // Npc 인터렉트(임시 생성): 윤정
+// Npc 인터렉트(임시 생성): 윤정
+#include "Actors/Npc/Npc.h" 
+#include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 
 APC_InGame::APC_InGame()
 {
@@ -98,15 +100,16 @@ void APC_InGame::TryAttack(const FInputActionValue& InputActionValue)
 
 void APC_InGame::OnTalk(const FInputActionValue& InputActionValue)
 {
-	/*APawn* PlayerPawn = GetPawn();
-	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);*/
-
 	if (Npc && Npc->GetCanTalk())
 	{
-		Npc->OnTalkKeyPressed(); // 또는 FSM 상태 변경
+		if (UNpcFSMComponent* FSM = Npc->GetFSMComponent())
+		{
+			FSM->ChangeState(ENpcState::Talk);
+			// Play Player Talk Animation
+			// Limit Moving
+		}
 	}
-	// Play Player Talk Animation
-	// Limit Moving
+	
 }
 
 

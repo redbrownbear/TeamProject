@@ -10,6 +10,9 @@ class TEAMPROJECT_API UFurikoFSMComponent : public UNpcFSMComponent
 {
 	GENERATED_BODY()
 
+public:
+	UFurikoFSMComponent();
+
 protected:
 	virtual void BeginPlay() override;
 

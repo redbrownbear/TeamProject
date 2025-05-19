@@ -1,6 +1,11 @@
 #include "FurikoFSMComponent.h"
 #include "Actors/Npc/Furiko/Furiko.h"
 
+UFurikoFSMComponent::UFurikoFSMComponent()
+{
+	eCurrentState = ENpcState::Stroll;
+}
+
 void UFurikoFSMComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -98,6 +103,7 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 {
 	Super::UpdateTalk(DeltaTime);
 
+	// 숨바꼭질 선택지 선택할 경우
 	/*if (FurikoController->bPlayHide)
 	{
 		FurikoController->bTalk = false;
@@ -108,10 +114,7 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 
 void UFurikoFSMComponent::UpdateHide(float DeltaTime)
 {
-	if (FurikoController->bTalk)
-	{
-		SetNpcState(ENpcState::Talk);
-	}
+	
 }
 
 void UFurikoFSMComponent::UpdatePlay(float DeltaTime)
