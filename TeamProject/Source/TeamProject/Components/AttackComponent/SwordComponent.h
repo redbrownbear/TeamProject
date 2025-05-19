@@ -20,6 +20,9 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+
+	
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -27,5 +30,26 @@ public:
 
 	void SetAttackBox();
 
+	void SetCanAttack();
+
+	void SetCanMove();
 		
+protected:
+
+	FTimerHandle ComboTimerHandle;
+	FTimerHandle MoveTimerHandle;
+
+	bool bCanAttack = true;
+
+	UPROPERTY(EditAnywhere)
+	TArray<UAnimMontage*> Arr_Sword_Attack_MTG;
+
+	UPROPERTY()
+	int32 CurrentComboIndex = 0;
+
+	UPROPERTY()
+	int32 MaxComboIndex = 0;
+
+
+
 };

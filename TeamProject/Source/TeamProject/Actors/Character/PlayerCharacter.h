@@ -41,6 +41,11 @@ public:
 
 
 
+public:
+	USwordComponent* GetSwordComponent() { return SwordComponent; }
+
+
+
 protected:
 
 	UPROPERTY(EditAnywhere, Category="Sword")
@@ -68,6 +73,5 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> RWeapon;
 
 protected:
-	UPROPERTY(EditAnywhere)
-	TArray<UAnimMontage*> Arr_Sword_Attack_MTG;
+	
 };
