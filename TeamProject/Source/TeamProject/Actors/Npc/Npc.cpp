@@ -1,11 +1,15 @@
 #include "Npc.h"
 #include "Actors/Controller/Npc/NpcController.h"
+
 #include "Components/BoxComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Kismet/KismetMathLibrary.h"
+
+#include "Actors/Character/PlayerCharacter.h"
+#include "GameFramework/PC_InGame.h"
 
 ANpc::ANpc()
 {
@@ -17,7 +21,7 @@ ANpc::ANpc()
 	SetRootComponent(CollisionComponent);
 
 	BodyMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Body"));
-	BodyMeshComponent->SetCollisionProfileName(TEXT("Pawn"));
+	BodyMeshComponent->SetupAttachment(RootComponent);
 
 	FaceMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Face"));
 	FaceMeshComponent->SetupAttachment(BodyMeshComponent);
@@ -37,8 +41,6 @@ ANpc::ANpc()
 	// Collision Setting
 	BodyMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	BodyMeshComponent->SetCollisionProfileName(TEXT("Pawn"));
-
-
 }
 
 void ANpc::BeginPlay()
@@ -80,8 +82,13 @@ UNpcFSMComponent* ANpc::GetFSMComponent() const
 
 void ANpc::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor->ActorHasTag("Player"))
+	if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
 	{
+		if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
+		{
+			PC->Npc = this;
+		}
+
 		bPlayerInRange = true;
 		// Create Interact UI
 	}
@@ -89,8 +96,13 @@ void ANpc::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AA
 
 void ANpc::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherActor && OtherActor->ActorHasTag("Player"))
+	if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
 	{
+		if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
+		{
+			PC->Npc = nullptr;
+		}
+
 		bPlayerInRange = false;
 		// Delete Interact UI
 	}
@@ -98,11 +110,15 @@ void ANpc::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 
 void ANpc::OnTalkKeyPressed()
 {
-	if (bPlayerInRange && NpcFSMComponent)
+	if (bPlayerInRange && NpcFSMComponent.Get())
 	{
 		NpcFSMComponent->ChangeState(ENpcState::Talk);
 		// Delete Interact UI And Create Talk UI
-		// Play Animation
 	}
+}
+
+void ANpc::DisableMovement()
+{
+	// @TODO
 }
 

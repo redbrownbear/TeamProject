@@ -16,6 +16,7 @@ enum class ENpcState : uint8
 	Talk,
 	Hide,
 	Play, // 술래잡기: 시간 되면 추가
+	Sell,
 };
 
 class ANpc;

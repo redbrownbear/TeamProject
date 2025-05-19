@@ -28,4 +28,8 @@ protected:
 private:
 	UPROPERTY()
 	AFurikoController* FurikoController = nullptr;
+
+private:
+	int32 CurrentStrollIndex = 0;
+	float AcceptanceRadius = 50.0f;
 };

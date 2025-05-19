@@ -53,6 +53,12 @@ public:
 
 	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
 
+	void OnTalkKeyPressed(); // 대화 UI
+
+	bool GetCanTalk() { return bPlayerInRange; }
+
+	void DisableMovement(); // 움직임 제한
+	
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UNpcFSMComponent> NpcFSMComponent;
@@ -60,11 +66,12 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<AStrollPath> StrollPath;
 
-protected:
+private:
 	// 상호작용 가능 변수
 	UPROPERTY()
 	bool bPlayerInRange = false;
 
+protected:
 	// 상호작용 
 	UFUNCTION()
 	void OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -74,7 +81,4 @@ protected:
 	UFUNCTION()
 	void OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	// 대화 UI
-	void OnTalkKeyPressed();
 };
