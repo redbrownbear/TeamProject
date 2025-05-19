@@ -1,5 +1,5 @@
 #include "Npc.h"
-#include "Controller/Npc/NpcController.h"
+#include "Actors/Controller/Npc/NpcController.h"
 #include "Components/BoxComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"

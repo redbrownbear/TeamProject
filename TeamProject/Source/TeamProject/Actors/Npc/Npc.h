@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "Controller/Npc/NpcController.h"
+#include "Actors/Controller/Npc/NpcController.h"
 #include "Npc.generated.h"
 
 class UBoxComponent;

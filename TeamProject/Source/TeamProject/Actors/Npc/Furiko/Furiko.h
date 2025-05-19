@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actors/Npc/Npc.h"
-#include "Controller/Npc/Furiko/FurikoController.h"
+#include "Actors/Controller/Npc/Furiko/FurikoController.h"
 #include "Furiko.generated.h"
 
 class UFurikoFSMComponent;

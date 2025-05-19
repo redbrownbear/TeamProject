@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/FSMComponent/NPC/NpcFSMComponent.h"
-#include "Controller/Npc/Furiko/FurikoController.h"
+#include "Actors/Controller/Npc/Furiko/FurikoController.h"
 #include "FurikoFSMComponent.generated.h"
 
 UCLASS()
