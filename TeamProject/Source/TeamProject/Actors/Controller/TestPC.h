@@ -18,12 +18,12 @@ public:
 public:
 	virtual void SetupInputComponent() override;
 
-	// Å° ¹ÙÀÎµù¿ë
+	// Å° ï¿½ï¿½ï¿½Îµï¿½ï¿½ï¿½
 	void OnPressedE();
 	void OnPressedQ();
 
 public:
-	// ÀÎÇ² °ü·Ã
+	// ï¿½ï¿½Ç² ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputMappingContext* IMC_Inventory;
 

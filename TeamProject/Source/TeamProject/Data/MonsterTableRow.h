@@ -73,6 +73,10 @@ public: // Animation
 	UAnimMontage* WeaponCatchMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* FindMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* SignalStartMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* SignalEndMontage = nullptr;
 
 
 public:

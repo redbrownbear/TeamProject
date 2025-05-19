@@ -37,13 +37,13 @@ AMonster::AMonster()
 	SkeletalMeshComponent->SetWorldRotation(NewRotator.Quaternion());
 
 
-	AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
-	AISenseConfig_Sight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AISenseConfig_Sight"));
-	AISenseConfig_Sight->DetectionByAffiliation.bDetectNeutrals = true;
-	AISenseConfig_Sight->SightRadius = MONSTER_AISENSECONFIG_SIGHT_SIGHTRADIUS;
-	AISenseConfig_Sight->LoseSightRadius = MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS;
-	AISenseConfig_Sight->PeripheralVisionAngleDegrees = MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS_PERIPHERAL_VISIONANGLEDEGREES;
-	AIPerceptionComponent->ConfigureSense(*AISenseConfig_Sight);
+	//AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+	//AISenseConfig_Sight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AISenseConfig_Sight"));
+	//AISenseConfig_Sight->DetectionByAffiliation.bDetectNeutrals = true;
+	//AISenseConfig_Sight->SightRadius = MONSTER_AISENSECONFIG_SIGHT_SIGHTRADIUS;
+	//AISenseConfig_Sight->LoseSightRadius = MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS;
+	//AISenseConfig_Sight->PeripheralVisionAngleDegrees = MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS_PERIPHERAL_VISIONANGLEDEGREES;
+	//AIPerceptionComponent->ConfigureSense(*AISenseConfig_Sight);
 
 	StatusComponent = CreateDefaultSubobject<UMonsterStatusComponent>(TEXT("StatusComponent"));
 }
@@ -175,7 +175,7 @@ void AMonster::OnConstruction(const FTransform& Transform)
 	SetActorTransform(Transform);
 }
 
-void AMonster::PlayMontage(MONSTER_MONTAGE _InEnum, bool bIsLoop)
+void AMonster::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 {
 	UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
 
@@ -184,61 +184,70 @@ void AMonster::PlayMontage(MONSTER_MONTAGE _InEnum, bool bIsLoop)
 	UAnimMontage* TempAnimMontage = nullptr;
 	switch (_InEnum)
 	{
-	case MONSTER_MONTAGE::ATTACK:
+	case EMonsterMontage::ATTACK:
 		TempAnimMontage = MonsterData->AttackMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_BIG:
+	case EMonsterMontage::ATTACK_BIG:
 		TempAnimMontage = MonsterData->AttackBigMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_SPEAR:
+	case EMonsterMontage::ATTACK_SPEAR:
 		TempAnimMontage = MonsterData->AttackSpearMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_SWORD:
+	case EMonsterMontage::ATTACK_SWORD:
 		TempAnimMontage = MonsterData->AttackSwordMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_LSWORD:
+	case EMonsterMontage::ATTACK_LSWORD:
 		TempAnimMontage = MonsterData->AttackLSwordMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_THROW:
+	case EMonsterMontage::ATTACK_THROW:
 		TempAnimMontage = MonsterData->AttackThrowMontage;
 		break;
-	case MONSTER_MONTAGE::JUMP_START:
+	case EMonsterMontage::JUMP_START:
 		TempAnimMontage = MonsterData->JumpStartMontage;
 		break;
-	case MONSTER_MONTAGE::JUMP_END:
+	case EMonsterMontage::JUMP_END:
 		TempAnimMontage = MonsterData->JumpEndMontage;
 		break;
-	case MONSTER_MONTAGE::DAMAGE:
+	case EMonsterMontage::DAMAGE:
 		TempAnimMontage = MonsterData->DamageMontage;
 		break;
-	case MONSTER_MONTAGE::ANGRY:
+	case EMonsterMontage::ANGRY:
 		TempAnimMontage = MonsterData->AngryMontage;
 		break;
-	case MONSTER_MONTAGE::BOW_START:
+	case EMonsterMontage::BOW_START:
 		TempAnimMontage = MonsterData->BowStartMontage;
 		break;
-	case MONSTER_MONTAGE::BOW_END:
+	case EMonsterMontage::BOW_END:
 		TempAnimMontage = MonsterData->BowEndMontage;
 		break;
-	case MONSTER_MONTAGE::THROW:
+	case EMonsterMontage::THROW:
 		TempAnimMontage = MonsterData->ThrowMontage;
 		break;
-	case MONSTER_MONTAGE::DANCE_START:
+	case EMonsterMontage::DANCE_START:
 		TempAnimMontage = MonsterData->DanceStartMontage;
 		break;
-	case MONSTER_MONTAGE::DANCE_END:
+	case EMonsterMontage::DANCE_END:
 		TempAnimMontage = MonsterData->DanceEndMontage;
 		break;
-	case MONSTER_MONTAGE::WEAPON_CATCH:
+	case EMonsterMontage::WEAPON_CATCH:
 		TempAnimMontage = MonsterData->WeaponCatchMontage;
 		break;
-	case MONSTER_MONTAGE::FIND:
+	case EMonsterMontage::FIND:
 		TempAnimMontage = MonsterData->FindMontage;
 		break;
-	case MONSTER_MONTAGE::END:
+	case EMonsterMontage::SIGNAL_START:
+		TempAnimMontage = MonsterData->SignalStartMontage;
+		break;
+	case EMonsterMontage::SIGNAL_END:
+		TempAnimMontage = MonsterData->SignalEndMontage;
+		break;
+	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;
 	default:
+	{
+		int a = 0;
+	}
 		break;
 	}
 
@@ -253,67 +262,71 @@ void AMonster::PlayMontage(MONSTER_MONTAGE _InEnum, bool bIsLoop)
 			AnimInstance->Montage_Play(TempAnimMontage);
 		}
 	}
+	else
+	{
+		int a = 0;
+	}
 }
 
-bool AMonster::IsMontage(MONSTER_MONTAGE _InEnum)
+bool AMonster::IsMontage(EMonsterMontage _InEnum)
 {
 	if (!MonsterData) return false;
 
 	UAnimMontage* TempAnimMontage = nullptr;
 	switch (_InEnum)
 	{
-	case MONSTER_MONTAGE::ATTACK:
+	case EMonsterMontage::ATTACK:
 		TempAnimMontage = MonsterData->AttackMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_BIG:
+	case EMonsterMontage::ATTACK_BIG:
 		TempAnimMontage = MonsterData->AttackBigMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_SPEAR:
+	case EMonsterMontage::ATTACK_SPEAR:
 		TempAnimMontage = MonsterData->AttackSpearMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_SWORD:
+	case EMonsterMontage::ATTACK_SWORD:
 		TempAnimMontage = MonsterData->AttackSwordMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_LSWORD:
+	case EMonsterMontage::ATTACK_LSWORD:
 		TempAnimMontage = MonsterData->AttackLSwordMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_THROW:
+	case EMonsterMontage::ATTACK_THROW:
 		TempAnimMontage = MonsterData->AttackThrowMontage;
 		break;
-	case MONSTER_MONTAGE::JUMP_START:
+	case EMonsterMontage::JUMP_START:
 		TempAnimMontage = MonsterData->JumpStartMontage;
 		break;
-	case MONSTER_MONTAGE::JUMP_END:
+	case EMonsterMontage::JUMP_END:
 		TempAnimMontage = MonsterData->JumpEndMontage;
 		break;
-	case MONSTER_MONTAGE::DAMAGE:
+	case EMonsterMontage::DAMAGE:
 		TempAnimMontage = MonsterData->DamageMontage;
 		break;
-	case MONSTER_MONTAGE::ANGRY:
+	case EMonsterMontage::ANGRY:
 		TempAnimMontage = MonsterData->AngryMontage;
 		break;
-	case MONSTER_MONTAGE::BOW_START:
+	case EMonsterMontage::BOW_START:
 		TempAnimMontage = MonsterData->BowStartMontage;
 		break;
-	case MONSTER_MONTAGE::BOW_END:
+	case EMonsterMontage::BOW_END:
 		TempAnimMontage = MonsterData->BowEndMontage;
 		break;
-	case MONSTER_MONTAGE::THROW:
+	case EMonsterMontage::THROW:
 		TempAnimMontage = MonsterData->ThrowMontage;
 		break;
-	case MONSTER_MONTAGE::DANCE_START:
+	case EMonsterMontage::DANCE_START:
 		TempAnimMontage = MonsterData->DanceStartMontage;
 		break;
-	case MONSTER_MONTAGE::DANCE_END:
+	case EMonsterMontage::DANCE_END:
 		TempAnimMontage = MonsterData->DanceEndMontage;
 		break;
-	case MONSTER_MONTAGE::WEAPON_CATCH:
+	case EMonsterMontage::WEAPON_CATCH:
 		TempAnimMontage = MonsterData->WeaponCatchMontage;
 		break;
-	case MONSTER_MONTAGE::FIND:
+	case EMonsterMontage::FIND:
 		TempAnimMontage = MonsterData->FindMontage;
 		break;
-	case MONSTER_MONTAGE::END:
+	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;
 	default:
@@ -323,7 +336,7 @@ bool AMonster::IsMontage(MONSTER_MONTAGE _InEnum)
 	return TempAnimMontage ? true : false;
 }
 
-bool AMonster::IsPlayingMontage(MONSTER_MONTAGE _InEnum)
+bool AMonster::IsPlayingMontage(EMonsterMontage _InEnum)
 {
 	if (!MonsterData) return false;
 	UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
@@ -331,58 +344,58 @@ bool AMonster::IsPlayingMontage(MONSTER_MONTAGE _InEnum)
 	UAnimMontage* TempAnimMontage = nullptr;
 	switch (_InEnum)
 	{
-	case MONSTER_MONTAGE::ATTACK:
+	case EMonsterMontage::ATTACK:
 		TempAnimMontage = MonsterData->AttackMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_BIG:
+	case EMonsterMontage::ATTACK_BIG:
 		TempAnimMontage = MonsterData->AttackBigMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_SPEAR:
+	case EMonsterMontage::ATTACK_SPEAR:
 		TempAnimMontage = MonsterData->AttackSpearMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_SWORD:
+	case EMonsterMontage::ATTACK_SWORD:
 		TempAnimMontage = MonsterData->AttackSwordMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_LSWORD:
+	case EMonsterMontage::ATTACK_LSWORD:
 		TempAnimMontage = MonsterData->AttackLSwordMontage;
 		break;
-	case MONSTER_MONTAGE::ATTACK_THROW:
+	case EMonsterMontage::ATTACK_THROW:
 		TempAnimMontage = MonsterData->AttackThrowMontage;
 		break;
-	case MONSTER_MONTAGE::JUMP_START:
+	case EMonsterMontage::JUMP_START:
 		TempAnimMontage = MonsterData->JumpStartMontage;
 		break;
-	case MONSTER_MONTAGE::JUMP_END:
+	case EMonsterMontage::JUMP_END:
 		TempAnimMontage = MonsterData->JumpEndMontage;
 		break;
-	case MONSTER_MONTAGE::DAMAGE:
+	case EMonsterMontage::DAMAGE:
 		TempAnimMontage = MonsterData->DamageMontage;
 		break;
-	case MONSTER_MONTAGE::ANGRY:
+	case EMonsterMontage::ANGRY:
 		TempAnimMontage = MonsterData->AngryMontage;
 		break;
-	case MONSTER_MONTAGE::BOW_START:
+	case EMonsterMontage::BOW_START:
 		TempAnimMontage = MonsterData->BowStartMontage;
 		break;
-	case MONSTER_MONTAGE::BOW_END:
+	case EMonsterMontage::BOW_END:
 		TempAnimMontage = MonsterData->BowEndMontage;
 		break;
-	case MONSTER_MONTAGE::THROW:
+	case EMonsterMontage::THROW:
 		TempAnimMontage = MonsterData->ThrowMontage;
 		break;
-	case MONSTER_MONTAGE::DANCE_START:
+	case EMonsterMontage::DANCE_START:
 		TempAnimMontage = MonsterData->DanceStartMontage;
 		break;
-	case MONSTER_MONTAGE::DANCE_END:
+	case EMonsterMontage::DANCE_END:
 		TempAnimMontage = MonsterData->DanceEndMontage;
 		break;
-	case MONSTER_MONTAGE::WEAPON_CATCH:
+	case EMonsterMontage::WEAPON_CATCH:
 		TempAnimMontage = MonsterData->WeaponCatchMontage;
 		break;
-	case MONSTER_MONTAGE::FIND:
+	case EMonsterMontage::FIND:
 		TempAnimMontage = MonsterData->FindMontage;
 		break;
-	case MONSTER_MONTAGE::END:
+	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;
 	default:

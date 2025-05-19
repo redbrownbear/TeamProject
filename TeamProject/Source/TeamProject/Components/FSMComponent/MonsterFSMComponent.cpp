@@ -8,6 +8,8 @@
 #include "Actors/Object/PatrolPath.h"
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Object/CampFire.h"
+#include "Actors/Character/PlayerCharacter.h"
+
 
 #include "Navigation/PathFollowingComponent.h"
 
@@ -112,6 +114,9 @@ void UMonsterFSMComponent::HandleState(float DeltaTime)
 	case EMonsterState::ToDance:
 		UpdateToDance(DeltaTime);
 		break;
+	case EMonsterState::Signal:
+		UpdateSignal(DeltaTime);
+		break;
 	default:
 		break;
 	}
@@ -127,6 +132,7 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Patrol:
 		break;
 	case EMonsterState::Suspicious:
+		SuspicionGauge = 0.f;
 		break;
 	case EMonsterState::Alert:
 		break;
@@ -139,6 +145,9 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Eat:
 		break;
 	case EMonsterState::Dance:
+		break;
+	case EMonsterState::Signal:
+		Owner->PlayMontage(EMonsterMontage::SIGNAL_END);
 		break;
 	case EMonsterState::End:
 		break;
@@ -157,13 +166,16 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Suspicious:
 		break;
 	case EMonsterState::Alert:
-		Owner->PlayMontage(MONSTER_MONTAGE::FIND);
+		Owner->PlayMontage(EMonsterMontage::FIND);
 		break;
 	case EMonsterState::Combat:
-		Owner->PlayMontage(MONSTER_MONTAGE::ANGRY);
+		Owner->PlayMontage(EMonsterMontage::ANGRY);
 		break;
 	case EMonsterState::Dance:
-		Owner->PlayMontage(MONSTER_MONTAGE::DANCE_START);
+		Owner->PlayMontage(EMonsterMontage::DANCE_START);
+		break;
+	case EMonsterState::Signal:
+		Owner->PlayMontage(EMonsterMontage::SIGNAL_START);
 		break;
 	default:
 		break;
@@ -189,10 +201,13 @@ void UMonsterFSMComponent::UpdateDance(float DeltaTime)
 	if (AActor* CampFireActor = Owner->GetCampFire())
 	{
 		const FVector CampFireLocation = CampFireActor->GetActorLocation();
+		SmoothRotateActorToDirection(Owner, CampFireLocation, DeltaTime);
+	}
 
-		FVector Direction = CampFireLocation - Owner->GetActorLocation();
-		Direction.Normalize();
-		SmoothRotateActorToDirection(Owner, Direction, DeltaTime);
+
+	if (Player)
+	{
+		ChangeState(EMonsterState::Suspicious);
 	}
 }
 
@@ -210,6 +225,11 @@ void UMonsterFSMComponent::UpdateToDance(float DeltaTime)
 			StopMove();
 			ChangeState(EMonsterState::Dance);
 		}
+	}
+
+	if (Player)
+	{
+		ChangeState(EMonsterState::Suspicious);
 	}
 }
 
@@ -256,17 +276,42 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 			}
 		}
 	}
+
+	if (Player)
+	{
+		StopMove();
+		ChangeState(EMonsterState::Suspicious);
+	}
 }
 
 void UMonsterFSMComponent::UpdateSuspicious(float DeltaTime)
 {
-	if (SuspicionGauge >= MaxSuspicionGauge)
+	if (Player)
 	{
-		ChangeState(EMonsterState::Alert);
+		SuspicionGauge += DeltaTime * MONSTER_SUSPICIOUS_COEFFICIENT;
+
+		const FVector MonsterLocation = Owner->GetActorLocation();
+		const FVector PlayerLocation = Player->GetActorLocation();
+		const float fDistance = FVector::Dist(MonsterLocation, PlayerLocation);
+
+		if (SuspicionGauge >= MaxSuspicionGauge
+			|| fDistance < MONSTER_IMMEDIATE_ALERT_RADIUS
+			)
+		{
+			SuspicionGauge = 0.f;
+			ChangeState(EMonsterState::Alert);
+		}
+		else
+		{
+			SuspicionGauge += DeltaTime;
+		}
+
+		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+
 	}
 	else
 	{
-		SuspicionGauge += DeltaTime;
+		ChangeState(EMonsterState::Idle);
 	}
 }
 
@@ -277,7 +322,17 @@ void UMonsterFSMComponent::UpdateAlert(float DeltaTime)
 
 void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 {
+	int a = 0;
 	// Chase and Attack Player;
+}
+
+void UMonsterFSMComponent::UpdateSignal(float DeltaTime)
+{
+	SignalElapsedTime += DeltaTime;
+	if (SignalElapsedTime > MONSTER_MAX_SIGNAL_TIME)
+	{
+		ChangeState(EMonsterState::Combat);
+	}
 }
 
 void UMonsterFSMComponent::MoveToLocation(const FVector& InLocation)
