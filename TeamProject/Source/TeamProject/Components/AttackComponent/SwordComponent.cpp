@@ -2,6 +2,7 @@
 
 
 #include "Components/AttackComponent/SwordComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values for this component's properties
 USwordComponent::USwordComponent()
@@ -30,5 +31,74 @@ void USwordComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void USwordComponent::SetAttackBox()
+{
+    AActor* OwnerActor = GetOwner();
+    // 현재 액터 위치
+    FVector ActorLocation = OwnerActor->GetActorLocation();
+    FRotator ActorRotation = OwnerActor->GetActorRotation();
+
+    // 현재 전방 벡터
+    FVector ForwardVector = ActorRotation.Vector();
+
+    // Yaw -15도 회전
+    FRotator LeftRotator = FRotator(0.f, ActorRotation.Yaw - 15.f, 0.f);
+    FVector LeftVector = LeftRotator.RotateVector(FVector::ForwardVector) * 70.f + ActorLocation;
+
+    // Yaw +15도 회전
+    FRotator RightRotator = FRotator(0.f, ActorRotation.Yaw + 15.f, 0.f);
+    FVector RightVector = RightRotator.RotateVector(FVector::ForwardVector) * 70.f + ActorLocation;
+
+    // 변수에 대입
+    FVector Left = LeftVector;
+    FVector Right = RightVector;
+
+    // 박스 설정
+    FVector HalfSize = FVector(10.f, 10.f, 10.f);
+    FRotator Orientation = FRotator::ZeroRotator;
+
+    // 감지할 오브젝트 타입 (Pawn)
+    TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+    ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+    // 무시할 액터
+    TArray<AActor*> ActorsToIgnore;
+    ActorsToIgnore.Add(OwnerActor);
+
+    // 결과 저장용
+    TArray<FHitResult> OutHits;
+
+    // 박스 트레이스 실행
+        bool bHit = UKismetSystemLibrary::BoxTraceMultiForObjects(
+        this->GetWorld(),        // WorldContextObject
+        Left,                   // Start
+        Right,                  // End
+        FVector(10.f, 10.f, 10.f), // HalfSize
+        FRotator::ZeroRotator,  // Orientation
+        ObjectTypes,            // ObjectTypes
+        false,                  // bTraceComplex
+        ActorsToIgnore,         // ActorsToIgnore
+        EDrawDebugTrace::ForDuration, // DrawDebugType
+        OutHits,                // OutHits (여기 위치 중요!)
+        true,                   // bIgnoreSelf
+        FLinearColor::Red,      // TraceColor
+        FLinearColor::Green,    // TraceHitColor
+        0.2f                    // DrawTime
+    );
+
+    // 결과 출력 감지된 Actor UE_LOG 에 출력
+    if (bHit)
+    {
+        for (const FHitResult& Hit : OutHits)
+        {
+            if (AActor* HitActor = Hit.GetActor())
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
+            }
+        }
+    }
+
 }
 

@@ -19,6 +19,9 @@ APlayerCharacter::APlayerCharacter()
 
 	FVector Scale = FVector(45.f, 45.f, 45.f);
 	FVector Locate = FVector(0.f, 0.f, -41.f);
+	{
+		SwordComponent = CreateDefaultSubobject<USwordComponent>(TEXT("SwordComponent"));
+	}
 
 	//SpringArm, Camera 생성 및 초기화
 	{
@@ -70,12 +73,12 @@ APlayerCharacter::APlayerCharacter()
 	}
 
 	{
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/Armor/ArmorMix/ArmorMix.ArmorMix'")) };
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Armor/ArmorMix/ArmorMix.ArmorMix'")) };
 		USkeletalMeshComponent* mMesh = GetMesh();
 		mMesh->SetupAttachment(RootComponent);
 		mMesh->SetRelativeLocation(Locate);
 		mMesh->SetSkeletalMeshAsset(Smesh.Object);
-		ConstructorHelpers::FClassFinder<UAnimInstance> Anim{ (TEXT("/Script/Engine.AnimBlueprint'/Game/Armor/BP_PlayerAnimInstance.BP_PlayerAnimInstance_C'")) };
+		ConstructorHelpers::FClassFinder<UAnimInstance> Anim{ (TEXT("/Script/Engine.AnimBlueprint'/Game/Resources/Player/Armor/BP_PlayerAnimInstance.BP_PlayerAnimInstance_C'")) };
 		mMesh->SetAnimInstanceClass(Anim.Class);
 		mMesh->SetRelativeScale3D(Scale);
 	}
@@ -88,7 +91,7 @@ APlayerCharacter::APlayerCharacter()
 
 
 	{	
-		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Armor/Animation/Sword_Attack/Sword_Attack_Charge_L_Montage.Sword_Attack_Charge_L_Montage'"));
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Sword_Attack/Sword_Attack_Charge_L_Montage.Sword_Attack_Charge_L_Montage'"));
 
 		if (Asset.Object)
 		{
@@ -101,7 +104,7 @@ APlayerCharacter::APlayerCharacter()
 	}
 
 	{
-		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Armor/Animation/Sword_Attack/Sword_Attack_Charge_Montage.Sword_Attack_Charge_Montage'"));
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Sword_Attack/Sword_Attack_Charge_Montage.Sword_Attack_Charge_Montage'"));
 
 		if (Asset.Object)
 		{
@@ -120,7 +123,7 @@ APlayerCharacter::APlayerCharacter()
 		LWeapon->SetRelativeScale3D(Scale);
 
 		RWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RWeapon"));
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Resource/Sword/Weapon_Sword_003.Weapon_Sword_003'"));
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Sword/Weapon_Sword_003.Weapon_Sword_003'"));
 		RWeapon->SetSkeletalMeshAsset(Asset.Object);
 
 		if (GetMesh())
@@ -183,5 +186,6 @@ void APlayerCharacter::Play_Sword_Attack()
 			AnimInst->Montage_Play(Arr_Sword_Attack_MTG[1]);
 		}
 	}
+	SwordComponent->SetAttackBox();
 }
 
