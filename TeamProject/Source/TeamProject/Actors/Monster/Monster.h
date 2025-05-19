@@ -42,12 +42,6 @@ protected:
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UAdvancedFloatingPawnMovement> MovementComponent;
 
-//protected:
-//    UPROPERTY(VisibleAnywhere)
-//    TObjectPtr<UAIPerceptionComponent> AIPerceptionComponent;
-//    UPROPERTY(VisibleAnywhere)
-//    TObjectPtr<UAISenseConfig_Sight> AISenseConfig_Sight;
-
 public:
     UMonsterStatusComponent* GetStatusComponent() const { return StatusComponent; }
     UMonsterFSMComponent* GetFSMComponent() const;
@@ -84,5 +78,10 @@ public:
     bool IsMontage(EMonsterMontage _InEnum);
     bool IsPlayingMontage(EMonsterMontage _InEnum);
 
+protected:
+    UFUNCTION()
+    virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    UFUNCTION()
+    virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 };

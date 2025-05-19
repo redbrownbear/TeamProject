@@ -52,4 +52,7 @@ protected:
 
 public:
 	FVector GetVelocity();
+	FName GetProjectileName();
+
+
 };

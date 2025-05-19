@@ -105,3 +105,8 @@ FVector AProjectile::GetVelocity()
 	return Direction;
 }
 
+FName AProjectile::GetProjectileName()
+{
+	return DataTableRowHandle.RowName;
+}
+

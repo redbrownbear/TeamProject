@@ -3,6 +3,7 @@
 
 #include "Actors/Monster/Monster.h"
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
+#include "Actors/Projectile/Projectile.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
@@ -26,8 +27,10 @@ AMonster::AMonster()
 	MovementComponent = CreateDefaultSubobject<UAdvancedFloatingPawnMovement>(TEXT("MovementComponent"));
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
-
 	CollisionComponent->SetCanEverAffectNavigation(false);
+	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+	CollisionComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlap);
+
 	RootComponent = CollisionComponent;
 
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
@@ -375,4 +378,22 @@ bool AMonster::IsPlayingMontage(EMonsterMontage _InEnum)
 	}
 
 	return AnimInstance->Montage_IsPlaying(nullptr);
+}
+
+void AMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (AProjectile* Projectile = Cast<AProjectile>(OtherActor))
+	{
+		if (ProjectileName::Monster_PlayerAlert == Projectile->GetProjectileName())
+		{
+			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
+			{
+				FSMComponent->ChangeState(EMonsterState::Combat);
+			}
+		}
+	}
+}
+
+void AMonster::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
 }
