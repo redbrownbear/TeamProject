@@ -122,7 +122,18 @@ APlayerCharacter::APlayerCharacter()
 		RWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RWeapon"));
 		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Resource/Sword/Weapon_Sword_003.Weapon_Sword_003'"));
 		RWeapon->SetSkeletalMeshAsset(Asset.Object);
-		RWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_R"));
+
+		if (GetMesh())
+		{
+			if (GetMesh()->DoesSocketExist(TEXT("Weapon_R")))
+			{
+				RWeapon->SetupAttachment(GetMesh(), TEXT("Weapon_R"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("소켓 Weapon_R 없음!"));
+			}
+		}
 	}
 
 	bUseControllerRotationYaw = false;
