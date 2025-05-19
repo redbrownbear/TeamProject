@@ -10,7 +10,7 @@ void UTestPopupUI::OnCreated()
 	Super::OnCreated();
 
 	//우선 보류
-	//ExitButton->OnClicked.AddDynamic(this, &UTestPopupUI::OnMyButtonClicked);
+	ExitButton->OnClicked.AddDynamic(this, &UTestPopupUI::OnMyButtonClicked);
 
 	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
 	if (PC)
@@ -21,7 +21,7 @@ void UTestPopupUI::OnCreated()
 
 void UTestPopupUI::OnMyButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("My Button was clicked!"));
+	ClosePopup();
 }
 
 void UTestPopupUI::ClosePopup()
