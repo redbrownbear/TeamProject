@@ -1,6 +1,6 @@
 #include "CookSet.h"
 #include "Components/BoxComponent.h"
-#include "Character/TestCharacter.h"
+#include "Actors/TestCharacter/TestCharacter.h"
 
 ACookSet::ACookSet()
 {

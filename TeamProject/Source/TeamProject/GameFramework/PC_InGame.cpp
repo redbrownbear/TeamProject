@@ -4,7 +4,7 @@
 #include "GameFramework/PC_InGame.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
-#include "Actor/Character/PlayerCharacter.h"
+#include "Actors/Character/PlayerCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 
 APC_InGame::APC_InGame()
