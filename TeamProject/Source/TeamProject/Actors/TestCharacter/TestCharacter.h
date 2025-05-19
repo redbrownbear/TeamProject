@@ -11,15 +11,15 @@ struct FHandItem : public FTableRowBase
 {
     GENERATED_BODY()
 
-	// ¾ÆÀÌÅÛ °íÀ¯ ID
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ID
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName ItemID;
 
-	// ¾ÆÀÌÅÛ ÀÌ¸§
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ItemName;
 
-    // ¾ÆÀÌÅÛ °³¼ö
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 Quantity = 1;
 };
@@ -48,32 +48,32 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
-    // ÀÎº¥Åä¸®¿¡¼­ ¾ÆÀÌÅÛ ¼±ÅÃ ¡æ ¼Õ¿¡ µé±â
+    // ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Õ¿ï¿½ ï¿½ï¿½ï¿½
     void HoldItem(const FHandItem& Item);
 
-    // ¿ä¸® ½ÃÀÛ (¿ä¸® Å° ÀÔ·Â ½Ã È£Ãâ)
+    // ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ (ï¿½ä¸® Å° ï¿½Ô·ï¿½ ï¿½ï¿½ È£ï¿½ï¿½)
     void StartCooking(const FHandItem& Item);
 
-    // Ä³¸¯ÅÍ°¡ °¡Áø ¾ÆÀÌÅÛ µ¥ÀÌÅÍ Á¦°Å
+    // Ä³ï¿½ï¿½ï¿½Í°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     void RemoveHoldItem(const FHandItem& Item);
 
 public:
-    // ¿ä¸® ¼º°ø
+    // ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½
     void SuccessCooking();
 
-    // ¿ä¸® ½ÇÆÐ
+    // ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½
     void FailedCooking();
 
 protected:
-    // ¼Õ¿¡ µç ¾ÆÀÌÅÛ
+    // ï¿½Õ¿ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     UPROPERTY()
     TArray<FHandItem> CurrentHeldItem;
 
-    // ¿ä¸® Àç·á
+    // ï¿½ä¸® ï¿½ï¿½ï¿½
     UPROPERTY()
     ACookSet* CurrentCookSet = nullptr;
 
-    // ¿ä¸® °¡´É ¿©ºÎ
+    // ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     UPROPERTY(BlueprintReadOnly)
     bool bCanCook = false;
 };

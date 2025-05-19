@@ -51,6 +51,20 @@ void APC_InGame::SetupInputComponent()
 
 void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 {
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	if(!Player_C)
+	{
+		return;
+	}
+	if (Player_C->GetCharacterMovement()->MovementMode == MOVE_None)
+	{
+		return;
+	}
+	
+	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+	if (Anim->Montage_IsPlaying(nullptr) == true) {
+		Anim->Montage_Stop(0.f);
+	}
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 	const FRotator Rotation = K2_GetActorRotation();
 	const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
@@ -67,7 +81,7 @@ void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
 	AddYawInput(ActionValue.X);
-	AddPitchInput(ActionValue.Y);
+	AddPitchInput(-ActionValue.Y);
 }
 
 void APC_InGame::TryAttack(const FInputActionValue& InputActionValue)

@@ -37,12 +37,13 @@ enum class EMonsterState : uint8
     Eat,
     ToDance,
     Dance,
+    Signal,
     End,
 };
 
 
 
-enum class MONSTER_MONTAGE : uint8
+enum class EMonsterMontage : uint8
 {
     ATTACK = 0,
     ATTACK_BIG,
@@ -61,6 +62,8 @@ enum class MONSTER_MONTAGE : uint8
     DANCE_END,
     WEAPON_CATCH,
     FIND,
+    SIGNAL_START,
+    SIGNAL_END,
     END,
 };
 
@@ -77,13 +80,16 @@ inline void RotateActorToDirection(AActor* TargetActor, const FVector& TargetDir
     TargetActor->SetActorRotation(TargetRotation);
 }
 
-inline void SmoothRotateActorToDirection(AActor* TargetActor, const FVector& TargetDirection, float DeltaTime, float InterpSpeed = 5.f)
+inline void SmoothRotateActorToDirection(AActor* TargetActor, const FVector& TargetLocation, float DeltaTime, float InterpSpeed = 5.f)
 {
-    if (!TargetActor || TargetDirection.IsNearlyZero())
+    if (!TargetActor)
         return;
 
+    FVector ActorLocation = TargetActor->GetActorLocation();
+    FVector Direction = TargetLocation - ActorLocation;
+    Direction.Normalize();
     FRotator CurrentRot = TargetActor->GetActorRotation();
-    FRotator TargetRot = TargetDirection.Rotation();
+    FRotator TargetRot = Direction.Rotation();
 
     FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, InterpSpeed);
     TargetActor->SetActorRotation(NewRot);
