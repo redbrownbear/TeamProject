@@ -5,6 +5,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 
 // Sets default values for this component's properties
 USwordComponent::USwordComponent()
@@ -19,6 +20,7 @@ USwordComponent::USwordComponent()
         if (Asset.Object)
         {
             Arr_Sword_Attack_MTG.Add(Asset.Object);
+            MaxComboIndex += 1;
         }
         else
         {
@@ -32,6 +34,7 @@ USwordComponent::USwordComponent()
         if (Asset.Object)
         {
             Arr_Sword_Attack_MTG.Add(Asset.Object);
+            MaxComboIndex += 1;
         }
         else
         {
@@ -64,13 +67,20 @@ void USwordComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void USwordComponent::SetAttackBox()
 {
+    if (!bCanAttack)return;
 
     AActor* OwnerActor = GetOwner();
     // 현재 액터 위치
 
-    APlayerCharacter* Player_C = Cast<APlayerCharacter>(OwnerActor);
+    {
+        APlayerCharacter* Player_C = Cast<APlayerCharacter>(OwnerActor);
+        CurrentComboIndex += 1;
+        CurrentComboIndex = (MaxComboIndex <= CurrentComboIndex) ? 0 : CurrentComboIndex;
 
-    Player_C->GetMesh()->GetAnimInstance()->Montage_Play(Arr_Sword_Attack_MTG[0]);
+        Player_C->GetMesh()->GetAnimInstance()->Montage_Play(Arr_Sword_Attack_MTG[CurrentComboIndex]);
+
+        Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);
+    }
 
 
 
@@ -139,6 +149,36 @@ void USwordComponent::SetAttackBox()
             }
         }
     }
+    bCanAttack = false;
+    GetWorld()->GetTimerManager().SetTimer(
+        ComboTimerHandle,
+        this,
+        &ThisClass::SetCanAttack,
+        0.5f,
+        false
+    );
 
+    GetWorld()->GetTimerManager().SetTimer(
+        MoveTimerHandle,
+        this,
+        &ThisClass::SetCanMove,
+        1.5f,
+        false
+    );
 }
+
+void USwordComponent::SetCanAttack()
+{
+    bCanAttack = true;
+}
+
+void USwordComponent::SetCanMove()
+{
+    AActor* ActorPlayer = GetOwner();
+    ACharacter* Character = Cast<ACharacter>(ActorPlayer);
+
+    Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+}
+
+
 

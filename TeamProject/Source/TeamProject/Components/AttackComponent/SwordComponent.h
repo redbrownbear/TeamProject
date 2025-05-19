@@ -21,8 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 
-	UPROPERTY(EditAnywhere)
-	TArray<UAnimMontage*> Arr_Sword_Attack_MTG;
+	
 
 public:	
 	// Called every frame
@@ -31,5 +30,26 @@ public:
 
 	void SetAttackBox();
 
+	void SetCanAttack();
+
+	void SetCanMove();
 		
+protected:
+
+	FTimerHandle ComboTimerHandle;
+	FTimerHandle MoveTimerHandle;
+
+	bool bCanAttack = true;
+
+	UPROPERTY(EditAnywhere)
+	TArray<UAnimMontage*> Arr_Sword_Attack_MTG;
+
+	UPROPERTY()
+	int32 CurrentComboIndex = 0;
+
+	UPROPERTY()
+	int32 MaxComboIndex = 0;
+
+
+
 };
