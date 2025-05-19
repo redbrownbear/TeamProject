@@ -12,13 +12,6 @@ void UFurikoAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	APawn* Pawn = TryGetPawnOwner();
-	/*if (Pawn)
-	{
-		if (ANpc* Npc = Cast<ANpc>(Pawn))
-		{
-			FSMComponent = Cast<UFurikoFSMComponent>(Npc->GetFSMComponent());
-		}
-	}*/
 
 	if (GIsEditor && FApp::IsGame() && !Pawn)
 	{
@@ -65,6 +58,24 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsTalk = false;
 		bIsHide = false;		
 		break;
+	case ENpcState::Sit:
+		bIsIdle = false;
+		bIsSit = true;
+		bIsStand = false;
+		bIsWalk = false;
+		bIsRun = false;
+		bIsTalk = false;
+		bIsHide = false;
+		break;
+	case ENpcState::Stand:
+		bIsIdle = false;
+		bIsSit = false;
+		bIsStand = true;
+		bIsWalk = false;
+		bIsRun = false;
+		bIsTalk = false;
+		bIsHide = false;
+		break;
 	case ENpcState::Stroll:
 		bIsIdle = false;
 		bIsSit = false;
@@ -72,6 +83,15 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsWalk = false;
 		bIsRun = true;
 		bIsTalk = false;
+		bIsHide = false;
+		break;
+	case ENpcState::Talk:
+		bIsIdle = false;
+		bIsSit = false;
+		bIsStand = false;
+		bIsWalk = false;
+		bIsRun = false;
+		bIsTalk = true;
 		bIsHide = false;
 		break;
 	case ENpcState::Hide:

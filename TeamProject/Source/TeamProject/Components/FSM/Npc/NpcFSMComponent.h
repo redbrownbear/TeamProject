@@ -26,7 +26,7 @@ class TEAMPROJECT_API UNpcFSMComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-	friend class ANpcController;
+	friend class ANpc;
 
 public:
 	UNpcFSMComponent();
@@ -45,10 +45,7 @@ protected:
 	TObjectPtr<ANpc> Owner = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<AStrollPath> StrollPathActor;
-
-	/*UPROPERTY()
-	ANpcController* NpcController = nullptr;*/
+	TObjectPtr<AStrollPath> StrollPathActor;	
 
 protected:
 	ENpcState       eCurrentState;

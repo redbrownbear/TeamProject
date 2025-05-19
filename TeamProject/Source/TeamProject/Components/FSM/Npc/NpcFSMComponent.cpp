@@ -67,10 +67,7 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 
 void UNpcFSMComponent::UpdateIdle(float DeltaTime)
 {
-	/*if (Owner->GetStrollPath())
-	{
-		UpdateStroll(DeltaTime);
-	}*/
+	
 }
 
 void UNpcFSMComponent::UpdateStroll(float DeltaTime)
@@ -107,15 +104,15 @@ void UNpcFSMComponent::UpdateStroll(float DeltaTime)
 			}
 		}
 	}
-
-	/*if (NpcController->bTalk) 
-	{
-		SetNpcState(ENpcState::Talk);
-	}*/
 }
 
 void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 {
+	if (eCurrentState != ENpcState::Talk)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("eCurrentState is Not 'ENpcState::Talk'"));
+		return;
+	}
 	// Play Montage
 }
 

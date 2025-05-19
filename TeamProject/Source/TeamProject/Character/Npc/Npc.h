@@ -61,15 +61,19 @@ protected:
 	TObjectPtr<AStrollPath> StrollPath;
 
 protected:
-	//// 상호작용 가능 변수
-	//UPROPERTY()
-	//bool bPlayerInRange = false;
+	// 상호작용 가능 변수
+	UPROPERTY()
+	bool bPlayerInRange = false;
 
 	// 상호작용 
 	UFUNCTION()
-	void OnPlayerInteract(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	void OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	// 대화 UI
 	void OnTalkKeyPressed();
