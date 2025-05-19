@@ -68,6 +68,5 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> RWeapon;
 
 protected:
-	UPROPERTY(EditAnywhere)
-	TArray<UAnimMontage*> Arr_Sword_Attack_MTG;
+	
 };

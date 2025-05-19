@@ -20,6 +20,10 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+
+	UPROPERTY(EditAnywhere)
+	TArray<UAnimMontage*> Arr_Sword_Attack_MTG;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
