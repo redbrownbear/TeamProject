@@ -41,6 +41,11 @@ public:
 
 
 
+public:
+	USwordComponent* GetSwordComponent() { return SwordComponent; }
+
+
+
 protected:
 
 	UPROPERTY(EditAnywhere, Category="Sword")

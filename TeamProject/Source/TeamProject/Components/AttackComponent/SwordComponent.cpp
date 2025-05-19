@@ -150,21 +150,7 @@ void USwordComponent::SetAttackBox()
         }
     }
     bCanAttack = false;
-    GetWorld()->GetTimerManager().SetTimer(
-        ComboTimerHandle,
-        this,
-        &ThisClass::SetCanAttack,
-        0.5f,
-        false
-    );
 
-    GetWorld()->GetTimerManager().SetTimer(
-        MoveTimerHandle,
-        this,
-        &ThisClass::SetCanMove,
-        1.5f,
-        false
-    );
 }
 
 void USwordComponent::SetCanAttack()
