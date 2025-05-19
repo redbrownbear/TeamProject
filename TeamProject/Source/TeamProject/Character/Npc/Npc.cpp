@@ -38,7 +38,7 @@ ANpc::ANpc()
 void ANpc::BeginPlay()
 {
 	Super::BeginPlay();
-			
+	AIControllerClass = ANpcController::StaticClass();
 }
 
 // Called every frame

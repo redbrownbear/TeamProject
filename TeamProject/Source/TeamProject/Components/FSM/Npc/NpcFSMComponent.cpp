@@ -92,7 +92,7 @@ void UNpcFSMComponent::UpdateStroll(float DeltaTime)
 	MoveToLocation(Location);
 
 	// 다음 PatrolIndex 구하기
-	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 300.f);
 
 
 	if (bIsNear)
