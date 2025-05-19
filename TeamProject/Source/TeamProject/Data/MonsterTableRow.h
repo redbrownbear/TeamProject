@@ -84,10 +84,6 @@ public:
 	TSubclassOf<AMonsterAIController> AIControllerClass;
 
 public:
-	UPROPERTY(EditAnywhere, Category = "Projectile", meta = (RowType = "ProjectileTableRow"))
-	FDataTableRowHandle ProjectileTableRowHandle;
-
-public:
 	UPROPERTY(EditAnywhere, Category = "NiagaraEffect", meta = (RowType = "NiagaraEffectTableRow"))
 	FDataTableRowHandle NiagaraEffectTableRowHandle;
 

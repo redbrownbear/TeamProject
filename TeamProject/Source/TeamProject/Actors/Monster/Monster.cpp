@@ -26,7 +26,6 @@ AMonster::AMonster()
 	MovementComponent = CreateDefaultSubobject<UAdvancedFloatingPawnMovement>(TEXT("MovementComponent"));
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
-	//CollisionComponent->SetCollisionProfileName(CollisionProfileName::Monster);
 
 	CollisionComponent->SetCanEverAffectNavigation(false);
 	RootComponent = CollisionComponent;
@@ -35,15 +34,6 @@ AMonster::AMonster()
 	SkeletalMeshComponent->SetupAttachment(RootComponent);
 	FRotator NewRotator = FRotator(0.0, 0.0, 0.0);
 	SkeletalMeshComponent->SetWorldRotation(NewRotator.Quaternion());
-
-
-	//AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
-	//AISenseConfig_Sight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AISenseConfig_Sight"));
-	//AISenseConfig_Sight->DetectionByAffiliation.bDetectNeutrals = true;
-	//AISenseConfig_Sight->SightRadius = MONSTER_AISENSECONFIG_SIGHT_SIGHTRADIUS;
-	//AISenseConfig_Sight->LoseSightRadius = MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS;
-	//AISenseConfig_Sight->PeripheralVisionAngleDegrees = MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS_PERIPHERAL_VISIONANGLEDEGREES;
-	//AIPerceptionComponent->ConfigureSense(*AISenseConfig_Sight);
 
 	StatusComponent = CreateDefaultSubobject<UMonsterStatusComponent>(TEXT("StatusComponent"));
 }
@@ -65,24 +55,6 @@ void AMonster::Tick(float DeltaTime)
 
 	const float Speed = UKismetMathLibrary::VSizeXY(MovementComponent->Velocity);
 
-	//if (AMonsterAIController* MonsterAIController = Cast<AMonsterAIController>(GetController()))
-	//{
-	//	if (UMonsterFSMComponent* MonsterFSMComponent = Cast<UMonsterFSMComponent>(MonsterAIController->GetComponentByClass(UMonsterFSMComponent::StaticClass())))
-	//	{
-	//		if (FMath::IsNearlyZero(Speed))
-	//		{
-	//			MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Idle);
-	//		}
-	//		else if (FMath::IsNearlyEqual(Speed, MonsterData->WalkMovementMaxSpeed))
-	//		{
-	//			MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Walk);
-	//		}
-	//		else if (FMath::IsNearlyEqual(Speed, MonsterData->RunMovementMaxSpeed))
-	//		{
-	//			MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Run);
-	//		}
-	//	}
-	//}
 }
 
 UMonsterFSMComponent* AMonster::GetFSMComponent() const

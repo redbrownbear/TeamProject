@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Misc/Utils.h"
 
 #include "Components/FSMComponent/MonsterFSMComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
@@ -9,7 +10,7 @@
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Object/CampFire.h"
 #include "Actors/Character/PlayerCharacter.h"
-
+#include "Actors/Projectile/Projectile.h"
 
 #include "Navigation/PathFollowingComponent.h"
 
@@ -175,7 +176,10 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 		Owner->PlayMontage(EMonsterMontage::DANCE_START);
 		break;
 	case EMonsterState::Signal:
-		Owner->PlayMontage(EMonsterMontage::SIGNAL_START);
+		{
+			Owner->PlayMontage(EMonsterMontage::SIGNAL_START);
+			SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
+		}
 		break;
 	default:
 		break;
@@ -365,4 +369,20 @@ void UMonsterFSMComponent::StopMove()
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::StopMove // No AIController"));
 		check(false);
 	}
+}
+
+void UMonsterFSMComponent::SpawnProjectile(FName ProjectileName, FName CollisionProfileName)
+{
+	UWorld* World = GetWorld();
+
+	AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
+		FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+	FTransform NewTransform;
+	Projectile->SetData(ProjectileName, CollisionProfileName);
+	const FVector Location = Owner->GetActorLocation();
+
+	NewTransform.SetLocation(Location);
+	NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
+	Projectile->FinishSpawning(NewTransform);
 }

@@ -42,10 +42,10 @@ protected:
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 
 protected:
-	//UPROPERTY(EditAnywhere, meta = (RowType = "ProjectileTableRow"))
-	//FDataTableRowHandle DataTableRowHandle;
-	//const UDataTable* ProjectileDataTable;
-	//const FProjectileTableRow* ProjectileTableRow;
+	UPROPERTY(EditAnywhere, meta = (RowType = "ProjectileTableRow"))
+	FDataTableRowHandle DataTableRowHandle;
+	const UDataTable* ProjectileDataTable;
+	const FProjectileTableRow* ProjectileTableRow;
 
 protected:
 	ECollisionChannel CollisionChannel;
