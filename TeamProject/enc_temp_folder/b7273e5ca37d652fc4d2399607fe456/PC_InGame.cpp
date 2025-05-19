@@ -51,17 +51,8 @@ void APC_InGame::SetupInputComponent()
 
 void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 {
-	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
-	if(!Player_C)
-	{
-		return;
-	}
-	if (Player_C->GetCharacterMovement()->MovementMode == MOVE_None)
-	{
-		return;
-	}
 	
-	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+	UAnimInstance* Anim = Cast<APlayerCharacter>(GetPawn())->GetMesh()->GetAnimInstance();
 	if (Anim->Montage_IsPlaying(nullptr) == true) {
 		Anim->Montage_Stop(0.f);
 	}

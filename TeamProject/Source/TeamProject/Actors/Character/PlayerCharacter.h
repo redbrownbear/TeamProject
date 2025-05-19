@@ -45,6 +45,11 @@ public:
 
 
 
+public:
+	USwordComponent* GetSwordComponent() { return SwordComponent; }
+
+
+
 protected:
 
 	UPROPERTY(EditAnywhere, Category="Sword")
@@ -74,7 +79,6 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere)
 	TArray<UAnimMontage*> Arr_Sword_Attack_MTG;
-
 
 public:
 	virtual uint8 GetGenericTeamId() { return FGenericTeamId(PLAYER_GENERIC_TEAM_ID); }
