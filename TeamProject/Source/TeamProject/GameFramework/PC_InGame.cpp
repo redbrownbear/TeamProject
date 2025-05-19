@@ -67,7 +67,7 @@ void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
 	AddYawInput(ActionValue.X);
-	AddPitchInput(ActionValue.Y);
+	AddPitchInput(-ActionValue.Y);
 }
 
 void APC_InGame::TryAttack(const FInputActionValue& InputActionValue)
