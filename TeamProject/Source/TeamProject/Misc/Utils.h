@@ -10,9 +10,18 @@
 namespace CollisionProfileName
 {
 	static inline FName Monster = TEXT("Monster");
-	static inline FName MonsterProjectile = TEXT("MonsterProjectile");
-	static inline FName MapMesh = TEXT("MapMesh");
+    static inline FName Player = TEXT("Player");
+    static inline FName ToPlayer = TEXT("ToPlayer");
+    static inline FName ToMonster = TEXT("ToMonster");
+    static inline FName MapMesh = TEXT("MapMesh");
 }
+
+namespace ProjectileName
+{
+    static inline FName Monster_Attack = TEXT("Monster_Attack");
+    static inline FName Monster_PlayerAlert = TEXT("Monster_PlayerAlert");
+}
+
 
 
 UENUM()

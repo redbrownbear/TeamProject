@@ -9,10 +9,14 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/AttackComponent/SwordComponent.h"
+#include "GenericTeamAgentInterface.h"
+#include "Misc/Utils.h"
 #include "PlayerCharacter.generated.h"
 
+
+
 UCLASS()
-class TEAMPROJECT_API APlayerCharacter : public ACharacter
+class TEAMPROJECT_API APlayerCharacter : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -73,5 +77,9 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> RWeapon;
 
 protected:
-	
+	UPROPERTY(EditAnywhere)
+	TArray<UAnimMontage*> Arr_Sword_Attack_MTG;
+
+public:
+	virtual uint8 GetGenericTeamId() { return FGenericTeamId(PLAYER_GENERIC_TEAM_ID); }
 };

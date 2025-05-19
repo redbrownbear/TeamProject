@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Components/FSMComponent/MonsterFSMComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
@@ -9,7 +8,7 @@
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Object/CampFire.h"
 #include "Actors/Character/PlayerCharacter.h"
-
+#include "Actors/Projectile/Projectile.h"
 
 #include "Navigation/PathFollowingComponent.h"
 
@@ -137,6 +136,9 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Alert:
 		break;
 	case EMonsterState::Combat:
+	{
+		Owner->SetSpeedWalk();
+	}
 		break;
 	case EMonsterState::Dead:
 		break;
@@ -170,12 +172,16 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::Combat:
 		Owner->PlayMontage(EMonsterMontage::ANGRY);
+		Owner->SetSpeedRun();
 		break;
 	case EMonsterState::Dance:
 		Owner->PlayMontage(EMonsterMontage::DANCE_START);
 		break;
 	case EMonsterState::Signal:
-		Owner->PlayMontage(EMonsterMontage::SIGNAL_START);
+		{
+			Owner->PlayMontage(EMonsterMontage::SIGNAL_START);
+			SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
+		}
 		break;
 	default:
 		break;
@@ -257,9 +263,15 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 		return;
 	}
 
-	// 이동 
-	MoveToLocation(Location);
-
+	// 이동
+	if (Owner->IsPlayingMontage(EMonsterMontage::END))
+	{
+		StopMove();
+	}
+	else
+	{
+		MoveToLocation(Location);
+	}
 
 	// 다음 PatrolIndex 구하기
 	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
@@ -322,8 +334,35 @@ void UMonsterFSMComponent::UpdateAlert(float DeltaTime)
 
 void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 {
-	int a = 0;
-	// Chase and Attack Player;
+	if (!IsValid(Player)) 
+	{
+		ChangeState(EMonsterState::Idle); 
+		return;
+	}
+
+	// Get Target Location
+	FVector Location = Player->GetActorLocation();
+
+	// Move
+	// 이동
+	if (Owner->IsPlayingMontage(EMonsterMontage::END))
+	{
+		StopMove();
+	}
+	else
+	{
+		MoveToLocation(Location);
+	}
+
+
+	// Check if it's arrived
+	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
+
+	if (bIsNear)
+	{
+		StopMove();
+		Owner->PlayMontage(EMonsterMontage::ATTACK);
+	}
 }
 
 void UMonsterFSMComponent::UpdateSignal(float DeltaTime)
@@ -365,4 +404,20 @@ void UMonsterFSMComponent::StopMove()
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::StopMove // No AIController"));
 		check(false);
 	}
+}
+
+void UMonsterFSMComponent::SpawnProjectile(FName ProjectileName, FName CollisionProfileName)
+{
+	UWorld* World = GetWorld();
+
+	AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
+		FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+	FTransform NewTransform;
+	Projectile->SetData(ProjectileName, CollisionProfileName);
+	const FVector Location = Owner->GetActorLocation();
+
+	NewTransform.SetLocation(Location);
+	NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
+	Projectile->FinishSpawning(NewTransform);
 }

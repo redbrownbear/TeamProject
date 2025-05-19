@@ -16,5 +16,4 @@ class TEAMPROJECT_API UAnimNotify_MonsterFindEnd : public UAnimNotify
 public:
 	UAnimNotify_MonsterFindEnd();
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
-
 };
