@@ -31,6 +31,6 @@ private:
 
 private:
 	UPROPERTY(meta = (BindWidget))
-	UMultiLineEditableTextBox* MyMultiLineBox;
+	UMultiLineEditableTextBox* TextBox;
 	
 };

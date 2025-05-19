@@ -7,55 +7,49 @@
 
 void UQuestDialogueManager::Initialize(FSubsystemCollectionBase& Collection)
 {
-    if (!ItemDataTable)
+
+}
+
+void UQuestDialogueManager::Initialize(UDataTable* DataTable)
+{
+    if (!DataTable)
     {
-        UE_LOG(LogTemp, Error, TEXT("ItemDataTable is not assigned in %s"), *GetName());
+        UE_LOG(LogTemp, Warning, TEXT("DataTable is null!"));
         return;
     }
 
-    ItemRowMap.Empty();
+    static const FString ContextString(TEXT("Populate QuestRowMap"));
 
-    const FString Context = TEXT("Loading Dialogue Table");
+    TArray<FName> RowNames = DataTable->GetRowNames();
 
-    TArray<FNPCDialogueTableRow*> AllRows;
-    ItemDataTable->GetAllRows(Context, AllRows);
-
-    TSet<EQuestCharacter> SeenCharacters;
-
-    for (const FNPCDialogueTableRow* RowPtr : AllRows)
+    for (const FName& RowName : RowNames)
     {
-        if (!RowPtr)
+        FNPCDialogueTableRow* Row = DataTable->FindRow<FNPCDialogueTableRow>(RowName, ContextString);
+
+        if (Row)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Null row in DataTable"));
-            continue;
+            if (Row->QuestCharacter != EQuestCharacter::None)
+            {
+                if (!QuestRowMap.Contains(Row->QuestCharacter))
+                {
+                    QuestRowMap.Add(Row->QuestCharacter, Row);
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Duplicate QuestCharacter key found: %s"), *UEnum::GetValueAsString(Row->QuestCharacter));
+                }
+            }
         }
-
-        const FNPCDialogueTableRow& Row = *RowPtr;
-
-        EQuestCharacter Character = Row.QuestCharacter;
-
-        if (Character == EQuestCharacter::None)
+        else
         {
-            UE_LOG(LogTemp, Warning, TEXT("Invalid character enum in row"));
-            continue;
+            UE_LOG(LogTemp, Warning, TEXT("Failed to find row for name: %s"), *RowName.ToString());
         }
-
-        if (SeenCharacters.Contains(Character))
-        {
-            UE_LOG(LogTemp, Error, TEXT("Duplicate character entry: %s"), *UEnum::GetValueAsString(Character));
-            continue;
-        }
-
-        //SeenCharacters.Add(Character);
-        //ItemRowMap.Add(Character, Row);
     }
-
-    UE_LOG(LogTemp, Log, TEXT("ItemRowMap loaded with %d entries"), ItemRowMap.Num());
 }
 
 const FNPCDialogueTableRow* UQuestDialogueManager::GetItemRow(EQuestCharacter Questchar) const
 {
-    auto FoundRow = ItemRowMap.Find(Questchar);
+    auto FoundRow = QuestRowMap.Find(Questchar);
     if (!FoundRow)
     {
         UE_LOG(LogTemp, Warning, TEXT("No row found for character: %s"), *UEnum::GetValueAsString(Questchar));

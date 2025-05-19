@@ -37,6 +37,6 @@ void UNPCDialogue::RefreshDialogue(const FNPCDialogueTableRow& QuestData)
 
     for (FString Dialogue : DialogueArr)
     {
-        MyMultiLineBox->SetText(FText::FromString(Dialogue));
+        TextBox->SetText(FText::FromString(Dialogue));
     }
 }

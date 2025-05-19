@@ -19,6 +19,8 @@ class TEAMPROJECT_API UQuestDialogueManager : public UGameInstanceSubsystem
 	
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	void Initialize(UDataTable* DataTable);
+
 	const FNPCDialogueTableRow* GetItemRow(EQuestCharacter qusetChar) const;
 
 public:
@@ -30,9 +32,9 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UDataTable* ItemDataTable;
+	UDataTable* QuestDataTable;
 
 private:
-	TMap<EQuestCharacter, const FNPCDialogueTableRow*> ItemRowMap;
+	TMap<EQuestCharacter, const FNPCDialogueTableRow*> QuestRowMap;
 
 };

@@ -114,6 +114,12 @@ void AUITestGameMode::OnpenQuest()
     check(QuestManager);
     if (QuestManager)
     {
+        UDataTable* LoadedTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/NPC/DT_NPCDialogue.DT_NPCDialogue"));
+        if (LoadedTable)
+        {
+            QuestManager->Initialize(LoadedTable);
+        }
+
 
         QuestManager->ShowDialogue(EQuestCharacter::Furiko);
     }
