@@ -132,6 +132,7 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Patrol:
 		break;
 	case EMonsterState::Suspicious:
+		SuspicionGauge = 0.f;
 		break;
 	case EMonsterState::Alert:
 		break;
