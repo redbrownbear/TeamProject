@@ -10,7 +10,7 @@ struct FRecipeData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	// @TODO Æ¯Á¤ µ¥ÀÌÅÍ(·¹½ÃÇÇ) ³Ö¾îµÑ °Í
+	// @TODO Æ¯ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½) ï¿½Ö¾ï¿½ï¿½ ï¿½ï¿½
 
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FHandItem> RequiredIngredients;
@@ -49,10 +49,10 @@ protected:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:		
-	// Ä³¸¯ÅÍ°¡ Q ´­·¯ ¾ÆÀÌÅÛÀ» Àü´ÞÇßÀ» ¶§ È£Ãâ
+	// Ä³ï¿½ï¿½ï¿½Í°ï¿½ Q ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ È£ï¿½ï¿½
 	void ReceiveIngredient(const FHandItem& HandItem, const FRecipeData& Recipe);
 
-	// ·¹½ÃÇÇ Ã¼Å©(¿ä¸® ¼º°ø/½ÇÆÐ ÆÇ´Ü)
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¼Å©(ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ ï¿½Ç´ï¿½)
 	bool CheckRecipeMatch(const FHandItem& HandItem, const FRecipeData& Recipe);
 
 	void SuccessCooking();
@@ -60,15 +60,15 @@ public:
 	void FailedCooking();
 
 protected:
-	// ¿ä¸® °¡´É ¿©ºÎ
+	// ï¿½ä¸® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsCookable = false;
 
-	// ÇöÀç µé¾î¿Â Àç·á ¸®½ºÆ®
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
 	UPROPERTY()
 	TArray<FHandItem> CurrentIngredients;
 
-	// ÇöÀç ·¹½ÃÇÇ (¸ÅÄªµÇ´Â °æ¿ì¸¸ ¼³Á¤)
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½Äªï¿½Ç´ï¿½ ï¿½ï¿½ì¸¸ ï¿½ï¿½ï¿½ï¿½)
 	UPROPERTY()
 	FRecipeData CurrentRecipe;
 

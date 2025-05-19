@@ -369,6 +369,7 @@ FodyWeavers.xsd
 *.user
 *.userosscache
 *.sln.docstates
+*.sln
 
 TeamProject/Intermediate
 TeamProject/Saved

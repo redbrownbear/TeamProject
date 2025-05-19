@@ -42,11 +42,11 @@ protected:
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UAdvancedFloatingPawnMovement> MovementComponent;
 
-protected:
-    UPROPERTY(VisibleAnywhere)
-    TObjectPtr<UAIPerceptionComponent> AIPerceptionComponent;
-    UPROPERTY(VisibleAnywhere)
-    TObjectPtr<UAISenseConfig_Sight> AISenseConfig_Sight;
+//protected:
+//    UPROPERTY(VisibleAnywhere)
+//    TObjectPtr<UAIPerceptionComponent> AIPerceptionComponent;
+//    UPROPERTY(VisibleAnywhere)
+//    TObjectPtr<UAISenseConfig_Sight> AISenseConfig_Sight;
 
 public:
     UMonsterStatusComponent* GetStatusComponent() const { return StatusComponent; }
@@ -80,9 +80,9 @@ public:
     ACampFire* GetCampFire() const { return CampFire; }
 
 public:
-    void PlayMontage(MONSTER_MONTAGE _InEnum, bool bIsLoop = false);
-    bool IsMontage(MONSTER_MONTAGE _InEnum);
-    bool IsPlayingMontage(MONSTER_MONTAGE _InEnum);
+    void PlayMontage(EMonsterMontage _InEnum, bool bIsLoop = false);
+    bool IsMontage(EMonsterMontage _InEnum);
+    bool IsPlayingMontage(EMonsterMontage _InEnum);
 
 
 };
