@@ -19,6 +19,9 @@ APlayerCharacter::APlayerCharacter()
 
 	FVector Scale = FVector(45.f, 45.f, 45.f);
 	FVector Locate = FVector(0.f, 0.f, -41.f);
+	{
+		SwordComponent = CreateDefaultSubobject<USwordComponent>(TEXT("SwordComponent"));
+	}
 
 	//SpringArm, Camera 생성 및 초기화
 	{
@@ -183,5 +186,6 @@ void APlayerCharacter::Play_Sword_Attack()
 			AnimInst->Montage_Play(Arr_Sword_Attack_MTG[1]);
 		}
 	}
+	SwordComponent->SetAttackBox();
 }
 

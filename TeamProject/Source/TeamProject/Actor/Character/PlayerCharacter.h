@@ -8,6 +8,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/AttackComponent/SwordComponent.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -41,6 +42,9 @@ public:
 
 
 protected:
+
+	UPROPERTY(EditAnywhere, Category="Sword")
+	TObjectPtr<USwordComponent> SwordComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpringArm")
 	TObjectPtr<USpringArmComponent> SpringArm;
