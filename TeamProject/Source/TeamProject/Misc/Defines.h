@@ -9,3 +9,15 @@
 
 
 #define MONSTER_CAMPFIRE_MIN_LENGTH													350.f
+
+#define MONSTER_DEFAULT_SIGHT_RADIUS												1000.f
+#define MONSTER_DEFAULT_LOSE_SIGHT_RADIUS											1100.f
+#define MONSTER_IMMEDIATE_ALERT_RADIUS												700.f
+
+#define MONSTER_SIGHT_ANGLE															120.f
+
+#define MONSTER_SUSPICIOUS_COEFFICIENT												33.f
+
+#define MONSTER_MAX_SUSPICIOUS_GAUGE												100.f
+
+#define MONSTER_MAX_SIGNAL_TIME														3.f
