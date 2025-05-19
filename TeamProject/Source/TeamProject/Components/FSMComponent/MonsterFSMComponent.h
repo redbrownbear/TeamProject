@@ -10,7 +10,7 @@
 class AMonster;
 class APlayerCharacter;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS()
 class TEAMPROJECT_API UMonsterFSMComponent : public UActorComponent
 {
 	GENERATED_BODY()

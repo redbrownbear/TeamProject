@@ -8,7 +8,7 @@
 #include "Actors/Object/PatrolPath.h"
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Object/CampFire.h"
-#include "Actor/Character/PlayerCharacter.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 
 #include "Navigation/PathFollowingComponent.h"
@@ -286,25 +286,33 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 
 void UMonsterFSMComponent::UpdateSuspicious(float DeltaTime)
 {
-	SuspicionGauge += DeltaTime * MONSTER_SUSPICIOUS_COEFFICIENT;
-
-	const FVector MonsterLocation = Owner->GetActorLocation();
-	const FVector PlayerLocation = Player->GetActorLocation();
-	const float fDistance = FVector::Dist(MonsterLocation, PlayerLocation);
-
-	if (SuspicionGauge >= MaxSuspicionGauge
-		|| fDistance < MONSTER_IMMEDIATE_ALERT_RADIUS
-		)
+	if (Player)
 	{
-		SuspicionGauge = 0.f;
-		ChangeState(EMonsterState::Alert);
+		SuspicionGauge += DeltaTime * MONSTER_SUSPICIOUS_COEFFICIENT;
+
+		const FVector MonsterLocation = Owner->GetActorLocation();
+		const FVector PlayerLocation = Player->GetActorLocation();
+		const float fDistance = FVector::Dist(MonsterLocation, PlayerLocation);
+
+		if (SuspicionGauge >= MaxSuspicionGauge
+			|| fDistance < MONSTER_IMMEDIATE_ALERT_RADIUS
+			)
+		{
+			SuspicionGauge = 0.f;
+			ChangeState(EMonsterState::Alert);
+		}
+		else
+		{
+			SuspicionGauge += DeltaTime;
+		}
+
+		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+
 	}
 	else
 	{
-		SuspicionGauge += DeltaTime;
+		ChangeState(EMonsterState::Idle);
 	}
-
-	SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
 }
 
 void UMonsterFSMComponent::UpdateAlert(float DeltaTime)

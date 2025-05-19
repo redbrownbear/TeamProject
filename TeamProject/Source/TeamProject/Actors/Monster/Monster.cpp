@@ -235,10 +235,19 @@ void AMonster::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 	case EMonsterMontage::FIND:
 		TempAnimMontage = MonsterData->FindMontage;
 		break;
+	case EMonsterMontage::SIGNAL_START:
+		TempAnimMontage = MonsterData->SignalStartMontage;
+		break;
+	case EMonsterMontage::SIGNAL_END:
+		TempAnimMontage = MonsterData->SignalEndMontage;
+		break;
 	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;
 	default:
+	{
+		int a = 0;
+	}
 		break;
 	}
 
@@ -252,6 +261,10 @@ void AMonster::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 		{
 			AnimInstance->Montage_Play(TempAnimMontage);
 		}
+	}
+	else
+	{
+		int a = 0;
 	}
 }
 

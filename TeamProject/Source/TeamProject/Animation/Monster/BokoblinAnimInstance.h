@@ -43,4 +43,6 @@ protected:
 	bool bIsToDance = false;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsSignal = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsSuspicious = false;
 };

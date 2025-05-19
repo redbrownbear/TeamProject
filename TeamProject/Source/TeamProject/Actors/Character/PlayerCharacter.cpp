@@ -70,7 +70,7 @@ APlayerCharacter::APlayerCharacter()
 	}
 
 	{
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/Armor/ArmorMix/ArmorMix.ArmorMix'")) };
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/01Player/Armor/ArmorMix/ArmorMix.ArmorMix'")) };
 		USkeletalMeshComponent* mMesh = GetMesh();
 		mMesh->SetupAttachment(RootComponent);
 		mMesh->SetRelativeLocation(Locate);

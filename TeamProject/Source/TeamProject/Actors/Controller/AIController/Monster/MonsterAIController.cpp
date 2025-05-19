@@ -3,7 +3,7 @@
 
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Monster/Monster.h"
-#include "Actor/Character/PlayerCharacter.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 
 #include "Components/FSMComponent/MonsterFSMComponent.h"
@@ -32,8 +32,9 @@ AMonsterAIController::AMonsterAIController()
 	PerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
 
 	// 감지 업데이트 이벤트 바인딩
-	PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AMonsterAIController::OnPerceptionUpdated);
-
+	//PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AMonsterAIController::OnPerceptionUpdated);
+	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMonsterAIController::OnTargetPerceptionUpdated);
+	
 }
 
 void AMonsterAIController::BeginPlay()
@@ -43,6 +44,7 @@ void AMonsterAIController::BeginPlay()
 	if (MonsterFSMComponent)
 	{
 		MonsterFSMComponent->SetOwner(Cast<AMonster>(GetPawn()));
+		MonsterFSMComponent->SetPlayer(nullptr);
 	}
 }
 
@@ -74,6 +76,22 @@ void AMonsterAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedAct
 	}
 }
 
+void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+{
+	APlayerCharacter* Player = Cast<APlayerCharacter>(Actor);
+	if (!Player) return;
+
+	if (Stimulus.WasSuccessfullySensed())
+	{
+		// 감지됨
+		MonsterFSMComponent->SetPlayer(Player);
+	}
+	else
+	{
+		// 감지 해제됨
+		MonsterFSMComponent->SetPlayer(nullptr);
+	}
+}
 void AMonsterAIController::SetAIEnabled(bool bEnabled)
 {
 }
