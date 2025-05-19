@@ -15,7 +15,6 @@ void UInventory::OnCreated()
 
     UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
     check(InvenManager);
-
     if (InvenManager)
     {
         InvenManager->OnInventoryUpdated.AddDynamic(this, &UInventory::RefreshInventory);
