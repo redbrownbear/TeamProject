@@ -4,7 +4,7 @@
 #include "GameFramework/PlayerController.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "Character/TestCharacter.h"
+#include "Actors/TestCharacter/TestCharacter.h"
 #include "TestPC.generated.h"
 
 UCLASS()

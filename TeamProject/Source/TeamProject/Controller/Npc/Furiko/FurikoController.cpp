@@ -1,5 +1,5 @@
 #include "FurikoController.h"
-#include "Components/FSM/Npc/Furiko/FurikoFSMComponent.h"
+#include "Components/FSMComponent/Npc/Furiko/FurikoFSMComponent.h"
 //#include "Character/Npc/Furiko/Furiko.h"
 
 AFurikoController::AFurikoController()

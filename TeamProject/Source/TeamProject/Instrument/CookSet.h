@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Character/TestCharacter.h"
+#include "Actors/TestCharacter/TestCharacter.h"
 #include "CookSet.generated.h"
 
 USTRUCT(BlueprintType)
