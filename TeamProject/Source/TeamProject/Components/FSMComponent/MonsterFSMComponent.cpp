@@ -1,7 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Misc/Utils.h"
-
 #include "Components/FSMComponent/MonsterFSMComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
@@ -138,6 +136,9 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Alert:
 		break;
 	case EMonsterState::Combat:
+	{
+		Owner->SetSpeedWalk();
+	}
 		break;
 	case EMonsterState::Dead:
 		break;
@@ -171,6 +172,7 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::Combat:
 		Owner->PlayMontage(EMonsterMontage::ANGRY);
+		Owner->SetSpeedRun();
 		break;
 	case EMonsterState::Dance:
 		Owner->PlayMontage(EMonsterMontage::DANCE_START);
@@ -261,9 +263,15 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 		return;
 	}
 
-	// 이동 
-	MoveToLocation(Location);
-
+	// 이동
+	if (Owner->IsPlayingMontage(EMonsterMontage::END))
+	{
+		StopMove();
+	}
+	else
+	{
+		MoveToLocation(Location);
+	}
 
 	// 다음 PatrolIndex 구하기
 	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
@@ -326,8 +334,35 @@ void UMonsterFSMComponent::UpdateAlert(float DeltaTime)
 
 void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 {
-	int a = 0;
-	// Chase and Attack Player;
+	if (!IsValid(Player)) 
+	{
+		ChangeState(EMonsterState::Idle); 
+		return;
+	}
+
+	// Get Target Location
+	FVector Location = Player->GetActorLocation();
+
+	// Move
+	// 이동
+	if (Owner->IsPlayingMontage(EMonsterMontage::END))
+	{
+		StopMove();
+	}
+	else
+	{
+		MoveToLocation(Location);
+	}
+
+
+	// Check if it's arrived
+	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
+
+	if (bIsNear)
+	{
+		StopMove();
+		Owner->PlayMontage(EMonsterMontage::ATTACK);
+	}
 }
 
 void UMonsterFSMComponent::UpdateSignal(float DeltaTime)

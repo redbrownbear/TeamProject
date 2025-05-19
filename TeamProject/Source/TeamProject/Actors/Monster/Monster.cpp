@@ -4,6 +4,7 @@
 #include "Actors/Monster/Monster.h"
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Projectile/Projectile.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
@@ -16,7 +17,7 @@
 #include "Data/MonsterTableRow.h"
 
 #include "Kismet/KismetMathLibrary.h"
-
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMonster::AMonster()
@@ -221,7 +222,7 @@ void AMonster::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 		break;
 	default:
 	{
-		int a = 0;
+		check(false);
 	}
 		break;
 	}
@@ -389,6 +390,21 @@ void AMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 			{
 				FSMComponent->ChangeState(EMonsterState::Combat);
+				if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+				{
+					if (APlayerCharacter* Player = Cast<APlayerCharacter>(PlayerController->GetPawn()))
+					{
+						FSMComponent->SetPlayer(Player);
+					}
+					else
+					{
+						check(false);
+					}
+				}
+				else
+				{
+					check(false);
+				}
 			}
 		}
 	}
@@ -396,4 +412,14 @@ void AMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 void AMonster::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+}
+
+void AMonster::SetSpeedWalk()
+{
+	MovementComponent->MaxSpeed = MonsterData->WalkMovementMaxSpeed;
+}
+
+void AMonster::SetSpeedRun()
+{
+	MovementComponent->MaxSpeed = MonsterData->RunMovementMaxSpeed;
 }
