@@ -71,4 +71,6 @@ protected:
 protected:
 	void MoveToLocation(const FVector& InLocation);
 	void StopMove();
+	void SpawnProjectile(FName ProjectileName, FName CollisionProfileName);
+
 };
