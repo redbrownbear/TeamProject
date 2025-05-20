@@ -3,7 +3,6 @@
 #include "Actors/Npc/Npc.h"
 #include "GameFramework/FloatingPawnMovement.h"
 
-#include "UI/NpcDialogue/NPCDialogue.h"
 
 UConversationManagerComponent::UConversationManagerComponent()
 {	
@@ -35,25 +34,25 @@ void UConversationManagerComponent::BeginPlay()
 
 void UConversationManagerComponent::PlayTalkAnimations()
 {
-	//// NPC → 몽타주
-	//if (UAnimInstance* NpcAnim = CurrentNpc->GetMesh()->GetAnimInstance())
-	//{
-	//	NpcAnim->Montage_Play(NpcTalkMontage);
-	//}
+	// NPC → 몽타주
+	if (UAnimInstance* NpcAnim = CurrentNpc->GetBodyMesh()->GetAnimInstance())
+	{
+		NpcAnim->Montage_Play(NpcTalkMontage);
+	}
 
-	//// Player → 몽타주
-	//if (UAnimInstance* PlayerAnim = CurrentPlayer->GetMesh()->GetAnimInstance())
-	//{
-	//	PlayerAnim->Montage_Play(PlayerTalkMontage);
-	//}
+	// Player → 몽타주
+	if (UAnimInstance* PlayerAnim = CurrentPlayer->GetMesh()->GetAnimInstance())
+	{
+		PlayerAnim->Montage_Play(PlayerTalkMontage);
+	}
 }
 
 void UConversationManagerComponent::ShowTalkUI()
 {
-	//// Create Talk UI
+	// Create Talk UI
 	//Dialogue->OnCreated();
 
-	//PlayTalkAnimations();
+	PlayTalkAnimations();
 }
 
 void UConversationManagerComponent::LockCharacters(ANpc* Npc, APlayerCharacter* Player)
@@ -69,7 +68,7 @@ void UConversationManagerComponent::LockCharacters(ANpc* Npc, APlayerCharacter* 
 		// 이동만 제한
 		if (UCharacterMovementComponent* MoveComp = Player->GetCharacterMovement())
 		{
-			MoveComp->DisableMovement(); // 이동 불가 (Jump, 걷기 등 모두 막힘)
+			MoveComp->SetMovementMode(MOVE_None); // 이동 불가 (Jump, 걷기 등 모두 막힘)
 		}
 
 		// 회전도 수동 제어로 바꿈
@@ -80,5 +79,13 @@ void UConversationManagerComponent::LockCharacters(ANpc* Npc, APlayerCharacter* 
 void UConversationManagerComponent::UnlockCharacters(ANpc* Npc, APlayerCharacter* Player)
 {
 	// Can Move
+	if (Player)
+	{
+		if (UCharacterMovementComponent* MoveComp = Player->GetCharacterMovement())
+		{
+			MoveComp->SetMovementMode(MOVE_Walking); // 이동 가능 상태 복원
+		}
+	}
+
 }
 

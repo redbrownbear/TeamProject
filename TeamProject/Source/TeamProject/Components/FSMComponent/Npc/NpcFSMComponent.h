@@ -22,6 +22,7 @@ enum class ENpcState : uint8
 class ANpc;
 class APlayerCharacter;
 class ANpcController;
+class UNPCDialogue;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TEAMPROJECT_API UNpcFSMComponent : public UActorComponent
@@ -52,7 +53,11 @@ protected:
 	TObjectPtr<APlayerCharacter> Player = nullptr;
 
 	UPROPERTY()
-	TObjectPtr<ANpcController> Controller = nullptr;
+	ANpcController* Controller = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UNPCDialogue> Dialogue = nullptr;
+
 
 protected:
 	ENpcState       eCurrentState;

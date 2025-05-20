@@ -52,6 +52,8 @@ public:
 
 	AStrollPath* GetStrollPath() const { return StrollPath; }
 
+	USkeletalMeshComponent* GetBodyMesh() const { return BodyMeshComponent; }
+
 	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
 
 	void OnTalkKeyPressed(); // 대화 UI

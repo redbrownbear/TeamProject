@@ -44,4 +44,6 @@ void UNPCDialogue::RefreshDialogue(const FNPCDialogueTableRow& QuestData)
     {
         TextBox->SetText(FText::FromString(Dialogue));
     }
+
+    bEndDialogue = true; // 2025-05-20 대화 종료 확인 변수 추가
 }

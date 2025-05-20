@@ -4,9 +4,10 @@
 #include "Actors/Character/PlayerCharacter.h"
 
 #include "Navigation/PathFollowingComponent.h"
-#include "Animation/Npc/ConversationManagerComponent.h"
-
 #include "Kismet/GameplayStatics.h"
+
+#include "Animation/Npc/ConversationManagerComponent.h"
+#include "UI/NpcDialogue/NPCDialogue.h"
 
 UNpcFSMComponent::UNpcFSMComponent()
 {
@@ -20,7 +21,8 @@ void UNpcFSMComponent::BeginPlay()
 		
 	if (!Owner)
 	{
-		if (Controller = Cast<ANpcController>(GetOwner()))
+		Controller = Cast<ANpcController>(GetOwner());
+		if (Controller)
 		{
 			Owner = Cast<ANpc>(Controller->GetPawn());
 		}
@@ -136,8 +138,14 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 		SmoothRotateActorToDirection(Player, NpcLocation, DeltaTime);
 
 		Controller->GetConversationManager()->StartConversation(Owner, Player);
-	}				
+	}			
 
+	// 대화 종료 시	
+	if (Dialogue->GetDialogueState())
+	{
+		Dialogue->CloseUI();
+		Controller->GetConversationManager()->UnlockCharacters(Owner, Player);
+	}
 }
 
 void UNpcFSMComponent::MoveToLocation(const FVector& InLocation)

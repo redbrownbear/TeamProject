@@ -49,4 +49,9 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ExtraText;
 	
+public:
+	bool GetDialogueState() { return bEndDialogue; }
+
+private:
+	bool bEndDialogue = false; // 2025-05-20 대화 종료 확인 변수 추가
 };

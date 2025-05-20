@@ -1,4 +1,5 @@
 #include "Components/FSMComponent/Npc/Store/StoreFSMComponent.h"
+#include "UI/NpcDialogue/NPCDialogue.h"
 
 void UStoreFSMComponent::UpdateIdle(float DeltaTime)
 {
@@ -9,16 +10,16 @@ void UStoreFSMComponent::UpdateTalk(float DeltaTime)
 {
 	Super::UpdateTalk(DeltaTime);
 
-	// Npc Can't Move 
-
-	// 대화 종료되었을 때
-	/*if (bool bBye = DeleteTalkUI()) // 대화 ui 삭제 
+	if (Dialogue->GetDialogueState())
 	{
-		ChangeState(ENpcState::Idle)
-	}*/
+		ChangeState(ENpcState::Idle);
+	}
 }
 
 void UStoreFSMComponent::UpdateSell(float DeltaTime)
 {
+	// 물건 구매 시
+	ChangeState(ENpcState::Talk); 
 	
+	// 구매 ㄳㄳ한뒤에 Idle로 돌릴지 사고 바로 Idle 상태로 돌릴 지
 }

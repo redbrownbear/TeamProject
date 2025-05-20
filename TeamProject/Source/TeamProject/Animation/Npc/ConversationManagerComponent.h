@@ -32,8 +32,15 @@ public:
 
 private:
 	UPROPERTY()
-	ANpc* CurrentNpc;
+	ANpc* CurrentNpc = nullptr;
 
 	UPROPERTY()
-	APlayerCharacter* CurrentPlayer;
+	APlayerCharacter* CurrentPlayer = nullptr;
+
+private:
+	UPROPERTY()
+	UAnimMontage* NpcTalkMontage = nullptr;
+
+	UPROPERTY()
+	UAnimMontage* PlayerTalkMontage = nullptr;
 };
