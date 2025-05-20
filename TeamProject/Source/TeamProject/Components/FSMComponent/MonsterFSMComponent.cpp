@@ -354,6 +354,10 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 		MoveToLocation(Location);
 	}
 
+	// 공격 쿨타임 갱신
+	CurrentAttackCoolTime += DeltaTime;
+
+
 
 	// Check if it's arrived
 	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
@@ -361,7 +365,11 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 	if (bIsNear)
 	{
 		StopMove();
-		Owner->PlayMontage(EMonsterMontage::ATTACK);
+		if (CurrentAttackCoolTime > MONSTER_ATTACK_COOLTIME)
+		{
+			CurrentAttackCoolTime = 0.f;
+			Owner->PlayMontage(EMonsterMontage::ATTACK);
+		}
 	}
 }
 
