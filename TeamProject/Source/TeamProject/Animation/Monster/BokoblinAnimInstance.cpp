@@ -5,6 +5,8 @@
 #include "Components/FSMComponent/BokoblinFSMComponent.h"
 
 #include "Actors/Monster/Monster.h"
+#include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
+#include "Kismet/KismetMathLibrary.h"
 
 UBokoblinAnimInstance::UBokoblinAnimInstance()
 	:Super()
@@ -79,7 +81,20 @@ void UBokoblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	case EMonsterState::Alert:
 		break;
 	case EMonsterState::Combat:
-		bIsRun = true;
+	{
+		if (AMonster* Monster = Cast<AMonster>(TryGetPawnOwner()))
+		{
+			const double Speed = UKismetMathLibrary::VSizeXY(Monster->GetMovementComponent()->Velocity);
+			if (FMath::IsNearlyZero(Speed))
+			{
+				bIsIdle = true;
+			}
+			else
+			{
+				bIsRun = true;
+			}
+		}
+	}
 		break;
 	case EMonsterState::Dead:
 		break;

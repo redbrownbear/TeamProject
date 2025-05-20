@@ -4,16 +4,20 @@
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/InventoryManager.h"
+#include "SubSystem//UI/QuestDialogueManager.h"
+
 #include "UI/Test/TestPopupUI.h"
 #include "UI/Inven/Inventory.h"
+#include "UI/NpcDialogue/NPCDialogue.h"
 
 
 void AUITestGameMode::BeginPlay()
 {
     Super::BeginPlay();
 
-    CreatePopup();
+    CreateDialogueBox();
     CreateInven();
+
 
     APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
     if (PC)
@@ -25,12 +29,13 @@ void AUITestGameMode::BeginPlay()
     }
 }
 
-void AUITestGameMode::CreatePopup()
+void AUITestGameMode::CreateDialogueBox()
 {
     APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
     if (PC)
     {
-        FInputActionBinding& Bind = PC->InputComponent->BindAction("OpenPopup", IE_Pressed, this, &AUITestGameMode::OnOpenPopup);
+        FInputActionBinding& Bind1 = PC->InputComponent->BindAction("OpenPopup", IE_Pressed, this, &AUITestGameMode::OnOepnDialogueBox);
+        FInputActionBinding& Bind2 = PC->InputComponent->BindAction("Dialogue", IE_Pressed, this, &AUITestGameMode::OnpenQuest);
     }
 }
 
@@ -44,31 +49,6 @@ void AUITestGameMode::CreateInven()
     }
 }
 
-void AUITestGameMode::OnOpenPopup()
-{
-    UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-    check(UIManager);
-
-    if (UIManager)
-    {
-        FString Path = TEXT("/Game/BluePrint/UI/BP_TestPopup.BP_TestPopup_C");
-        TSubclassOf<UTestPopupUI> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
-
-        UTestPopupUI* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
-        if (NewUI)
-        {
-            FText Title = FText::FromString(TEXT("Hi"));
-            FText Main = FText::FromString(TEXT("Welcome"));
-
-            NewUI->SetPopupText(Title, Main);
-        }
-        else
-        {
-            check(NewUI);
-        }
-    }
-}
-
 void AUITestGameMode::OnOpenInven()
 {
     UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
@@ -77,7 +57,7 @@ void AUITestGameMode::OnOpenInven()
     if (UIManager)
     {
         //Inventory
-        FString Path = TEXT("/Game/BluePrint/UI/BP_InvenLayout.BP_InvenLayout_C");
+        FString Path = TEXT("/Game/BluePrint/UI/Inventory/BP_InvenLayout.BP_InvenLayout_C");
         TSubclassOf<UInventory> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
 
         UInventory* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
@@ -106,4 +86,42 @@ void AUITestGameMode::CreateItem()
                      
         }
     }
+}
+
+void AUITestGameMode::OnOepnDialogueBox()
+{
+    UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+    check(UIManager);
+
+    if (UIManager)
+    {
+        FString Path = TEXT("/Game/BluePrint/UI/NpcDialogue/BP_NpcDialogue.BP_NpcDialogue_C");
+        TSubclassOf<UNPCDialogue> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
+
+        UNPCDialogue* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
+        if (!NewUI)
+        {
+            check(NewUI);
+        }
+    }
+}
+
+void AUITestGameMode::OnpenQuest()
+{
+    //Çª¸®ÄÚ ÀÓ½Ã
+
+    UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+    if (QuestManager)
+    {
+        UDataTable* LoadedTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/NPC/DT_NPCDialogue.DT_NPCDialogue"));
+        if (LoadedTable)
+        {
+            QuestManager->Initialize(LoadedTable);
+        }
+
+
+        QuestManager->ShowDialogue(EQuestCharacter::Furiko);
+    }
+
 }
