@@ -9,8 +9,7 @@ USTRUCT(BlueprintType)
 struct FRecipeData : public FTableRowBase
 {
 	GENERATED_BODY()
-
-	// @TODO Ư�� ������(������) �־�� ��
+	
 
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FHandItem> RequiredIngredients;
@@ -48,11 +47,9 @@ protected:
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-public:		
-	// ĳ���Ͱ� Q ���� �������� �������� �� ȣ��
+public:
 	void ReceiveIngredient(const FHandItem& HandItem, const FRecipeData& Recipe);
 
-	// ������ üũ(�丮 ����/���� �Ǵ�)
 	bool CheckRecipeMatch(const FHandItem& HandItem, const FRecipeData& Recipe);
 
 	void SuccessCooking();
@@ -60,15 +57,12 @@ public:
 	void FailedCooking();
 
 protected:
-	// �丮 ���� ����
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsCookable = false;
 
-	// ���� ���� ��� ����Ʈ
 	UPROPERTY()
 	TArray<FHandItem> CurrentIngredients;
 
-	// ���� ������ (��Ī�Ǵ� ��츸 ����)
 	UPROPERTY()
 	FRecipeData CurrentRecipe;
 
