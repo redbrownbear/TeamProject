@@ -389,6 +389,7 @@ void AMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 		{
 			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 			{
+
 				FSMComponent->ChangeState(EMonsterState::FindWeapon);
 				if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0))
 				{

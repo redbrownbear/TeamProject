@@ -70,8 +70,6 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 		if (!HasAnyFlags(RF_ClassDefaultObject))
 		{
 			CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
-			CollisionComponent->SetEnableGravity(true);
-			CollisionComponent->SetSimulatePhysics(true);
 		}
 		if (USphereComponent* SphereComponent = Cast<USphereComponent>(CollisionComponent))
 		{
@@ -127,8 +125,6 @@ void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHa
 		if (!HasAnyFlags(RF_ClassDefaultObject))
 		{
 			CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
-			CollisionComponent->SetEnableGravity(true);
-			CollisionComponent->SetSimulatePhysics(true);
 		}
 		if (USphereComponent* SphereComponent = Cast<USphereComponent>(CollisionComponent))
 		{
@@ -205,6 +201,10 @@ void AWorldWeapon::BeginPlay()
 
 	StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
 	StimuliSource->RegisterWithPerceptionSystem();
+
+	CollisionComponent->BodyInstance.bUseCCD = true;
+	CollisionComponent->SetEnableGravity(true);
+	CollisionComponent->SetSimulatePhysics(true);
 }
 
 void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -219,12 +219,16 @@ void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 				{
 					FSMComponent->SetToCatchWeapon(nullptr);
 					FSMComponent->SetCatchedWeapon(this);
+					FSMComponent->ChangeState(EMonsterState::Combat);
+
 					bIsCatched = true;
 
 					this->AttachToComponent(
 						Monster->GetSkeletalMeshComponent(),
 						FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 						TEXT("WeaponRight"));
+
+					Proj->Destroy();
 				}
 			}
 		}

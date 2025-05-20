@@ -178,6 +178,12 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 		Owner->PlayMontage(EMonsterMontage::FIND);
 		break;
 	case EMonsterState::FindWeapon:
+		if (CatchedWeapon)
+		{
+			return;
+		}
+
+
 		if (PrevState != EMonsterState::Combat)
 		{
 			Owner->PlayMontage(EMonsterMontage::ANGRY);
