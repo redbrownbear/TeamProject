@@ -105,3 +105,11 @@ inline void SmoothRotateActorToDirection(AActor* TargetActor, const FVector& Tar
     FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, InterpSpeed);
     TargetActor->SetActorRotation(NewRot);
 }
+
+
+enum class EEquipWeapon
+{
+    Sword_Shiled,
+    Bow,
+
+};

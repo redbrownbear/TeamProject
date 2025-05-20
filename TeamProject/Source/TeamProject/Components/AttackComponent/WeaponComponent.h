@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "SwordComponent.generated.h"
+#include "WeaponComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class TEAMPROJECT_API USwordComponent : public UActorComponent
+class TEAMPROJECT_API UWeaponComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	USwordComponent();
+	UWeaponComponent();
 
 protected:
 	// Called when the game starts
@@ -35,9 +35,6 @@ public:
 	void SetCanMove();
 		
 protected:
-
-	FTimerHandle ComboTimerHandle;
-	FTimerHandle MoveTimerHandle;
 
 	bool bCanAttack = true;
 

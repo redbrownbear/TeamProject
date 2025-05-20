@@ -30,10 +30,14 @@ protected:
 	
 	void InitializePool(int32 PreloadCount);
 
-
 public:
 	void AddItemSlot(const FItemData& NewItem);
 	void UpdateSlots(const TArray<FItemData>& NewItemList);
+
+public:
+	void MoveSelection(FIntPoint Direction);
+	void SelectInit();
+
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -49,5 +53,5 @@ private:
 	UPROPERTY()
 	TArray<UInventorySlot*> PooledSlots;
 
-
+	int32 CurrentIndex = 0;
 };
