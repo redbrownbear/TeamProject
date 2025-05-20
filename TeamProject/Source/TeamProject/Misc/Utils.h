@@ -14,6 +14,7 @@ namespace CollisionProfileName
     static inline FName ToPlayer = TEXT("ToPlayer");
     static inline FName ToMonster = TEXT("ToMonster");
     static inline FName MapMesh = TEXT("MapMesh");
+    static inline FName Item = TEXT("Item");
 }
 
 namespace ProjectileName
