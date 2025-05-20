@@ -5,6 +5,8 @@
 #include "Components/FSMComponent/BokoblinFSMComponent.h"
 
 #include "Actors/Monster/Monster.h"
+#include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
+#include "Kismet/KismetMathLibrary.h"
 
 UBokoblinAnimInstance::UBokoblinAnimInstance()
 	:Super()
@@ -18,7 +20,7 @@ void UBokoblinAnimInstance::NativeInitializeAnimation()
 	APawn* Pawn = TryGetPawnOwner();
 	if (GIsEditor && FApp::IsGame() && !Pawn)
 	{
-		checkf(false, TEXT("UGPMarioAnimInstance를 사용하려면 소유권자가 Pawn이여야 합니다."));
+		checkf(false, TEXT("UBokoblinAnimInstance를 사용하려면 소유권자가 Pawn이여야 합니다."));
 		return;
 	}
 	else if (!Pawn) { return; }
@@ -79,6 +81,20 @@ void UBokoblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	case EMonsterState::Alert:
 		break;
 	case EMonsterState::Combat:
+	{
+		if (AMonster* Monster = Cast<AMonster>(TryGetPawnOwner()))
+		{
+			const double Speed = UKismetMathLibrary::VSizeXY(Monster->GetMovementComponent()->Velocity);
+			if (FMath::IsNearlyZero(Speed))
+			{
+				bIsIdle = true;
+			}
+			else
+			{
+				bIsRun = true;
+			}
+		}
+	}
 		break;
 	case EMonsterState::Dead:
 		break;

@@ -53,6 +53,9 @@ protected:
 protected:
 	int32 CurrentPatrolIndex = 0;
 
+protected:
+	float CurrentAttackCoolTime = 0.f;
+
 private:
 	void HandleState(float DeltaTime);
 public:
@@ -71,4 +74,6 @@ protected:
 protected:
 	void MoveToLocation(const FVector& InLocation);
 	void StopMove();
+	void SpawnProjectile(FName ProjectileName, FName CollisionProfileName);
+
 };

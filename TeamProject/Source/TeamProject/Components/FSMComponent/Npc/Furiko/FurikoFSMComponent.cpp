@@ -1,25 +1,14 @@
 #include "FurikoFSMComponent.h"
 #include "Actors/Npc/Furiko/Furiko.h"
 
+UFurikoFSMComponent::UFurikoFSMComponent()
+{
+	eCurrentState = ENpcState::Stroll;
+}
+
 void UFurikoFSMComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	/*if (!Owner)
-	{
-		Owner = Cast<AFuriko>(GetOwner()); 
-		if (!Owner)
-		{
-			UE_LOG(LogTemp, Error, TEXT("UFurikoFSMComponent::BeginPlay - Owner is null even after fallback"));
-			return;
-		}
-	}*/
-
-	//FurikoController = Cast<AFurikoController>(Owner->GetController());
-	//if (!FurikoController)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("UFurikoFSMComponent::BeginPlay - Controller is not AFurikoController"));
-	//}
 
 }
 
@@ -76,12 +65,45 @@ void UFurikoFSMComponent::UpdateStroll(float DeltaTime)
 {	
 	Super::UpdateStroll(DeltaTime);
 	
+	// 목표 위치 구하기
+	FVector Location = FVector();
+
+	if (AStrollPath* StrollPath = Owner->GetStrollPath())
+	{
+		Location = StrollPath->GetSplinePointLocation(CurrentStrollIndex);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::UpdateStroll // No StrollPath"));
+		check(false);
+	}
+
+	// 이동 
+	MoveToLocation(Location);
+
+	// 다음 PatrolIndex 구하기
+	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 300.f);
+
+
+	if (bIsNear)
+	{
+		++CurrentStrollIndex;
+
+		if (AStrollPath* StrollPath = Owner->GetStrollPath())
+		{
+			if (CurrentStrollIndex >= StrollPath->GetSplineMaxIndex())
+			{
+				CurrentStrollIndex = 0;
+			}
+		}
+	}
 }
 
 void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 {
 	Super::UpdateTalk(DeltaTime);
 
+	// 숨바꼭질 선택지 선택할 경우
 	/*if (FurikoController->bPlayHide)
 	{
 		FurikoController->bTalk = false;
@@ -92,10 +114,7 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 
 void UFurikoFSMComponent::UpdateHide(float DeltaTime)
 {
-	if (FurikoController->bTalk)
-	{
-		SetNpcState(ENpcState::Talk);
-	}
+	
 }
 
 void UFurikoFSMComponent::UpdatePlay(float DeltaTime)

@@ -4,14 +4,10 @@
 #include "Actors/Controller/Npc/NpcController.h"
 #include "FurikoController.generated.h"
 
-class UNpcFSMComponent;
-
 UCLASS()
 class TEAMPROJECT_API AFurikoController : public ANpcController
 {
 	GENERATED_BODY()
-	
-	friend class UFurikoFSMComponent;
 
 public:
 	AFurikoController();

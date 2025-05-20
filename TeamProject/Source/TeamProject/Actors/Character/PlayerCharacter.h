@@ -12,10 +12,14 @@
 #include "Actors/Weapon/WeaponSword.h"
 #include "Actors/Weapon/WeaponBow.h"
 #include "Components/WeaponChildActorComponent/WeaponChildActorComponent.h"
+#include "GenericTeamAgentInterface.h"
+#include "Misc/Utils.h"
 #include "PlayerCharacter.generated.h"
 
+
+
 UCLASS()
-class TEAMPROJECT_API APlayerCharacter : public ACharacter
+class TEAMPROJECT_API APlayerCharacter : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -42,7 +46,7 @@ public:
 
 	void Play_Sword_Attack();
 
-
+	
 
 public:
 	AWeaponSword* GetSword() { return Cast<AWeaponSword>(Sword->GetChildActor()); }
@@ -75,6 +79,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	TObjectPtr<UWeaponChildActorComponent> Sword;
 
-protected:
-	
+
+public:
+	virtual uint8 GetGenericTeamId() { return FGenericTeamId(PLAYER_GENERIC_TEAM_ID); }
 };

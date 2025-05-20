@@ -16,17 +16,19 @@ enum class ENpcState : uint8
 	Talk,
 	Hide,
 	Play, // 술래잡기: 시간 되면 추가
+	Sell,
 };
 
 class ANpc;
-//class ANpcController;
+class APlayerCharacter;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TEAMPROJECT_API UNpcFSMComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-	friend class ANpcController;
+	friend class ANpc;
+	friend class APC_InGame;
 
 public:
 	UNpcFSMComponent();
@@ -39,16 +41,17 @@ public:
 
 public:
 	void SetOwner(ANpc* InOwner) { Owner = InOwner; }
+	void SetPlayer(APlayerCharacter* InPlayer) { Player = InPlayer; }
 
 protected:
 	UPROPERTY()
 	TObjectPtr<ANpc> Owner = nullptr;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<AStrollPath> StrollPathActor;
+	UPROPERTY()
+	TObjectPtr<APlayerCharacter> Player = nullptr;
 
-	/*UPROPERTY()
-	ANpcController* NpcController = nullptr;*/
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<AStrollPath> StrollPathActor;	
 
 protected:
 	ENpcState       eCurrentState;

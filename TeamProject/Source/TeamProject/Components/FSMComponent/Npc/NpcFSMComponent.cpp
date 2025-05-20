@@ -7,7 +7,6 @@ UNpcFSMComponent::UNpcFSMComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	eCurrentState = ENpcState::Stroll;
 }
 
 void UNpcFSMComponent::BeginPlay()
@@ -46,6 +45,7 @@ void UNpcFSMComponent::HandleState(float DeltaTime)
 	default:
 		break;
 	}
+	
 }
 
 void UNpcFSMComponent::ChangeState(ENpcState NewState)
@@ -63,60 +63,40 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		break;
 	}
 	eCurrentState = NewState;
+
+	UE_LOG(LogTemp, Warning, TEXT("eCurrentState = %s"), *UEnum::GetValueAsString(eCurrentState));
 }
 
 void UNpcFSMComponent::UpdateIdle(float DeltaTime)
 {
-	/*if (Owner->GetStrollPath())
+	if (eCurrentState != ENpcState::Idle)
 	{
-		UpdateStroll(DeltaTime);
-	}*/
+		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Idle'"));
+		return;
+	}
 }
 
 void UNpcFSMComponent::UpdateStroll(float DeltaTime)
 {	
-	// 목표 위치 구하기
-	FVector Location = FVector();
-
-	if (AStrollPath* StrollPath = Owner->GetStrollPath())
+	if (eCurrentState != ENpcState::Stroll)
 	{
-		Location = StrollPath->GetSplinePointLocation(CurrentStrollIndex);	
+		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Stroll'"));
+		return;
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::UpdateStroll // No StrollPath"));
-		check(false);
-	}
-
-	// 이동 
-	MoveToLocation(Location);
-
-	// 다음 PatrolIndex 구하기
-	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 300.f);
-
-
-	if (bIsNear)
-	{
-		++CurrentStrollIndex;
-
-		if (AStrollPath* StrollPath = Owner->GetStrollPath())
-		{
-			if (CurrentStrollIndex >= StrollPath->GetSplineMaxIndex())
-			{
-				CurrentStrollIndex = 0;
-			}
-		}
-	}
-
-	/*if (NpcController->bTalk) 
-	{
-		SetNpcState(ENpcState::Talk);
-	}*/
+	
 }
 
 void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 {
-	// Play Montage
+	if (eCurrentState != ENpcState::Talk)
+	{
+		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Talk'"));
+		return;
+	}
+	// Play Npc Talk Animation
+	// Play Player Talk Animation
+	 
+	// 	
 }
 
 void UNpcFSMComponent::MoveToLocation(const FVector& InLocation)

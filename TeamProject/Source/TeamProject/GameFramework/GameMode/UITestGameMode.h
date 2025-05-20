@@ -27,6 +27,11 @@ public:
 
 	void CreateItem();
 
+	void CreateDialogueBox();
+	void OnOepnDialogueBox();
+
+	void OnpenQuest();
+
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
