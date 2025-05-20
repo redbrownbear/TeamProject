@@ -19,9 +19,6 @@ class TEAMPROJECT_API AUITestGameMode : public AGameModeBase
 
 	//전부테스트용
 public:
-	void CreatePopup();
-	void OnOpenPopup();
-
 	void CreateInven();
 	void OnOpenInven();
 
