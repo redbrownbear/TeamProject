@@ -129,7 +129,12 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 	}
 
 	if (Player)
-	{
+	{	
+		FVector PlayerLocation = Player->GetActorLocation();
+		FVector NpcLocation = Owner->GetActorLocation();
+		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+		SmoothRotateActorToDirection(Player, NpcLocation, DeltaTime);
+
 		Controller->GetConversationManager()->StartConversation(Owner, Player);
 	}				
 

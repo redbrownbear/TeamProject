@@ -116,9 +116,3 @@ void ANpc::OnTalkKeyPressed()
 		// Delete Interact UI And Create Talk UI		
 	}
 }
-
-void ANpc::DisableMovement()
-{
-	// @TODO
-}
-

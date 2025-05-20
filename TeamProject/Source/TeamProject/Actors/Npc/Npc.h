@@ -57,8 +57,6 @@ public:
 	void OnTalkKeyPressed(); // 대화 UI
 
 	bool GetCanTalk() { return bPlayerInRange; }
-
-	void DisableMovement(); // 움직임 제한
 	
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -66,6 +64,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<AStrollPath> StrollPath;
+
+
 
 private:
 	// 상호작용 가능 변수
