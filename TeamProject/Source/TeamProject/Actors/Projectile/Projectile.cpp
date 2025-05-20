@@ -35,6 +35,7 @@ AProjectile::AProjectile()
 	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
 	StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
+	CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
 }
 
 void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)

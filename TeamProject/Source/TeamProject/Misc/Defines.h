@@ -27,4 +27,4 @@
 
 #define MONSTER_ATTACK_COOLTIME														4.f
 
-#define MONSTER_ATTACK_PROJECTILE_OFFSET											50.f
+#define MONSTER_ATTACK_PROJECTILE_OFFSET											75.f

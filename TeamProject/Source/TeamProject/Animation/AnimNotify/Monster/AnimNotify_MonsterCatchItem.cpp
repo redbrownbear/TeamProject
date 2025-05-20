@@ -15,7 +15,7 @@ void UAnimNotify_MonsterCatchItem::Notify(USkeletalMeshComponent* MeshComp, UAni
 
 	if (AMonster* Monster = Cast<AMonster>(MeshComp->GetOwner()))
 	{
-		UWorld* World = GetWorld();
+		UWorld* World = MeshComp->GetWorld();
 
 		AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
 			FTransform::Identity, nullptr, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
