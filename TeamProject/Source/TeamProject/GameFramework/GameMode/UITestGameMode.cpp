@@ -95,7 +95,7 @@ void AUITestGameMode::OnOepnDialogueBox()
 
     if (UIManager)
     {
-        FString Path = TEXT("/Game/BluePrint/UI/NpcDialogue/BPD_NpcDialogue.BPD_NpcDialogue_C");
+        FString Path = TEXT("/Game/BluePrint/UI/NpcDialogue/BP_NpcDialogue.BP_NpcDialogue_C");
         TSubclassOf<UNPCDialogue> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
 
         UNPCDialogue* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);

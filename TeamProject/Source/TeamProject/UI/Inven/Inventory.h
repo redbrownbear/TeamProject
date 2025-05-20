@@ -23,6 +23,7 @@ class TEAMPROJECT_API UInventory : public UBaseUI
 	
 public:
 	virtual void OnCreated() override;
+	virtual void CloseUI() override;
 
 private:
 	void InitUI();

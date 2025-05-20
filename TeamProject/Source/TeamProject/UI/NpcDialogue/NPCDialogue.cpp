@@ -4,7 +4,7 @@
 #include "UI/NpcDialogue/NPCDialogue.h"
 
 #include "SubSystem/UI/QuestDialogueManager.h"
-
+#include "SubSystem/UI/UIManager.h"
 
 void UNPCDialogue::OnCreated()
 {
@@ -19,16 +19,21 @@ void UNPCDialogue::OnCreated()
         QuestManager->OnDialogueUpdated.AddDynamic(this, &UNPCDialogue::RefreshDialogue);
     }
 
+    APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+    if (PC)
+    {
+        FInputActionBinding& Bind = PC->InputComponent->BindAction("CloseInven", IE_Pressed, this, &UNPCDialogue::CloseUI);
+    }
+}
+
+void UNPCDialogue::CloseUI()
+{
+    Super::CloseUI();
 }
 
 void UNPCDialogue::InitUI()
 {
-
-}
-
-void UNPCDialogue::CloseDialogue()
-{
-
+    ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UNPCDialogue::RefreshDialogue(const FNPCDialogueTableRow& QuestData)

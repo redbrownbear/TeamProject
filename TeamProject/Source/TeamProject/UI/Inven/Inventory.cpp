@@ -23,28 +23,19 @@ void UInventory::OnCreated()
     APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
     if (PC)
     {
-        FInputActionBinding& Bind = PC->InputComponent->BindAction("CloseInven", IE_Pressed, this, &UInventory::CloseInven);
+        FInputActionBinding& Bind = PC->InputComponent->BindAction("CloseInven", IE_Pressed, this, &UInventory::CloseUI);
     }
+}
+
+void UInventory::CloseUI()
+{
+    Super:CloseUI();
 }
 
 void UInventory::InitUI()
 {
     //Scroll 불러오기
     check(BP_InvenScroll); // BindWidget이 잘 됐는지 확인
-}
-
-void UInventory::CloseInven()
-{
-    if (!IsInViewport())
-        return;
-
-    UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-    check(UIManager);
-
-    if (UIManager)
-    {
-        UIManager->RemoveUI(this);
-    }
 }
 
 void UInventory::RefreshInventory(const FItemData& ItemData)
