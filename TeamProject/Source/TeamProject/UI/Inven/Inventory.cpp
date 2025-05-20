@@ -29,7 +29,7 @@ void UInventory::OnCreated()
 
 void UInventory::CloseUI()
 {
-    Super:CloseUI();
+    Super::CloseUI();
 }
 
 void UInventory::InitUI()

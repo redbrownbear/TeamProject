@@ -27,7 +27,6 @@ public:
 
 private:
 	void InitUI();
-	void CloseInven();
 
 private:
 	UFUNCTION()
