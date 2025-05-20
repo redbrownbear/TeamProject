@@ -14,7 +14,8 @@ public class TeamProject : ModuleRules
         {
             "Core", "CoreUObject", "Engine",
             "InputCore", "EnhancedInput", "UMG",
-            "MoviePlayer", "AIModule", "Paper2D", "RenderCore", "RHI", "Niagara", "MediaAssets"/*"Graphics",*/
+            "MoviePlayer", "AIModule", "Paper2D",
+            "PhysicsCore", "RenderCore", "RHI", "Niagara", "MediaAssets"/*"Graphics",*/
         });
 
         // Uncomment if you are using Slate UI
