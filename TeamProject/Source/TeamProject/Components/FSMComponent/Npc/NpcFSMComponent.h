@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Actors/StrollPath/StrollPath.h"
+#include "Misc/Utils.h"
 #include "NpcFSMComponent.generated.h"
 
 UENUM()
@@ -21,6 +21,7 @@ enum class ENpcState : uint8
 
 class ANpc;
 class APlayerCharacter;
+class ANpcController;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TEAMPROJECT_API UNpcFSMComponent : public UActorComponent
@@ -50,8 +51,8 @@ protected:
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> Player = nullptr;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<AStrollPath> StrollPathActor;	
+	UPROPERTY()
+	TObjectPtr<ANpcController> Controller = nullptr;
 
 protected:
 	ENpcState       eCurrentState;

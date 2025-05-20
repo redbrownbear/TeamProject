@@ -96,6 +96,7 @@ inline void SmoothRotateActorToDirection(AActor* TargetActor, const FVector& Tar
 
     FVector ActorLocation = TargetActor->GetActorLocation();
     FVector Direction = TargetLocation - ActorLocation;
+    Direction.Z = 0.f;
     Direction.Normalize();
     FRotator CurrentRot = TargetActor->GetActorRotation();
     FRotator TargetRot = Direction.Rotation();
