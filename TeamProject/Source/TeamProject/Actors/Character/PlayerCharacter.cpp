@@ -3,7 +3,9 @@
 
 #include "Actors/Character/PlayerCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
-
+#include "Actors/Weapon/WeaponBase.h"
+#include "Actors/Weapon/WeaponSword.h"
+#include "Actors/Weapon/WeaponShield.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -18,9 +20,9 @@ APlayerCharacter::APlayerCharacter()
 
 
 	FVector Scale = FVector(45.f, 45.f, 45.f);
-	FVector Locate = FVector(0.f, 0.f, -41.f);
+	FVector Locate = FVector(0.f, 0.f, -43.f);
 	{
-		SwordComponent = CreateDefaultSubobject<USwordComponent>(TEXT("SwordComponent"));
+		//SwordComponent = CreateDefaultSubobject<UWeaponComponent>(TEXT("SwordComponent"));
 	}
 
 	//SpringArm, Camera 생성 및 초기화
@@ -28,6 +30,7 @@ APlayerCharacter::APlayerCharacter()
 		SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 		SpringArm->SetupAttachment(RootComponent);
 		SpringArm->TargetArmLength = 400.f;
+		
 
 		{
 			SpringArm->SetupAttachment(RootComponent);
@@ -94,26 +97,15 @@ APlayerCharacter::APlayerCharacter()
 	
 
 	{
-		LWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LWeapon"));
-		LWeapon->SetupAttachment(RootComponent);
-		
-		LWeapon->SetRelativeScale3D(Scale);
+		Shield = CreateDefaultSubobject<UWeaponChildActorComponent>(TEXT("Shield"));
+		Shield->SetupAttachment(GetMesh(), TEXT("Weapon_L"));
+		Shield->SetChildActorClass(AWeaponShield::StaticClass());
 
-		RWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RWeapon"));
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Sword/Weapon_Sword_003.Weapon_Sword_003'"));
-		RWeapon->SetSkeletalMeshAsset(Asset.Object);
+		Sword = CreateDefaultSubobject<UWeaponChildActorComponent>(TEXT("Sword"));
+		Sword->SetupAttachment(GetMesh(), TEXT("Weapon_R"));
+		Sword->SetChildActorClass(AWeaponSword::StaticClass());
 
-		if (GetMesh())
-		{
-			if (GetMesh()->DoesSocketExist(TEXT("Weapon_R")))
-			{
-				RWeapon->SetupAttachment(GetMesh(), TEXT("Weapon_R"));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("소켓 Weapon_R 없음!"));
-			}
-		}
+
 	}
 
 	bUseControllerRotationYaw = false;
@@ -123,7 +115,8 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	Sword->GetChildActor()->SetOwner(this);
+	SpringArm->ProbeChannel = ECC_GameTraceChannel1;
 }
 
 // Called every frame
@@ -145,8 +138,6 @@ void APlayerCharacter::OnConstruction(const FTransform& Transform)
 	
 	
 	USkeletalMeshComponent* mMesh = GetMesh();
-	RWeapon->SetLeaderPoseComponent(mMesh);
-	LWeapon->SetLeaderPoseComponent(mMesh);
 	Head->SetLeaderPoseComponent(mMesh);
 	Lower->SetLeaderPoseComponent(mMesh);
 	Upper->SetLeaderPoseComponent(mMesh);
@@ -156,6 +147,10 @@ void APlayerCharacter::OnConstruction(const FTransform& Transform)
 void APlayerCharacter::Play_Sword_Attack()
 {
 	
-	SwordComponent->SetAttackBox();
+	AActor* ChildActor = Sword->GetChildActor();
+	
+	AActor* SwordOwner = Sword->GetOwner();
+	AActor* OwnerActor = ChildActor->GetOwner();
+	Cast<AWeaponSword>(ChildActor)->SetAttackBox();
 }
 
