@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Misc/Utils.h"
 #include "MonsterAIController.generated.h"
 
 class UMonsterFSMComponent;
@@ -32,4 +33,6 @@ public:
 	UFUNCTION()
 	void SetAIEnabled(bool bEnabled);
 
+public:
+	virtual uint8 GetGenericTeamId() { return FGenericTeamId(MONSTER_GENERIC_TEAM_ID); }
 };

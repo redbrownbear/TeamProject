@@ -24,14 +24,14 @@ void ACookSet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Other
 {
     ATestCharacter* Player = Cast<ATestCharacter>(OtherActor);
     
-    // @TODO �ð� ����� UI ����
+    // @TODO
 }
 
 void ACookSet::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
     ATestCharacter* Player = Cast<ATestCharacter>(OtherActor);
 
-    // @TODO �ð� ����� UI ����
+    // @TODO 
 }
 
 void ACookSet::ReceiveIngredient(const FHandItem& HandItem, const FRecipeData& Recipe)
@@ -64,14 +64,11 @@ bool ACookSet::CheckRecipeMatch(const FHandItem& HandItem, const FRecipeData& Re
 
 void ACookSet::SuccessCooking()
 {
-    // @TODO �丮 ���� �ִϸ��̼� ���
-    // @TODO �丮 ������ UI ����
-    // @TODO �κ��丮�� �丮 ������ �߰�
+    // @TODO 
 }
 
 void ACookSet::FailedCooking()
 {
-    // @TODO �丮 ���� �ִϸ��̼� ���
-    // @TODO �丮 ���� UI ����
+    // @TODO 
 
 }

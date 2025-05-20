@@ -7,6 +7,10 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 
+// Npc 인터렉트(임시 생성): 윤정
+#include "Actors/Npc/Npc.h" 
+#include "Components/FSMComponent/Npc/NpcFSMComponent.h"
+
 APC_InGame::APC_InGame()
 {
 	{
@@ -28,8 +32,7 @@ void APC_InGame::BeginPlay()
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	Subsystem->AddMappingContext(PC_InGameDataAsset->IMC, 0);
-
-	
+	Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Interact, 1);	
 }
 
 void APC_InGame::SetupInputComponent()
@@ -46,6 +49,8 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Triggered, this, &ThisClass::OnLook);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Attack,
 		ETriggerEvent::Started, this, &ThisClass::TryAttack);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Talk,
+		ETriggerEvent::Triggered, this, &ThisClass::OnTalk);
 
 }
 
@@ -91,6 +96,20 @@ void APC_InGame::TryAttack(const FInputActionValue& InputActionValue)
 	
 	PlayerCharacter->Play_Sword_Attack();
 
+}
+
+void APC_InGame::OnTalk(const FInputActionValue& InputActionValue)
+{
+	if (Npc && Npc->GetCanTalk())
+	{
+		if (UNpcFSMComponent* FSM = Npc->GetFSMComponent())
+		{
+			FSM->ChangeState(ENpcState::Talk);
+			// Play Player Talk Animation
+			// Limit Moving
+		}
+	}
+	
 }
 
 

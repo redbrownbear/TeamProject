@@ -10,6 +10,9 @@ class TEAMPROJECT_API UFurikoFSMComponent : public UNpcFSMComponent
 {
 	GENERATED_BODY()
 
+public:
+	UFurikoFSMComponent();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -28,4 +31,8 @@ protected:
 private:
 	UPROPERTY()
 	AFurikoController* FurikoController = nullptr;
+
+private:
+	int32 CurrentStrollIndex = 0;
+	float AcceptanceRadius = 50.0f;
 };

@@ -34,7 +34,6 @@ AMonsterAIController::AMonsterAIController()
 	// 감지 업데이트 이벤트 바인딩
 	//PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AMonsterAIController::OnPerceptionUpdated);
 	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMonsterAIController::OnTargetPerceptionUpdated);
-	
 }
 
 void AMonsterAIController::BeginPlay()
@@ -69,28 +68,31 @@ void AMonsterAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedAct
 	if (Player)
 	{
 		MonsterFSMComponent->SetPlayer(Player);
+		UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Valid"));
 	}
 	else
 	{
 		MonsterFSMComponent->SetPlayer(nullptr);
+		UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Null"));
 	}
 }
 
 void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	APlayerCharacter* Player = Cast<APlayerCharacter>(Actor);
-	if (!Player) return;
-
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		// 감지됨
+		APlayerCharacter* Player = Cast<APlayerCharacter>(Actor);
+		if (!Player) return;
 		MonsterFSMComponent->SetPlayer(Player);
+		UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Valid"));
 	}
-	else
-	{
-		// 감지 해제됨
-		MonsterFSMComponent->SetPlayer(nullptr);
-	}
+	//else
+	//{
+	//	// 감지 해제됨
+	//	MonsterFSMComponent->SetPlayer(nullptr);
+	//	UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Null"));
+	//}
 }
 void AMonsterAIController::SetAIEnabled(bool bEnabled)
 {

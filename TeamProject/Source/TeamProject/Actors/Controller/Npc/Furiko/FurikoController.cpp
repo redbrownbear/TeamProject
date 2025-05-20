@@ -1,6 +1,5 @@
 #include "FurikoController.h"
 #include "Components/FSMComponent/Npc/Furiko/FurikoFSMComponent.h"
-//#include "Character/Npc/Furiko/Furiko.h"
 
 AFurikoController::AFurikoController()
     : ANpcController()
@@ -12,8 +11,7 @@ AFurikoController::AFurikoController()
 void AFurikoController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);    
-
-    
+   
 }
 
 void AFurikoController::BeginPlay()

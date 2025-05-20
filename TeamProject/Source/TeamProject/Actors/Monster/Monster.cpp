@@ -3,6 +3,8 @@
 
 #include "Actors/Monster/Monster.h"
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
+#include "Actors/Projectile/Projectile.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
@@ -15,7 +17,7 @@
 #include "Data/MonsterTableRow.h"
 
 #include "Kismet/KismetMathLibrary.h"
-
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMonster::AMonster()
@@ -26,24 +28,16 @@ AMonster::AMonster()
 	MovementComponent = CreateDefaultSubobject<UAdvancedFloatingPawnMovement>(TEXT("MovementComponent"));
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
-	//CollisionComponent->SetCollisionProfileName(CollisionProfileName::Monster);
-
 	CollisionComponent->SetCanEverAffectNavigation(false);
+	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+	CollisionComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlap);
+
 	RootComponent = CollisionComponent;
 
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
 	SkeletalMeshComponent->SetupAttachment(RootComponent);
 	FRotator NewRotator = FRotator(0.0, 0.0, 0.0);
 	SkeletalMeshComponent->SetWorldRotation(NewRotator.Quaternion());
-
-
-	//AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
-	//AISenseConfig_Sight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AISenseConfig_Sight"));
-	//AISenseConfig_Sight->DetectionByAffiliation.bDetectNeutrals = true;
-	//AISenseConfig_Sight->SightRadius = MONSTER_AISENSECONFIG_SIGHT_SIGHTRADIUS;
-	//AISenseConfig_Sight->LoseSightRadius = MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS;
-	//AISenseConfig_Sight->PeripheralVisionAngleDegrees = MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS_PERIPHERAL_VISIONANGLEDEGREES;
-	//AIPerceptionComponent->ConfigureSense(*AISenseConfig_Sight);
 
 	StatusComponent = CreateDefaultSubobject<UMonsterStatusComponent>(TEXT("StatusComponent"));
 }
@@ -65,24 +59,6 @@ void AMonster::Tick(float DeltaTime)
 
 	const float Speed = UKismetMathLibrary::VSizeXY(MovementComponent->Velocity);
 
-	//if (AMonsterAIController* MonsterAIController = Cast<AMonsterAIController>(GetController()))
-	//{
-	//	if (UMonsterFSMComponent* MonsterFSMComponent = Cast<UMonsterFSMComponent>(MonsterAIController->GetComponentByClass(UMonsterFSMComponent::StaticClass())))
-	//	{
-	//		if (FMath::IsNearlyZero(Speed))
-	//		{
-	//			MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Idle);
-	//		}
-	//		else if (FMath::IsNearlyEqual(Speed, MonsterData->WalkMovementMaxSpeed))
-	//		{
-	//			MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Walk);
-	//		}
-	//		else if (FMath::IsNearlyEqual(Speed, MonsterData->RunMovementMaxSpeed))
-	//		{
-	//			MonsterFSMComponent->SetMonsterMovementState(EMonsterMovementState::Run);
-	//		}
-	//	}
-	//}
 }
 
 UMonsterFSMComponent* AMonster::GetFSMComponent() const
@@ -246,7 +222,7 @@ void AMonster::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 		break;
 	default:
 	{
-		int a = 0;
+		check(false);
 	}
 		break;
 	}
@@ -403,4 +379,47 @@ bool AMonster::IsPlayingMontage(EMonsterMontage _InEnum)
 	}
 
 	return AnimInstance->Montage_IsPlaying(nullptr);
+}
+
+void AMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (AProjectile* Projectile = Cast<AProjectile>(OtherActor))
+	{
+		if (ProjectileName::Monster_PlayerAlert == Projectile->GetProjectileName())
+		{
+			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
+			{
+				FSMComponent->ChangeState(EMonsterState::Combat);
+				if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+				{
+					if (APlayerCharacter* Player = Cast<APlayerCharacter>(PlayerController->GetPawn()))
+					{
+						FSMComponent->SetPlayer(Player);
+					}
+					else
+					{
+						check(false);
+					}
+				}
+				else
+				{
+					check(false);
+				}
+			}
+		}
+	}
+}
+
+void AMonster::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+}
+
+void AMonster::SetSpeedWalk()
+{
+	MovementComponent->MaxSpeed = MonsterData->WalkMovementMaxSpeed;
+}
+
+void AMonster::SetSpeedRun()
+{
+	MovementComponent->MaxSpeed = MonsterData->RunMovementMaxSpeed;
 }
