@@ -26,7 +26,6 @@ public:
 
 private:
 	void InitUI();
-	void CloseDialogue();
 
 private:
 	UFUNCTION()
