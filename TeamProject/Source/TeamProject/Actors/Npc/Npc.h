@@ -5,10 +5,11 @@
 #include "Actors/Controller/Npc/NpcController.h"
 #include "Npc.generated.h"
 
-class UBoxComponent;
+class USphereComponent;
 class USkeletalMeshComponent;
 class UNpcFSMComponent;
 class UFloatingPawnMovement;
+class AStrollPath;
 
 UCLASS()
 class TEAMPROJECT_API ANpc : public APawn
@@ -29,7 +30,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
-	TObjectPtr<UBoxComponent> CollisionComponent;
+	TObjectPtr<USphereComponent> CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
 	TObjectPtr<USkeletalMeshComponent> BodyMeshComponent;

@@ -1,6 +1,11 @@
 #include "NpcFSMComponent.h"
+#include "Actors/Controller/Npc/NpcController.h"
 #include "Actors/Npc/Npc.h"
+#include "Actors/Character/PlayerCharacter.h"
+
 #include "Navigation/PathFollowingComponent.h"
+#include "Animation/Npc/ConversationManagerComponent.h"
+
 #include "Kismet/GameplayStatics.h"
 
 UNpcFSMComponent::UNpcFSMComponent()
@@ -13,6 +18,35 @@ void UNpcFSMComponent::BeginPlay()
 {
 	Super::BeginPlay();
 		
+	if (!Owner)
+	{
+		if (Controller = Cast<ANpcController>(GetOwner()))
+		{
+			Owner = Cast<ANpc>(Controller->GetPawn());
+		}
+	}
+
+	if (!Owner)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::BeginPlay // Owner (ANpc) is null!"));
+		return;
+	}
+
+	Controller = Cast<ANpcController>(Owner->GetController());
+	if (Controller && Controller->GetConversationManager())
+	{
+		UConversationManagerComponent* ConversationManager = Controller->GetConversationManager();
+
+		if (!ConversationManager)
+		{
+			UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::BeginPlay // ConversationManager is null (from NPC)!"));
+		}
+	}
+	
+	if (APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0)))
+	{
+		Player = PlayerChar;
+	}
 }
 
 void UNpcFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -93,10 +127,12 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Talk'"));
 		return;
 	}
-	// Play Npc Talk Animation
-	// Play Player Talk Animation
-	 
-	// 	
+
+	if (Player)
+	{
+		Controller->GetConversationManager()->StartConversation(Owner, Player);
+	}				
+
 }
 
 void UNpcFSMComponent::MoveToLocation(const FVector& InLocation)

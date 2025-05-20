@@ -19,16 +19,16 @@ public:
 
 public:
 	void StartConversation(ANpc* Npc, APlayerCharacter* Player);
-	void EndConversation();
+	void EndConversation(ANpc* Npc, APlayerCharacter* Player);
 
 protected:
 	virtual void BeginPlay() override;
 
-protected:
+public:
 	void PlayTalkAnimations();
 	void ShowTalkUI();
-	void LockCharacters();
-	void UnlockCharacters();
+	void LockCharacters(ANpc* Npc, APlayerCharacter* Player);
+	void UnlockCharacters(ANpc* Npc, APlayerCharacter* Player);
 
 private:
 	UPROPERTY()
@@ -36,5 +36,4 @@ private:
 
 	UPROPERTY()
 	APlayerCharacter* CurrentPlayer;
-		
 };
