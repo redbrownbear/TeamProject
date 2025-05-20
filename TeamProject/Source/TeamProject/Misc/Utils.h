@@ -15,12 +15,14 @@ namespace CollisionProfileName
     static inline FName ToMonster = TEXT("ToMonster");
     static inline FName MapMesh = TEXT("MapMesh");
     static inline FName Item = TEXT("Item");
+    static inline FName ToItem = TEXT("ToItem");
 }
 
 namespace ProjectileName
 {
     static inline FName Monster_Attack = TEXT("Monster_Attack");
     static inline FName Monster_PlayerAlert = TEXT("Monster_PlayerAlert");
+    static inline FName Monster_CatchItem = TEXT("Monster_CatchItem");
 }
 
 
@@ -41,6 +43,7 @@ enum class EMonsterState : uint8
     Patrol,
     Suspicious,
     Alert,
+    FindWeapon,
     Combat,
     Dead,
     Fire,

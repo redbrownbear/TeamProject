@@ -9,6 +9,8 @@
 struct FItemData;
 class UShapeComponent;
 class UPhysicalMaterial;
+class UAIPerceptionStimuliSourceComponent;
+
 UCLASS()
 class TEAMPROJECT_API AWorldWeapon : public AActor
 {
@@ -30,9 +32,9 @@ protected:
 	virtual void OnConstruction(const FTransform& Transform);
 	virtual void BeginPlay() override;
 
-	//UFUNCTION()
-	//virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	//	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	//UFUNCTION()
 	//virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
@@ -50,6 +52,9 @@ protected:
 	class UStaticMeshComponent* StaticMeshComponent;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UPhysicalMaterial> PhysicalMaterial;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UAIPerceptionStimuliSourceComponent> StimuliSource;
+	
 
 protected:
 	UPROPERTY(EditAnywhere, meta = (RowType = "ItemData"))
@@ -60,4 +65,9 @@ protected:
 public:
 	FName GetWorldWeaponName();
 	void AddForce(FVector _Direction, float Force);
+
+protected:
+	bool bIsCatched = false;
+public:
+	bool GetCatched() { return bIsCatched; }
 };

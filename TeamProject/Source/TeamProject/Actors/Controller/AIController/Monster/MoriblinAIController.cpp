@@ -2,7 +2,7 @@
 
 
 #include "Actors/Controller/AIController/Monster/MoriblinAIController.h"
-#include "Components/FSMComponent/MoriblinFSMComponent.h"
+#include "Components/FSMComponent/Monster/MoriblinFSMComponent.h"
 
 AMoriblinAIController::AMoriblinAIController()
 {

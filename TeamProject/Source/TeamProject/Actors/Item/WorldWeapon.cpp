@@ -2,16 +2,22 @@
 
 
 #include "Actors/Item/WorldWeapon.h"
+#include "Actors/Projectile/Projectile.h"
+#include "Actors/Monster/Monster.h"
+
 #include "Data/ItemDataRow.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 
 #include "PhysicalMaterials/PhysicalMaterial.h"
 
 #include "Misc/Utils.h"
 
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 
 // Sets default values
 AWorldWeapon::AWorldWeapon()
@@ -27,6 +33,8 @@ AWorldWeapon::AWorldWeapon()
 
 	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Script/PhysicsCore.PhysicalMaterial'/Game/Resources/Item/PhysicsMaterial/PM_WorldWeapon.PM_WorldWeapon'"));
 	PhysicalMaterial = PhysMaterial.Object;
+
+	StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
 }
 
 void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
@@ -93,7 +101,6 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 		StaticMeshComponent->SetRelativeTransform(ItemTableRow->Transform);
 		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	}
-
 }
 
 void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHandle)
@@ -193,8 +200,33 @@ void AWorldWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	SetDataWithHandle(DataTableRowHandle);
-	// 	CollisionComponent->SetSimulatePhysics(true);
 
+	StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
+	StimuliSource->RegisterWithPerceptionSystem();
+}
+
+void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (AProjectile* Proj = Cast<AProjectile>(OtherActor))
+	{
+		if (ProjectileName::Monster_CatchItem == Proj->GetProjectileName())
+		{
+			if (AMonster* Monster = Cast<AMonster>(Proj->GetInstigator()))
+			{
+				if (UMonsterFSMComponent* FSMComponent = Monster->GetFSMComponent())
+				{
+					FSMComponent->SetToCatchWeapon(nullptr);
+					FSMComponent->SetCatchedWeapon(this);
+					bIsCatched = true;
+
+					this->AttachToComponent(
+						Monster->GetSkeletalMeshComponent(),
+						FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+						TEXT("WeaponRight"));
+				}
+			}
+		}
+	}
 }
 
 // Called every frame
