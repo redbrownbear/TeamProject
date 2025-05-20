@@ -7,7 +7,9 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 
-// Npc 인터렉트(임시 생성): 윤정
+#include "SubSystem/UI/UIManager.h"
+#include "UI/NpcDialogue/NPCDialogue.h"
+
 #include "Actors/Npc/Npc.h" 
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 
@@ -30,9 +32,7 @@ void APC_InGame::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	Subsystem->AddMappingContext(PC_InGameDataAsset->IMC, 0);
-	Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Interact, 1);	
+	ChangeInputContext(EInputContext::IC_InGame);
 }
 
 void APC_InGame::SetupInputComponent()
@@ -49,9 +49,50 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Triggered, this, &ThisClass::OnLook);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Attack,
 		ETriggerEvent::Started, this, &ThisClass::TryAttack);
-	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Talk,
-		ETriggerEvent::Triggered, this, &ThisClass::OnTalk);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Interact,
+		ETriggerEvent::Triggered, this, &ThisClass::OnInteract);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Inventory,
+		ETriggerEvent::Triggered, this, &ThisClass::OpenInventory);
 
+}
+
+void APC_InGame::ChangeInputContext(EInputContext NewContext)
+{
+	UEnhancedInputLocalPlayerSubsystem* Subsystem =
+		ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+
+	// 우선 기존 맵핑 제거
+	Subsystem->ClearAllMappings();
+
+	// 새 컨텍스트 적용
+	switch (NewContext)
+	{
+	case EInputContext::IC_InGame:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_InGame, 0);
+		SetInputMode(FInputModeGameOnly());
+		bShowMouseCursor = false;
+		break;
+
+	case EInputContext::IC_Inventory:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Inventory, 1);
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+		break;
+	}
+
+	CurrentInputContext = NewContext;
+}
+
+void APC_InGame::BindInventoryInput(UInventory* Inventory)
+{
+	// 인풋 바인딩
+	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		EIC->BindAction(PC_InGameDataAsset->IA_Navigate, ETriggerEvent::Started, Inventory, &UInventory::OnNavigate);
+		EIC->BindAction(PC_InGameDataAsset->IA_Confirm, ETriggerEvent::Triggered, Inventory, &UInventory::OnConfirm);
+		EIC->BindAction(PC_InGameDataAsset->IA_Cancel, ETriggerEvent::Triggered, Inventory, &UInventory::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_AddItem, ETriggerEvent::Started ,Inventory, &UInventory::OnCreateItemTest);
+	}
 }
 
 void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
@@ -98,18 +139,56 @@ void APC_InGame::TryAttack(const FInputActionValue& InputActionValue)
 
 }
 
-void APC_InGame::OnTalk(const FInputActionValue& InputActionValue)
+void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 {
 	if (Npc && Npc->GetCanTalk())
 	{
 		if (UNpcFSMComponent* FSM = Npc->GetFSMComponent())
 		{
 			FSM->ChangeState(ENpcState::Talk);
-			// Play Player Talk Animation
-			// Limit Moving
+
+
+			UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+			check(UIManager);
+
+			if (UIManager)
+			{
+				FString Path = TEXT("/Game/BluePrint/UI/NpcDialogue/BP_NpcDialogue.BP_NpcDialogue_C");
+				TSubclassOf<UNPCDialogue> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
+
+				UNPCDialogue* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
+				if (!NewUI)
+				{
+					check(NewUI);
+
+					//이후에 QuestDialogueManager ->ShowDialogue 부분에서 NPCTableRow에 EQuestCharacter를 참조해서 넣어주면 됨
+					//에디터에 원하는 데이터를 넣어서 사용하세요
+					//추가로 대사 넘거가는 기능은 따로 만들예정
+				}
+			}
+
 		}
 	}
 	
+}
+
+void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	if (UIManager)
+	{
+		//Inventory
+		FString Path = TEXT("/Game/BluePrint/UI/Inventory/BP_InvenLayout.BP_InvenLayout_C");
+		TSubclassOf<UInventory> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
+
+		UInventory* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
+		if (!NewUI)
+		{
+			check(NewUI);
+		}
+	}
 }
 
 

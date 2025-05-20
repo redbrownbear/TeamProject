@@ -22,3 +22,8 @@ void UInventorySlot::SetItemData(const FItemData& Item)
     Amount->SetText(FText::FromString(Item.Name));
     SetVisibility(ESlateVisibility::Visible);
 }
+
+void UInventorySlot::SetSelected(bool bIsSelected)
+{
+    HighlightBg->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}

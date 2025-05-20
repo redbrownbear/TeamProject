@@ -45,6 +45,8 @@ void UInventoryScroll::AddItemSlot(const FItemData& NewItem)
     NewSlot->SetItemData(NewItem);
     ItemWrapBox->AddChildToWrapBox(NewSlot);
     ActiveSlots.Add(NewSlot);
+
+    SelectInit();
 }
 
 void UInventoryScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
@@ -72,5 +74,50 @@ void UInventoryScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
         NewSlot->SetItemData(Item);
         ItemWrapBox->AddChildToWrapBox(NewSlot);
         ActiveSlots.Add(NewSlot);
+
+        CurrentIndex = ActiveSlots.Num() - 1;
     }
+
+    SelectInit();
+}
+
+void UInventoryScroll::MoveSelection(FIntPoint Direction)
+{
+    if (ActiveSlots.Num() == 0) return;
+
+    const int32 NumPerRow = 5; // WrapBox 기준 가정
+    const int32 MaxIndex = ActiveSlots.Num() - 1;
+
+    int32 NextIndex = CurrentIndex;
+
+    if (Direction.X != 0) // 좌우
+    {
+        NextIndex += Direction.X;
+    }
+    else if (Direction.Y != 0) // 상하
+    {
+        NextIndex += Direction.Y * NumPerRow;
+    }
+
+    NextIndex = FMath::Clamp(NextIndex, 0, MaxIndex);
+
+    if (NextIndex != CurrentIndex)
+    {
+        ActiveSlots[CurrentIndex]->SetSelected(false);
+        ActiveSlots[NextIndex]->SetSelected(true);
+        CurrentIndex = NextIndex;
+    }
+}
+
+void UInventoryScroll::SelectInit()
+{
+    if (ActiveSlots.IsEmpty())
+        return;
+
+    for (UInventorySlot* slot : ActiveSlots)
+    {
+        slot->SetSelected(false);
+    }
+
+    ActiveSlots[CurrentIndex]->SetSelected(true);
 }
