@@ -17,5 +17,6 @@ class TEAMPROJECT_API UBaseUI : public UUserWidget
 	
 protected:
 	virtual void OnCreated();	//명시적 초기화
+	virtual void CloseUI();
 
 };
