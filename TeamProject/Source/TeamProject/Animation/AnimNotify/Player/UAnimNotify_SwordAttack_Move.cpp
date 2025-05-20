@@ -3,7 +3,7 @@
 
 #include "Animation/AnimNotify/Player/UAnimNotify_SwordAttack_Move.h"
 #include "Actors/Character/PlayerCharacter.h"
-#include "Components/AttackComponent/SwordComponent.h"
+#include "Components/AttackComponent/WeaponComponent.h"
 
 
 void UUAnimNotify_SwordAttack_Move::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)

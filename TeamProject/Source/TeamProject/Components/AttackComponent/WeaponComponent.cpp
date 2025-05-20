@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Components/AttackComponent/SwordComponent.h"
+#include "Components/AttackComponent/WeaponComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 
 // Sets default values for this component's properties
-USwordComponent::USwordComponent()
+UWeaponComponent::UWeaponComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -48,7 +48,7 @@ USwordComponent::USwordComponent()
 
 
 // Called when the game starts
-void USwordComponent::BeginPlay()
+void UWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -58,14 +58,14 @@ void USwordComponent::BeginPlay()
 
 
 // Called every frame
-void USwordComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
 }
 
-void USwordComponent::SetAttackBox()
+void UWeaponComponent::SetAttackBox()
 {
     if (!bCanAttack)return;
 
@@ -153,12 +153,12 @@ void USwordComponent::SetAttackBox()
 
 }
 
-void USwordComponent::SetCanAttack()
+void UWeaponComponent::SetCanAttack()
 {
     bCanAttack = true;
 }
 
-void USwordComponent::SetCanMove()
+void UWeaponComponent::SetCanMove()
 {
     AActor* ActorPlayer = GetOwner();
     ACharacter* Character = Cast<ACharacter>(ActorPlayer);

@@ -8,7 +8,10 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/AttackComponent/SwordComponent.h"
+// #include "Components/AttackComponent/WeaponComponent.h"
+#include "Actors/Weapon/WeaponSword.h"
+#include "Actors/Weapon/WeaponBow.h"
+#include "Components/WeaponChildActorComponent/WeaponChildActorComponent.h"
 #include "GenericTeamAgentInterface.h"
 #include "Misc/Utils.h"
 #include "PlayerCharacter.generated.h"
@@ -46,14 +49,14 @@ public:
 	
 
 public:
-	USwordComponent* GetSwordComponent() { return SwordComponent; }
+	AWeaponSword* GetSword() { return Cast<AWeaponSword>(Sword->GetChildActor()); }
 
 
 
 protected:
 
-	UPROPERTY(EditAnywhere, Category="Sword")
-	TObjectPtr<USwordComponent> SwordComponent;
+	/*UPROPERTY(EditAnywhere, Category="Weapon")
+	TObjectPtr<UWeaponComponent> SwordComponent;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpringArm")
 	TObjectPtr<USpringArmComponent> SpringArm;
@@ -71,14 +74,11 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> Upper;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> LWeapon;
+	TObjectPtr<UWeaponChildActorComponent> Shield;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> RWeapon;
+	TObjectPtr<UWeaponChildActorComponent> Sword;
 
-protected:
-	UPROPERTY(EditAnywhere)
-	TArray<UAnimMontage*> Arr_Sword_Attack_MTG;
 
 public:
 	virtual uint8 GetGenericTeamId() { return FGenericTeamId(PLAYER_GENERIC_TEAM_ID); }
