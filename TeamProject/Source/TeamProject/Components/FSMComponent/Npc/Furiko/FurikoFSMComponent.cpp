@@ -105,10 +105,18 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 {
 	Super::UpdateTalk(DeltaTime);
 	
-	if (Dialogue->GetDialogueState())
+	// 퀘스트 수락 버튼 클릭 시
+	/*bool bAcceptQuest = Dialogue->OnClicked();
+	if (bAcceptQuest)
+	{
+		ChangeState(ENpcState::Hide);
+	}*/
+
+	// 퀘스트 안 함 + 대화 끝남(UI 삭제)
+	/*if (!bAcceptQuest && !Dialogue->GetDialogueState())
 	{
 		ChangeState(ENpcState::Idle);
-	}
+	}*/
 }
 
 void UFurikoFSMComponent::UpdateHide(float DeltaTime)

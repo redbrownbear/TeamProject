@@ -10,10 +10,10 @@ void UStoreFSMComponent::UpdateTalk(float DeltaTime)
 {
 	Super::UpdateTalk(DeltaTime);
 
-	if (Dialogue->GetDialogueState())
+	/*if (!Dialogue->GetDialogueState())
 	{
 		ChangeState(ENpcState::Idle);
-	}
+	}*/
 }
 
 void UStoreFSMComponent::UpdateSell(float DeltaTime)

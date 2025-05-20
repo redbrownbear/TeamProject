@@ -141,11 +141,11 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 	}			
 
 	// 대화 종료 시	
-	if (Dialogue->GetDialogueState())
+	/*if (!Dialogue->GetDialogueState())
 	{
 		Dialogue->CloseUI();
 		Controller->GetConversationManager()->UnlockCharacters(Owner, Player);
-	}
+	}*/
 }
 
 void UNpcFSMComponent::MoveToLocation(const FVector& InLocation)

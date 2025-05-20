@@ -48,7 +48,7 @@ private:
 	UTextBlock* CancelText;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ExtraText;
-	
+
 public:
 	bool GetDialogueState() { return bEndDialogue; }
 

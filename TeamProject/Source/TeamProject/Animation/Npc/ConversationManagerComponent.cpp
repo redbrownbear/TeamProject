@@ -2,6 +2,8 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Npc/Npc.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "UI/NpcDialogue/NPCDialogue.h"
+#include "SubSystem/UI/UIManager.h"
 
 
 UConversationManagerComponent::UConversationManagerComponent()
@@ -14,9 +16,8 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 {
 	CurrentNpc = Npc;
 	CurrentPlayer = Player;
-
-	LockCharacters(Npc, Player);
-	PlayTalkAnimations();
+	
+	LockCharacters(Npc, Player);	
 	ShowTalkUI();
 }
 
@@ -24,7 +25,7 @@ void UConversationManagerComponent::EndConversation(ANpc* Npc, APlayerCharacter*
 {
 	// Delete Talk UI
 
-	//UnlockCharacters(Npc, Player);
+	UnlockCharacters(Npc, Player);
 }
 
 void UConversationManagerComponent::BeginPlay()
@@ -38,21 +39,37 @@ void UConversationManagerComponent::PlayTalkAnimations()
 	if (UAnimInstance* NpcAnim = CurrentNpc->GetBodyMesh()->GetAnimInstance())
 	{
 		NpcAnim->Montage_Play(NpcTalkMontage);
+		//NpcAnim->Montage_Play(NpcIdleMontage);
 	}
 
-	// Player → 몽타주
+	// Player → 몽타주 // 필요 없을 수도?
 	if (UAnimInstance* PlayerAnim = CurrentPlayer->GetMesh()->GetAnimInstance())
 	{
-		PlayerAnim->Montage_Play(PlayerTalkMontage);
+		PlayerAnim->Montage_Play(PlayerTalkMontage); 
+		//PlayerAnim->Montage_Play(PlayerIdleMontage);
 	}
 }
 
 void UConversationManagerComponent::ShowTalkUI()
 {
 	// Create Talk UI
-	//Dialogue->OnCreated();
+	UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
 
-	PlayTalkAnimations();
+	if (UIManager)
+	{
+		// Dialogue UI
+		FString Path = TEXT("/Game/Blueprint/UI/NpcDialogue/BP_NpcDialogue.BP_NpcDialogue_C");
+		TSubclassOf<UNPCDialogue> NPCDialogueClass = LoadClass<UBaseUI>(nullptr, *Path);
+
+		UNPCDialogue* DialogueUI = UIManager->CreateUI<UNPCDialogue>(GetWorld(), NPCDialogueClass);
+		if (!DialogueUI)
+		{
+			UE_LOG(LogTemp, Error, TEXT("StartConversation: DialogueUI 생성 실패 또는 이미 존재"));
+		}
+	}
+
+	PlayTalkAnimations(); 
 }
 
 void UConversationManagerComponent::LockCharacters(ANpc* Npc, APlayerCharacter* Player)

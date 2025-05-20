@@ -15,7 +15,7 @@ void UNPCDialogue::OnCreated()
     UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
     check(QuestManager);
     if (QuestManager)
-    {
+    {        
         QuestManager->OnDialogueUpdated.AddDynamic(this, &UNPCDialogue::RefreshDialogue);
     }
 
@@ -29,6 +29,8 @@ void UNPCDialogue::OnCreated()
 void UNPCDialogue::CloseUI()
 {
     Super::CloseUI();
+
+    bEndDialogue = true; // 2025-05-20 대화 종료 확인 변수 추가
 }
 
 void UNPCDialogue::InitUI()
@@ -44,6 +46,5 @@ void UNPCDialogue::RefreshDialogue(const FNPCDialogueTableRow& QuestData)
     {
         TextBox->SetText(FText::FromString(Dialogue));
     }
-
-    bEndDialogue = true; // 2025-05-20 대화 종료 확인 변수 추가
+ 
 }
