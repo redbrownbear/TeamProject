@@ -1,5 +1,6 @@
 #include "FurikoFSMComponent.h"
-#include "Actors/Npc/Furiko/Furiko.h"
+#include "Actors/StrollPath/StrollPath.h"
+#include "Actors/Npc/Npc.h"
 
 UFurikoFSMComponent::UFurikoFSMComponent()
 {
@@ -102,7 +103,7 @@ void UFurikoFSMComponent::UpdateStroll(float DeltaTime)
 void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 {
 	Super::UpdateTalk(DeltaTime);
-
+	
 	// 숨바꼭질 선택지 선택할 경우
 	/*if (FurikoController->bPlayHide)
 	{
@@ -110,6 +111,11 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 		SetNpcState(ENpcState::Hide);
 	}*/
 
+	/*if (!Player)
+	{
+		ChangeState(ENpcState::Stroll);
+		ConversationManager->UnlockCharacters(Owner, Player);
+	}*/
 }
 
 void UFurikoFSMComponent::UpdateHide(float DeltaTime)

@@ -14,6 +14,7 @@ namespace CollisionProfileName
     static inline FName ToPlayer = TEXT("ToPlayer");
     static inline FName ToMonster = TEXT("ToMonster");
     static inline FName MapMesh = TEXT("MapMesh");
+    static inline FName Item = TEXT("Item");
 }
 
 namespace ProjectileName
@@ -96,6 +97,7 @@ inline void SmoothRotateActorToDirection(AActor* TargetActor, const FVector& Tar
 
     FVector ActorLocation = TargetActor->GetActorLocation();
     FVector Direction = TargetLocation - ActorLocation;
+    Direction.Z = 0.f;
     Direction.Normalize();
     FRotator CurrentRot = TargetActor->GetActorRotation();
     FRotator TargetRot = Direction.Rotation();

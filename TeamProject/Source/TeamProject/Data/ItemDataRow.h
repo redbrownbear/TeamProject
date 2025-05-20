@@ -17,7 +17,30 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString Name;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
     TSoftObjectPtr<UTexture2D> Icon;
 
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+    UStaticMesh* StaticMesh = nullptr;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+    FTransform Transform = FTransform::Identity;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	TSubclassOf<UShapeComponent> CollisionClass/* = USphereComponent::StaticClass()*/;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	float CollisionSphereRadius = 32.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	FVector CollisionBoxExtent = FVector(32.0, 32.0, 32.0);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	float CollisionCapsuleRadius = 22.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	float CollisionCapsuleHalfHeight = 44.f;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+	float Damage = 1.f;
 };

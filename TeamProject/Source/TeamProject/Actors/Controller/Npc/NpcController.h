@@ -5,7 +5,7 @@
 #include "NpcController.generated.h"
 
 class UNpcFSMComponent;
-class AStrollPath;
+class UConversationManagerComponent;
 
 UCLASS()
 class TEAMPROJECT_API ANpcController : public AAIController
@@ -17,12 +17,24 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	UConversationManagerComponent* GetConversationManager() const { return ConversationManager;  }
+
 protected:
 	virtual void BeginPlay() override;
 
 protected:
+	UFUNCTION()
+	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
+	UFUNCTION()
+	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+
+protected:
 	UPROPERTY()
 	TObjectPtr<UNpcFSMComponent> NpcFSMComponent;
+	
+	UPROPERTY()
+	TObjectPtr<UConversationManagerComponent> ConversationManager;
 
 public:
 	bool bPerceive = false;

@@ -24,3 +24,5 @@
 #define PLAYER_GENERIC_TEAM_ID														1
 #define MONSTER_GENERIC_TEAM_ID														2
 #define NPC_GENERIC_TEAM_ID															3
+
+#define MONSTER_ATTACK_COOLTIME														4.f
