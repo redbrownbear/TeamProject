@@ -71,7 +71,4 @@ protected:
 	EWeapon_Type NextWeapon;
 
 	TQueue<EWeapon_Type> UnEquipWeapons;
-
-	UPROPERTY()
-	UAnimMontage* UnEquip_Sword_Shield;
 };

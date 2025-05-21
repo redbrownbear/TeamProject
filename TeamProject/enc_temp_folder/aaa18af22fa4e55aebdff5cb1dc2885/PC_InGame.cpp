@@ -142,7 +142,10 @@ void APC_InGame::EquipShield(const FInputActionValue& InputActionValue)
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
 	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
 	EEquip_State m_State = WeaponManagerComponent->GetEquipState();
-	
+	if (m_State == EEquip_State::Shield || m_State == EEquip_State::Sword_Shield)
+	{
+		return;
+	}
 	WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Shield);
 
 	WeaponManagerComponent->TryEquipWeapon();
@@ -154,7 +157,10 @@ void APC_InGame::EquipBow(const FInputActionValue& InputActionValue)
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
 	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
 	EEquip_State m_State = WeaponManagerComponent->GetEquipState();
-	
+	if (m_State == EEquip_State::Bow)
+	{
+		return;
+	}
 	WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Bow);
 
 	WeaponManagerComponent->TryEquipWeapon();

@@ -46,19 +46,6 @@ UWeaponManagerComponent::UWeaponManagerComponent()
 		Arrow->SetupAttachment(Player_C->GetMesh(), TEXT("Arrow_Normal"));
 	}
 
-	{
-		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Sword_Shield/Animation/Sword_Shield_Off.Sword_Shield_Off'"));
-
-		if (Asset.Object)
-		{
-			UnEquip_Sword_Shield = Asset.Object;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
-		}
-	}
-
 }
 
 
@@ -108,9 +95,6 @@ void UWeaponManagerComponent::TryEquipWeapon()
 			UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
 			UAnimMontage* UnEquipMontage = Cast<AWeaponBase>(Bow->GetChildActor())->GetUnEquipMontage();
 			AnimInstance->Montage_Play(UnEquipMontage);
-
-			UnEquipWeapons.Enqueue(EWeapon_Type::Bow);
-
 			FOnMontageEnded MontageEndedDelegate = FOnMontageEnded::CreateUObject<UWeaponManagerComponent>(
 				this,
 				&UWeaponManagerComponent::EquipWeapon
@@ -121,99 +105,6 @@ void UWeaponManagerComponent::TryEquipWeapon()
 		else
 		{
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Sword->GetChildActor());
-			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
-			Mesh->GetAnimInstance()->Montage_Play(EquipMontage);
-		}
-	}
-	else if (NextWeapon == EWeapon_Type::Bow)
-	{
-		if (Equip_State == EEquip_State::Bow)
-		{
-
-			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
-
-			UAnimMontage* UnEquipMontage = WeaponBaseWeapon->GetUnEquipMontage();
-
-			UnEquipWeapons.Enqueue(EWeapon_Type::Bow);
-
-			Mesh->GetAnimInstance()->Montage_Play(UnEquipMontage);
-		}
-		else if (Equip_State == EEquip_State::Sword)
-		{
-
-
-
-			UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
-			UAnimMontage* UnEquipMontage = Cast<AWeaponBase>(Sword->GetChildActor())->GetUnEquipMontage();
-
-			UnEquipWeapons.Enqueue(EWeapon_Type::Sword);
-
-			AnimInstance->Montage_Play(UnEquipMontage);
-			FOnMontageEnded MontageEndedDelegate = FOnMontageEnded::CreateUObject<UWeaponManagerComponent>(
-				this,
-				&UWeaponManagerComponent::EquipWeapon
-			);
-			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, UnEquipMontage);
-
-		}
-		else if (Equip_State == EEquip_State::Sword_Shield)
-		{
-			UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
-
-			UnEquipWeapons.Enqueue(EWeapon_Type::Sword);
-			UnEquipWeapons.Enqueue(EWeapon_Type::Shield);
-			AnimInstance->Montage_Play(UnEquip_Sword_Shield);
-			FOnMontageEnded MontageEndedDelegate = FOnMontageEnded::CreateUObject<UWeaponManagerComponent>(
-				this,
-				&UWeaponManagerComponent::EquipWeapon
-			);
-			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, UnEquip_Sword_Shield);
-
-
-		}
-		else
-		{
-			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Sword->GetChildActor());
-			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
-			Mesh->GetAnimInstance()->Montage_Play(EquipMontage);
-		}
-	}
-	else if (NextWeapon == EWeapon_Type::Shield)
-	{
-		if (Equip_State == EEquip_State::Shield || Equip_State == EEquip_State::Sword_Shield)
-		{
-
-			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Shield->GetChildActor());
-
-			UAnimMontage* UnEquipMontage = WeaponBaseWeapon->GetUnEquipMontage();
-
-			UnEquipWeapons.Enqueue(EWeapon_Type::Shield);
-
-			Mesh->GetAnimInstance()->Montage_Play(UnEquipMontage);
-		}
-		else if (Equip_State == EEquip_State::Bow)
-		{
-
-
-
-			UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
-			UAnimMontage* UnEquipMontage = Cast<AWeaponBase>(Bow->GetChildActor())->GetUnEquipMontage();
-			AnimInstance->Montage_Play(UnEquipMontage);
-
-			UnEquipWeapons.Enqueue(EWeapon_Type::Bow);
-
-			FOnMontageEnded MontageEndedDelegate = FOnMontageEnded::CreateUObject<UWeaponManagerComponent>(
-				this,
-				&UWeaponManagerComponent::EquipWeapon
-			);
-			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, UnEquipMontage);
-
-		}
-		else
-		{
-			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
 
 			Mesh->GetAnimInstance()->Montage_Play(EquipMontage);

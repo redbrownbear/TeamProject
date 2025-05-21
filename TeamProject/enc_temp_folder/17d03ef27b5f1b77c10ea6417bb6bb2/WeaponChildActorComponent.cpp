@@ -6,7 +6,6 @@
 
 void UWeaponChildActorComponent::BeginPlay()
 {
-
 	Super::BeginPlay();
 }
 
