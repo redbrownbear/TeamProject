@@ -32,18 +32,23 @@ public:
 	UInputAction* IA_LookMouse = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_Attack = nullptr;
+	UInputAction* IA_LeftClick = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_RightClick = nullptr;
 	// --------- Npc 인터렉트(임시 생성): 윤정 ----------
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Input|InputAction")
 	UInputAction* IA_Talk = nullptr;
 	// --------------------------------------------------
 
 	void CheckValid() const
 	{
 		check(IMC);
+		check(IMC_Interact);
 		check(IA_Move);
 		check(IA_LookMouse);
+		check(IA_LeftClick);
+		check(IA_RightClick);
 		check(IA_Talk); // Npc 인터렉트(임시 생성): 윤정
 	}
 };

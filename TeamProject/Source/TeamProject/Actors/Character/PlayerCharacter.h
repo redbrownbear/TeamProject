@@ -42,9 +42,9 @@ public:
 	virtual void OnConstruction(const FTransform& Transform);
 
 	
-	// 칼 휘두르는 몽타주 실행
+	// 클릭이벤트 발생
 
-	void Play_Sword_Attack();
+	void LeftClickAction();
 
 	
 

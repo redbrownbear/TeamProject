@@ -117,6 +117,8 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 	Sword->GetChildActor()->SetOwner(this);
 	SpringArm->ProbeChannel = ECC_GameTraceChannel1;
+
+	GetMesh()->SetCollisionProfileName(TEXT("Player"));
 }
 
 // Called every frame
@@ -144,13 +146,13 @@ void APlayerCharacter::OnConstruction(const FTransform& Transform)
 
 }
 
-void APlayerCharacter::Play_Sword_Attack()
+void APlayerCharacter::LeftClickAction()
 {
 	
 	AActor* ChildActor = Sword->GetChildActor();
 	
 	AActor* SwordOwner = Sword->GetOwner();
 	AActor* OwnerActor = ChildActor->GetOwner();
-	Cast<AWeaponSword>(ChildActor)->SetAttackBox();
+	Cast<AWeaponSword>(ChildActor)->LeftClickAction();
 }
 

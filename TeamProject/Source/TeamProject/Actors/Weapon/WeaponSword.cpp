@@ -54,7 +54,7 @@ AWeaponSword::AWeaponSword()
     }
 }
 
-void AWeaponSword::SetAttackBox()
+void AWeaponSword::LeftClickAction()
 {
     if (!bCanAttack)return;
 
@@ -99,7 +99,7 @@ void AWeaponSword::SetAttackBox()
 
         // 감지할 오브젝트 타입 (Pawn)
         TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-        ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+        ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1));
 
         // 무시할 액터
         TArray<AActor*> ActorsToIgnore;
@@ -139,8 +139,8 @@ void AWeaponSword::SetAttackBox()
         }
     }
     bCanAttack = false;
-
 }
+
 
 void AWeaponSword::SetCanAttack()
 {

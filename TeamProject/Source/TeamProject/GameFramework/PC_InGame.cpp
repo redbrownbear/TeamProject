@@ -47,10 +47,11 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Triggered, this, &ThisClass::OnMove);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LookMouse,
 		ETriggerEvent::Triggered, this, &ThisClass::OnLook);
-	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Attack,
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LeftClick,
 		ETriggerEvent::Started, this, &ThisClass::TryAttack);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Talk,
 		ETriggerEvent::Triggered, this, &ThisClass::OnTalk);
+	
 
 }
 
@@ -94,7 +95,7 @@ void APC_InGame::TryAttack(const FInputActionValue& InputActionValue)
 	APawn* PlayerPawn = GetPawn();
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
 	
-	PlayerCharacter->Play_Sword_Attack();
+	PlayerCharacter->LeftClickAction();
 
 }
 

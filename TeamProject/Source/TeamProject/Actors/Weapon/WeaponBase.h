@@ -45,8 +45,8 @@ public:
 
 
 public:
-	virtual void FirstAction();
-	virtual void SecondAction();
+	virtual void LeftClickAction();
+	virtual void RightClickAction();
 
 
 protected:
