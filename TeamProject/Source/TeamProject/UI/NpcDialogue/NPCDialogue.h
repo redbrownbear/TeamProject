@@ -26,10 +26,25 @@ public:
 
 private:
 	void InitUI();
+	void BindDelegates();
+
+public: //바인딩을 위해 퍼블릭선언
+	UFUNCTION()
+	void OnNavigate(const FInputActionValue& InputActionValue);
+	UFUNCTION()
+	void OnConfirm();
+	UFUNCTION()
+	void OnCancel();
+	UFUNCTION()
+	void OnNextDialogue(const FInputActionValue& InputActionValue);
+
 
 private:
 	UFUNCTION()
 	void RefreshDialogue(const FNPCDialogueTableRow& QuestData);
+
+	void UpdateTyping();
+	void OnNextButtonClicked();
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -53,5 +68,17 @@ public:
 	bool GetDialogueState() { return bEndDialogue; }
 
 private:
+	UPROPERTY()
+	FNPCDialogueTableRow DialogueDataRow;
+	EQuestCharacter CurQuestChar;
+	int32 NextDialogueID;
+
+	//한글자씩 보이는 기능을 위한 변수
+	FString FullText;
+	int32 CurrentCharIndex = 0;
+	FTimerHandle TypingTimerHandle;
+	bool bIsTyping = false;
+	//---------------------------------
+
 	bool bEndDialogue = false; // 2025-05-20 대화 종료 확인 변수 추가
 };

@@ -13,7 +13,6 @@ UCLASS()
 class TEAMPROJECT_API AGM_InGame : public AGameModeBase
 {
 	GENERATED_BODY()
-	
 
 public:
 	AGM_InGame();

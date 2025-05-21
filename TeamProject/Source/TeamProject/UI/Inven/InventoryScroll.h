@@ -80,6 +80,9 @@ public:
 
 private:
 	UPROPERTY(meta = (BindWidget))
+	UScrollBox* ScrollBox;
+
+	UPROPERTY(meta = (BindWidget))
 	UWrapBox* ItemWrapBox;
 
 	UPROPERTY()
