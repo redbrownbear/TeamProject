@@ -575,10 +575,15 @@ void UMonsterFSMComponent::MoveToLocation(const FVector& InLocation)
 
 		FNavPathSharedPtr NavPath;
 		AIController->MoveTo(MoveRequest, &NavPath);
+		static int a = 0;
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::MoveToLocation Called %d"), a++);
+
+		if (a > 10) a = 0;
+
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::MoveToLocation // No AIController"));
+		UE_LOG(LogTemp, Warning, TEXT("UMonsterFSMComponent::MoveToLocation // No AIController"));
 		check(false);
 	}
 }

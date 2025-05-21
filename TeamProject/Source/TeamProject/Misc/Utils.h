@@ -23,6 +23,7 @@ namespace ProjectileName
     static inline FName Monster_Attack = TEXT("Monster_Attack");
     static inline FName Monster_PlayerAlert = TEXT("Monster_PlayerAlert");
     static inline FName Monster_CatchItem = TEXT("Monster_CatchItem");
+    static inline FName Monster_Arrow = TEXT("Monster_Arrow");
 }
 
 
