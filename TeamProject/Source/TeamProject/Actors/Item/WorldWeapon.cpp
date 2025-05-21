@@ -223,17 +223,15 @@ void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 
 					bIsCatched = true;
 
+					// if PhyscisSimulates activated, AttachToComponent will fail
 					CollisionComponent->SetSimulatePhysics(false);
-
+					// Offset Changed to fix outlook
+					StaticMeshComponent->SetRelativeLocation(FVector::Zero());
 					bool bSucceeded = this->AttachToComponent(
 						Monster->GetSkeletalMeshComponent(),
 						FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 						TEXT("RightWeapon"));
 
-					if (bSucceeded)
-					{
-						int a = 0;
-					}
 
 					Proj->Destroy();
 				}
