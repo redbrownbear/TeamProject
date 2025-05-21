@@ -8,7 +8,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 #include "SubSystem/UI/UIManager.h"
-#include "UI/NpcDialogue/NPCDialogue.h"
+#include "SubSystem/UI/QuestDialogueManager.h"
 
 #include "Actors/Npc/Npc.h" 
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
@@ -50,9 +50,9 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Attack,
 		ETriggerEvent::Started, this, &ThisClass::TryAttack);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Interact,
-		ETriggerEvent::Triggered, this, &ThisClass::OnInteract);
+		ETriggerEvent::Started, this, &ThisClass::OnInteract);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Inventory,
-		ETriggerEvent::Triggered, this, &ThisClass::OpenInventory);
+		ETriggerEvent::Started, this, &ThisClass::OpenInventory);
 
 }
 
@@ -78,6 +78,13 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;
 		break;
+
+	case EInputContext::IC_Dialogue:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 2);
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+		break;
+
 	}
 
 	CurrentInputContext = NewContext;
@@ -88,10 +95,22 @@ void APC_InGame::BindInventoryInput(UInventory* Inventory)
 	// 인풋 바인딩
 	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		EIC->BindAction(PC_InGameDataAsset->IA_Navigate, ETriggerEvent::Started, Inventory, &UInventory::OnNavigate);
-		EIC->BindAction(PC_InGameDataAsset->IA_Confirm, ETriggerEvent::Triggered, Inventory, &UInventory::OnConfirm);
-		EIC->BindAction(PC_InGameDataAsset->IA_Cancel, ETriggerEvent::Triggered, Inventory, &UInventory::OnCancel);
-		EIC->BindAction(PC_InGameDataAsset->IA_AddItem, ETriggerEvent::Started ,Inventory, &UInventory::OnCreateItemTest);
+		EIC->BindAction(PC_InGameDataAsset->IA_InvenNavigate, ETriggerEvent::Started, Inventory, &UInventory::OnNavigate);
+		EIC->BindAction(PC_InGameDataAsset->IA_InvenConfirm, ETriggerEvent::Started, Inventory, &UInventory::OnConfirm);
+		EIC->BindAction(PC_InGameDataAsset->IA_InvenCancel, ETriggerEvent::Started, Inventory, &UInventory::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started ,Inventory, &UInventory::OnCreateItemTest);
+	}
+}
+
+void APC_InGame::BindDialogueInput(UNPCDialogue* NpcDialogue)
+{
+	// 인풋 바인딩
+	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, NpcDialogue, &UNPCDialogue::OnNavigate);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, NpcDialogue, &UNPCDialogue::OnConfirm);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, NpcDialogue, &UNPCDialogue::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, NpcDialogue, &UNPCDialogue::OnNextDialogue);
 	}
 }
 
@@ -158,13 +177,14 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 				TSubclassOf<UNPCDialogue> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
 
 				UNPCDialogue* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
-				if (!NewUI)
+				if (NewUI)
 				{
-					check(NewUI);
-
-					//이후에 QuestDialogueManager ->ShowDialogue 부분에서 NPCTableRow에 EQuestCharacter를 참조해서 넣어주면 됨
-					//에디터에 원하는 데이터를 넣어서 사용하세요
-					//추가로 대사 넘거가는 기능은 따로 만들예정
+					UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+					if (QuestManager)
+					{
+						//임시 코드 수정할것!
+						QuestManager->ShowDialogue(EQuestCharacter::Furiko, 0);
+					}
 				}
 			}
 
