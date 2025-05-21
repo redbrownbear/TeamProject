@@ -105,10 +105,21 @@ inline void SmoothRotateActorToDirection(AActor* TargetActor, const FVector& Tar
     TargetActor->SetActorRotation(NewRot);
 }
 
-
-enum class EEquipWeapon
+UENUM()
+enum class EWeapon_Type
 {
-    Sword_Shiled,
+    Sword,
+    Shield,
+    Bow
+};
+
+UENUM()
+enum class EEquip_State
+{
+    None,
+    Sword,
+    Shield,
+    Sword_Shield,
     Bow,
 
 };

@@ -8,10 +8,12 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
-// #include "Components/AttackComponent/WeaponComponent.h"
 #include "Actors/Weapon/WeaponSword.h"
 #include "Actors/Weapon/WeaponBow.h"
+#include "Actors/Weapon/WeaponArrow.h"
 #include "Components/WeaponChildActorComponent/WeaponChildActorComponent.h"
+#include "Components/StatusComponent/PlayerStatusComponent/PlayerStatusComponent.h"
+#include "Components/Character/WeaponManagerComponent.h"
 #include "GenericTeamAgentInterface.h"
 #include "Misc/Utils.h"
 #include "PlayerCharacter.generated.h"
@@ -45,12 +47,16 @@ public:
 	// 클릭이벤트 발생
 
 	void LeftClickAction();
+	void RightClickAction();
 
 	
 
 public:
-	AWeaponSword* GetSword() { return Cast<AWeaponSword>(Sword->GetChildActor()); }
-
+	UWeaponChildActorComponent* GetSword() { return WeaponManagerComponent->GetSword(); }
+	UWeaponChildActorComponent* GetShield() { return WeaponManagerComponent->GetShield(); }
+	UWeaponChildActorComponent* GetBow() { return WeaponManagerComponent->GetBow(); }
+	UPlayerStatusComponent* GetPlayerStatusComponent() { return StatusComponent; }
+	UWeaponManagerComponent* GetWeaponManagerComponent() { return WeaponManagerComponent; }
 
 
 protected:
@@ -64,20 +70,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	TObjectPtr<UCameraComponent> Camera;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> Head;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TObjectPtr<UWeaponManagerComponent> WeaponManagerComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> Lower;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> Upper;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<UWeaponChildActorComponent> Shield;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<UWeaponChildActorComponent> Sword;
+	UPROPERTY(EditAnywhere, Category = "Status")
+	TObjectPtr<UPlayerStatusComponent> StatusComponent;
+
+
 
 
 public:

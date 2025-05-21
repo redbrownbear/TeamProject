@@ -13,6 +13,6 @@ void UAnimNotify_SwordAttack0::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(MeshComp->GetOwner());
 	if (Player_C)
 	{
-		Player_C->GetSword()->SetCanAttack();
+		Cast<AWeaponSword>(Player_C->GetSword()->GetChildActor())->SetCanAttack();
 	}
 }

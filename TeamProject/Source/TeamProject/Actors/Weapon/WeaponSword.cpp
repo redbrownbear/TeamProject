@@ -52,6 +52,34 @@ AWeaponSword::AWeaponSword()
             UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
         }
     }
+
+    {
+        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Sword/Animation/Equip_Sword_On_Natural_Montage.Equip_Sword_On_Natural_Montage'"));
+
+        if (Asset.Object)
+        {
+            EquipMontage = Asset.Object;
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+        }
+    }
+
+    {
+        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Sword/Animation/Equip_Sword_Off_Montage.Equip_Sword_Off_Montage'"));
+
+        if (Asset.Object)
+        {
+            UnEquipMontage = Asset.Object;
+            
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+        }
+    }
+
 }
 
 void AWeaponSword::LeftClickAction()

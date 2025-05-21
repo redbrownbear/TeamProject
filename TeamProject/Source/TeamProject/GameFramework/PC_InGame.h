@@ -36,9 +36,23 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_RightClick = nullptr;
+
+	// --------- Weapon Swap-----------------------------
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_EquipSword = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_EquipShield = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_EquipBow = nullptr;
+
 	// --------- Npc 인터렉트(임시 생성): 윤정 ----------
 	UPROPERTY(EditDefaultsOnly, Category = "Input|InputAction")
 	UInputAction* IA_Talk = nullptr;
+
+
 	// --------------------------------------------------
 
 	void CheckValid() const
@@ -49,6 +63,9 @@ public:
 		check(IA_LookMouse);
 		check(IA_LeftClick);
 		check(IA_RightClick);
+		check(IA_EquipSword);
+		check(IA_EquipShield);
+		check(IA_EquipBow);
 		check(IA_Talk); // Npc 인터렉트(임시 생성): 윤정
 	}
 };
@@ -71,7 +88,16 @@ protected:
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
 	void OnLook(const FInputActionValue& InputActionValue);
-	void TryAttack(const FInputActionValue& InputActionValue);
+	void LeftClick(const FInputActionValue& InputActionValue);
+	void RightClick(const FInputActionValue& InputActionValue);
+	
+	// --------- Weapon Swap ------------------------------
+
+	void EquipSword(const FInputActionValue& InputActionValue);
+	void EquipShield(const FInputActionValue& InputActionValue);
+	void EquipBow(const FInputActionValue& InputActionValue);
+
+
 
 	// --------- Npc 인터렉트(임시 생성): 윤정 ----------
 	void OnTalk(const FInputActionValue& InputActionValue);
