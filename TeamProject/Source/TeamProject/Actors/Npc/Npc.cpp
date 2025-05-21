@@ -34,7 +34,7 @@ ANpc::ANpc()
 	NoseMeshComponent->SetupAttachment(HeadMeshComponent, TEXT("Nose"));
 
 	// Movement
-	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+	MovementComponent = CreateDefaultSubobject<UAdvancedFloatingPawnMovement>(TEXT("MovementComponent"));
 	MovementComponent->UpdatedComponent = CollisionComponent; // 충돌 기준 컴포넌트 설정
 
 	// Collision Overlap Event Binding

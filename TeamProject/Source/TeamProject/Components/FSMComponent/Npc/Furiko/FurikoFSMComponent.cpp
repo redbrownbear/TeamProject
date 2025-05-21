@@ -29,27 +29,25 @@ void UFurikoFSMComponent::UpdateRun(float DeltaTime)
 		return;
 	}
 
-	int32 CurrentStrollIndex = 0;
 	FVector TargetLocation = StrollPath->GetSplinePointLocation(CurrentStrollIndex);
 	FVector CurrentLocation = Owner->GetActorLocation();
 
 	// 이동
 	MoveToLocation(TargetLocation);
 
-	// 회전: 현재 위치 → TargetLocation 방향을 기준으로
-	FVector Direction = (TargetLocation - CurrentLocation).GetSafeNormal();
-	FRotator NpcRotation;
-	if (!Direction.IsNearlyZero())
-	{
-		NpcRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
-	}
+	//// 회전: 현재 위치 → TargetLocation 방향을 기준으로
+	//FVector Direction = (TargetLocation - CurrentLocation).GetSafeNormal();
+	//FRotator NpcRotation;
+	//if (!Direction.IsNearlyZero())
+	//{
+	//	NpcRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
+	//}
 
-	// 부드러운 회전 적용
-	FRotator SmoothRotation = FMath::RInterpTo(Owner->GetActorRotation(), NpcRotation, DeltaTime, 5.f);
-	Owner->SetActorRotation(SmoothRotation);
+	//// 부드러운 회전 적용
+	//FRotator SmoothRotation = FMath::RInterpTo(Owner->GetActorRotation(), NpcRotation, DeltaTime, 5.f);
+	//Owner->SetActorRotation(SmoothRotation);
 
 	// 도착 체크
-	/*bool bIsNear = FVector::Dist(CurrentLocation, TargetLocation) < 50.f;*/
 	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), TargetLocation, 500.f);
 	if (bIsNear)
 	{
@@ -71,6 +69,7 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 		Controller->GetConversationManager()->StartConversation(Owner, Player);
 	}
 
+
 	// 퀘스트 수락 버튼 클릭 시
 	/*bool bAcceptQuest = Dialogue->OnClicked();
 	if (bAcceptQuest)
@@ -89,9 +88,3 @@ void UFurikoFSMComponent::UpdateHide(float DeltaTime)
 {
 	Super::UpdateHide(DeltaTime);
 }
-
-void UFurikoFSMComponent::UpdatePlay(float DeltaTime)
-{
-	// 술래잡기: 시간 되면 추가
-}
-

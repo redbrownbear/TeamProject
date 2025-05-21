@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "GameFramework/FloatingPawnMovement.h"
+#include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
 #include "Data/NPCTableRow.h"
 #include "Data/NpcCharacterTableRow.h"
 #include "Misc/Utils.h"
@@ -12,6 +12,7 @@ class USphereComponent;
 class USkeletalMeshComponent;
 class UNpcFSMComponent;
 class AStrollPath;
+class UAdvancedFloatingPawnMovement;
 
 UCLASS()
 class TEAMPROJECT_API ANpc : public APawn
@@ -49,7 +50,7 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> NoseMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
-	TObjectPtr<UFloatingPawnMovement> MovementComponent;
+	TObjectPtr<UAdvancedFloatingPawnMovement> MovementComponent;
 
 public:
 	UNpcFSMComponent* GetFSMComponent() const;

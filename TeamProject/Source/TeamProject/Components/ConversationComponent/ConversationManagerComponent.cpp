@@ -65,7 +65,7 @@ void UConversationManagerComponent::ShowTalkUI(EQuestCharacter QuestNpc)
 	// Create Talk UI
 	if (QuestDialogueManager)
 	{
-		QuestDialogueManager->ShowDialogue(QuestNpc);
+		//@MODIFY: QuestDialogueManager->ShowDialogue(QuestNpc);
 	}
 	else
 	{
