@@ -5,13 +5,13 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 
-#include "GameFramework/FloatingPawnMovement.h"
 #include "Kismet/KismetMathLibrary.h"
 
 #include "Actors/Character/PlayerCharacter.h"
 #include "GameFramework/PC_InGame.h"
 
 #include "Animation/Npc/ConversationManagerComponent.h"
+#include "SubSystem/UI/QuestDialogueManager.h"
 
 ANpc::ANpc()
 {
@@ -63,7 +63,6 @@ void ANpc::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	//const float Speed = UKismetMathLibrary::VSizeXY(MovementComponent->Velocity);
 }
 
 UNpcFSMComponent* ANpc::GetFSMComponent() const
@@ -90,7 +89,7 @@ void ANpc::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AA
 		}
 
 		bPlayerInRange = true;
-		// Create Interact UI
+		// Create Interact UI (Press E)	
 	}
 }
 
@@ -104,7 +103,6 @@ void ANpc::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 		}
 
 		bPlayerInRange = false;
-		// Delete Interact UI
 	}
 }
 
@@ -113,6 +111,6 @@ void ANpc::OnTalkKeyPressed()
 	if (bPlayerInRange && IsValid(NpcFSMComponent))
 	{
 		NpcFSMComponent->ChangeState(ENpcState::Talk);
-		// Delete Interact UI And Create Talk UI		
+		// Delete Interact UI 	
 	}
 }

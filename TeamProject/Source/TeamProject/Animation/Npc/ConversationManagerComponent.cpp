@@ -1,9 +1,8 @@
 #include "Animation/Npc/ConversationManagerComponent.h"
 #include "Actors/Character/PlayerCharacter.h"
-#include "Actors/Npc/Npc.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "UI/NpcDialogue/NPCDialogue.h"
-#include "SubSystem/UI/UIManager.h"
+#include "SubSystem/UI/QuestDialogueManager.h"
 
 
 UConversationManagerComponent::UConversationManagerComponent()
@@ -18,7 +17,9 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 	CurrentPlayer = Player;
 	
 	LockCharacters(Npc, Player);	
-	ShowTalkUI();
+
+	EQuestCharacter QuestNpc = CurrentNpc->GetNpc();
+	ShowTalkUI(QuestNpc);
 }
 
 void UConversationManagerComponent::EndConversation(ANpc* Npc, APlayerCharacter* Player)
@@ -31,6 +32,15 @@ void UConversationManagerComponent::EndConversation(ANpc* Npc, APlayerCharacter*
 void UConversationManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (UGameInstance* GameInstance = GetWorld()->GetGameInstance())
+	{
+		QuestDialogueManager = GameInstance->GetSubsystem<UQuestDialogueManager>();
+		if (!QuestDialogueManager)
+		{
+			UE_LOG(LogTemp, Error, TEXT("QuestDialogueManager is NULL!"));
+		}
+	}
 }
 
 void UConversationManagerComponent::PlayTalkAnimations()
@@ -50,23 +60,16 @@ void UConversationManagerComponent::PlayTalkAnimations()
 	}
 }
 
-void UConversationManagerComponent::ShowTalkUI()
+void UConversationManagerComponent::ShowTalkUI(EQuestCharacter QuestNpc)
 {
 	// Create Talk UI
-	UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
-	check(UIManager);
-
-	if (UIManager)
+	if (QuestDialogueManager)
 	{
-		// Dialogue UI
-		FString Path = TEXT("/Game/Blueprint/UI/NpcDialogue/BP_NpcDialogue.BP_NpcDialogue_C");
-		TSubclassOf<UNPCDialogue> NPCDialogueClass = LoadClass<UBaseUI>(nullptr, *Path);
-
-		UNPCDialogue* DialogueUI = UIManager->CreateUI<UNPCDialogue>(GetWorld(), NPCDialogueClass);
-		if (!DialogueUI)
-		{
-			UE_LOG(LogTemp, Error, TEXT("StartConversation: DialogueUI 생성 실패 또는 이미 존재"));
-		}
+		QuestDialogueManager->ShowDialogue(QuestNpc);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("QuestDialogueManager is not initialized."));
 	}
 
 	PlayTalkAnimations(); 

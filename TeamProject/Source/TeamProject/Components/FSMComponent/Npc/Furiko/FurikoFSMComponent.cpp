@@ -1,7 +1,11 @@
 #include "FurikoFSMComponent.h"
-#include "Actors/StrollPath/StrollPath.h"
 #include "Actors/Npc/Npc.h"
+
+#include "Actors/StrollPath/StrollPath.h"
+#include "Components/SplineComponent.h"
+
 #include "UI/NpcDialogue/NPCDialogue.h"
+#include "Animation/Npc/ConversationManagerComponent.h"
 
 UFurikoFSMComponent::UFurikoFSMComponent()
 {
@@ -66,45 +70,87 @@ void UFurikoFSMComponent::UpdateIdle(float DeltaTime)
 void UFurikoFSMComponent::UpdateStroll(float DeltaTime)
 {	
 	Super::UpdateStroll(DeltaTime);
-	
-	// 목표 위치 구하기
-	FVector Location = FVector();
 
-	if (AStrollPath* StrollPath = Owner->GetStrollPath())
+	AStrollPath* StrollPath = Owner->GetStrollPath();
+	if (!StrollPath) return;
+
+	const FVector CurrentLocation = Owner->GetActorLocation();
+	const FVector TargetLocation = StrollPath->GetSplinePointLocation(CurrentStrollIndex);
+
+	// 이동
+	MoveToLocation(TargetLocation);
+
+	// 회전 보간 속도 계산
+	UFloatingPawnMovement* MoveComp = Cast<UFloatingPawnMovement>(Owner->GetMovementComponent());
+	float MovementSpeed = (MoveComp != nullptr) ? MoveComp->MaxSpeed : 300.f;
+	float RotationInterpSpeed = MovementSpeed / 50.f; // 튜닝값 (작을수록 천천히 회전)
+
+	// 방향 계산 (다음 인덱스를 X축 정면으로 바라보게 회전)
+	FVector Direction = (TargetLocation - CurrentLocation).GetSafeNormal();
+	if (!Direction.IsNearlyZero())
 	{
-		Location = StrollPath->GetSplinePointLocation(CurrentStrollIndex);
+		FRotator TargetRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
+		FRotator CurrentRotation = Owner->GetActorRotation();
+		FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationInterpSpeed);
+
+		Owner->SetActorRotation(SmoothRotation);
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::UpdateStroll // No StrollPath"));
-		check(false);
-	}
 
-	// 이동 
-	MoveToLocation(Location);
-
-	// 다음 PatrolIndex 구하기
-	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 300.f);
-
-
-	if (bIsNear)
+	// 도착 체크
+	const float Distance = FVector::Dist(CurrentLocation, TargetLocation);
+	if (Distance < 100.f)
 	{
 		++CurrentStrollIndex;
-
-		if (AStrollPath* StrollPath = Owner->GetStrollPath())
+		if (CurrentStrollIndex >= StrollPath->GetSplineMaxIndex())
 		{
-			if (CurrentStrollIndex >= StrollPath->GetSplineMaxIndex())
-			{
-				CurrentStrollIndex = 0;
-			}
+			CurrentStrollIndex = 0;
 		}
 	}
+	
+	//// 목표 위치 구하기
+	//FVector Location = FVector();
+
+	//if (AStrollPath* StrollPath = Owner->GetStrollPath())
+	//{
+	//	Location = StrollPath->GetSplinePointLocation(CurrentStrollIndex);
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::UpdateStroll // No StrollPath"));
+	//	check(false);
+	//}
+
+	//// 이동 
+	//MoveToLocation(Location);
+
+	//// 다음 PatrolIndex 구하기
+	//const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 100.f);
+
+
+	//if (bIsNear)
+	//{
+	//	++CurrentStrollIndex;
+
+	//	if (AStrollPath* StrollPath = Owner->GetStrollPath())
+	//	{
+	//		if (CurrentStrollIndex >= StrollPath->GetSplineMaxIndex())
+	//		{
+	//			CurrentStrollIndex = 0;
+	//		}
+	//	}
+	//}
 }
 
 void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 {
 	Super::UpdateTalk(DeltaTime);
 	
+	if (Player)
+	{
+		Owner->SetNpc(EQuestCharacter::Furiko);
+		Controller->GetConversationManager()->StartConversation(Owner, Player);
+	}
+
 	// 퀘스트 수락 버튼 클릭 시
 	/*bool bAcceptQuest = Dialogue->OnClicked();
 	if (bAcceptQuest)

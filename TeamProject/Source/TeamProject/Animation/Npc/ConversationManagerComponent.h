@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Actors/Npc/Npc.h"
 #include "ConversationManagerComponent.generated.h"
 
-class ANpc;
 class APlayerCharacter;
+class UQuestDialogueManager;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TEAMPROJECT_API UConversationManagerComponent : public UActorComponent
@@ -26,7 +27,7 @@ protected:
 
 public:
 	void PlayTalkAnimations();
-	void ShowTalkUI();
+	void ShowTalkUI(EQuestCharacter QuestNpc);
 	void LockCharacters(ANpc* Npc, APlayerCharacter* Player);
 	void UnlockCharacters(ANpc* Npc, APlayerCharacter* Player);
 
@@ -36,6 +37,9 @@ private:
 
 	UPROPERTY()
 	APlayerCharacter* CurrentPlayer = nullptr;
+
+	UPROPERTY()
+	UQuestDialogueManager* QuestDialogueManager = nullptr;
 
 private:
 	UPROPERTY()

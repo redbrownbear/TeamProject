@@ -2,13 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/FloatingPawnMovement.h"
 #include "Actors/Controller/Npc/NpcController.h"
+#include "Data/NPCTableRow.h"
 #include "Npc.generated.h"
 
 class USphereComponent;
 class USkeletalMeshComponent;
 class UNpcFSMComponent;
-class UFloatingPawnMovement;
 class AStrollPath;
 
 UCLASS()
@@ -59,6 +60,10 @@ public:
 	void OnTalkKeyPressed(); // 대화 UI
 
 	bool GetCanTalk() { return bPlayerInRange; }
+
+	EQuestCharacter GetNpc() const { return QuestNpc; }
+
+	void SetNpc(EQuestCharacter InQuestNpc) { QuestNpc = InQuestNpc; }
 	
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -67,7 +72,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<AStrollPath> StrollPath;
 
-
+	UPROPERTY(VisibleAnywhere)
+	EQuestCharacter QuestNpc;
 
 private:
 	// 상호작용 가능 변수

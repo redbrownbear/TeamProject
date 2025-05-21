@@ -55,8 +55,9 @@ protected:
 	UPROPERTY()
 	ANpcController* Controller = nullptr;
 
-	UPROPERTY()
-	TObjectPtr<UNPCDialogue> Dialogue = nullptr;
+	// 대화 종료 시 사용할 변수
+	/*UPROPERTY()
+	TObjectPtr<UNPCDialogue> Dialogue = nullptr;*/
 
 
 protected:

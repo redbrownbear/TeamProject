@@ -40,11 +40,6 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		Speed = Pawn->GetVelocity().Size2D(); 
 	} 
 
-	/*UE_LOG(LogTemp, Warning, TEXT("AnimInstance // Speed: %.1f | State: %d | bIsRun: %s"),
-		Speed,
-		static_cast<uint8>(eCurrentState),
-		bIsRun ? TEXT("true") : TEXT("false"));*/
-
 	eCurrentState = FSMComponent->GetNpcState();
 
 	switch (eCurrentState)
