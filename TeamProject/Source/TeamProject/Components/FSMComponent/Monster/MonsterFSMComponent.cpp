@@ -111,6 +111,9 @@ void UMonsterFSMComponent::HandleState(float DeltaTime)
 	case EMonsterState::Combat:
 		UpdateCombat(DeltaTime);
 		break;
+	case EMonsterState::AimingBow:
+		UpdateAimingBow(DeltaTime);
+		break;
 	case EMonsterState::Dance:
 		UpdateDance(DeltaTime);
 		break;
@@ -160,6 +163,8 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Signal:
 		Owner->PlayMontage(EMonsterMontage::SIGNAL_END);
 		break;
+	case EMonsterState::AimingBow:
+		break;
 	case EMonsterState::End:
 		break;
 	default:
@@ -192,6 +197,8 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 		Owner->SetSpeedRun();
 		break;
 	case EMonsterState::Combat:
+		break;
+	case EMonsterState::AimingBow:
 		break;
 	case EMonsterState::Dance:
 		Owner->PlayMontage(EMonsterMontage::DANCE_START);
@@ -247,7 +254,7 @@ void UMonsterFSMComponent::UpdateToDance(float DeltaTime)
 		float fDistance = FVector::Dist(Owner->GetActorLocation(), CampFireLocation);
 		if (fDistance < MONSTER_CAMPFIRE_MIN_LENGTH)
 		{
-			StopMove();
+			this->StopMove();
 			ChangeState(EMonsterState::Dance);
 		}
 	}
@@ -285,7 +292,7 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 	// 이동
 	if (Owner->IsPlayingMontage(EMonsterMontage::END))
 	{
-		StopMove();
+		this->StopMove();
 	}
 	else
 	{
@@ -310,7 +317,7 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 
 	if (Player)
 	{
-		StopMove();
+		this->StopMove();
 		ChangeState(EMonsterState::Suspicious);
 	}
 }
@@ -319,7 +326,7 @@ void UMonsterFSMComponent::UpdateSuspicious(float DeltaTime)
 {
 	if (Player)
 	{
-		StopMove();
+		this->StopMove();
 		SuspicionGauge += DeltaTime * MONSTER_SUSPICIOUS_COEFFICIENT;
 
 		const FVector MonsterLocation = Owner->GetActorLocation();
@@ -405,7 +412,7 @@ void UMonsterFSMComponent::UpdateFindWeapon(float DeltaTime)
 
 		if (Owner->IsPlayingMontage(EMonsterMontage::END))
 		{
-			StopMove();
+			this->StopMove();
 		}
 		else
 		{
@@ -416,7 +423,8 @@ void UMonsterFSMComponent::UpdateFindWeapon(float DeltaTime)
 
 		if (bIsNear)
 		{
-			StopMove();
+			this->StopMove();
+			InstantRotateActorToDirection(Owner, WeaponLocation);
 			Owner->PlayMontage(EMonsterMontage::WEAPON_CATCH);
 		}
 	}
@@ -428,9 +436,9 @@ void UMonsterFSMComponent::UpdateFindWeapon(float DeltaTime)
 
 void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 {
-	if (!IsValid(Player)) 
+	if (!IsValid(Player))
 	{
-		ChangeState(EMonsterState::Idle); 
+		ChangeState(EMonsterState::Idle);
 		return;
 	}
 
@@ -453,7 +461,7 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 	// 이동
 	if (Owner->IsPlayingMontage(EMonsterMontage::END))
 	{
-		StopMove();
+		this->StopMove();
 	}
 	else
 	{
@@ -468,39 +476,53 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 	// Check if it's arrived
 	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, Location, 150.f);
 
-	if (bIsNear)
-	{
-		StopMove();
-		if (CurrentAttackCoolTime > MONSTER_ATTACK_COOLTIME)
-		{
-			CurrentAttackCoolTime = 0.f;
+	if (bIsNear) this->StopMove();
 
-			if (CatchedWeapon)
+	if (CurrentAttackCoolTime > MONSTER_ATTACK_COOLTIME)
+	{
+		if (CatchedWeapon)
+		{
+			const EWeaponKind eWeaponKind = CatchedWeapon->GetWorldWeaponKind();
+			switch (eWeaponKind)
 			{
-				const EWeaponKind eWeaponKind = CatchedWeapon->GetWorldWeaponKind();
-				switch (eWeaponKind)
+			case EWeaponKind::SWORD:
+				if (bIsNear)
 				{
-				case EWeaponKind::SWORD: 
+					CurrentAttackCoolTime = 0.f;
 					Owner->PlayMontage(EMonsterMontage::ATTACK_SWORD);
-					break;
-				case EWeaponKind::SPEAR:
-					Owner->PlayMontage(EMonsterMontage::ATTACK_SPEAR);
-					break;
-				case EWeaponKind::LSWORD:
-					Owner->PlayMontage(EMonsterMontage::ATTACK_LSWORD);
-					break;
-				case EWeaponKind::BOW:
-					Owner->PlayMontage(EMonsterMontage::BOW_START);
-					break;
-				case EWeaponKind::END:
-				default:
-					UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdateCombat // No Weapon Kind"))
-					check(false);
-					break;
 				}
+				break;
+			case EWeaponKind::SPEAR:
+				if (bIsNear)
+				{
+					CurrentAttackCoolTime = 0.f;
+					Owner->PlayMontage(EMonsterMontage::ATTACK_SPEAR);
+				}
+				break;
+			case EWeaponKind::LSWORD:
+				if (bIsNear)
+				{
+					CurrentAttackCoolTime = 0.f;
+					Owner->PlayMontage(EMonsterMontage::ATTACK_LSWORD);
+				}
+				break;
+			case EWeaponKind::BOW:
+				CurrentAttackCoolTime = 0.f;
+				Owner->PlayMontage(EMonsterMontage::BOW_START);
+				ChangeState(EMonsterState::AimingBow);
+				break;
+			case EWeaponKind::END:
+			default:
+				UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdateCombat // No Weapon Kind"))
+					check(false);
+				break;
 			}
-			else
+		}
+		else
+		{
+			if (CurrentAttackCoolTime > MONSTER_ATTACK_COOLTIME)
 			{
+				CurrentAttackCoolTime = 0.f;
 				Owner->PlayMontage(EMonsterMontage::ATTACK);
 			}
 		}
@@ -510,12 +532,34 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 void UMonsterFSMComponent::UpdateSignal(float DeltaTime)
 {
 	SignalElapsedTime += DeltaTime;
-	StopMove();
+	this->StopMove();
 	const FVector PlayerLocation = Player->GetActorLocation();
 
 	SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
 	if (SignalElapsedTime > MONSTER_MAX_SIGNAL_TIME)
 	{
+		ChangeState(EMonsterState::Combat);
+	}
+}
+
+void UMonsterFSMComponent::UpdateAimingBow(float DeltaTime)
+{
+	if (!Player)
+	{
+		AimingBowElapsedTime = 0.f;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+	this->StopMove();
+	AimingBowElapsedTime += DeltaTime;
+	const FVector PlayerLocation = Player->GetActorLocation();
+	SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+
+	if (AimingBowElapsedTime > MONSTER_AIMINGBOW_MAX_TIME)
+	{
+		AimingBowElapsedTime = 0.f;
+		Owner->PlayMontage(EMonsterMontage::BOW_END);
 		ChangeState(EMonsterState::Combat);
 	}
 }

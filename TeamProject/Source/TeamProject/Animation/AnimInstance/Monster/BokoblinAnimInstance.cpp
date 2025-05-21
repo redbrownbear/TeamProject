@@ -48,9 +48,9 @@ void UBokoblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsFire = false;
 	bIsEat = false;
 	bIsDance = false;
-	bIsToDance = false;
 	bIsSignal= false;
 	bIsSuspicious = false;
+	bIsAimingBow = false;
 
 	switch (eMonsterState)
 	{
@@ -98,6 +98,9 @@ void UBokoblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		break;
 	case EMonsterState::FindWeapon:
 		bIsRun = true;
+		break;
+	case EMonsterState::AimingBow:
+		bIsAimingBow = true;
 		break;
 	case EMonsterState::Dead:
 		break;

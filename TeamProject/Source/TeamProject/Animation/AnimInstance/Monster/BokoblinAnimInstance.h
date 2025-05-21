@@ -40,9 +40,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly) 
 	bool bIsDance = false;
 	UPROPERTY(BlueprintReadOnly)
-	bool bIsToDance = false;
-	UPROPERTY(BlueprintReadOnly)
 	bool bIsSignal = false;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsSuspicious = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsAimingBow = false;
 };

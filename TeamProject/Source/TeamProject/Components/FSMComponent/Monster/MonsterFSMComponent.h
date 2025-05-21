@@ -58,6 +58,8 @@ protected:
 	float MaxSuspicionGauge = MONSTER_MAX_SUSPICIOUS_GAUGE;
 
 	float SignalElapsedTime = 0.f;
+	float AimingBowElapsedTime = 0.f;
+
 
 protected:
 	int32 CurrentPatrolIndex = 0;
@@ -80,6 +82,7 @@ protected:
 	virtual void UpdateFindWeapon(float DeltaTime);
 	virtual void UpdateCombat(float DeltaTime);
 	virtual void UpdateSignal(float DeltaTime);
+	virtual void UpdateAimingBow(float DeltaTime);
 
 protected:
 	void MoveToLocation(const FVector& InLocation);

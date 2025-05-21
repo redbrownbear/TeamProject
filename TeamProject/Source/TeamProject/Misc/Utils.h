@@ -51,6 +51,7 @@ enum class EMonsterState : uint8
     ToDance,
     Dance,
     Signal,
+    AimingBow,
     End,
 };
 
@@ -90,17 +91,27 @@ enum class EWeaponKind : uint8
 
 
 
-
-inline void RotateActorToDirection(AActor* TargetActor, const FVector& TargetDirection)
+inline void InstantRotateActorToDirection(AActor* TargetActor, const FVector& TargetLocation)
 {
-    if (!TargetActor || TargetDirection.IsNearlyZero())
+    if (!TargetActor)
         return;
 
-    // 방향을 회전으로 변환
-    FRotator TargetRotation = TargetDirection.Rotation();
+    FVector ActorLocation = TargetActor->GetActorLocation();
+    FVector Direction = TargetLocation - ActorLocation;
 
-    // 회전을 적용
-    TargetActor->SetActorRotation(TargetRotation);
+    // 방향 벡터가 0이 아니도록 확인 (같은 위치에 있을 경우 문제 방지)
+    if (Direction.IsNearlyZero())
+    {
+        return; // 대상과 액터가 같은 위치에 있으면 회전할 방향이 없으므로 종료
+    }
+
+    Direction.Normalize(); // 방향 벡터 정규화
+
+    // 대상 위치를 바라보는 회전값 계산
+    FRotator TargetRot = Direction.Rotation();
+
+    // 액터의 회전을 즉시 변경
+    TargetActor->SetActorRotation(TargetRot);
 }
 
 inline void SmoothRotateActorToDirection(AActor* TargetActor, const FVector& TargetLocation, float DeltaTime, float InterpSpeed = 5.f)
