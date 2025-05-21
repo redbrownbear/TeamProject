@@ -223,10 +223,17 @@ void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 
 					bIsCatched = true;
 
-					this->AttachToComponent(
+					CollisionComponent->SetSimulatePhysics(false);
+
+					bool bSucceeded = this->AttachToComponent(
 						Monster->GetSkeletalMeshComponent(),
 						FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-						TEXT("WeaponRight"));
+						TEXT("RightWeapon"));
+
+					if (bSucceeded)
+					{
+						int a = 0;
+					}
 
 					Proj->Destroy();
 				}

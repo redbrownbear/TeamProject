@@ -127,6 +127,8 @@ void UMonsterFSMComponent::HandleState(float DeltaTime)
 
 void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 {
+	if (eCurrentState == NewState) { return; }
+
 	const EMonsterState PrevState = eCurrentState;
 	switch (PrevState)
 	{
@@ -165,7 +167,6 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	}
 
 
-	if (eCurrentState == NewState) { return; }
 	switch (NewState)
 	{
 	case EMonsterState::Idle:
