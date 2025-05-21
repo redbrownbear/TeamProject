@@ -13,6 +13,8 @@
 
 #include "Animation/Npc/ConversationManagerComponent.h"
 
+#include "UI/HUD/MainHUD.h"
+
 ANpc::ANpc()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -87,9 +89,13 @@ void ANpc::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AA
 		if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
 		{
 			PC->Npc = this;
-		}
+			bPlayerInRange = true;
 
-		bPlayerInRange = true;
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			{
+				HUD->ShowInteractWidget(bPlayerInRange);
+			}
+		}
 		// Create Interact UI
 	}
 }
@@ -101,9 +107,14 @@ void ANpc::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 		if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
 		{
 			PC->Npc = nullptr;
-		}
+			bPlayerInRange = false;
 
-		bPlayerInRange = false;
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			{
+				HUD->ShowInteractWidget(bPlayerInRange);
+			}
+		}
+	
 		// Delete Interact UI
 	}
 }
