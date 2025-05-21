@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 
 #include "UI/Inven/Inventory.h"
+#include "UI/NpcDialogue/NPCDialogue.h"
 
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
@@ -39,7 +40,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
 	UInputMappingContext* IMC_Inventory = nullptr;
 
+	//Dialogue
+	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
+	UInputMappingContext* IMC_Dialogue = nullptr;
 
+	//Player
 public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_Move = nullptr;
@@ -55,31 +60,47 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_Inventory = nullptr;
 
+	//Inven
 public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_Navigate = nullptr;
+	UInputAction* IA_InvenNavigate = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_InvenConfirm = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_InvenCancel = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_InvenAddItem = nullptr;
 
+	//Dialogue
+public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_Confirm = nullptr;
+	UInputAction* IA_DialogueNavigate = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_Cancel = nullptr;
+	UInputAction* IA_DialogueConfirm = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_DialogueCancel = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_DialogueNext = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_AddItem = nullptr;
 
 
 	void CheckValid() const
 	{
 		check(IMC_InGame);
 		check(IMC_Inventory);
+		check(IMC_Dialogue);
 		check(IA_Move);
 		check(IA_LookMouse);
 		check(IA_Interact);
 		check(IA_Inventory);
-		check(IA_Navigate);
-		check(IA_Confirm);
-		check(IA_Cancel);
-		check(IA_AddItem);
+		check(IA_InvenNavigate);
+		check(IA_InvenConfirm);
+		check(IA_InvenCancel);
+		check(IA_InvenAddItem);
+		check(IA_DialogueNavigate);
+		check(IA_DialogueConfirm);
+		check(IA_DialogueCancel);
+		check(IA_DialogueNext);
 	}
 };
 
@@ -100,6 +121,7 @@ protected:
 public:
 	void ChangeInputContext(EInputContext NewContext);
 	void BindInventoryInput(UInventory* Inventory);
+	void BindDialogueInput(UNPCDialogue* NpcDialogue);
 
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);

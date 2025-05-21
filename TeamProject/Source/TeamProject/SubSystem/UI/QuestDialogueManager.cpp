@@ -7,10 +7,14 @@
 
 void UQuestDialogueManager::Initialize(FSubsystemCollectionBase& Collection)
 {
+    UDataTable* LoadedTable = Cast<UDataTable>(
+        StaticLoadObject(UDataTable::StaticClass(), nullptr, TEXT("/Game/Data/NPC/DT_NPCDialogue.DT_NPCDialogue"))
+    );
 
+    LoadDialogueData(LoadedTable);
 }
 
-void UQuestDialogueManager::Initialize(UDataTable* DataTable)
+void UQuestDialogueManager::LoadDialogueData(UDataTable* DataTable)
 {
     if (!DataTable)
     {
@@ -18,25 +22,22 @@ void UQuestDialogueManager::Initialize(UDataTable* DataTable)
         return;
     }
 
-    static const FString ContextString(TEXT("Populate QuestRowMap"));
-
     TArray<FName> RowNames = DataTable->GetRowNames();
-
     for (const FName& RowName : RowNames)
     {
-        FNPCDialogueTableRow* Row = DataTable->FindRow<FNPCDialogueTableRow>(RowName, ContextString);
-
+        FNPCDialogueTableRow* Row = DataTable->FindRow<FNPCDialogueTableRow>(RowName, "Populate QuestRowMap");
         if (Row)
         {
             if (Row->QuestCharacter != EQuestCharacter::None)
             {
-                if (!QuestRowMap.Contains(Row->QuestCharacter))
+                TArray<const FNPCDialogueTableRow*>* FoundArray = QuestRowMap.Find(Row->QuestCharacter);
+                if (FoundArray)
                 {
-                    QuestRowMap.Add(Row->QuestCharacter, Row);
+                    FoundArray->Add(Row);
                 }
                 else
                 {
-                    UE_LOG(LogTemp, Warning, TEXT("Duplicate QuestCharacter key found: %s"), *UEnum::GetValueAsString(Row->QuestCharacter));
+                    QuestRowMap.Add(Row->QuestCharacter, TArray<const FNPCDialogueTableRow*>{ Row });
                 }
             }
         }
@@ -47,27 +48,46 @@ void UQuestDialogueManager::Initialize(UDataTable* DataTable)
     }
 }
 
-const FNPCDialogueTableRow* UQuestDialogueManager::GetItemRow(EQuestCharacter Questchar) const
+TArray<const FNPCDialogueTableRow*> UQuestDialogueManager::GetDialogueData(EQuestCharacter QuestChar) const
 {
-    auto FoundRow = QuestRowMap.Find(Questchar);
-    if (!FoundRow)
+    const TArray<const FNPCDialogueTableRow*>* FoundRows = QuestRowMap.Find(QuestChar);
+    if (!FoundRows)
     {
-        UE_LOG(LogTemp, Warning, TEXT("No row found for character: %s"), *UEnum::GetValueAsString(Questchar));
-        return nullptr;
+        UE_LOG(LogTemp, Warning, TEXT("No dialogue found for character: %s"), *UEnum::GetValueAsString(QuestChar));
+        
+        return TArray<const FNPCDialogueTableRow*>{}; // 빈 배열 반환
     }
 
-    return *FoundRow;
+    return *FoundRows;
 }
 
-void UQuestDialogueManager::ShowDialogue(EQuestCharacter Questchar)
+void UQuestDialogueManager::ShowDialogue(EQuestCharacter QuestChar, int32 DialogueID)
 {
-    const FNPCDialogueTableRow* FoundRow = GetItemRow(Questchar);
-    if (!FoundRow)
+    TArray<const FNPCDialogueTableRow*> DialogueRows = GetDialogueData(QuestChar);
+
+    if (DialogueRows.Num() == 0)
     {
-        UE_LOG(LogTemp, Warning, TEXT("No dialogue found for character: %s"), *UEnum::GetValueAsString(Questchar));
+        UE_LOG(LogTemp, Warning, TEXT("No dialogue found for character: %s"), *UEnum::GetValueAsString(QuestChar));
         return;
     }
 
-    // 포인터 -> 참조로 변환해서 전달
+    const FNPCDialogueTableRow* FoundRow = nullptr;
+    for (const FNPCDialogueTableRow* Row : DialogueRows)
+    {
+        if (Row->CurrentDialogueID == DialogueID)
+        {
+            FoundRow = Row;
+            break;
+        }
+    }
+
+    if (!FoundRow)      
+        return;
+
     OnDialogueUpdated.Broadcast(*FoundRow);
+}
+
+void UQuestDialogueManager::HandleNextDialogueRequested(EQuestCharacter QuestChar, int32 NextID)
+{
+    ShowDialogue(QuestChar, NextID);
 }
