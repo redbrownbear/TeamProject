@@ -6,7 +6,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
-#include "Animation/Npc/ConversationManagerComponent.h"
+#include "Components/ConversationComponent/ConversationManagerComponent.h"
 
 ANpcController::ANpcController()
 {
@@ -64,7 +64,6 @@ void ANpcController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 	if (Player)
 	{
 		NpcFSMComponent->SetPlayer(Player);
-		UE_LOG(LogTemp, Warning, TEXT("ANpcController::OnPerceptionUpdated Player set Valid"));
 	}
 	else
 	{

@@ -2,7 +2,7 @@
 #include "UI/NpcDialogue/NPCDialogue.h"
 
 #include "Actors/Npc/Npc.h"
-#include "Animation/Npc/ConversationManagerComponent.h"
+#include "Components/ConversationComponent/ConversationManagerComponent.h"
 
 void UStoreFSMComponent::UpdateIdle(float DeltaTime)
 {

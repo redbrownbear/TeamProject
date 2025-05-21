@@ -5,61 +5,11 @@
 #include "Components/SplineComponent.h"
 
 #include "UI/NpcDialogue/NPCDialogue.h"
-#include "Animation/Npc/ConversationManagerComponent.h"
+#include "Components/ConversationComponent/ConversationManagerComponent.h"
 
 UFurikoFSMComponent::UFurikoFSMComponent()
 {
-	eCurrentState = ENpcState::Stroll;
-}
-
-void UFurikoFSMComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
-void UFurikoFSMComponent::HandleState(float DeltaTime)
-{
-	switch (eCurrentState)
-	{
-	case ENpcState::Idle:
-		UpdateIdle(DeltaTime);
-	case ENpcState::Stroll:
-		UpdateStroll(DeltaTime);
-		break;
-	case ENpcState::Talk:
-		UpdateTalk(DeltaTime);
-		break;
-	case ENpcState::Hide:
-		UpdateHide(DeltaTime);
-		break;
-	case ENpcState::Play: // 술래잡기: 시간 되면 추가
-		UpdatePlay(DeltaTime); 
-		break;
-	default:
-		break;
-	}
-}
-
-void UFurikoFSMComponent::ChangeState(ENpcState NewState)
-{
-	if (eCurrentState == NewState) { return; }
-	switch (NewState)
-	{
-	case ENpcState::Idle:
-		break;
-	case ENpcState::Stroll:
-		break;
-	case ENpcState::Talk:
-		break;
-	case ENpcState::Hide:
-		break;
-	case ENpcState::Play: // 술래잡기: 시간 되면 추가
-		break;
-	default:
-		break;
-	}
-	eCurrentState = NewState;
+	eCurrentState = ENpcState::Run;
 }
 
 void UFurikoFSMComponent::UpdateIdle(float DeltaTime)
@@ -67,38 +17,41 @@ void UFurikoFSMComponent::UpdateIdle(float DeltaTime)
 	Super::UpdateIdle(DeltaTime);
 }
 
-void UFurikoFSMComponent::UpdateStroll(float DeltaTime)
+void UFurikoFSMComponent::UpdateRun(float DeltaTime)
 {	
-	Super::UpdateStroll(DeltaTime);
+	Super::UpdateRun(DeltaTime);		
 
+	// 스플라인 경로
 	AStrollPath* StrollPath = Owner->GetStrollPath();
-	if (!StrollPath) return;
+	if (!StrollPath)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UFurikoFSMComponent::UpdateStroll // No StrollPath"));
+		return;
+	}
 
-	const FVector CurrentLocation = Owner->GetActorLocation();
-	const FVector TargetLocation = StrollPath->GetSplinePointLocation(CurrentStrollIndex);
+	int32 CurrentStrollIndex = 0;
+	FVector TargetLocation = StrollPath->GetSplinePointLocation(CurrentStrollIndex);
+	FVector CurrentLocation = Owner->GetActorLocation();
 
 	// 이동
 	MoveToLocation(TargetLocation);
 
-	// 회전 보간 속도 계산
-	UFloatingPawnMovement* MoveComp = Cast<UFloatingPawnMovement>(Owner->GetMovementComponent());
-	float MovementSpeed = (MoveComp != nullptr) ? MoveComp->MaxSpeed : 300.f;
-	float RotationInterpSpeed = MovementSpeed / 50.f; // 튜닝값 (작을수록 천천히 회전)
-
-	// 방향 계산 (다음 인덱스를 X축 정면으로 바라보게 회전)
+	// 회전: 현재 위치 → TargetLocation 방향을 기준으로
 	FVector Direction = (TargetLocation - CurrentLocation).GetSafeNormal();
+	FRotator NpcRotation;
 	if (!Direction.IsNearlyZero())
 	{
-		FRotator TargetRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
-		FRotator CurrentRotation = Owner->GetActorRotation();
-		FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationInterpSpeed);
-
-		Owner->SetActorRotation(SmoothRotation);
+		NpcRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
 	}
 
+	// 부드러운 회전 적용
+	FRotator SmoothRotation = FMath::RInterpTo(Owner->GetActorRotation(), NpcRotation, DeltaTime, 5.f);
+	Owner->SetActorRotation(SmoothRotation);
+
 	// 도착 체크
-	const float Distance = FVector::Dist(CurrentLocation, TargetLocation);
-	if (Distance < 100.f)
+	/*bool bIsNear = FVector::Dist(CurrentLocation, TargetLocation) < 50.f;*/
+	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), TargetLocation, 500.f);
+	if (bIsNear)
 	{
 		++CurrentStrollIndex;
 		if (CurrentStrollIndex >= StrollPath->GetSplineMaxIndex())
@@ -106,39 +59,6 @@ void UFurikoFSMComponent::UpdateStroll(float DeltaTime)
 			CurrentStrollIndex = 0;
 		}
 	}
-	
-	//// 목표 위치 구하기
-	//FVector Location = FVector();
-
-	//if (AStrollPath* StrollPath = Owner->GetStrollPath())
-	//{
-	//	Location = StrollPath->GetSplinePointLocation(CurrentStrollIndex);
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::UpdateStroll // No StrollPath"));
-	//	check(false);
-	//}
-
-	//// 이동 
-	//MoveToLocation(Location);
-
-	//// 다음 PatrolIndex 구하기
-	//const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 100.f);
-
-
-	//if (bIsNear)
-	//{
-	//	++CurrentStrollIndex;
-
-	//	if (AStrollPath* StrollPath = Owner->GetStrollPath())
-	//	{
-	//		if (CurrentStrollIndex >= StrollPath->GetSplineMaxIndex())
-	//		{
-	//			CurrentStrollIndex = 0;
-	//		}
-	//	}
-	//}
 }
 
 void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
@@ -167,10 +87,11 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 
 void UFurikoFSMComponent::UpdateHide(float DeltaTime)
 {
-	
+	Super::UpdateHide(DeltaTime);
 }
 
 void UFurikoFSMComponent::UpdatePlay(float DeltaTime)
 {
 	// 술래잡기: 시간 되면 추가
-};
+}
+

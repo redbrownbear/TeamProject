@@ -14,16 +14,8 @@ public:
 	UFurikoFSMComponent();
 
 protected:
-	virtual void BeginPlay() override;
-
-private:
-	void HandleState(float DeltaTime);
-
-	void ChangeState(ENpcState NewState);
-
-protected:
 	virtual void UpdateIdle(float DeltaTime) override;
-	virtual void UpdateStroll(float DeltaTime) override;
+	virtual void UpdateRun(float DeltaTime) override;
 	virtual void UpdateTalk(float DeltaTime) override;
 	virtual void UpdateHide(float DeltaTime);
 	virtual void UpdatePlay(float DeltaTime); // // 술래잡기: 시간 되면 추가
@@ -32,7 +24,4 @@ private:
 	UPROPERTY()
 	AFurikoController* FurikoController = nullptr;
 
-private:
-	int32 CurrentStrollIndex = 0;
-	float AcceptanceRadius = 50.0f;
 };

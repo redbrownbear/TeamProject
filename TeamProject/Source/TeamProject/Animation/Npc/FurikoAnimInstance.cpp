@@ -1,10 +1,10 @@
 ﻿#include "FurikoAnimInstance.h"
 #include "Actors/Npc/Npc.h"
-#include "Components/FSMComponent/Npc/NpcFSMComponent.h"
+//#include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 
 UFurikoAnimInstance::UFurikoAnimInstance()
 	:Super()
-{	
+{		
 }
 
 void UFurikoAnimInstance::NativeInitializeAnimation()
@@ -71,7 +71,7 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsTalk = false;
 		bIsHide = false;
 		break;
-	case ENpcState::Stroll:
+	case ENpcState::Run:
 		bIsIdle = false;
 		bIsSit = false;
 		bIsStand = false;

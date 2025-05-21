@@ -3,8 +3,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/FloatingPawnMovement.h"
-#include "Actors/Controller/Npc/NpcController.h"
 #include "Data/NPCTableRow.h"
+#include "Data/NpcCharacterTableRow.h"
+#include "Misc/Utils.h"
 #include "Npc.generated.h"
 
 class USphereComponent;
@@ -25,6 +26,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void OnConstruction(const FTransform& Transform);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -37,7 +40,7 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> BodyMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
-	TObjectPtr<USkeletalMeshComponent> FaceMeshComponent;
+	TObjectPtr<USkeletalMeshComponent> HeadMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
 	TObjectPtr<USkeletalMeshComponent> HairMeshComponent;
@@ -55,6 +58,8 @@ public:
 
 	USkeletalMeshComponent* GetBodyMesh() const { return BodyMeshComponent; }
 
+	//USkeletalMesh* GetBodySkeletalMesh() const { return BodyMeshComponent ? BodyMeshComponent->SkeletalMesh : nullptr; }
+
 	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
 
 	void OnTalkKeyPressed(); // 대화 UI
@@ -64,6 +69,21 @@ public:
 	EQuestCharacter GetNpc() const { return QuestNpc; }
 
 	void SetNpc(EQuestCharacter InQuestNpc) { QuestNpc = InQuestNpc; }
+
+	void AttachToSocket();
+
+protected:
+	UPROPERTY(EditAnywhere)
+	FDataTableRowHandle DataTableRowHandle;
+	FNpcCharacterTableRow* NpcData;
+
+public:
+	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+
+public:
+	void PlayMontage(ENpcMontage _InEnum, bool bIsLoop = false);
+	bool IsMontage(ENpcMontage _InEnum);
+	bool IsPlayingMontage(ENpcMontage _InEnum);
 	
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -74,6 +94,16 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	EQuestCharacter QuestNpc;
+
+protected:
+	UPROPERTY(EditAnywhere)
+	USkeletalMesh* HeadMeshAsset;
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMesh* HairMeshAsset;
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMesh* NoseMeshAsset;
 
 private:
 	// 상호작용 가능 변수
@@ -90,4 +120,8 @@ protected:
 	UFUNCTION()
 	void OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+public:
+	void SetSpeedWalk();
+	void SetSpeedRun();
 };
