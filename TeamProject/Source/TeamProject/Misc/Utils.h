@@ -54,8 +54,6 @@ enum class EMonsterState : uint8
     End,
 };
 
-
-
 enum class EMonsterMontage : uint8
 {
     ATTACK = 0,
@@ -79,6 +77,18 @@ enum class EMonsterMontage : uint8
     SIGNAL_END,
     END,
 };
+
+UENUM()
+enum class EWeaponKind : uint8
+{
+    SWORD = 0,
+    SPEAR,
+    LSWORD,
+    BOW,
+    END,
+};
+
+
 
 
 inline void RotateActorToDirection(AActor* TargetActor, const FVector& TargetDirection)

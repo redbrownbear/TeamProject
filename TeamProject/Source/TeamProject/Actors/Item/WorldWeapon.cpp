@@ -251,6 +251,11 @@ FName AWorldWeapon::GetWorldWeaponName()
 	return DataTableRowHandle.RowName;
 }
 
+EWeaponKind AWorldWeapon::GetWorldWeaponKind()
+{
+	return ItemTableRow->eWeaponKind;
+}
+
 void AWorldWeapon::AddForce(FVector _Direction, float Force)
 {
 	CollisionComponent->AddForce(Force * _Direction);

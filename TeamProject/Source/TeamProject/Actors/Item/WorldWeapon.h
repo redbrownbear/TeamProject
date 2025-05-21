@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Misc/Utils.h"
 #include "WorldWeapon.generated.h"
 
 struct FItemData;
@@ -64,6 +65,7 @@ protected:
 
 public:
 	FName GetWorldWeaponName();
+	EWeaponKind GetWorldWeaponKind();
 	void AddForce(FVector _Direction, float Force);
 
 protected:

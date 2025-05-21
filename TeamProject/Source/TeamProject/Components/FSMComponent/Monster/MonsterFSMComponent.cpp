@@ -184,11 +184,11 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 			return;
 		}
 
-
 		if (PrevState != EMonsterState::Combat)
 		{
 			Owner->PlayMontage(EMonsterMontage::ANGRY);
 		}
+		
 		Owner->SetSpeedRun();
 		break;
 	case EMonsterState::Combat:
@@ -331,9 +331,18 @@ void UMonsterFSMComponent::UpdateSuspicious(float DeltaTime)
 		{
 			SuspicionGauge = 0.f;
 			ChangeState(EMonsterState::Alert);
+			return;
+		}
+		else if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+		{
+			ChangeState(EMonsterState::Idle);
+			Player = nullptr;
+			return;
 		}
 		else
 		{
+
+
 			SuspicionGauge += DeltaTime;
 		}
 
@@ -343,6 +352,7 @@ void UMonsterFSMComponent::UpdateSuspicious(float DeltaTime)
 	else
 	{
 		ChangeState(EMonsterState::Idle);
+		return;
 	}
 }
 
@@ -353,11 +363,20 @@ void UMonsterFSMComponent::UpdateAlert(float DeltaTime)
 
 void UMonsterFSMComponent::UpdateFindWeapon(float DeltaTime)
 {
+	if (!IsValid(Player))
+	{
+		ToCatchWeapon = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
 	if (ToCatchWeapon)
 	{
+		// Already Owned by other Monster or Player
 		if (ToCatchWeapon->GetCatched())
 		{
 			ChangeState(EMonsterState::Combat);
+			return;
 		}
 
 		if (CatchedWeapon)
@@ -368,18 +387,31 @@ void UMonsterFSMComponent::UpdateFindWeapon(float DeltaTime)
 		}
 
 		// 이동
-		const FVector Location = ToCatchWeapon->GetActorLocation();
+		// Get Target Location
+		FVector WeaponLocation = ToCatchWeapon->GetActorLocation();
+		FVector MonsterLocation = Owner->GetActorLocation();
+		FVector PlayerLocation = Player->GetActorLocation();
+
+		const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+		if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+		{
+			ToCatchWeapon = nullptr;
+			Player = nullptr;
+			ChangeState(EMonsterState::Idle);
+			return;
+		}
+
+
 		if (Owner->IsPlayingMontage(EMonsterMontage::END))
 		{
 			StopMove();
 		}
 		else
 		{
-			MoveToLocation(Location);
+			MoveToLocation(WeaponLocation);
 		}
 
-		// 다음 PatrolIndex 구하기
-		const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 100.f);
+		const bool bIsNear = FVector::PointsAreNear(MonsterLocation, WeaponLocation, 150.f);
 
 		if (bIsNear)
 		{
@@ -403,6 +435,18 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 
 	// Get Target Location
 	FVector Location = Player->GetActorLocation();
+	FVector MonsterLocation = Owner->GetActorLocation();
+
+	const float fDistance = FVector::Dist(Location, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+
+
 
 	// Move
 	// 이동
@@ -421,7 +465,7 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 
 
 	// Check if it's arrived
-	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, Location, 150.f);
 
 	if (bIsNear)
 	{
@@ -429,7 +473,35 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 		if (CurrentAttackCoolTime > MONSTER_ATTACK_COOLTIME)
 		{
 			CurrentAttackCoolTime = 0.f;
-			Owner->PlayMontage(EMonsterMontage::ATTACK);
+
+			if (CatchedWeapon)
+			{
+				const EWeaponKind eWeaponKind = CatchedWeapon->GetWorldWeaponKind();
+				switch (eWeaponKind)
+				{
+				case EWeaponKind::SWORD: 
+					Owner->PlayMontage(EMonsterMontage::ATTACK_SWORD);
+					break;
+				case EWeaponKind::SPEAR:
+					Owner->PlayMontage(EMonsterMontage::ATTACK_SPEAR);
+					break;
+				case EWeaponKind::LSWORD:
+					Owner->PlayMontage(EMonsterMontage::ATTACK_LSWORD);
+					break;
+				case EWeaponKind::BOW:
+					Owner->PlayMontage(EMonsterMontage::BOW_START);
+					break;
+				case EWeaponKind::END:
+				default:
+					UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdateCombat // No Weapon Kind"))
+					check(false);
+					break;
+				}
+			}
+			else
+			{
+				Owner->PlayMontage(EMonsterMontage::ATTACK);
+			}
 		}
 	}
 }
@@ -480,7 +552,7 @@ void UMonsterFSMComponent::SpawnProjectile(FName ProjectileName, FName Collision
 	UWorld* World = GetWorld();
 
 	AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
-		FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		FTransform::Identity, Owner, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 	FTransform NewTransform;
 	Projectile->SetData(ProjectileName, CollisionProfileName);
