@@ -319,6 +319,7 @@ void UMonsterFSMComponent::UpdateSuspicious(float DeltaTime)
 {
 	if (Player)
 	{
+		StopMove();
 		SuspicionGauge += DeltaTime * MONSTER_SUSPICIOUS_COEFFICIENT;
 
 		const FVector MonsterLocation = Owner->GetActorLocation();
@@ -509,6 +510,10 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 void UMonsterFSMComponent::UpdateSignal(float DeltaTime)
 {
 	SignalElapsedTime += DeltaTime;
+	StopMove();
+	const FVector PlayerLocation = Player->GetActorLocation();
+
+	SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
 	if (SignalElapsedTime > MONSTER_MAX_SIGNAL_TIME)
 	{
 		ChangeState(EMonsterState::Combat);

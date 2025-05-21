@@ -73,7 +73,7 @@ void UBokoblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsDance = true;
 		break;
 	case EMonsterState::ToDance:
-		bIsToDance = true;
+		bIsWalk = true;
 		break;
 	case EMonsterState::Signal:
 		bIsSignal = true;
@@ -95,6 +95,9 @@ void UBokoblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			}
 		}
 	}
+		break;
+	case EMonsterState::FindWeapon:
+		bIsRun = true;
 		break;
 	case EMonsterState::Dead:
 		break;
