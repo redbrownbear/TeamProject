@@ -10,6 +10,8 @@ void UMainHUDWidget::NativeConstruct()
 	if(HIntOverlay)
 		HIntOverlay->SetVisibility(ESlateVisibility::Hidden);
 
+	if (NameOvelay)
+		NameOvelay->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UMainHUDWidget::ShowInteractUI(bool bShow)
