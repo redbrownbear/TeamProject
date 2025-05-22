@@ -95,8 +95,6 @@ void AWeaponSword::LeftClickAction()
         CurrentComboIndex = (MaxComboIndex <= CurrentComboIndex) ? 0 : CurrentComboIndex;
 
         Player_C->GetMesh()->GetAnimInstance()->Montage_Play(Arr_Sword_Attack_MTG[CurrentComboIndex]);
-
-        Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);
     }
 
 

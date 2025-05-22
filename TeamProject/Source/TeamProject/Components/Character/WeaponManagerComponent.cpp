@@ -87,6 +87,15 @@ void UWeaponManagerComponent::TryEquipWeapon()
 {
 	ACharacter* CRT = Cast<ACharacter>(GetOwner());
 	USkeletalMeshComponent* Mesh = CRT->GetMesh();
+
+	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+
+
+	UAnimMontage* PlayingMontage = AnimInstance->GetCurrentActiveMontage();
+	if (PlayingMontage)
+		return;
+	
+
 	if (NextWeapon == EWeapon_Type::Sword)
 	{
 		if (Equip_State == EEquip_State::Sword || Equip_State == EEquip_State::Sword_Shield)
@@ -98,14 +107,11 @@ void UWeaponManagerComponent::TryEquipWeapon()
 			
 			UnEquipWeapons.Enqueue(EWeapon_Type::Sword);
 
-			Mesh->GetAnimInstance()->Montage_Play(UnEquipMontage);
+			AnimInstance->Montage_Play(UnEquipMontage);
 		}
 		else if (Equip_State == EEquip_State::Bow)
 		{
 			
-			
-
-			UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
 			UAnimMontage* UnEquipMontage = Cast<AWeaponBase>(Bow->GetChildActor())->GetUnEquipMontage();
 			AnimInstance->Montage_Play(UnEquipMontage);
 
@@ -123,7 +129,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Sword->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
 
-			Mesh->GetAnimInstance()->Montage_Play(EquipMontage);
+			AnimInstance->Montage_Play(EquipMontage);
 		}
 	}
 	else if (NextWeapon == EWeapon_Type::Bow)
@@ -137,14 +143,11 @@ void UWeaponManagerComponent::TryEquipWeapon()
 
 			UnEquipWeapons.Enqueue(EWeapon_Type::Bow);
 
-			Mesh->GetAnimInstance()->Montage_Play(UnEquipMontage);
+			AnimInstance->Montage_Play(UnEquipMontage);
 		}
 		else if (Equip_State == EEquip_State::Sword)
 		{
 
-
-
-			UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
 			UAnimMontage* UnEquipMontage = Cast<AWeaponBase>(Sword->GetChildActor())->GetUnEquipMontage();
 
 			UnEquipWeapons.Enqueue(EWeapon_Type::Sword);
@@ -159,7 +162,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 		}
 		else if (Equip_State == EEquip_State::Sword_Shield)
 		{
-			UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+		
 
 			UnEquipWeapons.Enqueue(EWeapon_Type::Sword);
 			UnEquipWeapons.Enqueue(EWeapon_Type::Shield);
@@ -177,7 +180,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Sword->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
 
-			Mesh->GetAnimInstance()->Montage_Play(EquipMontage);
+			AnimInstance->Montage_Play(EquipMontage);
 		}
 	}
 	else if (NextWeapon == EWeapon_Type::Shield)
@@ -191,14 +194,14 @@ void UWeaponManagerComponent::TryEquipWeapon()
 
 			UnEquipWeapons.Enqueue(EWeapon_Type::Shield);
 
-			Mesh->GetAnimInstance()->Montage_Play(UnEquipMontage);
+			AnimInstance->Montage_Play(UnEquipMontage);
 		}
 		else if (Equip_State == EEquip_State::Bow)
 		{
 
 
 
-			UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+		
 			UAnimMontage* UnEquipMontage = Cast<AWeaponBase>(Bow->GetChildActor())->GetUnEquipMontage();
 			AnimInstance->Montage_Play(UnEquipMontage);
 
@@ -216,7 +219,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
 
-			Mesh->GetAnimInstance()->Montage_Play(EquipMontage);
+			AnimInstance->Montage_Play(EquipMontage);
 		}
 	}
 
