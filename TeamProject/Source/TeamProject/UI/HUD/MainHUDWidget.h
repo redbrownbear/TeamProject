@@ -8,6 +8,7 @@
 #include "Components/CanvasPanel.h"
 #include "Components/Overlay.h"
 #include "Components/TextBlock.h"
+#include "Components/Image.h"
 
 #include "MainHUDWidget.generated.h"
 
@@ -21,6 +22,7 @@ class TEAMPROJECT_API UMainHUDWidget : public UUserWidget
 
 private:
 	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 public:
 	void ShowInteractUI(bool bIsShow);
@@ -29,9 +31,20 @@ public:
 public:
 	UPROPERTY(meta = (BindWidget))
 	UOverlay* HIntOverlay;
-
 	UPROPERTY(meta = (BindWidget))
 	UOverlay* NameOvelay;
 	UPROPERTY(meta = (BindWIdget))
 	UTextBlock* NameText;
+
+	UPROPERTY(meta = (BindWIdget))
+	UImage* StaminaImg;
+
+
+private:
+	UPROPERTY()
+	UMaterialInstanceDynamic* DynamicMaterial;
+
+	float ElapsedTime;
+	bool bIsFullStamina;
+
 };
