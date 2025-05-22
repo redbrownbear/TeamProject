@@ -175,7 +175,6 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 			{
 				FString Path = TEXT("/Game/BluePrint/UI/NpcDialogue/BP_NpcDialogue.BP_NpcDialogue_C");
 				TSubclassOf<UNPCDialogue> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
-
 				UNPCDialogue* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
 				if (NewUI)
 				{

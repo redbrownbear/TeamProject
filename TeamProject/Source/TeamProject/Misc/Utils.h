@@ -113,3 +113,32 @@ enum class EEquipWeapon
     Bow,
 
 };
+
+// NPC 추가
+UENUM()
+enum class ENpcState : uint8
+{
+    Idle = 0,
+    Sit,
+    Stand,
+    Walk,
+    Run,
+    Talk,
+    Hide, // 술래잡기: 시간 되면 추가
+    Sell,
+    End,
+};
+
+
+enum class ENpcMontage : uint8
+{
+    IDLE = 0,
+    SIT,
+    STAND,
+    WALK,
+    RUN,
+    TALK,
+    HIDE,
+    SELL,
+    END,
+};
