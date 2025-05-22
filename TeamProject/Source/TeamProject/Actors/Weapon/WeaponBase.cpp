@@ -47,11 +47,11 @@ void AWeaponBase::Tick(float DeltaTime)
 
 }
 
-void AWeaponBase::FirstAction()
+void AWeaponBase::LeftClickAction()
 {
 }
 
-void AWeaponBase::SecondAction()
+void AWeaponBase::RightClickAction()
 {
 }
 

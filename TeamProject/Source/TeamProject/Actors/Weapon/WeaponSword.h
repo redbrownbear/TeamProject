@@ -26,7 +26,7 @@ public:
 
 public:
 
-	void SetAttackBox();
+	virtual void LeftClickAction() override;
 
 	void SetCanAttack();
 
