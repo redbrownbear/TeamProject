@@ -64,6 +64,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UAnimMontage* UnEquipMontage;
 
+
+
 protected:
 	friend class UItemAction_Weapon;
 	UPROPERTY(EditAnywhere, meta = (RowType = "/Script/TeamProject.WeaponTableRow"))

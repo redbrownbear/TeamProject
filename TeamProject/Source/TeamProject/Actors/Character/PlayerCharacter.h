@@ -44,11 +44,6 @@ public:
 	virtual void OnConstruction(const FTransform& Transform);
 
 	
-	// 클릭이벤트 발생
-
-	void LeftClickAction();
-	void RightClickAction();
-
 	
 
 public:

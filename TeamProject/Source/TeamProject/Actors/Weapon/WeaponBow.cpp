@@ -2,6 +2,7 @@
 
 
 #include "Actors/Weapon/WeaponBow.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 AWeaponBow::AWeaponBow()
 {
@@ -47,4 +48,34 @@ AWeaponBow::AWeaponBow()
             UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
         }
     }
+    {
+        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Bow/Animation/Bow_Load_Charge_Montage.Bow_Load_Charge_Montage'"));
+
+        if (Asset.Object)
+        {
+            Attack_MTG = Asset.Object;
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+        }
+    }
+}
+
+void AWeaponBow::LeftClickAction()
+{
+    APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+    Player_C->GetMesh()->GetAnimInstance()->Montage_Resume(Attack_MTG);
+
+    Player_C->GetWeaponManagerComponent()->SetRightClick(false);
+
+    Player_C->GetCharacterMovement()->MaxWalkSpeed = 600.f;
+}
+
+void AWeaponBow::RightClickAction()
+{
+
+    APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+    Player_C->GetMesh()->GetAnimInstance()->Montage_Play(Attack_MTG);
+    
 }

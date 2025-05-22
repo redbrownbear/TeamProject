@@ -34,6 +34,11 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsFalling = false;
 
+	UPROPERTY(BlueprintReadOnly)
+	FVector2D ActionValue;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsZoom = false;
 
 
 

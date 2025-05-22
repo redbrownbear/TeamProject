@@ -49,6 +49,7 @@ void AWeaponBase::Tick(float DeltaTime)
 
 void AWeaponBase::LeftClickAction()
 {
+
 }
 
 void AWeaponBase::RightClickAction()

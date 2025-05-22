@@ -39,6 +39,8 @@ public:
 	EEquip_State GetEquipState() { return Equip_State; }
 	void SetEquipState(EEquip_State _State) { Equip_State = _State; }
 
+	void SetRightClick(bool _RightClick) { RightClick = _RightClick; }
+
 	EWeapon_Type GetUnEquipWeaponType() {
 		EWeapon_Type _Type;
 		UnEquipWeapons.Dequeue(_Type);
@@ -49,6 +51,12 @@ public:
 
 	void TryEquipWeapon();
 	void EquipWeapon(UAnimMontage* Montage, bool bInterrupted);
+
+
+	void LeftClickAction();
+	void RightClickAction();
+
+
 
 
 protected:
@@ -74,4 +82,7 @@ protected:
 
 	UPROPERTY()
 	UAnimMontage* UnEquip_Sword_Shield;
+
+
+	bool RightClick;
 };

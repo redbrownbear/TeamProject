@@ -104,16 +104,6 @@ void APlayerCharacter::OnConstruction(const FTransform& Transform)
 
 }
 
-void APlayerCharacter::LeftClickAction()
-{
-
-}
-
-void APlayerCharacter::RightClickAction()
-{
-
-}
-
 
 
 
