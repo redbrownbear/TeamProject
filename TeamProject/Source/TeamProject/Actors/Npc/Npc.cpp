@@ -113,9 +113,7 @@ void ANpc::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 			PC->Npc = nullptr;
 			bPlayerInRange = false;
 
-<<<<<<< HEAD
-		bPlayerInRange = false;
-=======
+
 			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
 			{
 				HUD->ShowInteractWidget(bPlayerInRange);
@@ -123,7 +121,6 @@ void ANpc::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 		}
 	
 		// Delete Interact UI
->>>>>>> origin/main
 	}
 }
 
