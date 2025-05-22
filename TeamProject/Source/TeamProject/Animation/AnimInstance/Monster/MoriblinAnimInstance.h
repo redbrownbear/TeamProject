@@ -38,4 +38,10 @@ protected:
 	bool bIsEat = false;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsDance = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsSignal = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsSuspicious = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsAimingBow = false;
 };

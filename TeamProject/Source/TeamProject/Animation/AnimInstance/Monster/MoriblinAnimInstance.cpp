@@ -2,10 +2,11 @@
 
 
 #include "Animation/AnimInstance/Monster/MoriblinAnimInstance.h"
-
 #include "Components/FSMComponent/Monster/MoriblinFSMComponent.h"
 
 #include "Actors/Monster/Monster.h"
+#include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 UMoriblinAnimInstance::UMoriblinAnimInstance()
@@ -40,70 +41,71 @@ void UMoriblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!FSMComponent) return;
 
 	const EMonsterState eMonsterState = FSMComponent->GetMonsterState();
+
+	bIsIdle = false;
+	bIsWalk = false;
+	bIsRun = false;
+	bIsSearch = false;
+	bIsFire = false;
+	bIsEat = false;
+	bIsDance = false;
+	bIsSignal = false;
+	bIsSuspicious = false;
+	bIsAimingBow = false;
+
 	switch (eMonsterState)
 	{
 	case EMonsterState::Idle:
 		bIsIdle = true;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsSearch = false;
-		bIsFire = false;
-		bIsEat = false;
-		bIsDance = false;
 		break;
 	case EMonsterState::Patrol:
-		bIsIdle = false;
 		bIsWalk = true;
-		bIsRun = false;
-		bIsSearch = false;
-		bIsFire = false;
-		bIsEat = false;
-		bIsDance = false;
 		break;
 	case EMonsterState::Suspicious:
-		bIsIdle = false;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsSearch = true;
-		bIsFire = false;
-		bIsEat = false;
-		bIsDance = false;
+		bIsSuspicious = true;
 		break;
-
 	case EMonsterState::Fire:
-		bIsIdle = false;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsSearch = false;
 		bIsFire = true;
-		bIsEat = false;
-		bIsDance = false;
 		break;
 	case EMonsterState::Eat:
-		bIsIdle = false;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsSearch = false;
-		bIsFire = false;
 		bIsEat = true;
-		bIsDance = false;
 		break;
 	case EMonsterState::Dance:
-		bIsIdle = false;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsSearch = false;
-		bIsFire = false;
-		bIsEat = false;
 		bIsDance = true;
 		break;
-	case EMonsterState::End:
+	case EMonsterState::ToDance:
+		bIsWalk = true;
+		break;
+	case EMonsterState::Signal:
+		bIsSignal = true;
 		break;
 	case EMonsterState::Alert:
 		break;
 	case EMonsterState::Combat:
+	{
+		if (AMonster* Monster = Cast<AMonster>(TryGetPawnOwner()))
+		{
+			const double Speed = UKismetMathLibrary::VSizeXY(Monster->GetMovementComponent()->Velocity);
+			if (FMath::IsNearlyZero(Speed))
+			{
+				bIsIdle = true;
+			}
+			else
+			{
+				bIsRun = true;
+			}
+		}
+	}
+	break;
+	case EMonsterState::FindWeapon:
+		bIsRun = true;
+		break;
+	case EMonsterState::AimingBow:
+		bIsAimingBow = true;
 		break;
 	case EMonsterState::Dead:
+		break;
+	case EMonsterState::End:
 		break;
 	default:
 		break;
