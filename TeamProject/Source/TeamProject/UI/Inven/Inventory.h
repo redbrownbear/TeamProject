@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+#include "EnhancedInputComponent.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Data/ItemDataRow.h"
@@ -28,10 +29,20 @@ public:
 private:
 	void InitUI();
 
+public: //바인딩을 위해 퍼블릭선언
+	UFUNCTION()
+	void OnNavigate(const FInputActionValue& InputActionValue);
+	void OnConfirm(const FInputActionValue& InputActionValue);
+	void OnCancel(const FInputActionValue& InputActionValue);
+	void OnCreateItemTest(const FInputActionValue& InputActionValue);
+
 private:
 	UFUNCTION()
 	void RefreshInventory(const FItemData& ItemData);
 
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	UDataTable* ItemDataTable;
 
 private:
 	UPROPERTY(meta = (BindWidget))

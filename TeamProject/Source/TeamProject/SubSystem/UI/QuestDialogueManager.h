@@ -8,23 +8,28 @@
 
 #include "QuestDialogueManager.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDisPlayDialogueUpdated, const FNPCDialogueTableRow&, ItemData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDisPlayDialogueUpdated, const FNPCDialogueTableRow&, DialogueRows);
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable, BlueprintType)
 class TEAMPROJECT_API UQuestDialogueManager : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 	
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-	void Initialize(UDataTable* DataTable);
+	void LoadDialogueData(UDataTable* DataTable);
 
-	const FNPCDialogueTableRow* GetItemRow(EQuestCharacter qusetChar) const;
+	TArray<const FNPCDialogueTableRow*> GetDialogueData(EQuestCharacter QusetChar) const;
 
 public:
-	void ShowDialogue(EQuestCharacter QusetChar);
+	void ShowDialogue(EQuestCharacter QusetChar, int32 DialogueID);
+
+public:
+	//대화를 위한 델리게이트 구독
+	UFUNCTION()
+	void HandleNextDialogueRequested(EQuestCharacter QuestChar, int32 CurrentID);
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -35,6 +40,6 @@ public:
 	UDataTable* QuestDataTable;
 
 private:
-	TMap<EQuestCharacter, const FNPCDialogueTableRow*> QuestRowMap;
+	TMap<EQuestCharacter, TArray<const FNPCDialogueTableRow*>> QuestRowMap;
 
 };

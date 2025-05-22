@@ -36,14 +36,14 @@ void ACookSet::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 
 void ACookSet::ReceiveIngredient(const FHandItem& HandItem, const FRecipeData& Recipe)
 {
-    for (const FRecipeData& Recipe : Recipes)
+    /*for (const FRecipeData& Recipe : Recipes)
     {
         if (CheckRecipeMatch(HandItem, Recipe))
         {
             SuccessCooking();
             return;
         }
-    }
+    }*/
     FailedCooking();
 }
 

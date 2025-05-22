@@ -19,6 +19,15 @@ struct TEAMPROJECT_API FNPCDialogueTableRow : public FTableRowBase
 	EQuestCharacter QuestCharacter = EQuestCharacter::None;
 
 	UPROPERTY(EditAnywhere)
-	TArray<FString> DialogueArr;
+	int32 CurrentDialogueID;
+
+	UPROPERTY(EditAnywhere)
+	int32 NextDialogueID;
+
+	UPROPERTY(EditAnywhere)
+	FString DialogueString;
+
+	UPROPERTY(EditAnywhere)
+	bool bIsEndConversation;
 
 };

@@ -2,25 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Actors/StrollPath/StrollPath.h"
+#include "Misc/Utils.h"
 #include "NpcFSMComponent.generated.h"
-
-UENUM()
-enum class ENpcState : uint8
-{
-	Idle = 0,
-	Sit,
-	Stand,
-	Walk,
-	Stroll,
-	Talk,
-	Hide,
-	Play, // 술래잡기: 시간 되면 추가
-	Sell,
-};
 
 class ANpc;
 class APlayerCharacter;
+class ANpcController;
+class UNPCDialogue;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TEAMPROJECT_API UNpcFSMComponent : public UActorComponent
@@ -50,8 +38,13 @@ protected:
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> Player = nullptr;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<AStrollPath> StrollPathActor;	
+	UPROPERTY()
+	ANpcController* Controller = nullptr;
+
+	// 대화 종료 시 사용할 변수
+	/*UPROPERTY()
+	TObjectPtr<UNPCDialogue> Dialogue = nullptr;*/
+
 
 protected:
 	ENpcState       eCurrentState;
@@ -67,14 +60,19 @@ protected:
 	void ChangeState(ENpcState NewState);
 
 	virtual void UpdateIdle(float DeltaTime);
-	virtual void UpdateStroll(float DeltaTime);
+	virtual void UpdateSit(float DeltaTime);
+	virtual void UpdateStand(float DeltaTime);
+	virtual void UpdateWalk(float DeltaTime);
+	virtual void UpdateRun(float DeltaTime);
 	virtual void UpdateTalk(float DeltaTime);
+	virtual void UpdateHide(float DeltaTime);
+	virtual void UpdateSell(float DeltaTime);
+	virtual void UpdateEnd(float DeltaTime);
 
 protected:
 	void MoveToLocation(const FVector& InLocation);
 
 private:
-	int32 CurrentStrollIndex = 0;
 	float AcceptanceRadius = 50.0f;
 
 };

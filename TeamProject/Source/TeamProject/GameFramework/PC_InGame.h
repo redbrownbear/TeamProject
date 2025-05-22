@@ -6,10 +6,25 @@
 #include "GameFramework/PlayerController.h"
 #include "Engine/DataAsset.h"
 #include "EnhancedInputSubsystems.h"
+
+#include "UI/Inven/Inventory.h"
+#include "UI/NpcDialogue/NPCDialogue.h"
+
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
 
 // 2025-05-19 Yunjung: 임시로 대화 IMC 등록 시키는 중(현석 오빠랑 의논 필요)
+
+enum class EInputContext
+{
+	IC_Start,
+	IC_InGame,
+	IC_Inventory,
+	IC_Dialogue,
+	//필요하면 추가해서 사용합니다.
+
+	IC_End,
+};
 
 UCLASS()
 class TEAMPROJECT_API UPC_InGameDataAsset : public UDataAsset
@@ -17,14 +32,19 @@ class TEAMPROJECT_API UPC_InGameDataAsset : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	//InGame
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
-	UInputMappingContext* IMC = nullptr;
+	UInputMappingContext* IMC_InGame = nullptr;
 
-	// --------- Npc 인터렉트(임시 생성): 윤정 ----------
-	UPROPERTY(EditDefaultsOnly, Category = "Input|InputMappingContext")
-	UInputMappingContext* IMC_Interact = nullptr;
-	// --------------------------------------------------
+	//Inventory
+	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
+	UInputMappingContext* IMC_Inventory = nullptr;
 
+	//Dialogue
+	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
+	UInputMappingContext* IMC_Dialogue = nullptr;
+
+	//Player
 public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_Move = nullptr;
@@ -37,6 +57,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_RightClick = nullptr;
 
+
 	// --------- Weapon Swap-----------------------------
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
@@ -48,17 +69,43 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_EquipBow = nullptr;
 
-	// --------- Npc 인터렉트(임시 생성): 윤정 ----------
-	UPROPERTY(EditDefaultsOnly, Category = "Input|InputAction")
-	UInputAction* IA_Talk = nullptr;
 
 
-	// --------------------------------------------------
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_Interact = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_Inventory = nullptr;
+
+	//Inven
+public:
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_InvenNavigate = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_InvenConfirm = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_InvenCancel = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_InvenAddItem = nullptr;
+
+	//Dialogue
+public:
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_DialogueNavigate = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_DialogueConfirm = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_DialogueCancel = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_DialogueNext = nullptr;
+
+
 
 	void CheckValid() const
 	{
-		check(IMC);
-		check(IMC_Interact);
+		check(IMC_InGame);
+		check(IMC_Inventory);
+		check(IMC_Dialogue);
 		check(IA_Move);
 		check(IA_LookMouse);
 		check(IA_LeftClick);
@@ -66,7 +113,16 @@ public:
 		check(IA_EquipSword);
 		check(IA_EquipShield);
 		check(IA_EquipBow);
-		check(IA_Talk); // Npc 인터렉트(임시 생성): 윤정
+		check(IA_Interact);
+		check(IA_Inventory);
+		check(IA_InvenNavigate);
+		check(IA_InvenConfirm);
+		check(IA_InvenCancel);
+		check(IA_InvenAddItem);
+		check(IA_DialogueNavigate);
+		check(IA_DialogueConfirm);
+		check(IA_DialogueCancel);
+		check(IA_DialogueNext);
 	}
 };
 
@@ -84,13 +140,17 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
+public:
+	void ChangeInputContext(EInputContext NewContext);
+	void BindInventoryInput(UInventory* Inventory);
+	void BindDialogueInput(UNPCDialogue* NpcDialogue);
 
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
 	void OnLook(const FInputActionValue& InputActionValue);
 	void LeftClick(const FInputActionValue& InputActionValue);
 	void RightClick(const FInputActionValue& InputActionValue);
-	
+
 	// --------- Weapon Swap ------------------------------
 
 	void EquipSword(const FInputActionValue& InputActionValue);
@@ -98,19 +158,20 @@ protected:
 	void EquipBow(const FInputActionValue& InputActionValue);
 
 
+	void OnInteract(const FInputActionValue& InputActionValue);
+	void OpenInventory(const FInputActionValue& InputActionValue);
 
-	// --------- Npc 인터렉트(임시 생성): 윤정 ----------
-	void OnTalk(const FInputActionValue& InputActionValue);
-	// --------------------------------------------------
 
 public:
 	UPROPERTY(EditAnywhere)
 	UPC_InGameDataAsset* PC_InGameDataAsset;
 
-	// --------- Npc 인터렉트(임시 생성): 윤정 ----------
+	// --------- Npc 인터렉트 윤정 ----------
 	bool bCanInteractWithNpc = false;
 
 	UPROPERTY()
 	TObjectPtr<class ANpc> Npc = nullptr;
-	// --------------------------------------------------
+
+	EInputContext CurrentInputContext = EInputContext::IC_Start;
+
 };

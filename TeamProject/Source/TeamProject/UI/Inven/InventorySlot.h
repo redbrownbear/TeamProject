@@ -27,9 +27,15 @@ protected:
 public:
 	void SetItemData(const FItemData& Item);
 
+public:
+	void SetSelected(bool bIsSelected);
+
 private:
 	UPROPERTY(meta = (BindWidget))
 	UImage* Icon;
+	UPROPERTY(meta = (BindWidget))
+	UImage* HighlightBg;
+
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Amount;
 };
