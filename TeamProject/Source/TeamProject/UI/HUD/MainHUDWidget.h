@@ -7,6 +7,7 @@
 
 #include "Components/CanvasPanel.h"
 #include "Components/Overlay.h"
+#include "Components/TextBlock.h"
 
 #include "MainHUDWidget.generated.h"
 
@@ -23,8 +24,14 @@ private:
 
 public:
 	void ShowInteractUI(bool bIsShow);
+	void ShowInteractName(bool bIsShow, FString Name);
 
 public:
 	UPROPERTY(meta = (BindWidget))
-	UOverlay* HIntOverLay;
+	UOverlay* HIntOverlay;
+
+	UPROPERTY(meta = (BindWidget))
+	UOverlay* NameOvelay;
+	UPROPERTY(meta = (BindWIdget))
+	UTextBlock* NameText;
 };

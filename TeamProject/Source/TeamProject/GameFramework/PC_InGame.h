@@ -52,7 +52,24 @@ public:
 	UInputAction* IA_LookMouse = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_Attack = nullptr;
+	UInputAction* IA_LeftClick = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_RightClick = nullptr;
+
+
+	// --------- Weapon Swap-----------------------------
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_EquipSword = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_EquipShield = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_EquipBow = nullptr;
+
+
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_Interact = nullptr;
@@ -91,6 +108,11 @@ public:
 		check(IMC_Dialogue);
 		check(IA_Move);
 		check(IA_LookMouse);
+		check(IA_LeftClick);
+		check(IA_RightClick);
+		check(IA_EquipSword);
+		check(IA_EquipShield);
+		check(IA_EquipBow);
 		check(IA_Interact);
 		check(IA_Inventory);
 		check(IA_InvenNavigate);
@@ -127,7 +149,16 @@ public:
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
 	void OnLook(const FInputActionValue& InputActionValue);
-	void TryAttack(const FInputActionValue& InputActionValue);
+	void LeftClick(const FInputActionValue& InputActionValue);
+	void RightClick(const FInputActionValue& InputActionValue);
+
+	// --------- Weapon Swap ------------------------------
+
+	void EquipSword(const FInputActionValue& InputActionValue);
+	void EquipShield(const FInputActionValue& InputActionValue);
+	void EquipBow(const FInputActionValue& InputActionValue);
+
+
 	void OnInteract(const FInputActionValue& InputActionValue);
 	void OpenInventory(const FInputActionValue& InputActionValue);
 

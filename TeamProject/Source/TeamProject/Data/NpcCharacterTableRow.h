@@ -13,6 +13,9 @@ struct TEAMPROJECT_API FNpcCharacterTableRow : public FTableRowBase
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, Category = "Npc")
+	FString NPCName;
+
+	UPROPERTY(EditAnywhere, Category = "Npc")
 	USkeletalMesh* SkeletalMesh = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Npc")

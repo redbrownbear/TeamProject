@@ -88,4 +88,6 @@ public:
     void SetSpeedWalk();
     void SetSpeedRun();
 
+public:
+    USkeletalMeshComponent* GetSkeletalMeshComponent() const { return SkeletalMeshComponent; }
 };

@@ -20,9 +20,12 @@
 #define MONSTER_MAX_SUSPICIOUS_GAUGE												100.f
 
 #define MONSTER_MAX_SIGNAL_TIME														3.f
+#define MONSTER_AIMINGBOW_MAX_TIME													2.f
 
 #define PLAYER_GENERIC_TEAM_ID														1
 #define MONSTER_GENERIC_TEAM_ID														2
 #define NPC_GENERIC_TEAM_ID															3
 
 #define MONSTER_ATTACK_COOLTIME														4.f
+
+#define MONSTER_ATTACK_PROJECTILE_OFFSET											100.f

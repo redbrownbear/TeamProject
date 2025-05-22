@@ -36,7 +36,7 @@ void UFurikoFSMComponent::UpdateRun(float DeltaTime)
 	MoveToLocation(TargetLocation);
 
 	// 도착 체크
-	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), TargetLocation, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), TargetLocation, 255.f);
 	if (bIsNear)
 	{
 		++CurrentStrollIndex;

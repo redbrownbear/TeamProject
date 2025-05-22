@@ -47,8 +47,25 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Triggered, this, &ThisClass::OnMove);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LookMouse,
 		ETriggerEvent::Triggered, this, &ThisClass::OnLook);
-	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Attack,
-		ETriggerEvent::Started, this, &ThisClass::TryAttack);
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LeftClick,
+		ETriggerEvent::Started, this, &ThisClass::LeftClick);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_RightClick,
+		ETriggerEvent::Started, this, &ThisClass::RightClick);
+
+
+	// ------------ Weapon Swap -----------------
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_EquipSword,
+		ETriggerEvent::Started, this, &ThisClass::EquipSword);
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_EquipShield,
+		ETriggerEvent::Started, this, &ThisClass::EquipShield);
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_EquipBow,
+		ETriggerEvent::Started, this, &ThisClass::EquipBow);
+
+
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Interact,
 		ETriggerEvent::Started, this, &ThisClass::OnInteract);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Inventory,
@@ -150,14 +167,59 @@ void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 	AddPitchInput(-ActionValue.Y);
 }
 
-void APC_InGame::TryAttack(const FInputActionValue& InputActionValue)
+void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
 {
 	APawn* PlayerPawn = GetPawn();
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
-	
-	PlayerCharacter->Play_Sword_Attack();
+
+	PlayerCharacter->LeftClickAction();
 
 }
+
+void APC_InGame::RightClick(const FInputActionValue& InputActionValue)
+{
+	APawn* PlayerPawn = GetPawn();
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
+
+	PlayerCharacter->RightClickAction();
+}
+
+void APC_InGame::EquipSword(const FInputActionValue& InputActionValue)
+{
+	APawn* PlayerPawn = GetPawn();
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
+	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+	EEquip_State m_State = WeaponManagerComponent->GetEquipState();
+
+	WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Sword);
+
+	WeaponManagerComponent->TryEquipWeapon();
+}
+
+void APC_InGame::EquipShield(const FInputActionValue& InputActionValue)
+{
+	APawn* PlayerPawn = GetPawn();
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
+	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+	EEquip_State m_State = WeaponManagerComponent->GetEquipState();
+
+	WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Shield);
+
+	WeaponManagerComponent->TryEquipWeapon();
+}
+
+void APC_InGame::EquipBow(const FInputActionValue& InputActionValue)
+{
+	APawn* PlayerPawn = GetPawn();
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
+	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+	EEquip_State m_State = WeaponManagerComponent->GetEquipState();
+
+	WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Bow);
+
+	WeaponManagerComponent->TryEquipWeapon();
+}
+
 
 void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 {

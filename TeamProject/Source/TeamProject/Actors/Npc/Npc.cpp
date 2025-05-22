@@ -5,6 +5,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 
+#include "GameFramework/FloatingPawnMovement.h"
 #include "Kismet/KismetMathLibrary.h"
 
 #include "Actors/Character/PlayerCharacter.h"
@@ -21,9 +22,10 @@ ANpc::ANpc()
 	PrimaryActorTick.bCanEverTick = true;
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
+	SetRootComponent(CollisionComponent);
 	AIControllerClass = ANpcController::StaticClass();
 
-	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	BodyMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Body"));
 	HeadMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Head"));
 	HairMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Hair"));
@@ -57,6 +59,12 @@ void ANpc::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	UE_LOG(LogTemp, Warning, TEXT("HeadMeshComponent: %s"), *GetNameSafe(HeadMeshComponent));
+	UE_LOG(LogTemp, Warning, TEXT("HeadMeshAsset: %s"), *GetNameSafe(HeadMeshAsset));
+
+	UE_LOG(LogTemp, Warning, TEXT("HeadMeshComponent SkeletalMesh: %s"), *GetNameSafe(HeadMeshComponent->SkeletalMesh));
+
+	SetData(DataTableRowHandle);
 }
 
 void ANpc::OnConstruction(const FTransform& Transform)
@@ -96,12 +104,13 @@ void ANpc::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AA
 			PC->Npc = this;
 			bPlayerInRange = true;
 
-			// Create Interact UI (Press E)	
 			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
 			{
 				HUD->ShowInteractWidget(bPlayerInRange);
+				HUD->ShowInteractName(bPlayerInRange, NpcData->NPCName);
 			}
 		}
+		// Create Interact UI
 	}
 }
 
@@ -117,8 +126,9 @@ void ANpc::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
 			{
 				HUD->ShowInteractWidget(bPlayerInRange);
+				HUD->ShowInteractName(bPlayerInRange, NpcData->NPCName);
 			}
-		}	
+		}
 	}
 }
 
@@ -131,6 +141,14 @@ void ANpc::SetSpeedRun()
 {
 	MovementComponent->MaxSpeed = NpcData->RunMovementMaxSpeed;
 }
+
+//void ANpc::OnTalkKeyPressed()
+//{
+//	if (bPlayerInRange && IsValid(NpcFSMComponent))
+//	{
+//		NpcFSMComponent->ChangeState(ENpcState::Talk);
+//	}
+//}
 
 void ANpc::AttachToSocket()
 {
@@ -192,8 +210,7 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		//CollisionComponent->SetGenerateOverlapEvents(true);
 		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
 		CollisionComponent->RegisterComponent();
-
-		// CollisionComponent->SetCollisionProfileName(CollisionProfileName::Npc);
+		CollisionComponent->SetCanEverAffectNavigation(false);
 	}
 
 	BodyMeshComponent->SetSkeletalMesh(NpcData->SkeletalMesh);

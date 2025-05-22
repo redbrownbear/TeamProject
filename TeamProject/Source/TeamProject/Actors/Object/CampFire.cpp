@@ -17,7 +17,7 @@ ACampFire::ACampFire()
 	RootComponent = StaticMeshComponent;
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset
-    { TEXT("/Script/Engine.StaticMesh'/Game/Assets/Object/FireWood/FireWood.FireWood'") };
+    { TEXT("/Script/Engine.StaticMesh'/Game/Resources/Map/ETC/FireWood.FireWood'") };
     if (Asset.Object)
     {
         StaticMeshComponent->SetStaticMesh(Asset.Object);

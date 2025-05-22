@@ -74,7 +74,7 @@ public:
 	void AttachToSocket();
 
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Table")
 	FDataTableRowHandle DataTableRowHandle;
 	FNpcCharacterTableRow* NpcData;
 
