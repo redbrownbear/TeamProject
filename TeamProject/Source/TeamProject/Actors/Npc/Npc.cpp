@@ -94,6 +94,7 @@ void ANpc::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AA
 			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
 			{
 				HUD->ShowInteractWidget(bPlayerInRange);
+				HUD->ShowInteractName(bPlayerInRange, FString("임시"));
 			}
 		}
 		// Create Interact UI
@@ -112,6 +113,7 @@ void ANpc::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
 			{
 				HUD->ShowInteractWidget(bPlayerInRange);
+				HUD->ShowInteractName(bPlayerInRange, FString("임시"));
 			}
 		}
 	

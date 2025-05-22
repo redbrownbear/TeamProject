@@ -7,13 +7,25 @@ void UMainHUDWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if(HIntOverLay)
-		HIntOverLay->SetVisibility(ESlateVisibility::Hidden);
+	if(HIntOverlay)
+		HIntOverlay->SetVisibility(ESlateVisibility::Hidden);
 
 }
 
 void UMainHUDWidget::ShowInteractUI(bool bShow)
 {
-	if (HIntOverLay)
-		HIntOverLay->SetVisibility(bShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	if (HIntOverlay)
+		HIntOverlay->SetVisibility(bShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}
+
+void UMainHUDWidget::ShowInteractName(bool bIsShow, FString Name)
+{
+	if (NameOvelay)
+		NameOvelay->SetVisibility(bIsShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+
+	if (bIsShow)
+	{
+		FText NametoText = FText::FromString(Name);
+		NameText->SetText(NametoText);
+	}
 }
