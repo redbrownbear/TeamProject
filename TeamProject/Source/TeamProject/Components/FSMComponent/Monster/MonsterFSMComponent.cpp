@@ -524,8 +524,11 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 		{
 			if (CurrentAttackCoolTime > MONSTER_ATTACK_COOLTIME)
 			{
-				CurrentAttackCoolTime = 0.f;
-				Owner->PlayMontage(EMonsterMontage::ATTACK);
+				if (bIsNear)
+				{
+					CurrentAttackCoolTime = 0.f;
+					Owner->PlayMontage(EMonsterMontage::ATTACK);
+				}
 			}
 		}
 	}
@@ -562,7 +565,6 @@ void UMonsterFSMComponent::UpdateAimingBow(float DeltaTime)
 	{
 		AimingBowElapsedTime = 0.f;
 		Owner->PlayMontage(EMonsterMontage::BOW_END);
-		ChangeState(EMonsterState::Combat);
 	}
 }
 
