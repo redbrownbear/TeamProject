@@ -9,7 +9,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
-#include "Components/FSMComponent/MonsterFSMComponent.h"
+#include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
@@ -389,7 +389,8 @@ void AMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 		{
 			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 			{
-				FSMComponent->ChangeState(EMonsterState::Combat);
+
+				FSMComponent->ChangeState(EMonsterState::FindWeapon);
 				if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0))
 				{
 					if (APlayerCharacter* Player = Cast<APlayerCharacter>(PlayerController->GetPawn()))

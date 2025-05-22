@@ -45,8 +45,10 @@ public:
 
 
 public:
-	virtual void FirstAction();
-	virtual void SecondAction();
+	virtual void LeftClickAction();
+	virtual void RightClickAction();
+	UAnimMontage* GetUnEquipMontage() { return UnEquipMontage; }
+	UAnimMontage* GetEquipMontage() { return EquipMontage; }
 
 
 protected:
@@ -55,6 +57,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* SkeletalMeshComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UAnimMontage* EquipMontage;
+
+	UPROPERTY(VisibleAnywhere)
+	UAnimMontage* UnEquipMontage;
 
 protected:
 	friend class UItemAction_Weapon;

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Misc/Utils.h"
 #include "ItemDataRow.generated.h"
 
 UENUM()
@@ -55,6 +56,8 @@ public:
 	float CollisionCapsuleHalfHeight = 44.f;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Damage")
 	float Damage = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Kind")
+	EWeaponKind eWeaponKind;
 };

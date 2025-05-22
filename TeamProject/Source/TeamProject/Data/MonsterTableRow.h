@@ -6,7 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "Misc/Utils.h"
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
-#include "Components/FSMComponent/MonsterFSMComponent.h"
+#include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "MonsterTableRow.generated.h"
 
 USTRUCT()

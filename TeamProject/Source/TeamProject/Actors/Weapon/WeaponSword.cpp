@@ -52,9 +52,37 @@ AWeaponSword::AWeaponSword()
             UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
         }
     }
+
+    {
+        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Sword/Animation/Equip_Sword_On_Natural_Montage.Equip_Sword_On_Natural_Montage'"));
+
+        if (Asset.Object)
+        {
+            EquipMontage = Asset.Object;
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+        }
+    }
+
+    {
+        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Sword/Animation/Equip_Sword_Off_Montage.Equip_Sword_Off_Montage'"));
+
+        if (Asset.Object)
+        {
+            UnEquipMontage = Asset.Object;
+            
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+        }
+    }
+
 }
 
-void AWeaponSword::SetAttackBox()
+void AWeaponSword::LeftClickAction()
 {
     if (!bCanAttack)return;
 
@@ -67,8 +95,6 @@ void AWeaponSword::SetAttackBox()
         CurrentComboIndex = (MaxComboIndex <= CurrentComboIndex) ? 0 : CurrentComboIndex;
 
         Player_C->GetMesh()->GetAnimInstance()->Montage_Play(Arr_Sword_Attack_MTG[CurrentComboIndex]);
-
-        Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);
     }
 
 
@@ -99,7 +125,7 @@ void AWeaponSword::SetAttackBox()
 
         // 감지할 오브젝트 타입 (Pawn)
         TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-        ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+        ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1));
 
         // 무시할 액터
         TArray<AActor*> ActorsToIgnore;
@@ -139,8 +165,8 @@ void AWeaponSword::SetAttackBox()
         }
     }
     bCanAttack = false;
-
 }
+
 
 void AWeaponSword::SetCanAttack()
 {
