@@ -63,7 +63,6 @@ void ANpc::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("HeadMeshComponent SkeletalMesh: %s"), *GetNameSafe(HeadMeshComponent->SkeletalMesh));
 
-	SetData(DataTableRowHandle);
 }
 
 void ANpc::OnConstruction(const FTransform& Transform)
@@ -119,7 +118,7 @@ void ANpc::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 		{
 			PC->Npc = nullptr;
 			bPlayerInRange = false;
-      
+
 			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
 			{
 				HUD->ShowInteractWidget(bPlayerInRange);

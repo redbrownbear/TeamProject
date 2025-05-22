@@ -23,3 +23,9 @@ void AMainHUD::ShowInteractWidget(bool bIsShow)
     MainWidgetInstance->ShowInteractUI(bIsShow);
 }
 
+void AMainHUD::ShowInteractName(bool bIsShow, FString Name)
+{
+    MainWidgetInstance->ShowInteractName(bIsShow, Name);
+
+}
+

@@ -20,6 +20,7 @@ private:
 
 public:
     void ShowInteractWidget(bool bIsShow);
+    void ShowInteractName(bool bIsShow, FString Name);
 
 protected:
     UPROPERTY(EditDefaultsOnly)
