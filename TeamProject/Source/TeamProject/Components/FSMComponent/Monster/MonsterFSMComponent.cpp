@@ -220,8 +220,9 @@ void UMonsterFSMComponent::UpdateIdle(float DeltaTime)
 	// if it is PatrolGroup, it's error
 	if (eGroupType == EMonsterGroupType::Patrol)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdateIdle // This Monster is PatrolGroup, not TreasureBoxGroup"));
-		check(false);
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdatePatrol // This Monster is PatrolGroup, not TreasureBoxGroup"));
+		ChangeState(EMonsterState::Patrol);
+		return;
 	}
 
 
@@ -271,7 +272,8 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 	if (eGroupType == EMonsterGroupType::TreasureBox)
 	{
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdatePatrol // This Monster is TreasureBoxGroup, not PatrolGroup"));
-		check(false);
+		ChangeState(EMonsterState::Patrol);
+		return;
 	}
 
 
