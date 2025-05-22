@@ -10,7 +10,7 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "GameFramework/PC_InGame.h"
 
-#include "Components/ConversationComponent/ConversationManagerComponent.h"
+//#include "Components/ConversationComponent/ConversationManagerComponent.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
 
 #include "UI/HUD/MainHUD.h"
@@ -47,6 +47,7 @@ ANpc::ANpc()
 	}
 
 	// Collision Setting
+
 	BodyMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	BodyMeshComponent->SetCollisionProfileName(TEXT("Pawn"));
 
@@ -56,16 +57,12 @@ void ANpc::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	UE_LOG(LogTemp, Warning, TEXT("HeadMeshComponent: %s"), *GetNameSafe(HeadMeshComponent));
-	UE_LOG(LogTemp, Warning, TEXT("HeadMeshAsset: %s"), *GetNameSafe(HeadMeshAsset));
-
-	UE_LOG(LogTemp, Warning, TEXT("HeadMeshComponent SkeletalMesh: %s"), *GetNameSafe(HeadMeshComponent->SkeletalMesh));
-
-
 }
 
 void ANpc::OnConstruction(const FTransform& Transform)
 {
+	Super::OnConstruction(Transform);
+
 	SetData(DataTableRowHandle);
 }
 
@@ -100,6 +97,10 @@ void ANpc::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AA
 			bPlayerInRange = true;
 
 			// Create Interact UI (Press E)	
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			{
+				HUD->ShowInteractWidget(bPlayerInRange);
+			}
 		}
 	}
 }
@@ -113,17 +114,11 @@ void ANpc::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 			PC->Npc = nullptr;
 			bPlayerInRange = false;
 
-<<<<<<< HEAD
-		bPlayerInRange = false;
-=======
 			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
 			{
 				HUD->ShowInteractWidget(bPlayerInRange);
 			}
-		}
-	
-		// Delete Interact UI
->>>>>>> origin/main
+		}	
 	}
 }
 
@@ -135,15 +130,6 @@ void ANpc::SetSpeedWalk()
 void ANpc::SetSpeedRun()
 {
 	MovementComponent->MaxSpeed = NpcData->RunMovementMaxSpeed;
-}
-
-void ANpc::OnTalkKeyPressed()
-{
-	if (bPlayerInRange && IsValid(NpcFSMComponent))
-	{
-		NpcFSMComponent->ChangeState(ENpcState::Talk);
-		// Delete Interact UI 	
-	}
 }
 
 void ANpc::AttachToSocket()
@@ -168,6 +154,8 @@ void ANpc::AttachToSocket()
 				FAttachmentTransformRules::SnapToTargetIncludingScale,
 				TEXT("Hair"));
 		}
+
+		HairMeshComponent->SetLeaderPoseComponent(HeadMeshComponent);
 	}
 
 	if (HeadMeshComponent && NoseMeshComponent && HeadMeshComponent->SkeletalMesh)
@@ -179,16 +167,10 @@ void ANpc::AttachToSocket()
 				FAttachmentTransformRules::SnapToTargetIncludingScale,
 				TEXT("Nose"));
 		}
+
+		NoseMeshComponent->SetLeaderPoseComponent(HeadMeshComponent);
 	}
-
-	if (HeadMeshComponent && BodyMeshComponent)
-		HeadMeshComponent->SetLeaderPoseComponent(BodyMeshComponent);
-
-	if (HairMeshComponent && HeadMeshComponent)
-		HairMeshComponent->SetLeaderPoseComponent(HeadMeshComponent);
-
-	if (NoseMeshComponent && HeadMeshComponent)
-		NoseMeshComponent->SetLeaderPoseComponent(HeadMeshComponent);	
+	
 }
 
 void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -202,9 +184,16 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	if (CollisionComponent)
 	{
 		CollisionComponent->SetSphereRadius(NpcData->CollisionSphereRadius);
-		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Monster);
+		CollisionComponent->SetSphereRadius(NpcData->CollisionSphereRadius);
+		CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		CollisionComponent->SetCollisionObjectType(ECC_WorldDynamic);
+		CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+		CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		CollisionComponent->SetGenerateOverlapEvents(true);
 		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
 		CollisionComponent->RegisterComponent();
+
+		// CollisionComponent->SetCollisionProfileName(CollisionProfileName::Npc);
 	}
 
 	BodyMeshComponent->SetSkeletalMesh(NpcData->SkeletalMesh);
@@ -215,20 +204,28 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 
 	AIControllerClass = NpcData->NpcControllerClass;
 
+	bool bShouldAttach = false;
+
 	if (HeadMeshAsset && HeadMeshComponent)
 	{
 		HeadMeshComponent->SetSkeletalMesh(HeadMeshAsset);
+		bShouldAttach = true;
 	}
 	if (HairMeshAsset && HairMeshComponent)
 	{
 		HairMeshComponent->SetSkeletalMesh(HairMeshAsset);
+		bShouldAttach = true;
 	}
 	if (NoseMeshAsset && NoseMeshComponent)
 	{
 		NoseMeshComponent->SetSkeletalMesh(NoseMeshAsset);
+		bShouldAttach = true;
 	}
 
-	AttachToSocket();
+	if (bShouldAttach)
+	{
+		AttachToSocket(); // Head 계열 메시가 하나라도 있을 때만 연결
+	}
 }
 
 void ANpc::PlayMontage(ENpcMontage _InEnum, bool bIsLoop)

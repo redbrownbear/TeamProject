@@ -167,7 +167,7 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 		{
 			FSM->ChangeState(ENpcState::Talk);
 
-
+			
 			UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 			check(UIManager);
 
@@ -185,7 +185,7 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 						QuestManager->ShowDialogue(EQuestCharacter::Furiko, 0);
 					}
 				}
-			}
+			}	
 
 		}
 	}

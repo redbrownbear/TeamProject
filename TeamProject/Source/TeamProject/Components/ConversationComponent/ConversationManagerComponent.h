@@ -20,7 +20,7 @@ public:
 
 public:
 	void StartConversation(ANpc* Npc, APlayerCharacter* Player);
-	void EndConversation(ANpc* Npc, APlayerCharacter* Player);
+	void EndConversation();
 
 protected:
 	virtual void BeginPlay() override;
@@ -47,4 +47,5 @@ private:
 
 	UPROPERTY()
 	UAnimMontage* PlayerTalkMontage = nullptr;
+
 };

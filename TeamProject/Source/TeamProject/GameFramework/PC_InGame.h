@@ -130,13 +130,9 @@ protected:
 	void OnInteract(const FInputActionValue& InputActionValue);
 	void OpenInventory(const FInputActionValue& InputActionValue);
 
-
 public:
 	UPROPERTY(EditAnywhere)
-	UPC_InGameDataAsset* PC_InGameDataAsset;
-
-	// --------- Npc 인터렉트 윤정 ----------
-	bool bCanInteractWithNpc = false;
+	UPC_InGameDataAsset* PC_InGameDataAsset;	
 
 	UPROPERTY()
 	TObjectPtr<class ANpc> Npc = nullptr;

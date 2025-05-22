@@ -31,6 +31,8 @@ public:
 	void SetOwner(ANpc* InOwner) { Owner = InOwner; }
 	void SetPlayer(APlayerCharacter* InPlayer) { Player = InPlayer; }
 
+	ANpcController* GetController() const { return Controller; }
+
 protected:
 	UPROPERTY()
 	TObjectPtr<ANpc> Owner = nullptr;

@@ -3,6 +3,9 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "UI/NpcDialogue/NPCDialogue.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/PC_InGame.h"
+#include "UI/HUD/MainHUD.h"
 
 
 UConversationManagerComponent::UConversationManagerComponent()
@@ -18,15 +21,22 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 	
 	LockCharacters(Npc, Player);	
 
-	EQuestCharacter QuestNpc = CurrentNpc->GetNpc();
-	ShowTalkUI(QuestNpc);
+	PlayTalkAnimations();
 }
 
-void UConversationManagerComponent::EndConversation(ANpc* Npc, APlayerCharacter* Player)
-{
-	// Delete Talk UI
+void UConversationManagerComponent::EndConversation()
+{	
+	UnlockCharacters(CurrentNpc, CurrentPlayer);
 
-	UnlockCharacters(Npc, Player);
+	if (APC_InGame* PC = Cast<APC_InGame>(CurrentPlayer->GetController()))
+	{
+		PC->Npc = nullptr;
+
+		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+		{
+			HUD->ShowInteractWidget(false);
+		}
+	}
 }
 
 void UConversationManagerComponent::BeginPlay()
@@ -62,17 +72,22 @@ void UConversationManagerComponent::PlayTalkAnimations()
 
 void UConversationManagerComponent::ShowTalkUI(EQuestCharacter QuestNpc)
 {
-	// Create Talk UI
-	if (QuestDialogueManager)
-	{
-		//@MODIFY: QuestDialogueManager->ShowDialogue(QuestNpc);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("QuestDialogueManager is not initialized."));
-	}
+	//// Create Talk UI
+	//if (QuestDialogueManager)
+	//{
+	//	/*APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+	//	if (PC_InGame)
+	//	{
+	//		PC_InGame->ChangeInputContext(EInputContext::IC_Dialogue);
+	//	}*/
 
-	PlayTalkAnimations(); 
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("QuestDialogueManager is not initialized."));
+	//}
+
+	
 }
 
 void UConversationManagerComponent::LockCharacters(ANpc* Npc, APlayerCharacter* Player)
@@ -98,7 +113,6 @@ void UConversationManagerComponent::LockCharacters(ANpc* Npc, APlayerCharacter* 
 
 void UConversationManagerComponent::UnlockCharacters(ANpc* Npc, APlayerCharacter* Player)
 {
-	// Can Move
 	if (Player)
 	{
 		if (UCharacterMovementComponent* MoveComp = Player->GetCharacterMovement())
@@ -106,6 +120,8 @@ void UConversationManagerComponent::UnlockCharacters(ANpc* Npc, APlayerCharacter
 			MoveComp->SetMovementMode(MOVE_Walking); // 이동 가능 상태 복원
 		}
 	}
+
+	// Change Npc Status
 
 }
 

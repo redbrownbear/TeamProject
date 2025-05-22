@@ -174,22 +174,16 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 		return;
 	}
 
-	if (Player)
+	/*if (Player)
 	{	
 		FVector PlayerLocation = Player->GetActorLocation();
 		FVector NpcLocation = Owner->GetActorLocation();
 		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
 		SmoothRotateActorToDirection(Player, NpcLocation, DeltaTime);		
 
-		//Controller->GetConversationManager()->StartConversation(Owner, Player);
-	}			
+		Controller->GetConversationManager()->StartConversation(Owner, Player);
+	}	*/		
 
-	// 대화 종료 시	
-	/*if (!Dialogue->GetDialogueState())
-	{
-		Dialogue->CloseUI();
-		Controller->GetConversationManager()->UnlockCharacters(Owner, Player);
-	}*/
 }
 
 void UNpcFSMComponent::UpdateHide(float DeltaTime)

@@ -63,7 +63,7 @@ public:
 
 	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
 
-	void OnTalkKeyPressed(); // 대화 UI
+	//void OnTalkKeyPressed(); // 대화 UI
 
 	bool GetCanTalk() { return bPlayerInRange; }
 
@@ -110,7 +110,6 @@ private:
 	// 상호작용 가능 변수
 	UPROPERTY()
 	bool bPlayerInRange = false;
-
 protected:
 	// 상호작용 
 	UFUNCTION()
