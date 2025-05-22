@@ -8,7 +8,12 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Components/AttackComponent/SwordComponent.h"
+#include "Actors/Weapon/WeaponSword.h"
+#include "Actors/Weapon/WeaponBow.h"
+#include "Actors/Weapon/WeaponArrow.h"
+#include "Components/WeaponChildActorComponent/WeaponChildActorComponent.h"
+#include "Components/StatusComponent/PlayerStatusComponent/PlayerStatusComponent.h"
+#include "Components/Character/WeaponManagerComponent.h"
 #include "GenericTeamAgentInterface.h"
 #include "Misc/Utils.h"
 #include "PlayerCharacter.generated.h"
@@ -39,21 +44,25 @@ public:
 	virtual void OnConstruction(const FTransform& Transform);
 
 	
-	// 칼 휘두르는 몽타주 실행
+	// 클릭이벤트 발생
 
-	void Play_Sword_Attack();
+	void LeftClickAction();
+	void RightClickAction();
 
 	
 
 public:
-	USwordComponent* GetSwordComponent() { return SwordComponent; }
-
+	UWeaponChildActorComponent* GetSword() { return WeaponManagerComponent->GetSword(); }
+	UWeaponChildActorComponent* GetShield() { return WeaponManagerComponent->GetShield(); }
+	UWeaponChildActorComponent* GetBow() { return WeaponManagerComponent->GetBow(); }
+	UPlayerStatusComponent* GetPlayerStatusComponent() { return StatusComponent; }
+	UWeaponManagerComponent* GetWeaponManagerComponent() { return WeaponManagerComponent; }
 
 
 protected:
 
-	UPROPERTY(EditAnywhere, Category="Sword")
-	TObjectPtr<USwordComponent> SwordComponent;
+	/*UPROPERTY(EditAnywhere, Category="Weapon")
+	TObjectPtr<UWeaponComponent> SwordComponent;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpringArm")
 	TObjectPtr<USpringArmComponent> SpringArm;
@@ -61,24 +70,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	TObjectPtr<UCameraComponent> Camera;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> Head;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TObjectPtr<UWeaponManagerComponent> WeaponManagerComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> Lower;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> Upper;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> LWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-	TObjectPtr<USkeletalMeshComponent> RWeapon;
+	UPROPERTY(EditAnywhere, Category = "Status")
+	TObjectPtr<UPlayerStatusComponent> StatusComponent;
 
-protected:
-	UPROPERTY(EditAnywhere)
-	TArray<UAnimMontage*> Arr_Sword_Attack_MTG;
+
+
 
 public:
 	virtual uint8 GetGenericTeamId() { return FGenericTeamId(PLAYER_GENERIC_TEAM_ID); }

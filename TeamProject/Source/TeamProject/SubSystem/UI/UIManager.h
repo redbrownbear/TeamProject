@@ -10,7 +10,8 @@
 
 #include "UIManager.generated.h"
 
-
+//퀘스트대화를 위한 델리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDialogueNextRequested, EQuestCharacter, QuestChar, int32, DialogueID);
 
 /**
  * 
@@ -51,6 +52,19 @@ public:
         return NewUI;
     }
 
+    template <typename T>
+    T* FindUI()
+    {
+        for (UBaseUI* UI : CreatedUIs)
+        {
+            if (T* FoundUI = Cast<T>(UI))
+            {
+                return FoundUI;
+            }
+        }
+        return nullptr;
+    }
+
     void RemoveUI(UBaseUI* TargetUI)
     {
         if (!TargetUI) return;
@@ -60,7 +74,7 @@ public:
             if (!IsValid(CreatedUIs[i]))
                 continue;
 
-            if (CreatedUIs[i]->GetClass() == TargetUI->GetClass())
+            if (CreatedUIs[i] == TargetUI)
             {
                 TargetUI->RemoveFromParent();
                 CreatedUIs.RemoveAt(i);
@@ -73,4 +87,8 @@ public:
 private:
     UPROPERTY()
     TArray<UBaseUI*> CreatedUIs;
+
+public:
+    UPROPERTY(BlueprintAssignable)
+    FOnDialogueNextRequested OnDialogueNextRequested;
 };

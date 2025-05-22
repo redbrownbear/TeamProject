@@ -12,6 +12,8 @@ enum class EQuestCharacter
 
 	Furiko,
 
+	Store,
+
 	End,
 };
 

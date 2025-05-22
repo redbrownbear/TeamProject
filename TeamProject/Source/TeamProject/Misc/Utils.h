@@ -122,6 +122,7 @@ inline void SmoothRotateActorToDirection(AActor* TargetActor, const FVector& Tar
 
     FVector ActorLocation = TargetActor->GetActorLocation();
     FVector Direction = TargetLocation - ActorLocation;
+    Direction.Z = 0.f;
     Direction.Normalize();
     FRotator CurrentRot = TargetActor->GetActorRotation();
     FRotator TargetRot = Direction.Rotation();
@@ -129,3 +130,51 @@ inline void SmoothRotateActorToDirection(AActor* TargetActor, const FVector& Tar
     FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, InterpSpeed);
     TargetActor->SetActorRotation(NewRot);
 }
+
+UENUM()
+enum class EWeapon_Type
+{
+    Sword,
+    Shield,
+    Bow
+};
+
+UENUM()
+enum class EEquip_State
+{
+    None,
+    Sword,
+    Shield,
+    Sword_Shield,
+    Bow,
+
+};
+
+// NPC 추가
+UENUM()
+enum class ENpcState : uint8
+{
+    Idle = 0,
+    Sit,
+    Stand,
+    Walk,
+    Run,
+    Talk,
+    Hide, // 술래잡기: 시간 되면 추가
+    Sell,
+    End,
+};
+
+
+enum class ENpcMontage : uint8
+{
+    IDLE = 0,
+    SIT,
+    STAND,
+    WALK,
+    RUN,
+    TALK,
+    HIDE,
+    SELL,
+    END,
+};

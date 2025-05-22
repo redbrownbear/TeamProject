@@ -3,7 +3,9 @@
 
 #include "Actors/Character/PlayerCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
-
+#include "Actors/Weapon/WeaponBase.h"
+#include "Actors/Weapon/WeaponSword.h"
+#include "Actors/Weapon/WeaponShield.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -18,9 +20,9 @@ APlayerCharacter::APlayerCharacter()
 
 
 	FVector Scale = FVector(45.f, 45.f, 45.f);
-	FVector Locate = FVector(0.f, 0.f, -41.f);
+	FVector Locate = FVector(0.f, 0.f, -43.f);
 	{
-		SwordComponent = CreateDefaultSubobject<USwordComponent>(TEXT("SwordComponent"));
+		//SwordComponent = CreateDefaultSubobject<UWeaponComponent>(TEXT("SwordComponent"));
 	}
 
 	//SpringArm, Camera 생성 및 초기화
@@ -28,6 +30,7 @@ APlayerCharacter::APlayerCharacter()
 		SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 		SpringArm->SetupAttachment(RootComponent);
 		SpringArm->TargetArmLength = 400.f;
+		
 
 		{
 			SpringArm->SetupAttachment(RootComponent);
@@ -44,33 +47,6 @@ APlayerCharacter::APlayerCharacter()
 	Movement->bOrientRotationToMovement = true;
 	
 
-	{
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/Armor/Head/Armor_230_Head.Armor_230_Head'")) };
-		Head = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("HEAD"));
-		Head->SetSkeletalMeshAsset(Smesh.Object);
-		Head->SetupAttachment(RootComponent);
-		Head->SetRelativeLocation(Locate);
-		Head->SetRelativeScale3D(Scale);
-		
-	}
-
-	{
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/Armor/Lower/Armor_230_Lower.Armor_230_Lower'")) };
-		Lower = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Lower"));
-		Lower->SetupAttachment(RootComponent);
-		Lower->SetRelativeLocation(Locate);
-		Lower->SetRelativeScale3D(Scale);
-		Lower->SetSkeletalMeshAsset(Smesh.Object);
-	}
-
-	{
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/Armor/Upper/Armor_230_Upper.Armor_230_Upper'")) };
-		Upper = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Upper"));
-		Upper->SetupAttachment(RootComponent);
-		Upper->SetRelativeLocation(Locate);
-		Upper->SetRelativeScale3D(Scale);
-		Upper->SetSkeletalMeshAsset(Smesh.Object);
-	}
 
 	{
 		ConstructorHelpers::FObjectFinder<USkeletalMesh> Smesh{ (TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Armor/ArmorMix/ArmorMix.ArmorMix'")) };
@@ -89,33 +65,11 @@ APlayerCharacter::APlayerCharacter()
 
 	}
 
-
-	
-	
-
 	{
-		LWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LWeapon"));
-		LWeapon->SetupAttachment(RootComponent);
-		
-		LWeapon->SetRelativeScale3D(Scale);
-
-		RWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RWeapon"));
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Sword/Weapon_Sword_003.Weapon_Sword_003'"));
-		RWeapon->SetSkeletalMeshAsset(Asset.Object);
-
-		if (GetMesh())
-		{
-			if (GetMesh()->DoesSocketExist(TEXT("Weapon_R")))
-			{
-				RWeapon->SetupAttachment(GetMesh(), TEXT("Weapon_R"));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("소켓 Weapon_R 없음!"));
-			}
-		}
+		StatusComponent = CreateDefaultSubobject<UPlayerStatusComponent>(TEXT("PlayerStatus"));
 	}
-
+	
+	WeaponManagerComponent = CreateDefaultSubobject<UWeaponManagerComponent>(TEXT("WeaponManager"));
 	bUseControllerRotationYaw = false;
 }
 
@@ -123,7 +77,10 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	//Arrow->GetChildActor()->SetOwner(this);
+	SpringArm->ProbeChannel = ECC_GameTraceChannel1;
+
+	GetMesh()->SetCollisionProfileName(TEXT("Player"));
 }
 
 // Called every frame
@@ -144,18 +101,19 @@ void APlayerCharacter::OnConstruction(const FTransform& Transform)
 {
 	
 	
-	USkeletalMeshComponent* mMesh = GetMesh();
-	RWeapon->SetLeaderPoseComponent(mMesh);
-	LWeapon->SetLeaderPoseComponent(mMesh);
-	Head->SetLeaderPoseComponent(mMesh);
-	Lower->SetLeaderPoseComponent(mMesh);
-	Upper->SetLeaderPoseComponent(mMesh);
 
 }
 
-void APlayerCharacter::Play_Sword_Attack()
+void APlayerCharacter::LeftClickAction()
 {
-	
-	SwordComponent->SetAttackBox();
+
 }
+
+void APlayerCharacter::RightClickAction()
+{
+
+}
+
+
+
 
