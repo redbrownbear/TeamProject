@@ -6,6 +6,17 @@
 #include "Misc/Utils.h"
 #include "ItemDataRow.generated.h"
 
+UENUM()
+enum class ItemCategoryType : int8
+{
+	IT_Weapon,
+	IT_Arrow,
+	IT_Shield,
+	IT_Armor,
+	IT_Material,
+	IT_Food,
+};
+
 /**
  *
  */
@@ -15,12 +26,15 @@ struct TEAMPROJECT_API FItemData : public FTableRowBase
 	GENERATED_BODY()
 
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
     FString Name;
 
-public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-    TSoftObjectPtr<UTexture2D> Icon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	ItemCategoryType ItemCategory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSoftObjectPtr<UTexture2D> Icon;
+
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
