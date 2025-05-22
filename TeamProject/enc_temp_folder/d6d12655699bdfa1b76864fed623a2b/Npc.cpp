@@ -63,7 +63,6 @@ void ANpc::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("HeadMeshComponent SkeletalMesh: %s"), *GetNameSafe(HeadMeshComponent->SkeletalMesh));
 
-	SetData(DataTableRowHandle);
 }
 
 void ANpc::OnConstruction(const FTransform& Transform)
