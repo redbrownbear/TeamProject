@@ -142,13 +142,13 @@ void ANpc::SetSpeedRun()
 	MovementComponent->MaxSpeed = NpcData->RunMovementMaxSpeed;
 }
 
-void ANpc::OnTalkKeyPressed()
-{
-	if (bPlayerInRange && IsValid(NpcFSMComponent))
-	{
-		NpcFSMComponent->ChangeState(ENpcState::Talk);
-	}
-}
+//void ANpc::OnTalkKeyPressed()
+//{
+//	if (bPlayerInRange && IsValid(NpcFSMComponent))
+//	{
+//		NpcFSMComponent->ChangeState(ENpcState::Talk);
+//	}
+//}
 
 void ANpc::AttachToSocket()
 {
@@ -202,13 +202,15 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	if (CollisionComponent)
 	{
 		CollisionComponent->SetSphereRadius(NpcData->CollisionSphereRadius);
-		CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		CollisionComponent->SetCollisionObjectType(ECC_WorldDynamic);
-		CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
-		CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		CollisionComponent->SetGenerateOverlapEvents(true);
+		CollisionComponent->SetCollisionProfileName(CollisionProfileName::NPC);
+		//CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		//CollisionComponent->SetCollisionObjectType(ECC_WorldDynamic);
+		//CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+		//CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		//CollisionComponent->SetGenerateOverlapEvents(true);
 		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
 		CollisionComponent->RegisterComponent();
+		CollisionComponent->SetCanEverAffectNavigation(false);
 	}
 
 	BodyMeshComponent->SetSkeletalMesh(NpcData->SkeletalMesh);
