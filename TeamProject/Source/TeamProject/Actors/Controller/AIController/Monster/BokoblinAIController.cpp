@@ -2,7 +2,7 @@
 
 
 #include "Actors/Controller/AIController/Monster/BokoblinAIController.h"
-#include "Components/FSMComponent/BokoblinFSMComponent.h"
+#include "Components/FSMComponent/Monster/BokoblinFSMComponent.h"
 
 ABokoblinAIController::ABokoblinAIController()
 {

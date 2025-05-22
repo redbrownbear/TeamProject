@@ -2,16 +2,22 @@
 
 
 #include "Actors/Item/WorldWeapon.h"
+#include "Actors/Projectile/Projectile.h"
+#include "Actors/Monster/Monster.h"
+
 #include "Data/ItemDataRow.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 
 #include "PhysicalMaterials/PhysicalMaterial.h"
 
 #include "Misc/Utils.h"
 
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 
 // Sets default values
 AWorldWeapon::AWorldWeapon()
@@ -27,6 +33,8 @@ AWorldWeapon::AWorldWeapon()
 
 	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Script/PhysicsCore.PhysicalMaterial'/Game/Resources/Item/PhysicsMaterial/PM_WorldWeapon.PM_WorldWeapon'"));
 	PhysicalMaterial = PhysMaterial.Object;
+
+	StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
 }
 
 void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
@@ -51,6 +59,7 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 		CollisionComponent->RegisterComponent();
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
 		CollisionComponent->SetCanEverAffectNavigation(false);
+		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
 
 		// Change RootComponent 
 		SetRootComponent(CollisionComponent);
@@ -61,8 +70,6 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 		if (!HasAnyFlags(RF_ClassDefaultObject))
 		{
 			CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
-			CollisionComponent->SetEnableGravity(true);
-			CollisionComponent->SetSimulatePhysics(true);
 		}
 		if (USphereComponent* SphereComponent = Cast<USphereComponent>(CollisionComponent))
 		{
@@ -93,7 +100,6 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 		StaticMeshComponent->SetRelativeTransform(ItemTableRow->Transform);
 		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	}
-
 }
 
 void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHandle)
@@ -114,12 +120,11 @@ void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHa
 		DefaultSceneRoot->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
+		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
 
 		if (!HasAnyFlags(RF_ClassDefaultObject))
 		{
 			CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
-			CollisionComponent->SetEnableGravity(true);
-			CollisionComponent->SetSimulatePhysics(true);
 		}
 		if (USphereComponent* SphereComponent = Cast<USphereComponent>(CollisionComponent))
 		{
@@ -193,8 +198,46 @@ void AWorldWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	SetDataWithHandle(DataTableRowHandle);
-	// 	CollisionComponent->SetSimulatePhysics(true);
 
+	StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
+	StimuliSource->RegisterWithPerceptionSystem();
+
+	CollisionComponent->BodyInstance.bUseCCD = true;
+	CollisionComponent->SetEnableGravity(true);
+	CollisionComponent->SetSimulatePhysics(true);
+}
+
+void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (AProjectile* Proj = Cast<AProjectile>(OtherActor))
+	{
+		if (ProjectileName::Monster_CatchItem == Proj->GetProjectileName())
+		{
+			if (AMonster* Monster = Cast<AMonster>(Proj->GetInstigator()))
+			{
+				if (UMonsterFSMComponent* FSMComponent = Monster->GetFSMComponent())
+				{
+					FSMComponent->SetToCatchWeapon(nullptr);
+					FSMComponent->SetCatchedWeapon(this);
+					FSMComponent->ChangeState(EMonsterState::Combat);
+
+					bIsCatched = true;
+
+					// if PhyscisSimulates activated, AttachToComponent will fail
+					CollisionComponent->SetSimulatePhysics(false);
+					// Offset Changed to fix outlook
+					StaticMeshComponent->SetRelativeLocation(FVector::Zero());
+					bool bSucceeded = this->AttachToComponent(
+						Monster->GetSkeletalMeshComponent(),
+						FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+						TEXT("RightWeapon"));
+
+
+					Proj->Destroy();
+				}
+			}
+		}
+	}
 }
 
 // Called every frame
@@ -206,6 +249,11 @@ void AWorldWeapon::Tick(float DeltaTime)
 FName AWorldWeapon::GetWorldWeaponName()
 {
 	return DataTableRowHandle.RowName;
+}
+
+EWeaponKind AWorldWeapon::GetWorldWeaponKind()
+{
+	return ItemTableRow->eWeaponKind;
 }
 
 void AWorldWeapon::AddForce(FVector _Direction, float Force)
