@@ -35,20 +35,8 @@ void UFurikoFSMComponent::UpdateRun(float DeltaTime)
 	// 이동
 	MoveToLocation(TargetLocation);
 
-	//// 회전: 현재 위치 → TargetLocation 방향을 기준으로
-	//FVector Direction = (TargetLocation - CurrentLocation).GetSafeNormal();
-	//FRotator NpcRotation;
-	//if (!Direction.IsNearlyZero())
-	//{
-	//	NpcRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
-	//}
-
-	//// 부드러운 회전 적용
-	//FRotator SmoothRotation = FMath::RInterpTo(Owner->GetActorRotation(), NpcRotation, DeltaTime, 5.f);
-	//Owner->SetActorRotation(SmoothRotation);
-
 	// 도착 체크
-	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), TargetLocation, 500.f);
+	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), TargetLocation, 150.f);
 	if (bIsNear)
 	{
 		++CurrentStrollIndex;

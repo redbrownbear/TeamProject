@@ -80,6 +80,5 @@ void ANpcController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimul
 		APlayerCharacter* Player = Cast<APlayerCharacter>(Actor);
 		if (!Player) return;
 		NpcFSMComponent->SetPlayer(Player);
-		UE_LOG(LogTemp, Warning, TEXT("ANpcController::OnPerceptionUpdated Player set Valid"));
 	}
 }

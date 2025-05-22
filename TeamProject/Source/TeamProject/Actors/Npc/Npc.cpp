@@ -56,6 +56,10 @@ void ANpc::BeginPlay()
 	
 	UE_LOG(LogTemp, Warning, TEXT("HeadMeshComponent: %s"), *GetNameSafe(HeadMeshComponent));
 	UE_LOG(LogTemp, Warning, TEXT("HeadMeshAsset: %s"), *GetNameSafe(HeadMeshAsset));
+
+	UE_LOG(LogTemp, Warning, TEXT("HeadMeshComponent SkeletalMesh: %s"), *GetNameSafe(HeadMeshComponent->SkeletalMesh));
+
+
 }
 
 void ANpc::OnConstruction(const FTransform& Transform)
