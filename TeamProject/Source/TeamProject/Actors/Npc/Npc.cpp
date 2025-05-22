@@ -184,7 +184,6 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	if (CollisionComponent)
 	{
 		CollisionComponent->SetSphereRadius(NpcData->CollisionSphereRadius);
-		CollisionComponent->SetSphereRadius(NpcData->CollisionSphereRadius);
 		CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		CollisionComponent->SetCollisionObjectType(ECC_WorldDynamic);
 		CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);

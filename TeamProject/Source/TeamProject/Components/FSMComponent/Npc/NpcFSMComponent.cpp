@@ -7,7 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
-#include "UI/NpcDialogue/NPCDialogue.h"
+
+#include "GameFramework/PC_InGame.h"
 
 UNpcFSMComponent::UNpcFSMComponent()
 {
@@ -121,6 +122,7 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		Owner->SetSpeedRun();
 		break;
 	case ENpcState::Talk:
+		Controller->GetConversationManager()->StartConversation(Owner, Player);
 		break;	
 	case ENpcState::Hide:
 		break;
@@ -174,16 +176,16 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 		return;
 	}
 
-	/*if (Player)
+	if (Player)
 	{	
 		FVector PlayerLocation = Player->GetActorLocation();
 		FVector NpcLocation = Owner->GetActorLocation();
 		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
 		SmoothRotateActorToDirection(Player, NpcLocation, DeltaTime);		
+	}		
 
-		Controller->GetConversationManager()->StartConversation(Owner, Player);
-	}	*/		
-
+	APC_InGame* PC = Cast<APC_InGame>(Player->GetController());
+	PC->SetNpc(Owner);
 }
 
 void UNpcFSMComponent::UpdateHide(float DeltaTime)

@@ -27,9 +27,10 @@ protected:
 
 public:
 	void PlayTalkAnimations();
-	void ShowTalkUI(EQuestCharacter QuestNpc);
 	void LockCharacters(ANpc* Npc, APlayerCharacter* Player);
 	void UnlockCharacters(ANpc* Npc, APlayerCharacter* Player);
+
+	bool GetState() { return bStateChange; }
 
 private:
 	UPROPERTY()
@@ -47,5 +48,8 @@ private:
 
 	UPROPERTY()
 	UAnimMontage* PlayerTalkMontage = nullptr;
+
+private:
+	bool bStateChange = false;
 
 };

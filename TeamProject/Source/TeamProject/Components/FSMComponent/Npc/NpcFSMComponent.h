@@ -32,6 +32,7 @@ public:
 	void SetPlayer(APlayerCharacter* InPlayer) { Player = InPlayer; }
 
 	ANpcController* GetController() const { return Controller; }
+	UNPCDialogue* GetNpcDialogue() const { return Dialogue; }
 
 protected:
 	UPROPERTY()
@@ -44,8 +45,8 @@ protected:
 	ANpcController* Controller = nullptr;
 
 	// 대화 종료 시 사용할 변수
-	/*UPROPERTY()
-	TObjectPtr<UNPCDialogue> Dialogue = nullptr;*/
+	UPROPERTY()
+	TObjectPtr<UNPCDialogue> Dialogue = nullptr;
 
 
 protected:

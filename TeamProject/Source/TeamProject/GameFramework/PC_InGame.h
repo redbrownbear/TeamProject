@@ -122,6 +122,7 @@ public:
 	void ChangeInputContext(EInputContext NewContext);
 	void BindInventoryInput(UInventory* Inventory);
 	void BindDialogueInput(UNPCDialogue* NpcDialogue);
+	void ShowDialogueUI();
 
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
@@ -129,6 +130,9 @@ protected:
 	void TryAttack(const FInputActionValue& InputActionValue);
 	void OnInteract(const FInputActionValue& InputActionValue);
 	void OpenInventory(const FInputActionValue& InputActionValue);
+
+public:
+	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
 
 public:
 	UPROPERTY(EditAnywhere)

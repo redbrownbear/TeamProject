@@ -19,24 +19,27 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 	CurrentNpc = Npc;
 	CurrentPlayer = Player;
 	
-	LockCharacters(Npc, Player);	
+	LockCharacters(Npc, Player);
 
-	PlayTalkAnimations();
-}
+	APC_InGame* PC = Cast<APC_InGame>(CurrentPlayer->GetController());
 
-void UConversationManagerComponent::EndConversation()
-{	
-	UnlockCharacters(CurrentNpc, CurrentPlayer);
-
-	if (APC_InGame* PC = Cast<APC_InGame>(CurrentPlayer->GetController()))
+	if (PC)
 	{
-		PC->Npc = nullptr;
-
 		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
 		{
 			HUD->ShowInteractWidget(false);
 		}
-	}
+
+		PC->ShowDialogueUI();
+	}	
+
+}
+
+void UConversationManagerComponent::EndConversation()
+{	
+	UnlockCharacters(CurrentNpc, CurrentPlayer);	
+	
+	bStateChange = true;
 }
 
 void UConversationManagerComponent::BeginPlay()
@@ -70,26 +73,6 @@ void UConversationManagerComponent::PlayTalkAnimations()
 	}
 }
 
-void UConversationManagerComponent::ShowTalkUI(EQuestCharacter QuestNpc)
-{
-	//// Create Talk UI
-	//if (QuestDialogueManager)
-	//{
-	//	/*APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-	//	if (PC_InGame)
-	//	{
-	//		PC_InGame->ChangeInputContext(EInputContext::IC_Dialogue);
-	//	}*/
-
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("QuestDialogueManager is not initialized."));
-	//}
-
-	
-}
-
 void UConversationManagerComponent::LockCharacters(ANpc* Npc, APlayerCharacter* Player)
 {	
 	if (!Npc)
@@ -120,8 +103,5 @@ void UConversationManagerComponent::UnlockCharacters(ANpc* Npc, APlayerCharacter
 			MoveComp->SetMovementMode(MOVE_Walking); // 이동 가능 상태 복원
 		}
 	}
-
-	// Change Npc Status
-
 }
 
