@@ -17,9 +17,9 @@ ANpcController::ANpcController()
 
 	// 시야 설정
 	UAISenseConfig_Sight* SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
-	SightConfig->SightRadius = 1500.0f;
-	SightConfig->LoseSightRadius = 1800.0f;
-	SightConfig->PeripheralVisionAngleDegrees = 90.0f;
+	SightConfig->SightRadius = MONSTER_AISENSECONFIG_SIGHT_SIGHTRADIUS;
+	SightConfig->LoseSightRadius = MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS;
+	SightConfig->PeripheralVisionAngleDegrees = MONSTER_SIGHT_ANGLE;
 
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;

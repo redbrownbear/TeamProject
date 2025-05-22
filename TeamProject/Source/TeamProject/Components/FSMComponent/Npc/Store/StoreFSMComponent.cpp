@@ -19,7 +19,7 @@ void UStoreFSMComponent::UpdateTalk(float DeltaTime)
 		Owner->SetNpc(EQuestCharacter::Store);
 	}
 
-	if (Controller->GetConversationManager()->GetState())
+	if (Controller->GetConversationManager()->GetStateChanged())
 	{
 		ChangeState(ENpcState::Idle);
 	}

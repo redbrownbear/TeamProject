@@ -21,10 +21,6 @@ protected:
 	//virtual void UpdatePlay(float DeltaTime); // 술래잡기: 시간 되면 추가
 
 private:
-	UPROPERTY()
-	AFurikoController* FurikoController = nullptr;
-
-private:
 	int32 CurrentStrollIndex = 0;
 
 };

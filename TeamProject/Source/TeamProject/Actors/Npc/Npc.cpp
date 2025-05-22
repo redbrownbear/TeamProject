@@ -142,14 +142,6 @@ void ANpc::SetSpeedRun()
 	MovementComponent->MaxSpeed = NpcData->RunMovementMaxSpeed;
 }
 
-//void ANpc::OnTalkKeyPressed()
-//{
-//	if (bPlayerInRange && IsValid(NpcFSMComponent))
-//	{
-//		NpcFSMComponent->ChangeState(ENpcState::Talk);
-//	}
-//}
-
 void ANpc::AttachToSocket()
 {
 	if (BodyMeshComponent && HeadMeshComponent && BodyMeshComponent->SkeletalMesh)
