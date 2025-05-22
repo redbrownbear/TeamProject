@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "MainHUD.generated.h"
 
+class UMainHUDWidget;
 /**
  * 
  */
@@ -15,6 +16,16 @@ class TEAMPROJECT_API AMainHUD : public AHUD
 	GENERATED_BODY()
 	
 private:
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
+
+public:
+    void ShowInteractWidget(bool bIsShow);
+
+protected:
+    UPROPERTY(EditDefaultsOnly)
+    TSubclassOf<UMainHUDWidget> MainWidgetClass;
+
+    UPROPERTY()
+    UMainHUDWidget* MainWidgetInstance;
 
 };
