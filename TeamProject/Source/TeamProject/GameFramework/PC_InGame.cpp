@@ -227,31 +227,9 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 	{
 		if (UNpcFSMComponent* FSM = Npc->GetFSMComponent())
 		{
-			FSM->ChangeState(ENpcState::Talk);
-
-
-			UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-			check(UIManager);
-
-			if (UIManager)
-			{
-				FString Path = TEXT("/Game/BluePrint/UI/NpcDialogue/BP_NpcDialogue.BP_NpcDialogue_C");
-				TSubclassOf<UNPCDialogue> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
-				UNPCDialogue* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
-				if (NewUI)
-				{
-					UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
-					if (QuestManager)
-					{
-						//임시 코드 수정할것!
-						QuestManager->ShowDialogue(EQuestCharacter::Furiko, 0);
-					}
-				}
-			}
-
+			FSM->ChangeState(ENpcState::Talk);			
 		}
-	}
-	
+	}	
 }
 
 void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
@@ -269,6 +247,28 @@ void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
 		if (!NewUI)
 		{
 			check(NewUI);
+		}
+	}
+}
+
+void APC_InGame::ShowDialogueUI()
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	if (UIManager)
+	{
+		FString Path = TEXT("/Game/BluePrint/UI/NpcDialogue/BP_NpcDialogue.BP_NpcDialogue_C");
+		TSubclassOf<UNPCDialogue> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
+		UNPCDialogue* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
+		if (NewUI)
+		{
+			UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+			if (QuestManager)
+			{
+				//임시 코드 수정할것!
+				QuestManager->ShowDialogue(EQuestCharacter::Furiko, 0);
+			}
 		}
 	}
 }

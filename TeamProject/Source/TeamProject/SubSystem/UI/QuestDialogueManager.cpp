@@ -81,7 +81,7 @@ void UQuestDialogueManager::ShowDialogue(EQuestCharacter QuestChar, int32 Dialog
         }
     }
 
-    if (!FoundRow)      
+    if (!FoundRow) 
         return;
 
     OnDialogueUpdated.Broadcast(*FoundRow);
