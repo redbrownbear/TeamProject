@@ -10,12 +10,11 @@
 
 
 
-void UInventory::OnCreated()
+void UInventory::ShowUI()
 {
-    Super::OnCreated();
+    Super::ShowUI();
 
     InitUI();
-
     UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
     check(InvenManager);
     if (InvenManager)
@@ -24,16 +23,9 @@ void UInventory::OnCreated()
     }
 }
 
-void UInventory::CloseUI()
+void UInventory::HideUI(TSubclassOf<UBaseUI> UIClass)
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
-    }
-
-    Super::CloseUI();
-
+    Super::HideUI(UInventory::StaticClass());
 }
 
 void UInventory::InitUI()

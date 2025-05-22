@@ -23,8 +23,8 @@ class TEAMPROJECT_API UInventory : public UBaseUI
 	GENERATED_BODY()
 	
 public:
-	virtual void OnCreated() override;
-	virtual void CloseUI() override;
+	virtual void ShowUI() override;
+	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
 private:
 	void InitUI();

@@ -32,6 +32,10 @@ public:
 	void HandleNextDialogueRequested(EQuestCharacter QuestChar, int32 CurrentID);
 
 public:
+	void SetConversation(bool isTalk) { bIsNowConversation = isTalk; }
+	bool IsConversation() { return bIsNowConversation; }
+
+public:
 	UPROPERTY(BlueprintAssignable)
 	FOnDisPlayDialogueUpdated OnDialogueUpdated;
 
@@ -41,5 +45,8 @@ public:
 
 private:
 	TMap<EQuestCharacter, TArray<const FNPCDialogueTableRow*>> QuestRowMap;
+
+private:
+	bool bIsNowConversation = false;
 
 };

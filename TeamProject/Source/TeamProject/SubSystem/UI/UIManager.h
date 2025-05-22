@@ -8,19 +8,27 @@
 #include "Kismet/GameplayStatics.h"
 #include "UI/Base/BaseUI.h"
 
+#include "UI/Inven/Inventory.h"
+#include "UI/NpcDialogue/NPCDialogue.h"
+
 #include "UIManager.generated.h"
 
 //퀘스트대화를 위한 델리게이트
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDialogueNextRequested, EQuestCharacter, QuestChar, int32, DialogueID);
 
+
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable, BlueprintType)
 class TEAMPROJECT_API UUIManager : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
+public:
+    void PostWorldInitialize();
+    void BindDelegates();
+    void LoadUIClass();
 
 //---건들지 말기
 private:
@@ -29,33 +37,9 @@ private:
     //UI 생성
 public:
     template <typename T>
-    T* CreateUI(UWorld* World, TSubclassOf<T> UIClass)
-    {
-        if (!World || !UIClass)
-            return nullptr;
-
-        for (UBaseUI* UI : CreatedUIs)
-        {
-            if (UI && UI->IsA(UIClass))
-            {
-                return nullptr;
-            }
-        }
-
-        T* NewUI = CreateWidget<T>(World, UIClass);
-        if (NewUI)
-        {
-            NewUI->AddToViewport();
-            NewUI->OnCreated();
-            CreatedUIs.Add(NewUI);
-        }
-        return NewUI;
-    }
-
-    template <typename T>
     T* FindUI()
     {
-        for (UBaseUI* UI : CreatedUIs)
+        for (UBaseUI* UI : CachedUIs)
         {
             if (T* FoundUI = Cast<T>(UI))
             {
@@ -65,28 +49,46 @@ public:
         return nullptr;
     }
 
-    void RemoveUI(UBaseUI* TargetUI)
+    void ShowUI(TSubclassOf<UBaseUI> UIClass)
     {
-        if (!TargetUI) return;
+        if (!UIClass) return;
 
-        for (int32 i = 0; i < CreatedUIs.Num(); ++i)
+        UBaseUI* FoundUI = nullptr;
+        if (CachedUIs.Contains(UIClass))
         {
-            if (!IsValid(CreatedUIs[i]))
-                continue;
-
-            if (CreatedUIs[i] == TargetUI)
+            FoundUI = CachedUIs[UIClass];
+            if (IsValid(FoundUI))
             {
-                TargetUI->RemoveFromParent();
-                CreatedUIs.RemoveAt(i);
-                break;
+                FoundUI->SetVisibility(ESlateVisibility::Visible);
+                FoundUI->ShowUI();
+            }
+        }
+    }
+
+    void HideUI(TSubclassOf<UBaseUI> UIClass)
+    {
+        if (!UIClass) return;
+
+        UBaseUI* FoundUI = nullptr;
+        if (CachedUIs.Contains(UIClass))
+        {
+            FoundUI = CachedUIs[UIClass];
+            if (IsValid(FoundUI))
+            {
+                (FoundUI)->SetVisibility(ESlateVisibility::Hidden);
             }
         }
     };
 //---건들지 말기
 
-private:
+public:
     UPROPERTY()
-    TArray<UBaseUI*> CreatedUIs;
+    TMap<TSubclassOf<UBaseUI>, UBaseUI*> CachedUIs;
+
+    UPROPERTY()
+    UInventory* CachedInventoryClass;
+    UPROPERTY()
+    UNPCDialogue* CachedDialogueClass;
 
 public:
     UPROPERTY(BlueprintAssignable)

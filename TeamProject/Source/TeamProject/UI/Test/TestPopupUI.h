@@ -19,7 +19,7 @@ class TEAMPROJECT_API UTestPopupUI : public UBaseUI
 	GENERATED_BODY()
 	
 public:
-	virtual void OnCreated() override;
+	virtual void ShowUI() override;
 	void SetPopupText(FText title, FText main);
 
 private:

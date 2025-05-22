@@ -17,18 +17,6 @@ class TEAMPROJECT_API AUITestGameMode : public AGameModeBase
 	virtual void BeginPlay() override;
 
 
-	//전부테스트용
-public:
-	void CreateInven();
-	void OnOpenInven();
-
-	void CreateItem();
-
-	void CreateDialogueBox();
-	void OnOepnDialogueBox();
-
-	void OnpenQuest();
-
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
