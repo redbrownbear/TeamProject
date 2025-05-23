@@ -124,6 +124,8 @@ void UMonsterFSMComponent::HandleState(float DeltaTime)
 		UpdateSignal(DeltaTime);
 		break;
 	default:
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // Unexpected MonsterState"));
+		check(false);
 		break;
 	}
 }

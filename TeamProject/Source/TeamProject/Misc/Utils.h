@@ -38,7 +38,7 @@ enum class EMonsterGroupType : uint8
 };
 
 UENUM()
-enum class EMonsterState : uint8
+enum class EMonsterState : uint16
 {
     Idle = 0,
     Patrol,
@@ -53,6 +53,15 @@ enum class EMonsterState : uint8
     Dance,
     Signal,
     AimingBow,
+    AimingBowUpper,
+    DashAttack,
+    ExplosionAttack,
+    FireAttack,
+    HornAttack,
+    RunningAttack,
+    Rebound,
+    Rodeo,
+    Stun,
     End,
 };
 

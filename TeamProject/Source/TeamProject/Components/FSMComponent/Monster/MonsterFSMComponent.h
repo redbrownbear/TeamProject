@@ -58,7 +58,7 @@ protected:
 	float MaxSuspicionGauge = MONSTER_MAX_SUSPICIOUS_GAUGE;
 
 	float SignalElapsedTime = 0.f;
-	float AimingBowElapsedTime = 0.f;
+	float AimingBowElapsedTime = MONSTER_AIMINGBOW_MAX_TIME;
 
 
 protected:
@@ -67,10 +67,10 @@ protected:
 protected:
 	float CurrentAttackCoolTime = 0.f;
 
-private:
-	void HandleState(float DeltaTime);
+protected:
+	virtual void HandleState(float DeltaTime);
 public:
-	void ChangeState(EMonsterState NewState);
+	virtual void ChangeState(EMonsterState NewState);
 
 protected:
 	virtual void UpdateIdle(float DeltaTime);
