@@ -5,7 +5,7 @@
 #include "Actors/Controller/Npc/Furiko/FurikoController.h"
 #include "FurikoFSMComponent.generated.h"
 
-class AFurikoHidePoint;
+class AHidePoint;
 
 UCLASS()
 class TEAMPROJECT_API UFurikoFSMComponent : public UNpcFSMComponent
@@ -31,7 +31,7 @@ public:
 	TArray<FVector> TeleportLocations;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HidePoint")
-	TArray<AFurikoHidePoint*> HidePoints;
+	TArray<AHidePoint*> HidePoints;
 
 private:
 	int32 CurrentStrollIndex = 0;

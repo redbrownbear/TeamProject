@@ -7,7 +7,7 @@
 #include "UI/NpcDialogue/NPCDialogue.h"
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
 
-#include "Actors/HidePoint/FurikoHidePoint.h" 
+#include "Actors/HidePoint/HidePoint.h"
 
 UFurikoFSMComponent::UFurikoFSMComponent()
 {
@@ -89,17 +89,16 @@ void UFurikoFSMComponent::HideFuriko()
 
 	// 랜덤 인덱스 선택
 	const int32 Index = FMath::RandRange(0, HidePoints.Num() - 1);
-	AFurikoHidePoint* Target = HidePoints[Index];
+	AHidePoint* Target = HidePoints[Index];
 
-	if (Target && Owner) // 위치 이동
+	if (Target && Owner)
 	{
 		SetActorLocation(Target->GetActorLocation());
 
-		// CreateUI <푸리코와 놀자!>: 퀘스트명 ui 띄울까 말까 윤호오빠랑 얘기해볼 것
+		// <푸리코와 놀자!> 퀘스트 UI 생성할까 말까 윤호오빠랑 얘기해보기
 
 		UE_LOG(LogTemp, Log, TEXT("Furiko가 HidePoint %s 로 순간이동했습니다."), *Target->GetName());
 	}
-
 }
 
 void UFurikoFSMComponent::SetActorLocation(FVector InLocation)

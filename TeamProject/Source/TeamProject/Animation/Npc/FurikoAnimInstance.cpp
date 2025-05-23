@@ -42,13 +42,13 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	eCurrentState = FSMComponent->GetNpcState();
 
-	/*bool bIsIdle = false;
-	bool bIsSit = false;
-	bool bIsStand = false;
-	bool bIsWalk = false;
-	bool bIsRun = false;
-	bool bIsTalk = false;
-	bool bIsHide = false;*/
+	bIsIdle = false;
+	bIsSit = false;
+	bIsStand = false;
+	bIsWalk = false;
+	bIsRun = false;
+	bIsTalk = false;
+	bIsHide = false;
 
 	switch (eCurrentState)
 	{
