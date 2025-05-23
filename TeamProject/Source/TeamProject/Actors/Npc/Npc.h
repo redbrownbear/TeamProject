@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
-#include "Data/NPCTableRow.h"
 #include "Data/NpcCharacterTableRow.h"
 #include "Misc/Utils.h"
 #include "Npc.generated.h"
@@ -59,11 +58,7 @@ public:
 
 	USkeletalMeshComponent* GetBodyMesh() const { return BodyMeshComponent; }
 
-	//USkeletalMesh* GetBodySkeletalMesh() const { return BodyMeshComponent ? BodyMeshComponent->SkeletalMesh : nullptr; }
-
 	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
-
-	void OnTalkKeyPressed(); // 대화 UI
 
 	bool GetCanTalk() { return bPlayerInRange; }
 
@@ -80,6 +75,7 @@ protected:
 
 public:
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+	FNpcCharacterTableRow* GetData() { return NpcData; }
 
 public:
 	void PlayMontage(ENpcMontage _InEnum, bool bIsLoop = false);
@@ -98,13 +94,13 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	USkeletalMesh* HeadMeshAsset;
+	TObjectPtr<USkeletalMesh> HeadMeshAsset;
 
 	UPROPERTY(EditAnywhere)
-	USkeletalMesh* HairMeshAsset;
+	TObjectPtr<USkeletalMesh> HairMeshAsset;
 
 	UPROPERTY(EditAnywhere)
-	USkeletalMesh* NoseMeshAsset;
+	TObjectPtr<USkeletalMesh> NoseMeshAsset;
 
 private:
 	// 상호작용 가능 변수

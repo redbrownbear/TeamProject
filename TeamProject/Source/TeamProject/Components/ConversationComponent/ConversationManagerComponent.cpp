@@ -2,7 +2,12 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "UI/NpcDialogue/NPCDialogue.h"
+
+#include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/PC_InGame.h"
+#include "UI/HUD/MainHUD.h"
 
 
 UConversationManagerComponent::UConversationManagerComponent()
@@ -16,17 +21,39 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 	CurrentNpc = Npc;
 	CurrentPlayer = Player;
 	
-	LockCharacters(Npc, Player);	
+	LockCharacters(Npc, Player);
 
-	EQuestCharacter QuestNpc = CurrentNpc->GetNpc();
-	ShowTalkUI(QuestNpc);
+	APC_InGame* PC = Cast<APC_InGame>(CurrentPlayer->GetController());
+	check(PC);
+
+	AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD());
+	check(HUD)
+
+	if (PC && HUD)
+		HUD->ShowInteractWidget(false);
+			
+	UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+	check(QuestManager);
+
+	if (UIManager && QuestManager)
+	{
+		if (QuestManager->IsConversation())
+			return;
+
+		UIManager->ShowUI(UNPCDialogue::StaticClass());
+		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 0);
+	}
+
 }
 
-void UConversationManagerComponent::EndConversation(ANpc* Npc, APlayerCharacter* Player)
-{
-	// Delete Talk UI
-
-	UnlockCharacters(Npc, Player);
+void UConversationManagerComponent::EndConversation()
+{	
+	UnlockCharacters(CurrentNpc, CurrentPlayer);	
+	
+	bStateChange = true;
 }
 
 void UConversationManagerComponent::BeginPlay()
@@ -60,21 +87,6 @@ void UConversationManagerComponent::PlayTalkAnimations()
 	}
 }
 
-void UConversationManagerComponent::ShowTalkUI(EQuestCharacter QuestNpc)
-{
-	// Create Talk UI
-	if (QuestDialogueManager)
-	{
-		//@MODIFY: QuestDialogueManager->ShowDialogue(QuestNpc);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("QuestDialogueManager is not initialized."));
-	}
-
-	PlayTalkAnimations(); 
-}
-
 void UConversationManagerComponent::LockCharacters(ANpc* Npc, APlayerCharacter* Player)
 {	
 	if (!Npc)
@@ -98,7 +110,6 @@ void UConversationManagerComponent::LockCharacters(ANpc* Npc, APlayerCharacter* 
 
 void UConversationManagerComponent::UnlockCharacters(ANpc* Npc, APlayerCharacter* Player)
 {
-	// Can Move
 	if (Player)
 	{
 		if (UCharacterMovementComponent* MoveComp = Player->GetCharacterMovement())
@@ -106,6 +117,5 @@ void UConversationManagerComponent::UnlockCharacters(ANpc* Npc, APlayerCharacter
 			MoveComp->SetMovementMode(MOVE_Walking); // 이동 가능 상태 복원
 		}
 	}
-
 }
 

@@ -10,6 +10,9 @@
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
 
+#include "UI/NpcDialogue/NPCDialogue.h"
+#include "UI/Inven/Inventory.h"
+
 #include "Actors/Npc/Npc.h" 
 
 
@@ -34,6 +37,10 @@ APC_InGame::APC_InGame()
 void APC_InGame::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if(UIManager)
+		UIManager->PostWorldInitialize();
 
 	ChangeInputContext(EInputContext::IC_InGame);
 }
@@ -303,31 +310,9 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 	{
 		if (UNpcFSMComponent* FSM = Npc->GetFSMComponent())
 		{
-			FSM->ChangeState(ENpcState::Talk);
-
-
-			UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-			check(UIManager);
-
-			if (UIManager)
-			{
-				FString Path = TEXT("/Game/BluePrint/UI/NpcDialogue/BP_NpcDialogue.BP_NpcDialogue_C");
-				TSubclassOf<UNPCDialogue> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
-				UNPCDialogue* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
-				if (NewUI)
-				{
-					UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
-					if (QuestManager)
-					{
-						//임시 코드 수정할것!
-						QuestManager->ShowDialogue(EQuestCharacter::Furiko, 0);
-					}
-				}
-			}
-
+			FSM->ChangeState(ENpcState::Talk);			
 		}
-	}
-	
+	}	
 }
 
 void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
@@ -337,16 +322,13 @@ void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
 
 	if (UIManager)
 	{
-		//Inventory
-		FString Path = TEXT("/Game/BluePrint/UI/Inventory/BP_InvenLayout.BP_InvenLayout_C");
-		TSubclassOf<UInventory> PopupUIBPClass = LoadClass<UBaseUI>(nullptr, *Path);
-
-		UInventory* NewUI = UIManager->CreateUI(GetWorld(), PopupUIBPClass);
-		if (!NewUI)
-		{
-			check(NewUI);
-		}
+		UIManager->ShowUI(UInventory::StaticClass());
 	}
+}
+
+void APC_InGame::ShowDialogueUI()
+{
+
 }
 
 

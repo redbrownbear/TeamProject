@@ -4,9 +4,10 @@
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Monster/Monster.h"
 #include "Actors/Character/PlayerCharacter.h"
+#include "Actors/Item/WorldWeapon.h"
 
 
-#include "Components/FSMComponent/MonsterFSMComponent.h"
+#include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
@@ -82,10 +83,28 @@ void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus 
 	if (Stimulus.WasSuccessfullySensed())
 	{
 		// 감지됨
-		APlayerCharacter* Player = Cast<APlayerCharacter>(Actor);
-		if (!Player) return;
-		MonsterFSMComponent->SetPlayer(Player);
-		UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Valid"));
+		if (APlayerCharacter* Player = Cast<APlayerCharacter>(Actor))
+		{
+			MonsterFSMComponent->SetPlayer(Player);
+			UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Valid"));
+			return;
+		}
+		else if (AWorldWeapon* WW = Cast<AWorldWeapon>(Actor))
+		{
+			if (!MonsterFSMComponent->IsToCatchWeapon())
+			{
+				if (MonsterFSMComponent->GetMonsterState() == EMonsterState::FindWeapon)
+				{
+					MonsterFSMComponent->SetToCatchWeapon(WW);
+				}
+				else if (MonsterFSMComponent->GetMonsterState() == EMonsterState::Combat)
+				{
+					MonsterFSMComponent->ChangeState(EMonsterState::FindWeapon);
+					MonsterFSMComponent->SetToCatchWeapon(WW);
+				}
+			}
+		}
+
 	}
 	//else
 	//{

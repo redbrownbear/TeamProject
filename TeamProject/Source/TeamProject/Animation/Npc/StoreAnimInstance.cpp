@@ -40,17 +40,11 @@ void UStoreAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 	case ENpcState::Idle:
 		bIsIdle = true;
-		bIsTalk = false;
-		bIsSell = false;
 		break;
 	case ENpcState::Talk:
 		bIsIdle = false;
-		bIsTalk = true;
-		bIsSell = false;
 		break;
 	case ENpcState::Sell:
-		bIsIdle = false;
-		bIsTalk = false;
 		bIsSell = true;
 		break;
 	default:

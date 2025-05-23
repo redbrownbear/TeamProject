@@ -12,6 +12,34 @@ void UMainHUDWidget::NativeConstruct()
 
 	if (NameOvelay)
 		NameOvelay->SetVisibility(ESlateVisibility::Hidden);
+
+	if (StaminaImg)
+	{
+		DynamicMaterial = DynamicMaterial = StaminaImg->GetDynamicMaterial();
+	}
+
+	ElapsedTime = 0.0f;
+	bIsFullStamina = false;
+}
+
+void UMainHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	if(bIsFullStamina == false)
+	{
+		ElapsedTime += InDeltaTime;
+		float FillRatio = FMath::Clamp(ElapsedTime / 5.0f, 0.0f, 1.0f);
+		if (DynamicMaterial)
+		{
+			DynamicMaterial->SetScalarParameterValue("Percent", FillRatio);
+
+			if (FillRatio >= 1.0f)	
+				bIsFullStamina = true;
+							
+			StaminaImg->SetVisibility(bIsFullStamina ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+		}
+	}
 }
 
 void UMainHUDWidget::ShowInteractUI(bool bShow)

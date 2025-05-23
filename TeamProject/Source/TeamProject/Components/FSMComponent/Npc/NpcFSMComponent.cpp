@@ -7,7 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
-#include "UI/NpcDialogue/NPCDialogue.h"
+
+#include "GameFramework/PC_InGame.h"
 
 UNpcFSMComponent::UNpcFSMComponent()
 {
@@ -49,6 +50,14 @@ void UNpcFSMComponent::BeginPlay()
 	{
 		Player = PlayerChar;
 	}
+
+	APC_InGame* PC = Cast<APC_InGame>(Player->GetController());
+	if (PC)
+	{
+		PC->SetNpc(Owner);
+	}
+
+
 }
 
 void UNpcFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -106,32 +115,42 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 {	
 	if (eCurrentState == NewState) { return; }
 
+	eCurrentState = NewState;
+
 	switch (NewState)
 	{
 	case ENpcState::Idle:
+		Owner->PlayMontage(ENpcMontage::IDLE);
 		break;
 	case ENpcState::Sit:
+		Owner->PlayMontage(ENpcMontage::SIT);
 		break;
 	case ENpcState::Stand:
+		Owner->PlayMontage(ENpcMontage::STAND);
 		break;
 	case ENpcState::Walk:
 		Owner->SetSpeedWalk();
+		Owner->PlayMontage(ENpcMontage::WALK);
 		break;
 	case ENpcState::Run:
 		Owner->SetSpeedRun();
+		Owner->PlayMontage(ENpcMontage::RUN);
 		break;
 	case ENpcState::Talk:
+		Controller->GetConversationManager()->StartConversation(Owner, Player);
 		break;	
 	case ENpcState::Hide:
+		Owner->PlayMontage(ENpcMontage::HIDE);
 		break;
 	case ENpcState::Sell:
+		Owner->PlayMontage(ENpcMontage::SELL);
 		break;
 	case ENpcState::End:
+		Owner->PlayMontage(ENpcMontage::END);
 		break;
 	default:
 		break;
 	}
-	eCurrentState = NewState;
 
 }
 
@@ -180,16 +199,8 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 		FVector NpcLocation = Owner->GetActorLocation();
 		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
 		SmoothRotateActorToDirection(Player, NpcLocation, DeltaTime);		
-
-		//Controller->GetConversationManager()->StartConversation(Owner, Player);
 	}			
 
-	// 대화 종료 시	
-	/*if (!Dialogue->GetDialogueState())
-	{
-		Dialogue->CloseUI();
-		Controller->GetConversationManager()->UnlockCharacters(Owner, Player);
-	}*/
 }
 
 void UNpcFSMComponent::UpdateHide(float DeltaTime)

@@ -7,31 +7,22 @@
 #include "SubSystem/UI/UIManager.h"
 
 #include "GameFramework/PC_InGame.h"
+#include "Components/ConversationComponent/ConversationManagerComponent.h"
 
 void UNPCDialogue::OnCreated()
 {
-	Super::OnCreated();
-
     InitUI();
     BindDelegates();
 }
 
-void UNPCDialogue::CloseUI()
+void UNPCDialogue::ShowUI()
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
-    }
+	Super::ShowUI();
 
-    //Close 변수가 아래에 있을시 이미 Widget이 꺼지기 때문에 위치조정함 
-    bEndDialogue = true; // 2025-05-20 대화 종료 확인 변수 추가
+    ConfirmButton->SetVisibility(ESlateVisibility::Hidden);
+    CancelButton->SetVisibility(ESlateVisibility::Hidden);
+    ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 
-    Super::CloseUI();
-}
-
-void UNPCDialogue::InitUI()
-{
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     {
@@ -46,19 +37,45 @@ void UNPCDialogue::InitUI()
         PC_InGame->SetInputMode(InputMode);
         PC_InGame->BindDialogueInput(this);
     }
+}
 
-    APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
-    if (PC)
+void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
+{
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    if (PC_InGame)
     {
-        FInputActionBinding& Bind = PC->InputComponent->BindAction("CloseInven", IE_Pressed, this, &UNPCDialogue::CloseUI);
+        PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
     }
-    
+
+    //Close 변수가 아래에 있을시 이미 Widget이 꺼지기 때문에 위치조정함 
+
+    if (PC_InGame->Npc)
+    {
+        ANpcController* Controller = Cast<ANpcController>(PC_InGame->Npc->GetController());
+        if (Controller)
+        {
+            UConversationManagerComponent* TalkManager = Controller->GetConversationManager();
+            if (TalkManager)
+            {
+                TalkManager->EndConversation();  
+            }
+        }
+    }
+
+    UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+    if (QuestManager)
+    {
+        QuestManager->SetConversation(false);
+    }
+
+    Super::HideUI(UNPCDialogue::StaticClass());
+}
+
+void UNPCDialogue::InitUI()
+{
     ConfirmButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnConfirm);
     CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancel);
-
-    ConfirmButton->SetVisibility(ESlateVisibility::Hidden);
-    CancelButton->SetVisibility(ESlateVisibility::Hidden);
-    ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UNPCDialogue::BindDelegates()
@@ -77,12 +94,12 @@ void UNPCDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 
 void UNPCDialogue::OnConfirm()
 {
-    CloseUI();
+    HideUI(UNPCDialogue::StaticClass());
 }
 
 void UNPCDialogue::OnCancel()
 {
-    CloseUI();
+    HideUI(UNPCDialogue::StaticClass());
 }
 
 void UNPCDialogue::OnNextDialogue(const FInputActionValue& InputActionValue)

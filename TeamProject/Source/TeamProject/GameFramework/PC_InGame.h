@@ -144,6 +144,7 @@ public:
 	void ChangeInputContext(EInputContext NewContext);
 	void BindInventoryInput(UInventory* Inventory);
 	void BindDialogueInput(UNPCDialogue* NpcDialogue);
+	void ShowDialogueUI();
 
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
@@ -164,13 +165,12 @@ protected:
 	void OnInteract(const FInputActionValue& InputActionValue);
 	void OpenInventory(const FInputActionValue& InputActionValue);
 
+public:
+	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
 
 public:
 	UPROPERTY(EditAnywhere)
-	UPC_InGameDataAsset* PC_InGameDataAsset;
-
-	// --------- Npc 인터렉트 윤정 ----------
-	bool bCanInteractWithNpc = false;
+	UPC_InGameDataAsset* PC_InGameDataAsset;	
 
 	UPROPERTY()
 	TObjectPtr<class ANpc> Npc = nullptr;

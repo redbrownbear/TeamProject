@@ -7,6 +7,7 @@
 void UStoreFSMComponent::UpdateIdle(float DeltaTime)
 {
 	Super::UpdateIdle(DeltaTime);
+	
 }
 
 void UStoreFSMComponent::UpdateTalk(float DeltaTime)
@@ -15,14 +16,13 @@ void UStoreFSMComponent::UpdateTalk(float DeltaTime)
 
 	if (Player)
 	{
-		Owner->SetNpc(EQuestCharacter::Furiko);
-		Controller->GetConversationManager()->StartConversation(Owner, Player);
+		Owner->SetNpc(EQuestCharacter::Store);
 	}
 
-	/*if (!Dialogue->GetDialogueState())
+	if (Controller->GetConversationManager()->GetStateChanged())
 	{
 		ChangeState(ENpcState::Idle);
-	}*/
+	}
 }
 
 void UStoreFSMComponent::UpdateSell(float DeltaTime)
