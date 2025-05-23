@@ -59,13 +59,16 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 	if (Controller->GetConversationManager()->GetEndTalked())
 	{
 		bool IsConfirmed = Owner->GetIsConfirmed();
-		if (!IsConfirmed)
+		bool IsFound = Owner->GetIsHide();
+		if (!IsConfirmed || IsFound)
 		{
 			ChangeState(ENpcState::Run);
+			Owner->SetIsHide(false);
 		}
 		else
 		{
 			ChangeState(ENpcState::Hide);
+			Owner->SetIsConfirmed(false);
 		}		
 	}
 }
@@ -81,6 +84,4 @@ void UFurikoFSMComponent::UpdateHide(float DeltaTime)
 	//	Owner->SetNpc(EQuestCharacter::Furiko);
 	//}
 	 
-	// 찾았을 경우
-
 }

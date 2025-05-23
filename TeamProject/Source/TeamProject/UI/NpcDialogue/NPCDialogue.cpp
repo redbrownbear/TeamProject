@@ -102,6 +102,9 @@ void UNPCDialogue::OnConfirm()
 
 void UNPCDialogue::OnCancel()
 {
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    PC_InGame->Npc->SetIsConfirmed(false);
+
     HideUI(UNPCDialogue::StaticClass());
 }
 

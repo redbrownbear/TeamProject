@@ -139,6 +139,10 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		Owner->PlayMontage(ENpcMontage::RUN);
 		break;
 	case ENpcState::Talk:
+		if (Owner->GetIsHide())
+		{
+			Owner->PlayMontage(ENpcMontage::STAND);
+		}
 		// @TODO Play Sequence
 		//PlayInterectSequence();
 		Controller->GetConversationManager()->StartConversation(Owner, Player);
@@ -271,7 +275,7 @@ void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 
 	// 순간 이동
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
-
+	Owner->SetIsHide(true);
 }
 
 void UNpcFSMComponent::PlayInterectSequence()

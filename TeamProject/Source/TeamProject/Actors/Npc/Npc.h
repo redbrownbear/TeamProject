@@ -62,6 +62,8 @@ public:
 
 	bool GetIsConfirmed() { return bIsConfirm; }
 
+	bool GetIsHide() { return bIsHide; }
+
 	EQuestCharacter GetNpc() const { return QuestNpc; }
 
 public:
@@ -70,6 +72,8 @@ public:
 	void SetNpc(EQuestCharacter InQuestNpc) { QuestNpc = InQuestNpc; }
 
 	void SetIsConfirmed(bool IsConfirm) { bIsConfirm = IsConfirm; }
+
+	void SetIsHide(bool IsHide) { bIsHide = IsHide; }
 
 	void AttachToSocket();
 
@@ -115,8 +119,8 @@ private:
 	UPROPERTY() // 퀘스트 수락 시 
 	bool bIsConfirm = false;
 
-	/*UPROPERTY()
-	bool bIsFound = false;*/
+	UPROPERTY()
+	bool bIsHide = false;
 
 protected:
 	// 상호작용 
