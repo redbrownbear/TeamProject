@@ -42,7 +42,7 @@ protected:
 	TObjectPtr<APlayerCharacter> Player = nullptr;
 
 	UPROPERTY()
-	ANpcController* Controller = nullptr;
+	TObjectPtr<ANpcController> Controller = nullptr;
 
 	// 대화 종료 시 사용할 변수
 	UPROPERTY()
