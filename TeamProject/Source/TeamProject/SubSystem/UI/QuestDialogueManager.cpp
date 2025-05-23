@@ -63,6 +63,9 @@ TArray<const FNPCDialogueTableRow*> UQuestDialogueManager::GetDialogueData(EQues
 
 void UQuestDialogueManager::ShowDialogue(EQuestCharacter QuestChar, int32 DialogueID)
 {
+    if (IsConversation())
+        return;
+
     TArray<const FNPCDialogueTableRow*> DialogueRows = GetDialogueData(QuestChar);
 
     if (DialogueRows.Num() == 0)
@@ -83,6 +86,8 @@ void UQuestDialogueManager::ShowDialogue(EQuestCharacter QuestChar, int32 Dialog
 
     if (!FoundRow) 
         return;
+
+    SetConversation(true);
 
     OnDialogueUpdated.Broadcast(*FoundRow);
 }

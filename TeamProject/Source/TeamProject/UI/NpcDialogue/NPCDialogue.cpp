@@ -9,15 +9,15 @@
 #include "GameFramework/PC_InGame.h"
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
 
-void UNPCDialogue::OnCreated()
+void UNPCDialogue::ShowUI()
 {
-	Super::OnCreated();
+	Super::ShowUI();
 
     InitUI();
     BindDelegates();
 }
 
-void UNPCDialogue::CloseUI()
+void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
 {
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
@@ -40,7 +40,14 @@ void UNPCDialogue::CloseUI()
         }
     }
 
-    Super::CloseUI();
+    UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+    if (QuestManager)
+    {
+        QuestManager->SetConversation(false);
+    }
+
+    Super::HideUI(UNPCDialogue::StaticClass());
 }
 
 void UNPCDialogue::InitUI()
@@ -60,12 +67,6 @@ void UNPCDialogue::InitUI()
         PC_InGame->BindDialogueInput(this);
     }
 
-    APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
-    if (PC)
-    {
-        FInputActionBinding& Bind = PC->InputComponent->BindAction("CloseInven", IE_Pressed, this, &UNPCDialogue::CloseUI);
-    }
-    
     ConfirmButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnConfirm);
     CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancel);
 
@@ -90,12 +91,12 @@ void UNPCDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 
 void UNPCDialogue::OnConfirm()
 {
-    CloseUI();
+    HideUI(UNPCDialogue::StaticClass());
 }
 
 void UNPCDialogue::OnCancel()
 {
-    CloseUI();
+    HideUI(UNPCDialogue::StaticClass());
 }
 
 void UNPCDialogue::OnNextDialogue(const FInputActionValue& InputActionValue)
