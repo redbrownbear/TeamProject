@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NPCTableRow.h"
+#include "NpcCharacterTableRow.h"
 
 #include "NPCDialogueTableRow.generated.h"
 

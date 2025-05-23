@@ -5,18 +5,6 @@
 #include "CoreMinimal.h"
 #include "NPCTableRow.generated.h"
 
-UENUM()
-enum class EQuestCharacter
-{
-	None,
-
-	Furiko,
-
-	Store,
-
-	End,
-};
-
 /**
  * 
  */
