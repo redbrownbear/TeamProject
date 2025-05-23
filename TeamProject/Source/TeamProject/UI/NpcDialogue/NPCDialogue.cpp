@@ -46,9 +46,6 @@ void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
     {
         PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
     }
-
-    //Close 변수가 아래에 있을시 이미 Widget이 꺼지기 때문에 위치조정함 
-
     if (PC_InGame->Npc)
     {
         ANpcController* Controller = Cast<ANpcController>(PC_InGame->Npc->GetController());
