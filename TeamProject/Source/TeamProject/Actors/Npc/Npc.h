@@ -58,13 +58,22 @@ public:
 
 	USkeletalMeshComponent* GetBodyMesh() const { return BodyMeshComponent; }
 
-	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
-
 	bool GetCanTalk() { return bPlayerInRange; }
+
+	bool GetIsConfirmed() { return bIsConfirm; }
+
+	bool GetIsHide() { return bIsHide; }
 
 	EQuestCharacter GetNpc() const { return QuestNpc; }
 
+public:
+	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
+
 	void SetNpc(EQuestCharacter InQuestNpc) { QuestNpc = InQuestNpc; }
+
+	void SetIsConfirmed(bool IsConfirm) { bIsConfirm = IsConfirm; }
+
+	void SetIsHide(bool IsHide) { bIsHide = IsHide; }
 
 	void AttachToSocket();
 
@@ -106,6 +115,12 @@ private:
 	// 상호작용 가능 변수
 	UPROPERTY()
 	bool bPlayerInRange = false;
+
+	UPROPERTY() // 퀘스트 수락 시 
+	bool bIsConfirm = false;
+
+	UPROPERTY()
+	bool bIsHide = false;
 
 protected:
 	// 상호작용 

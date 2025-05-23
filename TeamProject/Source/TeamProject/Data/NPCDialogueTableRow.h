@@ -32,4 +32,6 @@ struct TEAMPROJECT_API FNPCDialogueTableRow : public FTableRowBase
 
 	int32 questId = 1100;
 
+	UPROPERTY(EditAnywhere)
+	bool bDoQuest;
 };

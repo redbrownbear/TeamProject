@@ -14,6 +14,9 @@
 #include "UI/Inven/Inventory.h"
 
 #include "Actors/Npc/Npc.h" 
+
+
+#include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 
 APC_InGame::APC_InGame()
@@ -52,8 +55,17 @@ void APC_InGame::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
 		ETriggerEvent::Triggered, this, &ThisClass::OnMove);
+	
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
+		ETriggerEvent::Completed, this, &ThisClass::OnMoveCancel);
+
+
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LookMouse,
 		ETriggerEvent::Triggered, this, &ThisClass::OnLook);
+
+
+
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LeftClick,
 		ETriggerEvent::Started, this, &ThisClass::LeftClick);
@@ -152,18 +164,46 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	
 
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
-	if (Anim->Montage_IsPlaying(nullptr) == true) {
-		Anim->Montage_Stop(0.f);
-	}
+
+	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+	
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+	
 	const FRotator Rotation = K2_GetActorRotation();
 	const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
 	const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
 	const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
+	
+
+	P_Anim->ActionValue = ActionValue;
 
 	APawn* ControlledPawn = GetPawn();
 	ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
 	ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
+
+}
+
+void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	if (!Player_C)
+	{
+		return;
+	}
+	if (Player_C->GetCharacterMovement()->MovementMode == MOVE_None)
+	{
+		return;
+	}
+
+
+	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+
+	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+
+	const FVector2D ActionValue = FVector2D();
+
+	P_Anim->ActionValue = ActionValue;
+
 }
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
@@ -172,6 +212,23 @@ void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 
 	AddYawInput(ActionValue.X);
 	AddPitchInput(-ActionValue.Y);
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	if (!Player_C)
+	{
+		return;
+	}
+	if (Player_C->GetCharacterMovement()->MovementMode == MOVE_None)
+	{
+		return;
+	}
+
+
+	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+
+	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+	
+	P_Anim->SetPitch();
+	
 }
 
 void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
@@ -179,16 +236,35 @@ void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
 	APawn* PlayerPawn = GetPawn();
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
 
-	PlayerCharacter->LeftClickAction();
+	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+
+	if (!WeaponManagerComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WeaponManagerComponent is Null"));
+		return;
+	}
+
+
+	WeaponManagerComponent->LeftClickAction();
 
 }
 
 void APC_InGame::RightClick(const FInputActionValue& InputActionValue)
 {
+
 	APawn* PlayerPawn = GetPawn();
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
 
-	PlayerCharacter->RightClickAction();
+	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+
+	if (!WeaponManagerComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WeaponManagerComponent is Null"));
+		return;
+	}
+
+	WeaponManagerComponent->RightClickAction();
+
 }
 
 void APC_InGame::EquipSword(const FInputActionValue& InputActionValue)

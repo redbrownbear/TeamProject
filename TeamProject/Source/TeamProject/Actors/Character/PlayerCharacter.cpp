@@ -10,6 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Engine/SkeletalMesh.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -29,7 +30,8 @@ APlayerCharacter::APlayerCharacter()
 	{
 		SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 		SpringArm->SetupAttachment(RootComponent);
-		SpringArm->TargetArmLength = 400.f;
+		SpringArm->TargetArmLength = 300.f;
+		SpringArm->SetRelativeLocation(FVector(0.f, 0.f, 30.f));
 		
 
 		{
@@ -69,8 +71,26 @@ APlayerCharacter::APlayerCharacter()
 		StatusComponent = CreateDefaultSubobject<UPlayerStatusComponent>(TEXT("PlayerStatus"));
 	}
 	
+	ZoomTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("ZoomTimeline"));
+
+
 	WeaponManagerComponent = CreateDefaultSubobject<UWeaponManagerComponent>(TEXT("WeaponManager"));
 	bUseControllerRotationYaw = false;
+
+	if (!ZoomCurve)
+	{
+		static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveAsset(TEXT("/Script/Engine.CurveFloat'/Game/Resources/Player/Camera/CameraZoom.CameraZoom'")); // 예시 경로
+		if (CurveAsset.Succeeded())
+		{
+			ZoomCurve = CurveAsset.Object;
+		}
+	}
+	if (ZoomCurve)
+	{
+		InterpFunction.BindUFunction(this, FName("TimelineProgress"));
+		ZoomTimeline->AddInterpFloat(ZoomCurve, InterpFunction);
+
+	}
 }
 
 // Called when the game starts or when spawned
@@ -81,6 +101,7 @@ void APlayerCharacter::BeginPlay()
 	SpringArm->ProbeChannel = ECC_GameTraceChannel1;
 
 	GetMesh()->SetCollisionProfileName(TEXT("Player"));
+
 }
 
 // Called every frame
@@ -104,16 +125,37 @@ void APlayerCharacter::OnConstruction(const FTransform& Transform)
 
 }
 
-void APlayerCharacter::LeftClickAction()
+void APlayerCharacter::TimelineProgress(float Value)
 {
 
+	float Length = FMath::Lerp(300.f, 150.f, Value);
+
+	FVector SpringArmLocation = FVector::Zero();
+	float Y = FMath::Lerp(0.f, 30.f, Value);
+	float Z = FMath::Lerp(30.f, 40.f, Value);
+	SpringArmLocation.Y = Y;
+	SpringArmLocation.Z = Z;
+	SpringArm->SetRelativeLocation(SpringArmLocation);
+	SpringArm->TargetArmLength = Length;
 }
 
-void APlayerCharacter::RightClickAction()
+
+
+
+void APlayerCharacter::ZoomIn()
 {
-
+	if (!bZoomedIn)
+	{
+		bZoomedIn = true;
+		ZoomTimeline->Play();
+	}
 }
 
-
-
-
+void APlayerCharacter::ZoomOut()
+{
+	if (bZoomedIn)
+	{
+		bZoomedIn = false;
+		ZoomTimeline->Reverse();
+	}
+}

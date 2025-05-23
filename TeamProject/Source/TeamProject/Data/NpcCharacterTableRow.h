@@ -33,8 +33,17 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Npc")
 	USkeletalMesh* SkeletalMesh = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "Npc")
-	FTransform MeshTransform = FTransform::Identity;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform MeshTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform HeadTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform HairTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform NoseTransform;
 	
 	UPROPERTY(EditAnywhere, Category = "Npc|Animation")
 	TSubclassOf<UAnimInstance> AnimClass;

@@ -14,6 +14,8 @@
 #include "Components/WeaponChildActorComponent/WeaponChildActorComponent.h"
 #include "Components/StatusComponent/PlayerStatusComponent/PlayerStatusComponent.h"
 #include "Components/Character/WeaponManagerComponent.h"
+#include "Components/TimelineComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "GenericTeamAgentInterface.h"
 #include "Misc/Utils.h"
 #include "PlayerCharacter.generated.h"
@@ -44,11 +46,6 @@ public:
 	virtual void OnConstruction(const FTransform& Transform);
 
 	
-	// 클릭이벤트 발생
-
-	void LeftClickAction();
-	void RightClickAction();
-
 	
 
 public:
@@ -57,7 +54,15 @@ public:
 	UWeaponChildActorComponent* GetBow() { return WeaponManagerComponent->GetBow(); }
 	UPlayerStatusComponent* GetPlayerStatusComponent() { return StatusComponent; }
 	UWeaponManagerComponent* GetWeaponManagerComponent() { return WeaponManagerComponent; }
+	USpringArmComponent* GetSpringArm() { return SpringArm; }
 
+
+	UFUNCTION()
+	void TimelineProgress(float Value);
+
+
+	void ZoomIn();
+	void ZoomOut();
 
 protected:
 
@@ -72,11 +77,21 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TObjectPtr<UWeaponManagerComponent> WeaponManagerComponent;
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	TObjectPtr<UTimelineComponent> ZoomTimeline;
+
+	FOnTimelineFloat InterpFunction{};
 
 
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	TObjectPtr<UPlayerStatusComponent> StatusComponent;
+
+	bool bZoomedIn;
+
+
+	UPROPERTY(EditAnywhere, Category = "Zoom")
+	UCurveFloat* ZoomCurve;
 
 
 
