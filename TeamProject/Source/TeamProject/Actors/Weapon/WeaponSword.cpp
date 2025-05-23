@@ -95,12 +95,15 @@ void AWeaponSword::LeftClickAction()
         CurrentComboIndex = (MaxComboIndex <= CurrentComboIndex) ? 0 : CurrentComboIndex;
 
         Player_C->GetMesh()->GetAnimInstance()->Montage_Play(Arr_Sword_Attack_MTG[CurrentComboIndex]);
+        Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);
+
     }
 
 
 
 
     {
+
         FVector ActorLocation = OwnerActor->GetActorLocation();
         FRotator ActorRotation = OwnerActor->GetActorRotation();
 
@@ -165,6 +168,7 @@ void AWeaponSword::LeftClickAction()
         }
     }
     bCanAttack = false;
+    
 }
 
 
