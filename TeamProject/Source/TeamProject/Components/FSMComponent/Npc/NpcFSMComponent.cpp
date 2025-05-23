@@ -184,7 +184,7 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 		//Controller->GetConversationManager()->StartConversation(Owner, Player);
 	}			
 
-	// ´ëÈ­ Á¾·á ½Ã	
+	// ï¿½ï¿½È­ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½	
 	/*if (!Dialogue->GetDialogueState())
 	{
 		Dialogue->CloseUI();

@@ -28,7 +28,7 @@ private:
 	void InitUI();
 	void BindDelegates();
 
-public: //¹ÙÀÎµùÀ» À§ÇØ ÆÛºí¸¯¼±¾ð
+public: //ï¿½ï¿½ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ûºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	UFUNCTION()
@@ -73,12 +73,12 @@ private:
 	EQuestCharacter CurQuestChar;
 	int32 NextDialogueID;
 
-	//ÇÑ±ÛÀÚ¾¿ º¸ÀÌ´Â ±â´ÉÀ» À§ÇÑ º¯¼ö
+	//ï¿½Ñ±ï¿½ï¿½Ú¾ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	FString FullText;
 	int32 CurrentCharIndex = 0;
 	FTimerHandle TypingTimerHandle;
 	bool bIsTyping = false;
 	//---------------------------------
 
-	bool bEndDialogue = false; // 2025-05-20 ´ëÈ­ Á¾·á È®ÀÎ º¯¼ö Ãß°¡
+	bool bEndDialogue = false; // 2025-05-20 ï¿½ï¿½È­ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
 };

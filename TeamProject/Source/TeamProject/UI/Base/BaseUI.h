@@ -16,7 +16,7 @@ class TEAMPROJECT_API UBaseUI : public UUserWidget
 
 	
 protected:
-	virtual void OnCreated();	//¸í½ÃÀû ÃÊ±âÈ­
+	virtual void OnCreated();	//ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
 	virtual void CloseUI();
 
 	void PauseAllPausableActors(bool bPause);

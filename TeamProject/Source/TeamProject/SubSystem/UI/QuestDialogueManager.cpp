@@ -55,7 +55,7 @@ TArray<const FNPCDialogueTableRow*> UQuestDialogueManager::GetDialogueData(EQues
     {
         UE_LOG(LogTemp, Warning, TEXT("No dialogue found for character: %s"), *UEnum::GetValueAsString(QuestChar));
         
-        return TArray<const FNPCDialogueTableRow*>{}; // ºó ¹è¿­ ¹ÝÈ¯
+        return TArray<const FNPCDialogueTableRow*>{}; // ï¿½ï¿½ ï¿½è¿­ ï¿½ï¿½È¯
     }
 
     return *FoundRows;

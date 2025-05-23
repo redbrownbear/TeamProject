@@ -24,8 +24,8 @@ void UNPCDialogue::CloseUI()
         PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
     }
 
-    //Close º¯¼ö°¡ ¾Æ·¡¿¡ ÀÖÀ»½Ã ÀÌ¹Ì WidgetÀÌ ²¨Áö±â ¶§¹®¿¡ À§Ä¡Á¶Á¤ÇÔ 
-    bEndDialogue = true; // 2025-05-20 ´ëÈ­ Á¾·á È®ÀÎ º¯¼ö Ãß°¡
+    //Close ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ Widgetï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
+    bEndDialogue = true; // 2025-05-20 ï¿½ï¿½È­ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
 
     Super::CloseUI();
 }
@@ -110,7 +110,7 @@ void UNPCDialogue::UpdateTyping()
 {
     if (CurrentCharIndex >= FullText.Len())
     {
-        // Ãâ·Â ¿Ï·á
+        // ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½
         GetWorld()->GetTimerManager().ClearTimer(TypingTimerHandle);
         bIsTyping = false;
         return;
@@ -125,7 +125,7 @@ void UNPCDialogue::OnNextButtonClicked()
 {
     if (bIsTyping)
     {
-        // Å¸ÀÌÇÎ ÁßÀÌ¸é Áï½Ã ÀüÃ¼ ÅØ½ºÆ® Ãâ·Â
+        // Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½
         GetWorld()->GetTimerManager().ClearTimer(TypingTimerHandle);
         TextBox->SetText(FText::FromString(FullText));
         bIsTyping = false;

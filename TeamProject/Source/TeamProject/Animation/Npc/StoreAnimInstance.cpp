@@ -14,7 +14,7 @@ void UStoreAnimInstance::NativeInitializeAnimation()
 
 	if (GIsEditor && FApp::IsGame() && !Pawn)
 	{
-		checkf(false, TEXT("UStoreAnimInstance¸¦ »ç¿ëÇÏ·Á¸é ¼ÒÀ¯±ÇÀÚ°¡ PawnÀÌ¾î¾ß ÇÕ´Ï´Ù."));
+		checkf(false, TEXT("UStoreAnimInstanceï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú°ï¿½ Pawnï¿½Ì¾ï¿½ï¿½ ï¿½Õ´Ï´ï¿½."));
 		return;
 	}
 	else if (!Pawn) { return; }
