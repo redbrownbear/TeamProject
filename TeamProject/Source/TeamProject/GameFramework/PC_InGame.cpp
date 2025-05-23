@@ -252,20 +252,7 @@ void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
 
 void APC_InGame::ShowDialogueUI()
 {
-	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-	check(UIManager);
 
-	UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
-	check(QuestManager);
-
-	if (UIManager && QuestManager)
-	{
-		if (QuestManager->IsConversation())
-			return;
-
-		UIManager->ShowUI(UNPCDialogue::StaticClass());
-		QuestManager->ShowDialogue(EQuestCharacter::Furiko, 0);
-	}
 }
 
 

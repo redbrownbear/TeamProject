@@ -4,14 +4,22 @@
 #include "SubSystem/UI/QuestDialogueManager.h"
 
 
+UQuestDialogueManager::UQuestDialogueManager()
+{
+    static ConstructorHelpers::FObjectFinder<UDataTable> DialogueTableObj(TEXT("/Game/Data/NPC/DT_NPCDialogue.DT_NPCDialogue"));
+
+    if (DialogueTableObj.Succeeded())
+    {
+        QuestDataTable = DialogueTableObj.Object;
+    }
+    check(QuestDataTable);
+}
 
 void UQuestDialogueManager::Initialize(FSubsystemCollectionBase& Collection)
 {
-    UDataTable* LoadedTable = Cast<UDataTable>(
-        StaticLoadObject(UDataTable::StaticClass(), nullptr, TEXT("/Game/Data/NPC/DT_NPCDialogue.DT_NPCDialogue"))
-    );
+    check(QuestDataTable);
 
-    LoadDialogueData(LoadedTable);
+    LoadDialogueData(QuestDataTable);
 }
 
 void UQuestDialogueManager::LoadDialogueData(UDataTable* DataTable)
@@ -28,17 +36,18 @@ void UQuestDialogueManager::LoadDialogueData(UDataTable* DataTable)
         FNPCDialogueTableRow* Row = DataTable->FindRow<FNPCDialogueTableRow>(RowName, "Populate QuestRowMap");
         if (Row)
         {
-            if (Row->QuestCharacter != EQuestCharacter::None)
+            // 원본 Row 복사본 생성
+            FNPCDialogueTableRow* NewRow = new FNPCDialogueTableRow(*Row);
+            TSharedPtr<const FNPCDialogueTableRow> SharedRow = MakeShareable(NewRow);
+
+            TArray<TSharedPtr<const FNPCDialogueTableRow>>* FoundRowsPtr = QuestRowMap.Find(Row->QuestCharacter);
+            if (FoundRowsPtr)
             {
-                TArray<const FNPCDialogueTableRow*>* FoundArray = QuestRowMap.Find(Row->QuestCharacter);
-                if (FoundArray)
-                {
-                    FoundArray->Add(Row);
-                }
-                else
-                {
-                    QuestRowMap.Add(Row->QuestCharacter, TArray<const FNPCDialogueTableRow*>{ Row });
-                }
+                FoundRowsPtr->Add(SharedRow);
+            }
+            else
+            {
+                QuestRowMap.Add(Row->QuestCharacter, TArray<TSharedPtr<const FNPCDialogueTableRow>>{ SharedRow });
             }
         }
         else
@@ -48,31 +57,25 @@ void UQuestDialogueManager::LoadDialogueData(UDataTable* DataTable)
     }
 }
 
-TArray<const FNPCDialogueTableRow*> UQuestDialogueManager::GetDialogueData(EQuestCharacter QuestChar) const
+TArray<TSharedPtr<const FNPCDialogueTableRow>> UQuestDialogueManager::GetDialogueData(EQuestCharacter QuestChar) const
 {
-    const TArray<const FNPCDialogueTableRow*>* FoundRows = QuestRowMap.Find(QuestChar);
-    if (!FoundRows)
+    const TArray<TSharedPtr<const FNPCDialogueTableRow>>* FoundRowsPtr = QuestRowMap.Find(QuestChar);
+    if (!FoundRowsPtr)
     {
         UE_LOG(LogTemp, Warning, TEXT("No dialogue found for character: %s"), *UEnum::GetValueAsString(QuestChar));
         
-        return TArray<const FNPCDialogueTableRow*>{}; // 빈 배열 반환
+        return  TArray<TSharedPtr<const FNPCDialogueTableRow>>{}; // 빈 배열 반환
     }
 
-    return *FoundRows;
+    return *FoundRowsPtr;
 }
 
 void UQuestDialogueManager::ShowDialogue(EQuestCharacter QuestChar, int32 DialogueID)
 {
-    TArray<const FNPCDialogueTableRow*> DialogueRows = GetDialogueData(QuestChar);
+    TArray<TSharedPtr<const FNPCDialogueTableRow>> DialogueRows = GetDialogueData(QuestChar);
+    TSharedPtr<const FNPCDialogueTableRow> FoundRow = nullptr;
 
-    if (DialogueRows.Num() == 0)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("No dialogue found for character: %s"), *UEnum::GetValueAsString(QuestChar));
-        return;
-    }
-
-    const FNPCDialogueTableRow* FoundRow = nullptr;
-    for (const FNPCDialogueTableRow* Row : DialogueRows)
+    for (TSharedPtr<const FNPCDialogueTableRow> Row : DialogueRows)
     {
         if (Row->CurrentDialogueID == DialogueID)
         {
@@ -81,8 +84,17 @@ void UQuestDialogueManager::ShowDialogue(EQuestCharacter QuestChar, int32 Dialog
         }
     }
 
-    if (!FoundRow) 
-        return;
+    if (!FoundRow)
+    {
+        TSharedPtr<FNPCDialogueTableRow> DummyRow = MakeShared<FNPCDialogueTableRow>();
+        DummyRow->QuestCharacter = QuestChar;
+        DummyRow->CurrentDialogueID = 0;
+        DummyRow->NextDialogueID = 0;
+        DummyRow->DialogueString = TEXT("0");
+        DummyRow->bIsEndConversation = true;
+
+        FoundRow = DummyRow;
+    }
 
     SetConversation(true);
 

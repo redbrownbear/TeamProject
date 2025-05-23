@@ -2,6 +2,8 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "UI/NpcDialogue/NPCDialogue.h"
+
+#include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PC_InGame.h"
@@ -22,16 +24,28 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 	LockCharacters(Npc, Player);
 
 	APC_InGame* PC = Cast<APC_InGame>(CurrentPlayer->GetController());
+	check(PC);
 
-	if (PC)
+	AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD());
+	check(HUD)
+
+	if (PC && HUD)
+		HUD->ShowInteractWidget(false);
+			
+	UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+	check(QuestManager);
+
+	if (UIManager && QuestManager)
 	{
-		if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
-		{
-			HUD->ShowInteractWidget(false);
-		}
+		if (QuestManager->IsConversation())
+			return;
 
-		PC->ShowDialogueUI();
-	}	
+		UIManager->ShowUI(UNPCDialogue::StaticClass());
+		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 0);
+	}
 
 }
 

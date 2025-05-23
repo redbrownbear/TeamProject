@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
-#include "Data/NPCTableRow.h"
 #include "Data/NpcCharacterTableRow.h"
 #include "Misc/Utils.h"
 #include "Npc.generated.h"
@@ -76,6 +75,7 @@ protected:
 
 public:
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+	FNpcCharacterTableRow* GetData() { return NpcData; }
 
 public:
 	void PlayMontage(ENpcMontage _InEnum, bool bIsLoop = false);
