@@ -7,6 +7,8 @@
 #include "UI/NpcDialogue/NPCDialogue.h"
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
 
+#include "Actors/HidePoint/FurikoHidePoint.h" 
+
 UFurikoFSMComponent::UFurikoFSMComponent()
 {
 	eCurrentState = ENpcState::Run;
@@ -65,4 +67,47 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 void UFurikoFSMComponent::UpdateHide(float DeltaTime)
 {
 	Super::UpdateHide(DeltaTime);
+
+	if (Player)
+	{
+		Owner->SetNpc(EQuestCharacter::Furiko);
+	}
+
+	if (Controller->GetConversationManager()->GetStateChanged())
+	{
+		ChangeState(ENpcState::Talk);
+	}
+}
+
+void UFurikoFSMComponent::HideFuriko()
+{
+	if (HidePoints.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HidePoints 배열이 비어있습니다."));
+		return;
+	}
+
+	// 랜덤 인덱스 선택
+	const int32 Index = FMath::RandRange(0, HidePoints.Num() - 1);
+	AFurikoHidePoint* Target = HidePoints[Index];
+
+	if (Target && Owner) // 위치 이동
+	{
+		SetActorLocation(Target->GetActorLocation());
+
+		// CreateUI <푸리코와 놀자!>: 퀘스트명 ui 띄울까 말까 윤호오빠랑 얘기해볼 것
+
+		UE_LOG(LogTemp, Log, TEXT("Furiko가 HidePoint %s 로 순간이동했습니다."), *Target->GetName());
+	}
+
+}
+
+void UFurikoFSMComponent::SetActorLocation(FVector InLocation)
+{
+	if (!Owner) return;
+
+	// 순간 이동
+	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
+
+	UE_LOG(LogTemp, Log, TEXT("Furiko가 HidePoint로 이동했습니다: %s"), *InLocation.ToString());
 }

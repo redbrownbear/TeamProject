@@ -5,6 +5,8 @@
 #include "Actors/Controller/Npc/Furiko/FurikoController.h"
 #include "FurikoFSMComponent.generated.h"
 
+class AFurikoHidePoint;
+
 UCLASS()
 class TEAMPROJECT_API UFurikoFSMComponent : public UNpcFSMComponent
 {
@@ -19,6 +21,17 @@ protected:
 	virtual void UpdateTalk(float DeltaTime) override;
 	virtual void UpdateHide(float DeltaTime) override;
 	//virtual void UpdatePlay(float DeltaTime); // 술래잡기: 시간 되면 추가
+
+protected:
+	void HideFuriko();
+	void SetActorLocation(FVector InLocation);
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Teleport")
+	TArray<FVector> TeleportLocations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HidePoint")
+	TArray<AFurikoHidePoint*> HidePoints;
 
 private:
 	int32 CurrentStrollIndex = 0;
