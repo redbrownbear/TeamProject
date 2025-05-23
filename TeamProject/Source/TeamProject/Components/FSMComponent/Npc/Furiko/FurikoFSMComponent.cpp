@@ -54,22 +54,12 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 	if (Player)
 	{
 		Owner->SetNpc(EQuestCharacter::Furiko);
-		Controller->GetConversationManager()->StartConversation(Owner, Player);
 	}
 
-
-	// 퀘스트 수락 버튼 클릭 시
-	/*bool bAcceptQuest = Dialogue->OnClicked();
-	if (bAcceptQuest)
+	if (Controller->GetConversationManager()->GetStateChanged())
 	{
-		ChangeState(ENpcState::Hide);
-	}*/
-
-	// 퀘스트 안 함 + 대화 끝남(UI 삭제)
-	/*if (!bAcceptQuest && !Dialogue->GetDialogueState())
-	{
-		ChangeState(ENpcState::Idle);
-	}*/
+		ChangeState(ENpcState::Run);
+	}
 }
 
 void UFurikoFSMComponent::UpdateHide(float DeltaTime)

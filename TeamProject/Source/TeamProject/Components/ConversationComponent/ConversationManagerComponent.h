@@ -30,7 +30,7 @@ public:
 	void LockCharacters(ANpc* Npc, APlayerCharacter* Player);
 	void UnlockCharacters(ANpc* Npc, APlayerCharacter* Player);
 
-	bool GetState() { return bStateChange; }
+	bool GetStateChanged() { return bStateChange; }
 
 private:
 	UPROPERTY()

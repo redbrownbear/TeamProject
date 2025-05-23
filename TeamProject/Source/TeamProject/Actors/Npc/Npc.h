@@ -59,11 +59,7 @@ public:
 
 	USkeletalMeshComponent* GetBodyMesh() const { return BodyMeshComponent; }
 
-	//USkeletalMesh* GetBodySkeletalMesh() const { return BodyMeshComponent ? BodyMeshComponent->SkeletalMesh : nullptr; }
-
 	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
-
-	//void OnTalkKeyPressed(); // 대화 UI
 
 	bool GetCanTalk() { return bPlayerInRange; }
 
@@ -98,18 +94,19 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	USkeletalMesh* HeadMeshAsset;
+	TObjectPtr<USkeletalMesh> HeadMeshAsset;
 
 	UPROPERTY(EditAnywhere)
-	USkeletalMesh* HairMeshAsset;
+	TObjectPtr<USkeletalMesh> HairMeshAsset;
 
 	UPROPERTY(EditAnywhere)
-	USkeletalMesh* NoseMeshAsset;
+	TObjectPtr<USkeletalMesh> NoseMeshAsset;
 
 private:
 	// 상호작용 가능 변수
 	UPROPERTY()
 	bool bPlayerInRange = false;
+
 protected:
 	// 상호작용 
 	UFUNCTION()
