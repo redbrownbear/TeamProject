@@ -19,6 +19,10 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	
+	void SetPitch();
+
+
 public:
 
 	UPROPERTY()
@@ -39,6 +43,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsZoom = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	FRotator Rotator;
 
 
 

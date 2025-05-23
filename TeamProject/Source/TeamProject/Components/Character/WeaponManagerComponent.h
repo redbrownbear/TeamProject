@@ -39,7 +39,14 @@ public:
 	EEquip_State GetEquipState() { return Equip_State; }
 	void SetEquipState(EEquip_State _State) { Equip_State = _State; }
 
-	void SetRightClick(bool _RightClick) { RightClick = _RightClick; }
+	void SetRightClick(bool _RightClick) { bRightClick = _RightClick; }
+	bool GetRightClick() { return bRightClick; }
+
+	void SetCanShot(bool _CanShot) { bCanShot = _CanShot; }
+	bool GetCanShot() { return bCanShot; }
+
+
+
 
 	EWeapon_Type GetUnEquipWeaponType() {
 		EWeapon_Type _Type;
@@ -84,5 +91,6 @@ protected:
 	UAnimMontage* UnEquip_Sword_Shield;
 
 
-	bool RightClick;
+	bool bRightClick;
+	bool bCanShot;
 };

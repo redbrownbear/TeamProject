@@ -273,7 +273,7 @@ void UWeaponManagerComponent::LeftClickAction()
 	
 	else if (Equip_State == EEquip_State::Bow)
 	{
-		if (!RightClick)
+		if (!bCanShot)
 		{
 			return;
 		}
@@ -301,6 +301,8 @@ void UWeaponManagerComponent::RightClickAction()
 	else if(Equip_State == EEquip_State::Bow)
 	{
 
+		bRightClick = !bRightClick;
+
 		AWeaponBow* BowActor = Cast<AWeaponBow>(Bow->GetChildActor());
 
 		if (!BowActor)
@@ -310,7 +312,11 @@ void UWeaponManagerComponent::RightClickAction()
 			return;
 
 		}
-		BowActor->RightClickAction();
+
+		
+
+		BowActor->RightClickAction(bRightClick);
+		
 	}
 
 }

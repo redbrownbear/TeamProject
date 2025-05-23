@@ -46,7 +46,7 @@ public:
 
 public:
 	virtual void LeftClickAction();
-	virtual void RightClickAction();
+	virtual void RightClickAction(bool _bool);
 	UAnimMontage* GetUnEquipMontage() { return UnEquipMontage; }
 	UAnimMontage* GetEquipMontage() { return EquipMontage; }
 

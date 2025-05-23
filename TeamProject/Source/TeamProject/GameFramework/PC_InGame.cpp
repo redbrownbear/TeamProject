@@ -48,8 +48,17 @@ void APC_InGame::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
 		ETriggerEvent::Triggered, this, &ThisClass::OnMove);
+	
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
+		ETriggerEvent::Completed, this, &ThisClass::OnMoveCancel);
+
+
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LookMouse,
 		ETriggerEvent::Triggered, this, &ThisClass::OnLook);
+
+
+
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LeftClick,
 		ETriggerEvent::Started, this, &ThisClass::LeftClick);
@@ -167,12 +176,52 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 }
 
+void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	if (!Player_C)
+	{
+		return;
+	}
+	if (Player_C->GetCharacterMovement()->MovementMode == MOVE_None)
+	{
+		return;
+	}
+
+
+	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+
+	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+
+	const FVector2D ActionValue = FVector2D();
+
+	P_Anim->ActionValue = ActionValue;
+
+}
+
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 {
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
 	AddYawInput(ActionValue.X);
 	AddPitchInput(-ActionValue.Y);
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	if (!Player_C)
+	{
+		return;
+	}
+	if (Player_C->GetCharacterMovement()->MovementMode == MOVE_None)
+	{
+		return;
+	}
+
+
+	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+
+	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+	
+	P_Anim->SetPitch();
+	
 }
 
 void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)

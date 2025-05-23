@@ -23,7 +23,7 @@ public:
 	AWeaponBow();
 
 	virtual void LeftClickAction() override;
-	virtual void RightClickAction() override;
+	virtual void RightClickAction(bool _bool) override;
 
 
 private:

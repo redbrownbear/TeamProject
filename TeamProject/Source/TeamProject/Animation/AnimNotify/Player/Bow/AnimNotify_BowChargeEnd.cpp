@@ -20,10 +20,8 @@ void UAnimNotify_BowChargeEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 	
 	UWeaponManagerComponent* WeaponManagerComponent = Player_C->GetWeaponManagerComponent();
 	
-	WeaponManagerComponent->SetRightClick(true);
+	WeaponManagerComponent->SetCanShot(true);
 
 	MeshComp->GetAnimInstance()->Montage_Pause();
-
-	Player_C->GetCharacterMovement()->MaxWalkSpeed = 300;
 
 }

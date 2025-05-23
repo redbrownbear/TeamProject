@@ -52,7 +52,7 @@ void AWeaponBase::LeftClickAction()
 
 }
 
-void AWeaponBase::RightClickAction()
+void AWeaponBase::RightClickAction(bool _bool)
 {
 }
 
