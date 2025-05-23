@@ -205,9 +205,33 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		CollisionComponent->SetCanEverAffectNavigation(false);
 	}
 
-	BodyMeshComponent->SetSkeletalMesh(NpcData->SkeletalMesh);
-	BodyMeshComponent->SetAnimClass(NpcData->AnimClass);
-	BodyMeshComponent->SetRelativeScale3D(NpcData->MeshTransform.GetScale3D());
+	// Body
+	if (BodyMeshComponent)
+	{
+		BodyMeshComponent->SetRelativeTransform(NpcData->MeshTransform);
+		BodyMeshComponent->SetSkeletalMesh(NpcData->SkeletalMesh);
+		BodyMeshComponent->SetAnimClass(NpcData->AnimClass);
+		BodyMeshComponent->SetRelativeScale3D(NpcData->MeshTransform.GetScale3D());
+		BodyMeshComponent->SetRelativeTransform(NpcData->MeshTransform);
+	}
+
+	// Head
+	if (HeadMeshComponent)
+	{
+		HeadMeshComponent->SetRelativeTransform(NpcData->HeadTransform);
+	}
+
+	// Hair
+	if (HairMeshComponent)
+	{
+		HairMeshComponent->SetRelativeTransform(NpcData->HairTransform);
+	}
+
+	// Nose
+	if (NoseMeshComponent)
+	{
+		NoseMeshComponent->SetRelativeTransform(NpcData->NoseTransform);
+	}
 	
 	MovementComponent->MaxSpeed = NpcData->WalkMovementMaxSpeed;
 

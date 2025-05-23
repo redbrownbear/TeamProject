@@ -51,10 +51,10 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 {
 	Super::UpdateTalk(DeltaTime);
 	
-	/*if (Player)
+	if (Player)
 	{
 		Owner->SetNpc(EQuestCharacter::Furiko);
-	}*/
+	}
 
 	if (Controller->GetConversationManager()->GetEndTalked())
 	{
@@ -77,11 +77,9 @@ void UFurikoFSMComponent::UpdateHide(float DeltaTime)
 {
 	Super::UpdateHide(DeltaTime);
 
-	//Controller->GetConversationManager()->SetStateChanged(true);
-
-	//if (Player)
-	//{
-	//	Owner->SetNpc(EQuestCharacter::Furiko);
-	//}
+	if (Player)
+	{
+		Owner->SetNpc(EQuestCharacter::Furiko);
+	}
 	 
 }

@@ -30,4 +30,6 @@ struct TEAMPROJECT_API FNPCDialogueTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere)
 	bool bIsEndConversation;
 
+	UPROPERTY(EditAnywhere)
+	bool bDoQuest;
 };

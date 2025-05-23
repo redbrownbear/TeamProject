@@ -87,6 +87,6 @@ public:
 	TArray<AHidePoint*> HidePoints;
 
 private:
-	float AcceptanceRadius = 50.0f;
+	float AcceptanceRadius = 150.0f;
 
 };
