@@ -1,14 +1,15 @@
 #include "NpcFSMComponent.h"
-#include "Actors/Controller/Npc/NpcController.h"
 #include "Actors/Npc/Npc.h"
+#include "Actors/Controller/Npc/NpcController.h"
 #include "Actors/Character/PlayerCharacter.h"
+#include "GameFramework/PC_InGame.h"
 
 #include "Navigation/PathFollowingComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
 
-#include "GameFramework/PC_InGame.h"
+#include "Actors/HidePoint/HidePoint.h"
 
 UNpcFSMComponent::UNpcFSMComponent()
 {
@@ -35,17 +36,6 @@ void UNpcFSMComponent::BeginPlay()
 		return;
 	}
 
-	Controller = Cast<ANpcController>(Owner->GetController());
-	if (Controller && Controller->GetConversationManager())
-	{
-		UConversationManagerComponent* ConversationManager = Controller->GetConversationManager();
-
-		if (!ConversationManager)
-		{
-			UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::BeginPlay // ConversationManager is null (from NPC)!"));
-		}
-	}
-	
 	if (APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0)))
 	{
 		Player = PlayerChar;
@@ -57,7 +47,29 @@ void UNpcFSMComponent::BeginPlay()
 		PC->SetNpc(Owner);
 	}
 
+	Controller = Cast<ANpcController>(Owner->GetController());
+	if (Controller && Controller->GetConversationManager())
+	{
+		UConversationManagerComponent* ConversationManager = Controller->GetConversationManager();
 
+		if (!ConversationManager)
+		{
+			UE_LOG(LogTemp, Error, TEXT("UNpcFSMComponent::BeginPlay // ConversationManager is null (from NPC)!"));
+		}
+	}
+
+	TArray<AActor*> Found;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHidePoint::StaticClass(), Found);
+
+	for (AActor* Actor : Found)
+	{
+		if (AHidePoint* HidePoint = Cast<AHidePoint>(Actor))
+		{
+			HidePoints.Add(HidePoint);
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("HidePoints 자동 수집 완료: %d개"), HidePoints.Num());
 }
 
 void UNpcFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -141,6 +153,7 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		break;	
 	case ENpcState::Hide:
 		Owner->PlayMontage(ENpcMontage::HIDE);
+		HideFuriko();
 		break;
 	case ENpcState::Sell:
 		Owner->PlayMontage(ENpcMontage::SELL);
@@ -151,6 +164,8 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 	default:
 		break;
 	}
+
+	Controller->GetConversationManager()->SetStateChanged(false);
 
 }
 
@@ -233,4 +248,36 @@ void UNpcFSMComponent::MoveToLocation(const FVector& InLocation)
 		UE_LOG(LogTemp, Error, TEXT("NpcFSMComponent::MoveToLocation // No NpcController"));
 		check(false);
 	}
+}
+
+void UNpcFSMComponent::HideFuriko()
+{
+	if (HidePoints.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HidePoints 배열이 비어있습니다."));
+		return;
+	}
+
+	// 랜덤 인덱스 선택
+	const int32 Index = FMath::RandRange(0, HidePoints.Num() - 1);
+	AHidePoint* Target = HidePoints[Index];
+
+	if (Target && Owner)
+	{
+		SetHideLocation(Target->GetActorLocation());
+
+		// <푸리코와 놀자!> 퀘스트 UI 생성할까 말까 윤호오빠랑 얘기해보기
+
+		UE_LOG(LogTemp, Log, TEXT("Furiko가 HidePoint %s 로 순간이동했습니다."), *Target->GetName());
+	}
+}
+
+void UNpcFSMComponent::SetHideLocation(FVector InLocation)
+{
+	if (!Owner) return;
+
+	// 순간 이동
+	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
+
+	UE_LOG(LogTemp, Log, TEXT("Furiko가 HidePoint로 이동했습니다: %s"), *InLocation.ToString());
 }

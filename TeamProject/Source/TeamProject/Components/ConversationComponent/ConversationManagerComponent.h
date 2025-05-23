@@ -30,6 +30,7 @@ public:
 	void LockCharacters(ANpc* Npc, APlayerCharacter* Player);
 	void UnlockCharacters(ANpc* Npc, APlayerCharacter* Player);
 
+	void SetStateChanged(bool IsStateChange) { bStateChange = IsStateChange; }
 	bool GetStateChanged() { return bStateChange; }
 
 private:

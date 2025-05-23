@@ -94,6 +94,9 @@ void UNPCDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 
 void UNPCDialogue::OnConfirm()
 {
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    PC_InGame->Npc->SetIsConfirmed(true);
+
     HideUI(UNPCDialogue::StaticClass());
 }
 
