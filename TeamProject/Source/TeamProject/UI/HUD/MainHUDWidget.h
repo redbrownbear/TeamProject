@@ -45,6 +45,7 @@ private:
 	UMaterialInstanceDynamic* DynamicMaterial;
 
 	float ElapsedTime;
+	float StaminaHideDelayTime;
 	bool bIsFullStamina;
 
 };

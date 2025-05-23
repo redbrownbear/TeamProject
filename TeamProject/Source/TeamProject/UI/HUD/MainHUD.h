@@ -19,6 +19,9 @@ private:
     virtual void BeginPlay() override;
 
 public:
+    void SetMainHUDVisible(bool bIsShow);
+
+public:
     void ShowInteractWidget(bool bIsShow);
     void ShowInteractName(bool bIsShow, FString Name);
 

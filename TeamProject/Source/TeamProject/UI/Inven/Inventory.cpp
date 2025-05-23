@@ -6,6 +6,8 @@
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/InventoryManager.h"
 
+#include "UI/HUD/MainHUD.h"
+
 #include "GameFramework/PC_InGame.h"
 
 
@@ -33,17 +35,36 @@ void UInventory::ShowUI()
 
         PC_InGame->SetInputMode(InputMode);
         PC_InGame->BindInventoryInput(this);
+
+        //HUD가리기
+        AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
+        if(HUD)
+            HUD->SetMainHUDVisible(false);
     }
 }
 
 void UInventory::HideUI(TSubclassOf<UBaseUI> UIClass)
 {
+    //HUD가리기
+
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    if (PC_InGame)
+    {
+        PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
+
+        AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
+        if (HUD)
+            HUD->SetMainHUDVisible(true);
+
+    }
+
     Super::HideUI(UInventory::StaticClass());
 }
 
 void UInventory::InitUI()
 {
     check(BP_InvenScroll); // BindWidget이 잘 됐는지 확인
+    check(BP_InvenEquip);
 }
 
 void UInventory::BindDelegates()
@@ -85,28 +106,59 @@ void UInventory::OnNavigate(const FInputActionValue& InputActionValue)
 
 void UInventory::OnConfirm(const FInputActionValue& InputActionValue)
 {
+    HideUI(UInventory::StaticClass());
 }
 
 void UInventory::OnCancel(const FInputActionValue& InputActionValue)
 {
+    HideUI(UInventory::StaticClass());
 }
 
 void UInventory::OnCreateItemTest(const FInputActionValue& InputActionValue)
 {
+    // 구조 바꿔야 함
     UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
     check(InvenManager);
 
     if (InvenManager)
     {
-        const FItemData* RowData = ItemDataTable->FindRow<FItemData>(FName("testItem"), TEXT("LookupItem"));
+        TArray<TSharedPtr<const FItemData>> FoundRows;
+        FItemData Item;
 
-        if (RowData)
+
+        TArray<FName> RowNames = ItemDataTable->GetRowNames();
+        for (const FName& RowName : RowNames)
         {
-            FItemData Item;
-            Item = *RowData;
+            FItemData* Row = ItemDataTable->FindRow<FItemData>(RowName, "Item");
+            if (Row)
+            {
+                // 원본 Row 복사본 생성
+                FItemData* NewRow = new FItemData(*Row);
+                TSharedPtr<const FItemData> SharedRow = MakeShareable(NewRow);
+         
+                FoundRows.Add(SharedRow);
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("Failed to find row for name: %s"), *RowName.ToString());
+            }
+        }
 
-            InvenManager->AddItem(Item);
+        if (!FoundRows.IsEmpty())
+        {
+            if (FoundRows.Num() > 0)
+            {
+                int32 RandomIndex = FMath::RandRange(0, FoundRows.Num() - 1);
+                TSharedPtr<const FItemData> RandomItem = (FoundRows)[RandomIndex];
+                InvenManager->AddItem(*RandomItem);
 
+                // 사용 예
+                UE_LOG(LogTemp, Log, TEXT("랜덤 Name: %s"), *RandomItem->Name);
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("아이템 데이터가 없거나 FoundRowsPtr가 null입니다."));
+            }
         }
     }
 }
@@ -114,4 +166,11 @@ void UInventory::OnCreateItemTest(const FInputActionValue& InputActionValue)
 void UInventory::RefreshInventory(const FItemData& ItemData)
 {
     BP_InvenScroll->AddItemSlot(ItemData);
+
+    RefreshEquip(ItemData);
+}
+
+void UInventory::RefreshEquip(const FItemData& ItemData)
+{
+    BP_InvenEquip->RefreshDescription(ItemData);
 }
