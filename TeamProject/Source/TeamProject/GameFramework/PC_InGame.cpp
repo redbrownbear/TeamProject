@@ -255,14 +255,16 @@ void APC_InGame::ShowDialogueUI()
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	if (UIManager)
+	UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+	check(QuestManager);
+
+	if (UIManager && QuestManager)
 	{
+		if (QuestManager->IsConversation())
+			return;
+
 		UIManager->ShowUI(UNPCDialogue::StaticClass());
-		UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
-		if (QuestManager)
-		{
-			QuestManager->ShowDialogue(EQuestCharacter::Furiko, 0);
-		}	
+		QuestManager->ShowDialogue(EQuestCharacter::Furiko, 0);
 	}
 }
 

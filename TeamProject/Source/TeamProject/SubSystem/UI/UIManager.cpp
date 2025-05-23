@@ -36,6 +36,7 @@ void UUIManager::LoadUIClass()
         {
             CachedInventoryClass->AddToViewport();
             CachedInventoryClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedInventoryClass->OnCreated();
             CachedUIs.Add(UInventory::StaticClass(), CachedInventoryClass);
         }
     }
@@ -47,6 +48,7 @@ void UUIManager::LoadUIClass()
         {
             CachedDialogueClass->AddToViewport();
             CachedDialogueClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedDialogueClass->OnCreated();
             CachedUIs.Add(UNPCDialogue::StaticClass(), CachedDialogueClass);
         }
     }
