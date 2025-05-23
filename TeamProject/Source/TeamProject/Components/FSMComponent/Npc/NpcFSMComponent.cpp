@@ -93,12 +93,6 @@ void UNpcFSMComponent::HandleState(float DeltaTime)
 	case ENpcState::Idle:
 		UpdateIdle(DeltaTime);
 		break;
-	case ENpcState::Sit:
-		UpdateSit(DeltaTime);
-		break;
-	case ENpcState::Stand:
-		UpdateStand(DeltaTime);
-		break;
 	case ENpcState::Walk:
 		UpdateWalk(DeltaTime);
 		break;
@@ -129,16 +123,12 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 
 	eCurrentState = NewState;
 
+	Controller->GetConversationManager()->SetEndTalked(false);
+
 	switch (NewState)
 	{
 	case ENpcState::Idle:
 		Owner->PlayMontage(ENpcMontage::IDLE);
-		break;
-	case ENpcState::Sit:
-		Owner->PlayMontage(ENpcMontage::SIT);
-		break;
-	case ENpcState::Stand:
-		Owner->PlayMontage(ENpcMontage::STAND);
 		break;
 	case ENpcState::Walk:
 		Owner->SetSpeedWalk();
@@ -149,6 +139,8 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		Owner->PlayMontage(ENpcMontage::RUN);
 		break;
 	case ENpcState::Talk:
+		// @TODO Play Sequence
+		//PlayInterectSequence();
 		Controller->GetConversationManager()->StartConversation(Owner, Player);
 		break;	
 	case ENpcState::Hide:
@@ -165,8 +157,6 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		break;
 	}
 
-	Controller->GetConversationManager()->SetStateChanged(false);
-
 }
 
 void UNpcFSMComponent::UpdateIdle(float DeltaTime)
@@ -178,16 +168,13 @@ void UNpcFSMComponent::UpdateIdle(float DeltaTime)
 	}
 }
 
-void UNpcFSMComponent::UpdateSit(float DeltaTime)
-{
-}
-
-void UNpcFSMComponent::UpdateStand(float DeltaTime)
-{
-}
-
 void UNpcFSMComponent::UpdateWalk(float DeltaTime)
 {
+	if (eCurrentState != ENpcState::Walk)
+	{
+		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Walk'"));
+		return;
+	}
 }
 
 void UNpcFSMComponent::UpdateRun(float DeltaTime)
@@ -206,29 +193,35 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 	{
 		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Talk'"));
 		return;
-	}
-
-	if (Player)
-	{	
-		FVector PlayerLocation = Player->GetActorLocation();
-		FVector NpcLocation = Owner->GetActorLocation();
-		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
-		SmoothRotateActorToDirection(Player, NpcLocation, DeltaTime);		
-	}			
+	}		
 
 }
 
 void UNpcFSMComponent::UpdateHide(float DeltaTime)
 {
-
+	if (eCurrentState != ENpcState::Hide)
+	{
+		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Hide'"));
+		return;
+	}
 }
 
 void UNpcFSMComponent::UpdateSell(float DeltaTime)
 {
+	if (eCurrentState != ENpcState::Sell)
+	{
+		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Sell'"));
+		return;
+	}
 }
 
 void UNpcFSMComponent::UpdateEnd(float DeltaTime)
 {
+	if (eCurrentState != ENpcState::End)
+	{
+		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::End'"));
+		return;
+	}
 }
 
 void UNpcFSMComponent::MoveToLocation(const FVector& InLocation)
@@ -279,5 +272,15 @@ void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 	// 순간 이동
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
 
-	UE_LOG(LogTemp, Log, TEXT("Furiko가 HidePoint로 이동했습니다: %s"), *InLocation.ToString());
+}
+
+void UNpcFSMComponent::PlayInterectSequence()
+{
+	/*if (Player)
+	{
+		FVector PlayerLocation = Player->GetActorLocation();
+		FVector NpcLocation = Owner->GetActorLocation();
+		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+		SmoothRotateActorToDirection(Player, NpcLocation, DeltaTime);
+	}*/
 }

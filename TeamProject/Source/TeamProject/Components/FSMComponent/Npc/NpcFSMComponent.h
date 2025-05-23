@@ -64,8 +64,6 @@ protected:
 	void ChangeState(ENpcState NewState);
 
 	virtual void UpdateIdle(float DeltaTime);
-	virtual void UpdateSit(float DeltaTime);
-	virtual void UpdateStand(float DeltaTime);
 	virtual void UpdateWalk(float DeltaTime);
 	virtual void UpdateRun(float DeltaTime);
 	virtual void UpdateTalk(float DeltaTime);
@@ -78,6 +76,8 @@ protected:
 
 	void HideFuriko();
 	void SetHideLocation(FVector InLocation);
+
+	void PlayInterectSequence();
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Teleport")

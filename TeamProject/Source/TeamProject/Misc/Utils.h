@@ -158,7 +158,6 @@ enum class ENpcState : uint8
 {
     Idle = 0,
     Sit,
-    Stand,
     Walk,
     Run,
     Talk,

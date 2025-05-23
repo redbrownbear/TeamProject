@@ -115,6 +115,9 @@ private:
 	UPROPERTY() // 퀘스트 수락 시 
 	bool bIsConfirm = false;
 
+	/*UPROPERTY()
+	bool bIsFound = false;*/
+
 protected:
 	// 상호작용 
 	UFUNCTION()

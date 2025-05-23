@@ -58,9 +58,6 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	case ENpcState::Sit:
 		bIsSit = true;
 		break;
-	case ENpcState::Stand:
-		bIsStand = true;
-		break;
 	case ENpcState::Run:
 		bIsRun = true;
 		break;

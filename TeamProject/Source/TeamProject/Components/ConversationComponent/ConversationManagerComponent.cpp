@@ -29,7 +29,7 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 		{
 			HUD->ShowInteractWidget(false);
 		}
-
+		
 		PC->ShowDialogueUI();
 	}	
 
@@ -39,7 +39,7 @@ void UConversationManagerComponent::EndConversation()
 {	
 	//UnlockCharacters(CurrentNpc, CurrentPlayer);	
 	
-	bStateChange = true;
+	bEndTalk = true;
 }
 
 void UConversationManagerComponent::BeginPlay()
