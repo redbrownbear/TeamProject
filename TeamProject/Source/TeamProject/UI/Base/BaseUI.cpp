@@ -5,6 +5,10 @@
 #include "SubSystem/UI/UIManager.h"
 #include "EngineUtils.h"
 
+void UBaseUI::OnCreated()
+{
+}
+
 void UBaseUI::ShowUI()
 {
     PauseAllPausableActors(true);

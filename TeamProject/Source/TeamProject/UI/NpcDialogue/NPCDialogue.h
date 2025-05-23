@@ -21,6 +21,7 @@ class TEAMPROJECT_API UNPCDialogue : public UBaseUI
 	GENERATED_BODY()
 
 public:
+	virtual void OnCreated() override;
 	virtual void ShowUI() override;
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 

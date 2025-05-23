@@ -23,11 +23,13 @@ class TEAMPROJECT_API UInventory : public UBaseUI
 	GENERATED_BODY()
 	
 public:
+	virtual void OnCreated() override;
 	virtual void ShowUI() override;
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
 private:
 	void InitUI();
+	void BindDelegates();
 
 public: //바인딩을 위해 퍼블릭선언
 	UFUNCTION()

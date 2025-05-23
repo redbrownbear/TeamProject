@@ -9,12 +9,34 @@
 #include "GameFramework/PC_InGame.h"
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
 
+void UNPCDialogue::OnCreated()
+{
+    InitUI();
+    BindDelegates();
+}
+
 void UNPCDialogue::ShowUI()
 {
 	Super::ShowUI();
 
-    InitUI();
-    BindDelegates();
+    ConfirmButton->SetVisibility(ESlateVisibility::Hidden);
+    CancelButton->SetVisibility(ESlateVisibility::Hidden);
+    ExtraButton->SetVisibility(ESlateVisibility::Hidden);
+
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    if (PC_InGame)
+    {
+
+        PC_InGame->ChangeInputContext(EInputContext::IC_Dialogue);
+
+        FInputModeGameAndUI InputMode;
+        InputMode.SetWidgetToFocus(TakeWidget());
+        InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+        InputMode.SetHideCursorDuringCapture(false);
+
+        PC_InGame->SetInputMode(InputMode);
+        PC_InGame->BindDialogueInput(this);
+    }
 }
 
 void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
@@ -52,27 +74,8 @@ void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 void UNPCDialogue::InitUI()
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-
-        PC_InGame->ChangeInputContext(EInputContext::IC_Dialogue);
-
-        FInputModeGameAndUI InputMode;
-        InputMode.SetWidgetToFocus(TakeWidget());
-        InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-        InputMode.SetHideCursorDuringCapture(false);
-
-        PC_InGame->SetInputMode(InputMode);
-        PC_InGame->BindDialogueInput(this);
-    }
-
     ConfirmButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnConfirm);
     CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancel);
-
-    ConfirmButton->SetVisibility(ESlateVisibility::Hidden);
-    CancelButton->SetVisibility(ESlateVisibility::Hidden);
-    ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UNPCDialogue::BindDelegates()

@@ -16,6 +16,7 @@ class TEAMPROJECT_API UBaseUI : public UUserWidget
 
 	
 public:
+	virtual void OnCreated();
 	virtual void ShowUI();	//명시적 초기화
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass);
 
