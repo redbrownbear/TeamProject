@@ -9,7 +9,6 @@
 #include "Kismet/KismetMathLibrary.h"
 
 UBokoblinAnimInstance::UBokoblinAnimInstance()
-	:Super()
 {
 }
 

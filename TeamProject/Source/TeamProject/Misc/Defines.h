@@ -29,3 +29,9 @@
 #define MONSTER_ATTACK_COOLTIME														4.f
 
 #define MONSTER_ATTACK_PROJECTILE_OFFSET											100.f
+
+#define LYNEL_DASH_GOAL_OFFSET														100.f
+#define LYNEL_FIRE_ATTACK_MAX_TIMES													3
+#define LYNEL_STUN_MAX_TIME															4.f
+#define LYNEL_RODEO_MAX_TIME														3.f
+#define LYNEL_HORN_ATTACK_MAX_PASS_LENGTH											300.f

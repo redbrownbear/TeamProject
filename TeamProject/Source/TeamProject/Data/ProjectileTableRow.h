@@ -17,15 +17,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	FTransform Transform = FTransform::Identity;
 
-	UPROPERTY(EditAnywhere, Category = "Projectile")
-	TSubclassOf<class AProjectile> ProjectileClass;
-
-public:
-	UPROPERTY(EditAnywhere, Category = "Target")
-	TSubclassOf<AActor> TargetActorClass0 = nullptr;
-	UPROPERTY(EditAnywhere, Category = "Target")
-	TSubclassOf<AActor> TargetActorClass1 = nullptr;
-
 public:
 	UPROPERTY(EditAnywhere, Category = "Collision")
 	TSubclassOf<UShapeComponent> CollisionClass/* = USphereComponent::StaticClass()*/;
@@ -51,4 +42,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere, Category = "Damage")
 	float Damage = 0.f;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "NiagaraEffect", meta = (RowType = "NiagaraEffectTableRow"))
+	FDataTableRowHandle NiagaraEffectTableRowHandle;
 };

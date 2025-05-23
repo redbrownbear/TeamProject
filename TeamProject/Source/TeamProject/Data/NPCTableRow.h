@@ -28,7 +28,7 @@ struct TEAMPROJECT_API FNPCTableRow : public FTableRowBase
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString Name;
 
-	//NPC¿ÍÀÇ ´ëÈ­ ½ºÅ©¸³Æ® °¡´ÉÇÏ¸é ¸Ç¾Æ·¡¿¡ ³öÁÖ¼¼¿ä
+	//NPCï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È­ ï¿½ï¿½Å©ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ ï¿½Ç¾Æ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, meta = (RowType = "/Script/TeamProject.DT_NPCDialogue"))
 	FDataTableRowHandle DialogueRowHandle;
 

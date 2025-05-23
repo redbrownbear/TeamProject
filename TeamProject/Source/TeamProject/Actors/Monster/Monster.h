@@ -89,5 +89,6 @@ public:
     void SetSpeedRun();
 
 public:
+    // No const to attach WorldWeapon to SkeletalMeshComponent
     USkeletalMeshComponent* GetSkeletalMeshComponent() const { return SkeletalMeshComponent; }
 };

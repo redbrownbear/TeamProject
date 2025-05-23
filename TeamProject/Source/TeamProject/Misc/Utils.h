@@ -24,6 +24,23 @@ namespace ProjectileName
     static inline FName Monster_PlayerAlert = TEXT("Monster_PlayerAlert");
     static inline FName Monster_CatchItem = TEXT("Monster_CatchItem");
     static inline FName Monster_Arrow = TEXT("Monster_Arrow");
+    static inline FName Monster_LynelAttack = TEXT("Monster_LynelAttack");
+    static inline FName Monster_LynelExplosion = TEXT("Monster_LynelExplosion");
+    static inline FName Monster_LynelFire = TEXT("Monster_LynelFire");
+    static inline FName Monster_LynelArrow = TEXT("Monster_LynelArrow");
+}
+
+namespace Monster_SocketName
+{
+    static inline FName Weapon_R = TEXT("Weapon_R");
+    static inline FName Weapon_L = TEXT("Weapon_L");
+    static inline FName Pod_A = TEXT("Pod_A");
+    static inline FName Pod_B = TEXT("Pod_B");
+    static inline FName Pod_C = TEXT("Pod_C");
+    static inline FName Pod_D = TEXT("Pod_D");
+    static inline FName Pod_Melee = TEXT("Pod_B");
+    static inline FName Pod_Bow = TEXT("Pod_C");
+    static inline FName Chin = TEXT("Chin");
 }
 
 
@@ -38,7 +55,7 @@ enum class EMonsterGroupType : uint8
 };
 
 UENUM()
-enum class EMonsterState : uint16
+enum class EMonsterState : uint8
 {
     Idle = 0,
     Patrol,
@@ -62,6 +79,7 @@ enum class EMonsterState : uint16
     Rebound,
     Rodeo,
     Stun,
+    Temp,
     End,
 };
 
@@ -80,14 +98,62 @@ enum class EMonsterMontage : uint8
     BOW_START,
     BOW_END,
     THROW,
+    SEARCH,
     DANCE_START,
     DANCE_END,
     WEAPON_CATCH,
     FIND,
     SIGNAL_START,
     SIGNAL_END,
+    APPEAR,
+    BOW_UPPER_START,
+    BOW_UPPER_END,
+    ATTACK_DASH_LSWORD_START,
+    ATTACK_DASH_LSWORD_END,
+    ATTACK_DASH_SWORD_START,
+    ATTACK_DASH_SWORD_END,
+    ATTACK_EXPLOSION_START,
+    ATTACK_EXPLOSION_END,
+    ATTACK_FIRE_START,
+    ATTACK_FIRE,
+    ATTACK_FIRE_END,
+    ATTACK_HORN_START,
+    ATTACK_HORN_END,
+    ATTACK_RUNNING_LSWORD_START,
+    ATTACK_RUNNING_LSWORD_END,
+    ATTACK_RUNNING_SWORD_START,
+    ATTACK_RUNNING_SWORD_END,
+    REBOUND,
+    RODEO_START,
+    RODEO_END,
+    STUN_START,
+    STUN_END,
+    TURN_180_L,
+    TURN_180_R,
+    DRAW_BOW,
+    SHEATH_BOW,
+    BOW_TO_SWORD,
+    SWORD_TO_BOW,
+    DRAW_LSWORD,
+    SHEATH_LSWORD,
     END,
 };
+
+UENUM()
+enum class ECombatIndex : uint8
+{
+    AimingBow = 0, 
+    DashAttack, 
+    ExplosionAttack, 
+    FireAttack, 
+    AimingBowUpper, 
+    HornAttack, 
+    RunningAttack,
+    End
+};
+
+
+
 
 UENUM()
 enum class EWeaponKind : uint8
@@ -139,6 +205,33 @@ inline void SmoothRotateActorToDirection(AActor* TargetActor, const FVector& Tar
     FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, InterpSpeed);
     TargetActor->SetActorRotation(NewRot);
 }
+
+inline float GetSideOfActor(AActor* A_Actor, AActor* B_Actor)
+{
+    if (!A_Actor || !B_Actor)
+    {
+        UE_LOG(LogTemp, Error, TEXT("GetSideOfActor // A_Actor or B_Actor is null"));
+        return 0.f;
+    }
+
+    FVector A_ForwardVector = A_Actor->GetActorForwardVector();
+    A_ForwardVector.Z = 0.f;
+    A_ForwardVector.Normalize();
+
+    FVector A_To_B_Vector = B_Actor->GetActorLocation() - A_Actor->GetActorLocation();
+    A_To_B_Vector.Z = 0.f;
+    A_To_B_Vector.Normalize();
+
+    FVector A_RightVector = A_Actor->GetActorRightVector();
+    A_RightVector.Z = 0.f;
+    A_RightVector.Normalize();
+
+    float DotProductResult = FVector::DotProduct(A_To_B_Vector, A_RightVector);
+
+    return DotProductResult;
+}
+
+
 
 UENUM()
 enum class EWeapon_Type

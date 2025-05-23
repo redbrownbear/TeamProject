@@ -45,5 +45,15 @@ protected:
 	bool bIsAimingBow = false;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsAimingBowUpper = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsAttackRunning = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsAttackHorn = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsAttackDash = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsRodeo = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsStun = false;
 
 };

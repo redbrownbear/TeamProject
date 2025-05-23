@@ -55,6 +55,30 @@ void UMonsterFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	HandleState(DeltaTime);
 }
 
+void UMonsterFSMComponent::SheathMeleeWeapon()
+{
+	CurrentWeapon = nullptr;
+	MeleeWeapon->AttachToMonster(Owner, Monster_SocketName::Pod_Melee);
+}
+
+void UMonsterFSMComponent::SheathBowWeapon()
+{
+	CurrentWeapon = nullptr;
+	BowWeapon->AttachToMonster(Owner, Monster_SocketName::Pod_Bow);
+}
+
+void UMonsterFSMComponent::DrawMeleeWeapon()
+{
+	CurrentWeapon = MeleeWeapon;
+	MeleeWeapon->AttachToMonster(Owner, Monster_SocketName::Weapon_R);
+}
+
+void UMonsterFSMComponent::DrawBowWeapon()
+{
+	CurrentWeapon = BowWeapon;
+	BowWeapon->AttachToMonster(Owner, Monster_SocketName::Weapon_R);
+}
+
 void UMonsterFSMComponent::SetMonsterGroupType(EMonsterGroupType NewGroupType)
 {
 	eGroupType = NewGroupType;
@@ -186,7 +210,7 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 		Owner->PlayMontage(EMonsterMontage::FIND);
 		break;
 	case EMonsterState::FindWeapon:
-		if (CatchedWeapon)
+		if (CurrentWeapon)
 		{
 			return;
 		}
@@ -391,7 +415,7 @@ void UMonsterFSMComponent::UpdateFindWeapon(float DeltaTime)
 			return;
 		}
 
-		if (CatchedWeapon)
+		if (CurrentWeapon)
 		{
 			UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdateFindWeapon // ToCatchWeapon, CatchedWeapon can't exist together "));
 			check(false);
@@ -484,9 +508,9 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 
 	if (CurrentAttackCoolTime > MONSTER_ATTACK_COOLTIME)
 	{
-		if (CatchedWeapon)
+		if (CurrentWeapon)
 		{
-			const EWeaponKind eWeaponKind = CatchedWeapon->GetWorldWeaponKind();
+			const EWeaponKind eWeaponKind = CurrentWeapon->GetWorldWeaponKind();
 			switch (eWeaponKind)
 			{
 			case EWeaponKind::SWORD:
@@ -581,11 +605,6 @@ void UMonsterFSMComponent::MoveToLocation(const FVector& InLocation)
 
 		FNavPathSharedPtr NavPath;
 		AIController->MoveTo(MoveRequest, &NavPath);
-		static int a = 0;
-		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::MoveToLocation Called %d"), a++);
-
-		if (a > 10) a = 0;
-
 	}
 	else
 	{

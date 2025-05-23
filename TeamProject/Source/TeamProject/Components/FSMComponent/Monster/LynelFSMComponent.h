@@ -4,11 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
+#include "Misc/Utils.h"
 #include "LynelFSMComponent.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class TEAMPROJECT_API ULynelFSMComponent : public UMonsterFSMComponent
 {
@@ -19,6 +17,28 @@ protected:
 public:
 	virtual void ChangeState(EMonsterState NewState) override;
 
+protected:
+	ECombatIndex eCombatIndex = ECombatIndex::AimingBow;
+	EMonsterState eNextState = EMonsterState::End;
+public:
+	EMonsterState GetNextState() const { return eNextState; }
+
+protected:
+	int32 FireAttackTimes = 0;
+public:
+	int32 GetFireAttackTimes() const { return FireAttackTimes; }
+	void SetFireAttack(int32 InTimes) { FireAttackTimes = InTimes; }
+
+protected:
+	FVector TargetLocation = FVector::Zero();
+
+
+protected:
+	bool bHornAttackPassed = false;
+
+protected:
+	float StunElapsedTime = 0.f;
+	float RodeoElapsedTime = 0.f;
 
 protected:
 	virtual void UpdateIdle(float DeltaTime) override;
@@ -37,9 +57,5 @@ protected:
 	virtual void UpdateRebound(float DeltaTime);
 	virtual void UpdateRodeo(float DeltaTime);
 	virtual void UpdateStun(float DeltaTime);
-
-
-
-
-
+	virtual void UpdateTemp(float DeltaTime);
 };

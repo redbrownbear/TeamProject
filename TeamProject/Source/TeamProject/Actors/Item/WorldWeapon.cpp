@@ -230,7 +230,7 @@ void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 					bool bSucceeded = this->AttachToComponent(
 						Monster->GetSkeletalMeshComponent(),
 						FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-						TEXT("RightWeapon"));
+						Monster_SocketName::Weapon_R);
 
 
 					Proj->Destroy();
@@ -246,12 +246,12 @@ void AWorldWeapon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-FName AWorldWeapon::GetWorldWeaponName()
+FName AWorldWeapon::GetWorldWeaponName() const
 {
 	return DataTableRowHandle.RowName;
 }
 
-EWeaponKind AWorldWeapon::GetWorldWeaponKind()
+EWeaponKind AWorldWeapon::GetWorldWeaponKind() const
 {
 	return ItemTableRow->eWeaponKind;
 }
@@ -259,5 +259,24 @@ EWeaponKind AWorldWeapon::GetWorldWeaponKind()
 void AWorldWeapon::AddForce(FVector _Direction, float Force)
 {
 	CollisionComponent->AddForce(Force * _Direction);
+}
+
+void AWorldWeapon::AttachToMonster(AMonster* Monster, FName SocketName)
+{
+	if (!IsValid(Monster)) { return; }
+
+	if (UMonsterFSMComponent* FSMComponent = Monster->GetFSMComponent())
+	{
+		bIsCatched = true;
+
+		// if PhyscisSimulates activated, AttachToComponent will fail
+		CollisionComponent->SetSimulatePhysics(false);
+		// Offset Changed to fix outlook
+		StaticMeshComponent->SetRelativeLocation(FVector::Zero());
+		bool bSucceeded = this->AttachToComponent(
+			Monster->GetSkeletalMeshComponent(),
+			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+			SocketName);
+	}
 }
 

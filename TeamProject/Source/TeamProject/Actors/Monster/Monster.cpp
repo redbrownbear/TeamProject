@@ -5,6 +5,7 @@
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Projectile/Projectile.h"
 #include "Actors/Character/PlayerCharacter.h"
+#include "Actors/Item/WorldWeapon.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
@@ -15,6 +16,7 @@
 #include "Perception/AISenseConfig_Sight.h"
 
 #include "Data/MonsterTableRow.h"
+#include "Data/ItemDataRow.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -114,6 +116,32 @@ void AMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	{
 		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
 	}
+
+	if (!(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
+	{
+		if (UWorld* World = GetWorld())
+		{
+			AWorldWeapon* MeleeWeapon = World->SpawnActorDeferred<AWorldWeapon>(AWorldWeapon::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+			MeleeWeapon->SetDataWithHandle(MonsterData->MeleeWeaponTableRowHandle);
+			MeleeWeapon->AttachToMonster(this, Monster_SocketName::Pod_B);
+			MeleeWeapon->FinishSpawning(FTransform::Identity);
+		}
+	}
+
+	if (!(MonsterData->BowWeaponTableRowHandle.IsNull()))
+	{
+		if (UWorld* World = GetWorld())
+		{
+			AWorldWeapon* BowWeapon = World->SpawnActorDeferred<AWorldWeapon>(AWorldWeapon::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+			BowWeapon->SetDataWithHandle(MonsterData->MeleeWeaponTableRowHandle);
+			BowWeapon->AttachToMonster(this, Monster_SocketName::Pod_C);
+			BowWeapon->FinishSpawning(FTransform::Identity);
+		}
+	}
+
+
 }
 
 void AMonster::PostDuplicate(EDuplicateMode::Type DuplicateMode)

@@ -28,9 +28,19 @@ public:
 public:
 	void SetOwner(AMonster* InOwner) { Owner = InOwner; }
 	void SetPlayer(APlayerCharacter* InPlayer) { Player = InPlayer; }
+public:
 	void SetToCatchWeapon(AWorldWeapon* InWW) { ToCatchWeapon = InWW; }
-	void SetCatchedWeapon(AWorldWeapon* InWW) { CatchedWeapon = InWW; }
+	void SetCatchedWeapon(AWorldWeapon* InWW) { CurrentWeapon = InWW; }
 	bool IsToCatchWeapon() { return ToCatchWeapon ? true : false; }
+	void SetMeleeWeapon(AWorldWeapon* InWW) { MeleeWeapon = InWW; }
+	void SetBowWeapon(AWorldWeapon* InWW) { BowWeapon = InWW; }
+
+public:
+	void SheathMeleeWeapon();
+	void SheathBowWeapon();
+	void DrawMeleeWeapon();
+	void DrawBowWeapon();
+	const AWorldWeapon* GetCurrentWeapon() const { return CurrentWeapon; }
 
 protected:
 	UPROPERTY()
@@ -40,7 +50,11 @@ protected:
 	UPROPERTY()
 	TObjectPtr<AWorldWeapon> ToCatchWeapon = nullptr;
 	UPROPERTY()
-	TObjectPtr<AWorldWeapon> CatchedWeapon = nullptr;
+	TObjectPtr<AWorldWeapon> CurrentWeapon = nullptr;
+	UPROPERTY()
+	TObjectPtr<AWorldWeapon> MeleeWeapon = nullptr;
+	UPROPERTY()
+	TObjectPtr<AWorldWeapon> BowWeapon = nullptr;
 
 protected:
 	EMonsterState			eCurrentState;
