@@ -16,12 +16,15 @@ UCLASS(Blueprintable, BlueprintType)
 class TEAMPROJECT_API UQuestDialogueManager : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
+
+private:
+	UQuestDialogueManager();
 	
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	void LoadDialogueData(UDataTable* DataTable);
 
-	TArray<const FNPCDialogueTableRow*> GetDialogueData(EQuestCharacter QusetChar) const;
+	TArray<TSharedPtr<const FNPCDialogueTableRow>> GetDialogueData(EQuestCharacter QusetChar) const;
 
 public:
 	void ShowDialogue(EQuestCharacter QusetChar, int32 DialogueID);
@@ -40,11 +43,11 @@ public:
 	FOnDisPlayDialogueUpdated OnDialogueUpdated;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* QuestDataTable;
 
 private:
-	TMap<EQuestCharacter, TArray<const FNPCDialogueTableRow*>> QuestRowMap;
+	TMap<EQuestCharacter, TArray<TSharedPtr<const FNPCDialogueTableRow>>> QuestRowMap;
 
 private:
 	bool bIsNowConversation = false;
