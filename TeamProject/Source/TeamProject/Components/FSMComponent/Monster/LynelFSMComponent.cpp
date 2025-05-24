@@ -8,6 +8,11 @@
 #include "Actors/Item/WorldWeapon.h"
 
 
+ULynelFSMComponent::ULynelFSMComponent()
+{
+	eCurrentState = EMonsterState::Idle;
+}
+
 void ULynelFSMComponent::HandleState(float DeltaTime)
 {
 	if (!Owner)
@@ -78,6 +83,9 @@ void ULynelFSMComponent::HandleState(float DeltaTime)
 		break;
 	case EMonsterState::Stun:
 		UpdateStun(DeltaTime);
+		break;
+	case EMonsterState::Temp:
+		UpdateTemp(DeltaTime);
 		break;
 	case EMonsterState::End:
 	default:
@@ -304,14 +312,14 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 				Direction.Z = 0.f; // ignore Z
 				Direction.Normalize();
 
-				FVector LeftDirection;
-				LeftDirection.X = -Direction.Y;
-				LeftDirection.Y = Direction.X;
-				LeftDirection.Z = 0.f; // ignore z
+				//FVector LeftDirection;
+				//LeftDirection.X = -Direction.Y;
+				//LeftDirection.Y = Direction.X;
+				//LeftDirection.Z = 0.f; // ignore z
 
-				LeftDirection.Normalize();
+				//LeftDirection.Normalize();
 
-				TargetLocation = PlayerLocation + (LeftDirection * LYNEL_DASH_GOAL_OFFSET);
+				TargetLocation = PlayerLocation + (Direction * LYNEL_DASH_GOAL_OFFSET);
 
 				Owner->PlayMontage(EMonsterMontage::ATTACK_DASH_LSWORD_START);
 			}
@@ -385,8 +393,8 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 				Owner->PlayMontage(EMonsterMontage::ATTACK_FIRE_START);
 				break;
 			case EWeaponKind::BOW:
-				Owner->PlayMontage(EMonsterMontage::BOW_TO_SWORD);
 				eNextState = EMonsterState::FireAttack;
+				Owner->PlayMontage(EMonsterMontage::BOW_TO_SWORD);
 				ChangeState(EMonsterState::Temp);
 				return;
 			case EWeaponKind::END:
@@ -398,8 +406,8 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		}
 		else
 		{
-			Owner->PlayMontage(EMonsterMontage::DRAW_LSWORD);
 			eNextState = EMonsterState::FireAttack;
+			Owner->PlayMontage(EMonsterMontage::DRAW_LSWORD);
 			ChangeState(EMonsterState::Temp);
 			return;
 		}
@@ -417,13 +425,13 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 			case EWeaponKind::SWORD:
 			case EWeaponKind::SPEAR:
 			case EWeaponKind::LSWORD:
-				Owner->PlayMontage(EMonsterMontage::SHEATH_LSWORD);
 				eNextState = EMonsterState::HornAttack;
+				Owner->PlayMontage(EMonsterMontage::SHEATH_LSWORD);
 				ChangeState(EMonsterState::Temp);
 				return;
 			case EWeaponKind::BOW:
-				Owner->PlayMontage(EMonsterMontage::SHEATH_BOW);
 				eNextState = EMonsterState::HornAttack;
+				Owner->PlayMontage(EMonsterMontage::SHEATH_BOW);
 				ChangeState(EMonsterState::Temp);
 				return;
 			case EWeaponKind::END:
@@ -435,6 +443,15 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		}
 		else
 		{
+			const FVector PlayerLocation = Player->GetActorLocation();
+			const FVector MonsterLocation = Owner->GetActorLocation();
+
+			FVector Direction = PlayerLocation - MonsterLocation;
+			Direction.Z = 0.f; // ignore Z
+			Direction.Normalize();
+
+			TargetLocation = PlayerLocation + (Direction * LYNEL_DASH_GOAL_OFFSET);
+
 			Owner->PlayMontage(EMonsterMontage::ATTACK_HORN_START);
 		}
 
@@ -478,14 +495,14 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 				Direction.Z = 0.f; // ignore Z
 				Direction.Normalize();
 
-				FVector LeftDirection;
-				LeftDirection.X = -Direction.Y;
-				LeftDirection.Y = Direction.X;
-				LeftDirection.Z = 0.f; // ignore z
+				//FVector LeftDirection;
+				//LeftDirection.X = -Direction.Y;
+				//LeftDirection.Y = Direction.X;
+				//LeftDirection.Z = 0.f; // ignore z
 
-				LeftDirection.Normalize();
+				//LeftDirection.Normalize();
 
-				TargetLocation = PlayerLocation + (LeftDirection * LYNEL_DASH_GOAL_OFFSET);
+				TargetLocation = PlayerLocation + (Direction * LYNEL_DASH_GOAL_OFFSET);
 
 				Owner->PlayMontage(EMonsterMontage::ATTACK_RUNNING_LSWORD_START);
 			}
@@ -533,10 +550,18 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 
 void ULynelFSMComponent::UpdateIdle(float DeltaTime)
 {
+	if (Player)
+	{
+		ChangeState(EMonsterState::Suspicious);
+	}
 }
 
 void ULynelFSMComponent::UpdatePatrol(float DeltaTime)
 {
+	if (Player)
+	{
+		ChangeState(EMonsterState::Suspicious);
+	}
 }
 
 void ULynelFSMComponent::UpdateSuspicious(float DeltaTime)
@@ -550,11 +575,12 @@ void ULynelFSMComponent::UpdateSuspicious(float DeltaTime)
 		const FVector PlayerLocation = Player->GetActorLocation();
 		const float fDistance = FVector::Dist(MonsterLocation, PlayerLocation);
 
-		if (SuspicionGauge >= MaxSuspicionGauge
+		if (SuspicionGauge >= MONSTER_MAX_SUSPICIOUS_GAUGE
 			|| fDistance < MONSTER_IMMEDIATE_ALERT_RADIUS
 			)
 		{
 			SuspicionGauge = 0.f;
+			InstantRotateActorToDirection(Owner, PlayerLocation);
 			ChangeState(EMonsterState::Alert);
 			return;
 		}
@@ -569,7 +595,7 @@ void ULynelFSMComponent::UpdateSuspicious(float DeltaTime)
 			SuspicionGauge += DeltaTime;
 		}
 
-		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime, 10.f);
 
 	}
 	else
@@ -594,22 +620,22 @@ void ULynelFSMComponent::UpdateCombat(float DeltaTime)
 		ChangeState(EMonsterState::AimingBow);
 		return;
 	case ECombatIndex::DashAttack:
-		ChangeState(EMonsterState::AimingBow);
+		ChangeState(EMonsterState::DashAttack);
 		return;
 	case ECombatIndex::ExplosionAttack:
-		ChangeState(EMonsterState::AimingBow);
+		ChangeState(EMonsterState::ExplosionAttack);
 		return;
 	case ECombatIndex::FireAttack:
-		ChangeState(EMonsterState::AimingBow);
+		ChangeState(EMonsterState::FireAttack);
 		return;
 	case ECombatIndex::AimingBowUpper:
-		ChangeState(EMonsterState::AimingBow);
+		ChangeState(EMonsterState::AimingBowUpper);
 		return;
 	case ECombatIndex::HornAttack:
-		ChangeState(EMonsterState::AimingBow);
+		ChangeState(EMonsterState::HornAttack);
 		return;
 	case ECombatIndex::RunningAttack:
-		ChangeState(EMonsterState::AimingBow);
+		ChangeState(EMonsterState::RunningAttack);
 		return;
 	case ECombatIndex::End:
 		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::UpdateCombat // Unexpected CombatIndex"));
@@ -675,7 +701,15 @@ void ULynelFSMComponent::UpdateDashAttack(float DeltaTime)
 	const FVector PlayerLocation = Player->GetActorLocation();
 	const FVector MonsterLocation = Owner->GetActorLocation();
 
-	MoveToLocation(TargetLocation);
+	if (Owner->IsPlayingMontage(EMonsterMontage::END))
+	{
+		this->StopMove();
+	}
+	else
+	{
+		MoveToLocation(PlayerLocation);
+	}
+
 
 	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, PlayerLocation, 150.f);
 
@@ -714,6 +748,7 @@ void ULynelFSMComponent::UpdateExplosionAttack(float DeltaTime)
 {
 	// Do Nothing
 	// Pattern will be handled in AnimNotify
+	this->StopMove();
 }
 
 void ULynelFSMComponent::UpdateFireAttack(float DeltaTime)
@@ -747,20 +782,22 @@ void ULynelFSMComponent::UpdateHornAttack(float DeltaTime)
 	}
 	else
 	{
-		MoveToLocation(TargetLocation);
+		MoveToLocation(PlayerLocation);
 	}
 
 
 	if (bHornAttackPassed)
 	{
+		Owner->PlayMontage(EMonsterMontage::ATTACK_HORN_END);
+		return;
 		const float fDist = FVector::Dist(PlayerLocation, MonsterLocation);
-		if (fDist > LYNEL_HORN_ATTACK_MAX_PASS_LENGTH)
-		{
-			// End
-			bHornAttackPassed = false;
-			Owner->PlayMontage(EMonsterMontage::ATTACK_HORN_END);
-			return;
-		}
+		//if (fDist > LYNEL_HORN_ATTACK_MAX_PASS_LENGTH)
+		//{
+		//	// End
+		//	bHornAttackPassed = false;
+		//	Owner->PlayMontage(EMonsterMontage::ATTACK_HORN_END);
+		//	return;
+		//}
 	}
 
 	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, PlayerLocation, 150.f);
@@ -784,16 +821,23 @@ void ULynelFSMComponent::UpdateRunningAttack(float DeltaTime)
 	const FVector PlayerLocation = Player->GetActorLocation();
 	const FVector MonsterLocation = Owner->GetActorLocation();
 
-	if (Owner->IsPlayingMontage(EMonsterMontage::END))
-	{
-		this->StopMove();
-	}
-	else
-	{
-		MoveToLocation(TargetLocation);
-	}
 
-	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, TargetLocation, 150.f);
+	FVector Direction = PlayerLocation - MonsterLocation;
+	Direction.Z = 0.f; // ignore Z
+	Direction.Normalize();
+
+	FVector LeftDirection;
+	LeftDirection.X = -Direction.Y;
+	LeftDirection.Y = Direction.X;
+	LeftDirection.Z = 0.f; // ignore z
+
+	LeftDirection.Normalize();
+
+	TargetLocation = PlayerLocation + (LeftDirection * LYNEL_DASH_GOAL_OFFSET);
+
+	MoveToLocation(TargetLocation);
+
+	const bool bIsNear = FVector::PointsAreNear(PlayerLocation, MonsterLocation, 150.f);
 
 	if (bIsNear)
 	{

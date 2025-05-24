@@ -361,7 +361,7 @@ void UMonsterFSMComponent::UpdateSuspicious(float DeltaTime)
 		const FVector PlayerLocation = Player->GetActorLocation();
 		const float fDistance = FVector::Dist(MonsterLocation, PlayerLocation);
 
-		if (SuspicionGauge >= MaxSuspicionGauge
+		if (SuspicionGauge >= MONSTER_MAX_SUSPICIOUS_GAUGE
 			|| fDistance < MONSTER_IMMEDIATE_ALERT_RADIUS
 			)
 		{

@@ -47,7 +47,7 @@ public:
     UMonsterFSMComponent* GetFSMComponent() const;
 
 protected:
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, meta = (RowType = "MonsterTableRow"))
     FDataTableRowHandle DataTableRowHandle;
     TObjectPtr<FMonsterTableRow> MonsterData;
 

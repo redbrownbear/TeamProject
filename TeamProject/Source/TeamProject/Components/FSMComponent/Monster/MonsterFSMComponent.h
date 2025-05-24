@@ -66,13 +66,10 @@ public:
 
 	void SetMonsterState(EMonsterState NewState) { eCurrentState = NewState; }	
 	void SetMonsterGroupType(EMonsterGroupType NewGroupType);
-
 protected:
 	float SuspicionGauge = 0.0f;
-	float MaxSuspicionGauge = MONSTER_MAX_SUSPICIOUS_GAUGE;
-
 	float SignalElapsedTime = 0.f;
-	float AimingBowElapsedTime = MONSTER_AIMINGBOW_MAX_TIME;
+	float AimingBowElapsedTime = 0.f;
 
 
 protected:

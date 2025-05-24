@@ -32,14 +32,14 @@ namespace ProjectileName
 
 namespace Monster_SocketName
 {
-    static inline FName Weapon_R = TEXT("Weapon_R");
-    static inline FName Weapon_L = TEXT("Weapon_L");
+    static inline FName Weapon_R = TEXT("Weapon_Right");
+    static inline FName Weapon_L = TEXT("Weapon_Light");
     static inline FName Pod_A = TEXT("Pod_A");
     static inline FName Pod_B = TEXT("Pod_B");
     static inline FName Pod_C = TEXT("Pod_C");
     static inline FName Pod_D = TEXT("Pod_D");
-    static inline FName Pod_Melee = TEXT("Pod_B");
-    static inline FName Pod_Bow = TEXT("Pod_C");
+    static inline FName Pod_Melee = TEXT("Pod_Melee");
+    static inline FName Pod_Bow = TEXT("Pod_Bow");
     static inline FName Chin = TEXT("Chin");
 }
 

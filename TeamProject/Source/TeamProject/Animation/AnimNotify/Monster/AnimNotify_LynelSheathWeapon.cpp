@@ -15,7 +15,6 @@ void UAnimNotify_LynelSheathWeapon::Notify(USkeletalMeshComponent* MeshComp, UAn
 		if (ULynelFSMComponent* FSMComponent = Cast<ULynelFSMComponent>(Monster->GetFSMComponent()))
 		{
 			const AWorldWeapon* WW = FSMComponent->GetCurrentWeapon();
-
 			const EWeaponKind eKind = WW->GetWorldWeaponKind();
 
 			switch (eKind)
@@ -23,10 +22,10 @@ void UAnimNotify_LynelSheathWeapon::Notify(USkeletalMeshComponent* MeshComp, UAn
 			case EWeaponKind::SWORD:
 			case EWeaponKind::SPEAR:
 			case EWeaponKind::LSWORD:
-				FSMComponent->DrawMeleeWeapon();
+				FSMComponent->SheathMeleeWeapon();
 				break;
 			case EWeaponKind::BOW:
-				FSMComponent->DrawBowWeapon();
+				FSMComponent->SheathBowWeapon();
 				break;
 			default:
 				break;

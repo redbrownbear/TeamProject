@@ -273,10 +273,15 @@ void AWorldWeapon::AttachToMonster(AMonster* Monster, FName SocketName)
 		CollisionComponent->SetSimulatePhysics(false);
 		// Offset Changed to fix outlook
 		StaticMeshComponent->SetRelativeLocation(FVector::Zero());
-		bool bSucceeded = this->AttachToComponent(
+		const bool bSucceeded = this->AttachToComponent(
 			Monster->GetSkeletalMeshComponent(),
 			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 			SocketName);
+
+		if (!bSucceeded)
+		{
+			check(false);
+		}
 	}
 }
 

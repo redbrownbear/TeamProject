@@ -55,5 +55,7 @@ protected:
 	bool bIsRodeo = false;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsStun = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsExplosion = false;
 
 };

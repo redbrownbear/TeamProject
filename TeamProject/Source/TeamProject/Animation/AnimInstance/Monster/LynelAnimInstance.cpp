@@ -55,6 +55,8 @@ void ULynelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsAttackDash = false;
 	bIsRodeo = false;
 	bIsStun = false;
+	bIsExplosion = false;
+
 
 	switch (eMonsterState)
 	{
@@ -68,7 +70,6 @@ void ULynelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsSuspicious = true;
 		break;
 	case EMonsterState::Alert:
-		check(false);
 		break;
 	case EMonsterState::Combat:
 		bIsRun = true;
@@ -100,7 +101,7 @@ void ULynelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsAttackDash = true;
 		break;
 	case EMonsterState::ExplosionAttack:
-		bIsIdle = true;
+		bIsExplosion = true;
 		break;
 	case EMonsterState::FireAttack:
 		bIsIdle = true;

@@ -124,8 +124,16 @@ void AMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 			AWorldWeapon* MeleeWeapon = World->SpawnActorDeferred<AWorldWeapon>(AWorldWeapon::StaticClass(),
 				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 			MeleeWeapon->SetDataWithHandle(MonsterData->MeleeWeaponTableRowHandle);
-			MeleeWeapon->AttachToMonster(this, Monster_SocketName::Pod_B);
+			const FVector Scale = MeleeWeapon->GetActorScale3D() * 2.f;
+			MeleeWeapon->SetActorScale3D(Scale);
+			MeleeWeapon->AttachToMonster(this, Monster_SocketName::Pod_Melee);
 			MeleeWeapon->FinishSpawning(FTransform::Identity);
+
+			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
+			{
+				FSMComponent->SetMeleeWeapon(MeleeWeapon);
+				FSMComponent->SheathMeleeWeapon();
+			}
 		}
 	}
 
@@ -135,9 +143,17 @@ void AMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		{
 			AWorldWeapon* BowWeapon = World->SpawnActorDeferred<AWorldWeapon>(AWorldWeapon::StaticClass(),
 				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-			BowWeapon->SetDataWithHandle(MonsterData->MeleeWeaponTableRowHandle);
-			BowWeapon->AttachToMonster(this, Monster_SocketName::Pod_C);
+			BowWeapon->SetDataWithHandle(MonsterData->BowWeaponTableRowHandle);
+			const FVector Scale = BowWeapon->GetActorScale3D() * 2.f;
+			BowWeapon->SetActorScale3D(Scale);
+			BowWeapon->AttachToMonster(this, Monster_SocketName::Pod_Bow);
 			BowWeapon->FinishSpawning(FTransform::Identity);
+
+			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
+			{
+				FSMComponent->SetBowWeapon(BowWeapon);
+				FSMComponent->SheathBowWeapon();
+			}
 		}
 	}
 
@@ -245,9 +261,100 @@ void AMonster::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 	case EMonsterMontage::SIGNAL_END:
 		TempAnimMontage = MonsterData->SignalEndMontage;
 		break;
-	case EMonsterMontage::END:
-		TempAnimMontage = nullptr;
+	case EMonsterMontage::APPEAR:
+		TempAnimMontage = MonsterData->APPEAR;
 		break;
+	case EMonsterMontage::BOW_UPPER_START:
+		TempAnimMontage = MonsterData->BOW_UPPER_START;
+		break;
+	case EMonsterMontage::BOW_UPPER_END:
+		TempAnimMontage = MonsterData->BOW_UPPER_END;
+		break;
+	case EMonsterMontage::ATTACK_DASH_LSWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_DASH_LSWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_DASH_LSWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_DASH_LSWORD_END;
+		break;
+	case EMonsterMontage::ATTACK_DASH_SWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_DASH_SWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_DASH_SWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_DASH_SWORD_END;
+		break;
+	case EMonsterMontage::ATTACK_EXPLOSION_START:
+		TempAnimMontage = MonsterData->ATTACK_EXPLOSION_START;
+		break;
+	case EMonsterMontage::ATTACK_EXPLOSION_END:
+		TempAnimMontage = MonsterData->ATTACK_EXPLOSION_END;
+		break;
+	case EMonsterMontage::ATTACK_FIRE_START:
+		TempAnimMontage = MonsterData->ATTACK_FIRE_START;
+		break;
+	case EMonsterMontage::ATTACK_FIRE:
+		TempAnimMontage = MonsterData->ATTACK_FIRE;
+		break;
+	case EMonsterMontage::ATTACK_FIRE_END:
+		TempAnimMontage = MonsterData->ATTACK_FIRE_END;
+		break;
+	case EMonsterMontage::ATTACK_HORN_START:
+		TempAnimMontage = MonsterData->ATTACK_HORN_START;
+		break;
+	case EMonsterMontage::ATTACK_HORN_END:
+		TempAnimMontage = MonsterData->ATTACK_HORN_END;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_LSWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_LSWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_LSWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_LSWORD_END;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_SWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_SWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_SWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_SWORD_END;
+		break;
+	case EMonsterMontage::REBOUND:
+		TempAnimMontage = MonsterData->REBOUND;
+		break;
+	case EMonsterMontage::RODEO_START:
+		TempAnimMontage = MonsterData->RODEO_START;
+		break;
+	case EMonsterMontage::RODEO_END:
+		TempAnimMontage = MonsterData->RODEO_END;
+		break;
+	case EMonsterMontage::STUN_START:
+		TempAnimMontage = MonsterData->STUN_START;
+		break;
+	case EMonsterMontage::STUN_END:
+		TempAnimMontage = MonsterData->STUN_END;
+		break;
+	case EMonsterMontage::TURN_180_L:
+		TempAnimMontage = MonsterData->TURN_180_L;
+		break;
+	case EMonsterMontage::TURN_180_R:
+		TempAnimMontage = MonsterData->TURN_180_R;
+		break;
+	case EMonsterMontage::DRAW_BOW:
+		TempAnimMontage = MonsterData->DRAW_BOW;
+		break;
+	case EMonsterMontage::SHEATH_BOW:
+		TempAnimMontage = MonsterData->SHEATH_BOW;
+		break;
+	case EMonsterMontage::BOW_TO_SWORD:
+		TempAnimMontage = MonsterData->BOW_TO_SWORD;
+		break;
+	case EMonsterMontage::SWORD_TO_BOW:
+		TempAnimMontage = MonsterData->SWORD_TO_BOW;
+		break;
+	case EMonsterMontage::DRAW_LSWORD:
+		TempAnimMontage = MonsterData->DRAW_LSWORD;
+		break;
+	case EMonsterMontage::SHEATH_LSWORD:
+		TempAnimMontage = MonsterData->SHEATH_LSWORD;
+	break;	
+	case EMonsterMontage::END:
 	default:
 	{
 		check(false);
@@ -330,6 +437,105 @@ bool AMonster::IsMontage(EMonsterMontage _InEnum)
 	case EMonsterMontage::FIND:
 		TempAnimMontage = MonsterData->FindMontage;
 		break;
+	case EMonsterMontage::SIGNAL_START:
+		TempAnimMontage = MonsterData->SignalStartMontage;
+		break;
+	case EMonsterMontage::SIGNAL_END:
+		TempAnimMontage = MonsterData->SignalEndMontage;
+		break;
+	case EMonsterMontage::APPEAR:
+		TempAnimMontage = MonsterData->APPEAR;
+		break;
+	case EMonsterMontage::BOW_UPPER_START:
+		TempAnimMontage = MonsterData->BOW_UPPER_START;
+		break;
+	case EMonsterMontage::BOW_UPPER_END:
+		TempAnimMontage = MonsterData->BOW_UPPER_END;
+		break;
+	case EMonsterMontage::ATTACK_DASH_LSWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_DASH_LSWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_DASH_LSWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_DASH_LSWORD_END;
+		break;
+	case EMonsterMontage::ATTACK_DASH_SWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_DASH_SWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_DASH_SWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_DASH_SWORD_END;
+		break;
+	case EMonsterMontage::ATTACK_EXPLOSION_START:
+		TempAnimMontage = MonsterData->ATTACK_EXPLOSION_START;
+		break;
+	case EMonsterMontage::ATTACK_EXPLOSION_END:
+		TempAnimMontage = MonsterData->ATTACK_EXPLOSION_END;
+		break;
+	case EMonsterMontage::ATTACK_FIRE_START:
+		TempAnimMontage = MonsterData->ATTACK_FIRE_START;
+		break;
+	case EMonsterMontage::ATTACK_FIRE:
+		TempAnimMontage = MonsterData->ATTACK_FIRE;
+		break;
+	case EMonsterMontage::ATTACK_FIRE_END:
+		TempAnimMontage = MonsterData->ATTACK_FIRE_END;
+		break;
+	case EMonsterMontage::ATTACK_HORN_START:
+		TempAnimMontage = MonsterData->ATTACK_HORN_START;
+		break;
+	case EMonsterMontage::ATTACK_HORN_END:
+		TempAnimMontage = MonsterData->ATTACK_HORN_END;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_LSWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_LSWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_LSWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_LSWORD_END;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_SWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_SWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_SWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_SWORD_END;
+		break;
+	case EMonsterMontage::REBOUND:
+		TempAnimMontage = MonsterData->REBOUND;
+		break;
+	case EMonsterMontage::RODEO_START:
+		TempAnimMontage = MonsterData->RODEO_START;
+		break;
+	case EMonsterMontage::RODEO_END:
+		TempAnimMontage = MonsterData->RODEO_END;
+		break;
+	case EMonsterMontage::STUN_START:
+		TempAnimMontage = MonsterData->STUN_START;
+		break;
+	case EMonsterMontage::STUN_END:
+		TempAnimMontage = MonsterData->STUN_END;
+		break;
+	case EMonsterMontage::TURN_180_L:
+		TempAnimMontage = MonsterData->TURN_180_L;
+		break;
+	case EMonsterMontage::TURN_180_R:
+		TempAnimMontage = MonsterData->TURN_180_R;
+		break;
+	case EMonsterMontage::DRAW_BOW:
+		TempAnimMontage = MonsterData->DRAW_BOW;
+		break;
+	case EMonsterMontage::SHEATH_BOW:
+		TempAnimMontage = MonsterData->SHEATH_BOW;
+		break;
+	case EMonsterMontage::BOW_TO_SWORD:
+		TempAnimMontage = MonsterData->BOW_TO_SWORD;
+		break;
+	case EMonsterMontage::SWORD_TO_BOW:
+		TempAnimMontage = MonsterData->SWORD_TO_BOW;
+		break;
+	case EMonsterMontage::DRAW_LSWORD:
+		TempAnimMontage = MonsterData->DRAW_LSWORD;
+		break;
+	case EMonsterMontage::SHEATH_LSWORD:
+		TempAnimMontage = MonsterData->SHEATH_LSWORD;
+		break;
 	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;
@@ -399,6 +605,105 @@ bool AMonster::IsPlayingMontage(EMonsterMontage _InEnum)
 	case EMonsterMontage::FIND:
 		TempAnimMontage = MonsterData->FindMontage;
 		break;
+	case EMonsterMontage::SIGNAL_START:
+		TempAnimMontage = MonsterData->SignalStartMontage;
+		break;
+	case EMonsterMontage::SIGNAL_END:
+		TempAnimMontage = MonsterData->SignalEndMontage;
+		break;
+	case EMonsterMontage::APPEAR:
+		TempAnimMontage = MonsterData->APPEAR;
+		break;
+	case EMonsterMontage::BOW_UPPER_START:
+		TempAnimMontage = MonsterData->BOW_UPPER_START;
+		break;
+	case EMonsterMontage::BOW_UPPER_END:
+		TempAnimMontage = MonsterData->BOW_UPPER_END;
+		break;
+	case EMonsterMontage::ATTACK_DASH_LSWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_DASH_LSWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_DASH_LSWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_DASH_LSWORD_END;
+		break;
+	case EMonsterMontage::ATTACK_DASH_SWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_DASH_SWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_DASH_SWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_DASH_SWORD_END;
+		break;
+	case EMonsterMontage::ATTACK_EXPLOSION_START:
+		TempAnimMontage = MonsterData->ATTACK_EXPLOSION_START;
+		break;
+	case EMonsterMontage::ATTACK_EXPLOSION_END:
+		TempAnimMontage = MonsterData->ATTACK_EXPLOSION_END;
+		break;
+	case EMonsterMontage::ATTACK_FIRE_START:
+		TempAnimMontage = MonsterData->ATTACK_FIRE_START;
+		break;
+	case EMonsterMontage::ATTACK_FIRE:
+		TempAnimMontage = MonsterData->ATTACK_FIRE;
+		break;
+	case EMonsterMontage::ATTACK_FIRE_END:
+		TempAnimMontage = MonsterData->ATTACK_FIRE_END;
+		break;
+	case EMonsterMontage::ATTACK_HORN_START:
+		TempAnimMontage = MonsterData->ATTACK_HORN_START;
+		break;
+	case EMonsterMontage::ATTACK_HORN_END:
+		TempAnimMontage = MonsterData->ATTACK_HORN_END;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_LSWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_LSWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_LSWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_LSWORD_END;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_SWORD_START:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_SWORD_START;
+		break;
+	case EMonsterMontage::ATTACK_RUNNING_SWORD_END:
+		TempAnimMontage = MonsterData->ATTACK_RUNNING_SWORD_END;
+		break;
+	case EMonsterMontage::REBOUND:
+		TempAnimMontage = MonsterData->REBOUND;
+		break;
+	case EMonsterMontage::RODEO_START:
+		TempAnimMontage = MonsterData->RODEO_START;
+		break;
+	case EMonsterMontage::RODEO_END:
+		TempAnimMontage = MonsterData->RODEO_END;
+		break;
+	case EMonsterMontage::STUN_START:
+		TempAnimMontage = MonsterData->STUN_START;
+		break;
+	case EMonsterMontage::STUN_END:
+		TempAnimMontage = MonsterData->STUN_END;
+		break;
+	case EMonsterMontage::TURN_180_L:
+		TempAnimMontage = MonsterData->TURN_180_L;
+		break;
+	case EMonsterMontage::TURN_180_R:
+		TempAnimMontage = MonsterData->TURN_180_R;
+		break;
+	case EMonsterMontage::DRAW_BOW:
+		TempAnimMontage = MonsterData->DRAW_BOW;
+		break;
+	case EMonsterMontage::SHEATH_BOW:
+		TempAnimMontage = MonsterData->SHEATH_BOW;
+		break;
+	case EMonsterMontage::BOW_TO_SWORD:
+		TempAnimMontage = MonsterData->BOW_TO_SWORD;
+		break;
+	case EMonsterMontage::SWORD_TO_BOW:
+		TempAnimMontage = MonsterData->SWORD_TO_BOW;
+		break;
+	case EMonsterMontage::DRAW_LSWORD:
+		TempAnimMontage = MonsterData->DRAW_LSWORD;
+		break;
+	case EMonsterMontage::SHEATH_LSWORD:
+		TempAnimMontage = MonsterData->SHEATH_LSWORD;
+	break;	
 	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;

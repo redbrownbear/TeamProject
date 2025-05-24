@@ -12,6 +12,9 @@ class TEAMPROJECT_API ULynelFSMComponent : public UMonsterFSMComponent
 {
 	GENERATED_BODY()
 	
+public:
+	ULynelFSMComponent();
+
 protected:
 	virtual void HandleState(float DeltaTime) override;
 public:
