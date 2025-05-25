@@ -84,6 +84,9 @@ void ULynelFSMComponent::HandleState(float DeltaTime)
 	case EMonsterState::Stun:
 		UpdateStun(DeltaTime);
 		break;
+	case EMonsterState::ReadyToAttack:
+		UpdateReadyToAttack(DeltaTime);
+		break;
 	case EMonsterState::Temp:
 		UpdateTemp(DeltaTime);
 		break;
@@ -153,6 +156,8 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Rodeo:
 		break;
 	case EMonsterState::Stun:
+		break;
+	case EMonsterState::ReadyToAttack:
 		break;
 	default:
 		break;
@@ -276,6 +281,13 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::DashAttack:
 	{
+		if (eReadyToAttackStep != EReadyToAttackStep::End)
+		{
+			eNextState = EMonsterState::RunningAttack;
+			ChangeState(EMonsterState::ReadyToAttack);
+			return;
+		}
+
 		if (CurrentWeapon)
 		{
 			EWeaponKind eKind = CurrentWeapon->GetWorldWeaponKind();
@@ -416,6 +428,13 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::HornAttack:
 	{
+		if (eReadyToAttackStep != EReadyToAttackStep::End)
+		{
+			eNextState = EMonsterState::RunningAttack;
+			ChangeState(EMonsterState::ReadyToAttack);
+			return;
+		}
+
 		bHornAttackPassed = false;
 		if (CurrentWeapon)
 		{
@@ -459,6 +478,14 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 	break;	
 	case EMonsterState::RunningAttack:
 	{
+		if (eReadyToAttackStep != EReadyToAttackStep::End)
+		{
+			eNextState = EMonsterState::RunningAttack;
+			ChangeState(EMonsterState::ReadyToAttack);
+			return;
+		}
+
+
 		if (CurrentWeapon)
 		{
 			EWeaponKind eKind = CurrentWeapon->GetWorldWeaponKind();
@@ -538,6 +565,8 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::Stun:
 		Owner->PlayMontage(EMonsterMontage::STUN_START);
+		break;
+	case EMonsterState::ReadyToAttack:
 		break;
 	case EMonsterState::Temp:
 		break;
@@ -899,6 +928,98 @@ void ULynelFSMComponent::UpdateStun(float DeltaTime)
 		StunElapsedTime = 0.f;
 		Owner->PlayMontage(EMonsterMontage::STUN_END);
 	}
+}
+
+void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
+{
+	if (!Player)
+	{
+		ChangeState(EMonsterState::Idle);
+		eReadyToAttackStep = EReadyToAttackStep::RunToLink;
+	}
+
+	const FVector PlayerLocation = Player->GetActorLocation();
+	const FVector MonsterLocation = Owner->GetActorLocation();
+
+	switch (eReadyToAttackStep)
+	{
+	case EReadyToAttackStep::RunToLink:
+	{
+		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+		if (!Owner->IsPlayingMontage(EMonsterMontage::GEAR_3_FORWARD))
+		{
+			Owner->PlayMontage(EMonsterMontage::GEAR_3_FORWARD);
+		}
+		const bool bIsNear = FVector::PointsAreNear(PlayerLocation, MonsterLocation, 300.f);
+		if (bIsNear)
+		{
+			eReadyToAttackStep = EReadyToAttackStep::TurnRight;
+			Owner->PlayMontage(EMonsterMontage::GEAR_3_RIGHT);
+		}
+	}	
+		break;
+	case EReadyToAttackStep::TurnRight:
+		if (LyenlTurnRightCount >= 2)
+		{
+			Owner->PlayMontage(EMonsterMontage::GEAR_3_FORWARD);
+			LyenlTurnRightCount = 0;
+			eReadyToAttackStep = EReadyToAttackStep::AwayFromLink;
+		}
+		else
+		{
+			if (!Owner->IsPlayingMontage(EMonsterMontage::GEAR_3_RIGHT))
+			{
+				Owner->PlayMontage(EMonsterMontage::GEAR_3_RIGHT);
+			}
+		}
+		break;
+	case EReadyToAttackStep::AwayFromLink:
+	{
+
+		FVector DirectionToPlayer = PlayerLocation - MonsterLocation;
+		DirectionToPlayer.Z = 0.f; // ignore Z
+		FVector NormalizedDirectionToPlayer = DirectionToPlayer.GetSafeNormal();
+		FVector DirectionAwayFromPlayer = -NormalizedDirectionToPlayer;
+		float DistanceToMoveAway = LYNEL_AWAY_FROM_LINK_OFFSET;
+		FVector AwayLocation = MonsterLocation + (DirectionAwayFromPlayer * DistanceToMoveAway);
+		SmoothRotateActorToDirection(Owner, AwayLocation, DeltaTime);
+
+		if (!Owner->IsPlayingMontage(EMonsterMontage::GEAR_3_FORWARD))
+		{
+			Owner->PlayMontage(EMonsterMontage::GEAR_3_FORWARD);
+		}
+
+		float fDistance = FVector::Dist(MonsterLocation, PlayerLocation);
+		if (fDistance > LYNEL_AWAY_FROM_LINK_OFFSET)
+		{
+			eReadyToAttackStep = EReadyToAttackStep::TurnLeft;
+			Owner->PlayMontage(EMonsterMontage::GEAR_3_LEFT);
+		}
+
+	}
+		break;
+	case EReadyToAttackStep::TurnLeft:
+		if (LyenlTurnLeftCount >= 2)
+		{
+			LyenlTurnLeftCount = 0;
+			eReadyToAttackStep = EReadyToAttackStep::End;
+			ChangeState(eNextState); // Horn or Dash or Running Attack
+		}
+		else
+		{
+			if (!Owner->IsPlayingMontage(EMonsterMontage::GEAR_3_LEFT))
+			{
+				Owner->PlayMontage(EMonsterMontage::GEAR_3_LEFT);
+			}
+		}
+		break;
+	case EReadyToAttackStep::End:
+		break;
+	default:
+		break;
+	}
+
+
 }
 
 void ULynelFSMComponent::UpdateTemp(float DeltaTime)

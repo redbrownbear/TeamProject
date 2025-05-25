@@ -354,11 +354,36 @@ void AMonster::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 	case EMonsterMontage::SHEATH_LSWORD:
 		TempAnimMontage = MonsterData->SHEATH_LSWORD;
 	break;	
+	case EMonsterMontage::GEAR_1_FORWARD:
+		TempAnimMontage = MonsterData->Gear_1_Forward;
+		break;
+	case EMonsterMontage::GEAR_1_LEFT:
+		TempAnimMontage = MonsterData->Gear_1_Left;
+		break;
+	case EMonsterMontage::GEAR_1_RIGHT:
+		TempAnimMontage = MonsterData->Gear_1_Right;
+		break;
+	case EMonsterMontage::GEAR_2_FORWARD:
+		TempAnimMontage = MonsterData->Gear_2_Forward;
+		break;
+	case EMonsterMontage::GEAR_2_LEFT:
+		TempAnimMontage = MonsterData->Gear_2_Left;
+		break;
+	case EMonsterMontage::GEAR_2_RIGHT:
+		TempAnimMontage = MonsterData->Gear_2_Right;
+		break;
+	case EMonsterMontage::GEAR_3_FORWARD:
+		TempAnimMontage = MonsterData->Gear_3_Forward;
+		break;
+	case EMonsterMontage::GEAR_3_LEFT:
+		TempAnimMontage = MonsterData->Gear_3_Left;
+		break;
+	case EMonsterMontage::GEAR_3_RIGHT:
+		TempAnimMontage = MonsterData->Gear_3_Right;
+		break;
 	case EMonsterMontage::END:
 	default:
-	{
 		check(false);
-	}
 		break;
 	}
 
@@ -536,6 +561,33 @@ bool AMonster::IsMontage(EMonsterMontage _InEnum)
 	case EMonsterMontage::SHEATH_LSWORD:
 		TempAnimMontage = MonsterData->SHEATH_LSWORD;
 		break;
+	case EMonsterMontage::GEAR_1_FORWARD:
+		TempAnimMontage = MonsterData->Gear_1_Forward;
+		break;
+	case EMonsterMontage::GEAR_1_LEFT:
+		TempAnimMontage = MonsterData->Gear_1_Left;
+		break;
+	case EMonsterMontage::GEAR_1_RIGHT:
+		TempAnimMontage = MonsterData->Gear_1_Right;
+		break;
+	case EMonsterMontage::GEAR_2_FORWARD:
+		TempAnimMontage = MonsterData->Gear_2_Forward;
+		break;
+	case EMonsterMontage::GEAR_2_LEFT:
+		TempAnimMontage = MonsterData->Gear_2_Left;
+		break;
+	case EMonsterMontage::GEAR_2_RIGHT:
+		TempAnimMontage = MonsterData->Gear_2_Right;
+		break;
+	case EMonsterMontage::GEAR_3_FORWARD:
+		TempAnimMontage = MonsterData->Gear_3_Forward;
+		break;
+	case EMonsterMontage::GEAR_3_LEFT:
+		TempAnimMontage = MonsterData->Gear_3_Left;
+		break;
+	case EMonsterMontage::GEAR_3_RIGHT:
+		TempAnimMontage = MonsterData->Gear_3_Right;
+		break;
 	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;
@@ -704,6 +756,33 @@ bool AMonster::IsPlayingMontage(EMonsterMontage _InEnum)
 	case EMonsterMontage::SHEATH_LSWORD:
 		TempAnimMontage = MonsterData->SHEATH_LSWORD;
 	break;	
+	case EMonsterMontage::GEAR_1_FORWARD:
+		TempAnimMontage = MonsterData->Gear_1_Forward;
+		break;
+	case EMonsterMontage::GEAR_1_LEFT:
+		TempAnimMontage = MonsterData->Gear_1_Left;
+		break;
+	case EMonsterMontage::GEAR_1_RIGHT:
+		TempAnimMontage = MonsterData->Gear_1_Right;
+		break;
+	case EMonsterMontage::GEAR_2_FORWARD:
+		TempAnimMontage = MonsterData->Gear_2_Forward;
+		break;
+	case EMonsterMontage::GEAR_2_LEFT:
+		TempAnimMontage = MonsterData->Gear_2_Left;
+		break;
+	case EMonsterMontage::GEAR_2_RIGHT:
+		TempAnimMontage = MonsterData->Gear_2_Right;
+		break;
+	case EMonsterMontage::GEAR_3_FORWARD:
+		TempAnimMontage = MonsterData->Gear_3_Forward;
+		break;
+	case EMonsterMontage::GEAR_3_LEFT:
+		TempAnimMontage = MonsterData->Gear_3_Left;
+		break;
+	case EMonsterMontage::GEAR_3_RIGHT:
+		TempAnimMontage = MonsterData->Gear_3_Right;
+		break;
 	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;

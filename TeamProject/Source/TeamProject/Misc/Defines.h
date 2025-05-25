@@ -35,3 +35,4 @@
 #define LYNEL_STUN_MAX_TIME															4.f
 #define LYNEL_RODEO_MAX_TIME														3.f
 #define LYNEL_HORN_ATTACK_MAX_PASS_LENGTH											300.f
+#define LYNEL_AWAY_FROM_LINK_OFFSET													1000.f

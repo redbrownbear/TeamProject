@@ -23,8 +23,16 @@ public:
 protected:
 	ECombatIndex eCombatIndex = ECombatIndex::AimingBow;
 	EMonsterState eNextState = EMonsterState::End;
+	EReadyToAttackStep eReadyToAttackStep = EReadyToAttackStep::RunToLink;
+	int32 LyenlTurnRightCount = 0;
+	int32 LyenlTurnLeftCount = 0;
+
 public:
 	EMonsterState GetNextState() const { return eNextState; }
+	void SetTurnRightCount(int32 Count) { LyenlTurnRightCount = Count; }	
+	void SetTurnLeftCount(int32 Count) { LyenlTurnLeftCount = Count; }
+	int32 GetTurnRightCount() const { return LyenlTurnRightCount; }
+	int32 GetTurnLeftCount() const { return LyenlTurnLeftCount; }	
 
 protected:
 	int32 FireAttackTimes = 0;
@@ -51,8 +59,8 @@ protected:
 	virtual void UpdateCombat(float DeltaTime) override;
 	virtual void UpdateAimingBow(float DeltaTime) override;
 	virtual void UpdateAimingBowUpper(float DeltaTime);
-	virtual void UpdateDashAttack(float DeltaTime);
 	virtual void UpdateExplosionAttack(float DeltaTime);
+	virtual void UpdateDashAttack(float DeltaTime);
 	virtual void UpdateFireAttack(float DeltaTime);
 	virtual void UpdateHornAttack(float DeltaTime);
 	virtual void UpdateRunningAttack(float DeltaTime);
@@ -60,5 +68,6 @@ protected:
 	virtual void UpdateRebound(float DeltaTime);
 	virtual void UpdateRodeo(float DeltaTime);
 	virtual void UpdateStun(float DeltaTime);
+	virtual void UpdateReadyToAttack(float DeltaTime);
 	virtual void UpdateTemp(float DeltaTime);
 };

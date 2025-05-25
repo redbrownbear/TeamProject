@@ -139,6 +139,24 @@ public: // Animation
 	UAnimMontage* DRAW_LSWORD = nullptr;
     UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* SHEATH_LSWORD = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_1_Forward = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_1_Left = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_1_Right = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_2_Forward = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_2_Left = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_2_Right = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_3_Forward = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_3_Left = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_3_Right = nullptr;
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Monster|AI")

@@ -79,6 +79,7 @@ enum class EMonsterState : uint8
     Rebound,
     Rodeo,
     Stun,
+    ReadyToAttack,
     Temp,
     End,
 };
@@ -136,6 +137,15 @@ enum class EMonsterMontage : uint8
     SWORD_TO_BOW,
     DRAW_LSWORD,
     SHEATH_LSWORD,
+    GEAR_1_FORWARD,
+    GEAR_1_LEFT,
+    GEAR_1_RIGHT,
+    GEAR_2_FORWARD,
+    GEAR_2_LEFT,
+    GEAR_2_RIGHT,
+    GEAR_3_FORWARD,
+    GEAR_3_LEFT,
+    GEAR_3_RIGHT,
     END,
 };
 
@@ -152,7 +162,15 @@ enum class ECombatIndex : uint8
     End
 };
 
-
+UENUM()
+enum class EReadyToAttackStep : uint8
+{
+    RunToLink = 0,
+    TurnRight,
+    AwayFromLink,
+    TurnLeft,
+    End
+};
 
 
 UENUM()
