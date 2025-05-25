@@ -64,6 +64,8 @@ public:
 
 	bool GetIsHide() { return bIsHide; }
 
+	bool GetDoQuest() { return bDoQuest; }
+
 	EQuestCharacter GetNpc() const { return QuestNpc; }
 
 public:
@@ -74,6 +76,8 @@ public:
 	void SetIsConfirmed(bool IsConfirm) { bIsConfirm = IsConfirm; }
 
 	void SetIsHide(bool IsHide) { bIsHide = IsHide; }
+
+	void SetDoQuest(bool IsQuest) { bDoQuest = IsQuest; }
 
 	void AttachToSocket();
 
@@ -121,6 +125,9 @@ private:
 
 	UPROPERTY()
 	bool bIsHide = false;
+
+	UPROPERTY()
+	bool bDoQuest = false;
 
 protected:
 	// 상호작용 

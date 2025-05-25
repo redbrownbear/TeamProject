@@ -47,7 +47,7 @@ void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
         PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
     }
 
-    //Close º¯¼ö°¡ ¾Æ·¡¿¡ ÀÖÀ»½Ã ÀÌ¹Ì WidgetÀÌ ²¨Áö±â ¶§¹®¿¡ À§Ä¡Á¶Á¤ÇÔ 
+    //Close ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ Widgetï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
 
     if (PC_InGame->Npc)
     {
@@ -98,6 +98,21 @@ void UNPCDialogue::OnConfirm()
     PC_InGame->Npc->SetIsConfirmed(true);
 
     HideUI(UNPCDialogue::StaticClass());
+
+    bool IsQuest = PC_InGame->Npc->GetDoQuest();
+
+    if (DialogueDataRow.bIsEndConversation && !IsQuest)
+    {
+        PC_InGame->Npc->SetDoQuest(true);
+
+        //DialogueDataRow.CurrentDialogueID = 101;
+    }
+    else
+    {
+        PC_InGame->Npc->SetDoQuest(false);
+
+        //DialogueDataRow.CurrentDialogueID = 0;
+    }
 }
 
 void UNPCDialogue::OnCancel()
@@ -133,7 +148,7 @@ void UNPCDialogue::UpdateTyping()
 {
     if (CurrentCharIndex >= FullText.Len())
     {
-        // Ãâ·Â ¿Ï·á
+        // ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½
         GetWorld()->GetTimerManager().ClearTimer(TypingTimerHandle);
         bIsTyping = false;
         return;
@@ -148,7 +163,7 @@ void UNPCDialogue::OnNextButtonClicked()
 {
     if (bIsTyping)
     {
-        // Å¸ÀÌÇÎ ÁßÀÌ¸é Áï½Ã ÀüÃ¼ ÅØ½ºÆ® Ãâ·Â
+        // Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½
         GetWorld()->GetTimerManager().ClearTimer(TypingTimerHandle);
         TextBox->SetText(FText::FromString(FullText));
         bIsTyping = false;
