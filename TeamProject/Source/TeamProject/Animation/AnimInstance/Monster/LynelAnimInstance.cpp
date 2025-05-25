@@ -31,6 +31,21 @@ void ULynelAnimInstance::NativeInitializeAnimation()
 void ULynelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
+
+	FRootMotionMovementParams RootMotion = ConsumeExtractedRootMotion(DeltaSeconds);
+
+	if (RootMotion.bHasRootMotion)
+	{
+		if (APawn* Pawn = TryGetPawnOwner())
+		{
+			FTransform Transform = RootMotion.GetRootMotionTransform();
+
+			Pawn->AddActorWorldOffset(Transform.GetTranslation(), true);
+			Pawn->AddActorWorldRotation(Transform.GetRotation().Rotator());
+		}
+	}
+
+
 	if (AMonster* Monster = Cast<AMonster>(TryGetPawnOwner()))
 	{
 		FSMComponent = Cast<ULynelFSMComponent>(Monster->GetFSMComponent());

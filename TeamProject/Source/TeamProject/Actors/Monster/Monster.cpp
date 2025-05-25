@@ -107,7 +107,9 @@ void AMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		SkeletalMeshComponent->SetRelativeLocation(FVector(0.0, 0.0, -MonsterData->CollisionSphereRadius));
 	}
 
-	
+
+
+
 	MovementComponent->MaxSpeed = MonsterData->WalkMovementMaxSpeed;
 
 	AIControllerClass = MonsterData->AIControllerClass;
