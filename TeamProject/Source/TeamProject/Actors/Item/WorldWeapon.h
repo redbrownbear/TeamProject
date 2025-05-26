@@ -52,7 +52,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UShapeComponent> CollisionComponent;
 	UPROPERTY(VisibleAnywhere)
-	class UStaticMeshComponent* StaticMeshComponent;
+	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UPhysicalMaterial> PhysicalMaterial;
 	UPROPERTY(VisibleAnywhere)

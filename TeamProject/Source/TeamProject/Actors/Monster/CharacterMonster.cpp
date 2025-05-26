@@ -214,7 +214,6 @@ void ACharacterMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 		{
 			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 			{
-
 				FSMComponent->ChangeState(EMonsterState::FindWeapon);
 				if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0))
 				{

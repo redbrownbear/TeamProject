@@ -218,8 +218,9 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 
 
 	case EMonsterState::FindWeapon:
-		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::ChangeState // Unexpected MonsterState"));
-		check(false);
+		// Called when Bokoblin's Alert on
+		// ignore it
+		return;
 		break;
 	case EMonsterState::Dead:
 		break;
