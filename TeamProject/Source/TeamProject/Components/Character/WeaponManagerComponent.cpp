@@ -352,6 +352,13 @@ void UWeaponManagerComponent::LeftClickAction()
 
 void UWeaponManagerComponent::RightClickAction()
 {
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+	if ("NULL" == Player_C->GetCharacterMovement()->GetMovementName())
+	{
+		return;
+	}
+
 	if (Equip_State == EEquip_State::None || Equip_State == EEquip_State::Sword)
 	{
 		return;
@@ -403,7 +410,7 @@ void UWeaponManagerComponent::RightClickEnd()
 		if (AnimInst->bIsZoom)
 		{
 
-			AnimInst->Montage_Stop(0.f);
+			
 
 			AnimInst->bIsZoom = false;
 
@@ -422,7 +429,7 @@ void UWeaponManagerComponent::RightClickEnd()
 	{
 		if (AnimInst->bIsWaitShield)
 		{
-			AnimInst->Montage_Stop(0.f);
+			
 
 			AnimInst->bIsWaitShield = false;
 

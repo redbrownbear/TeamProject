@@ -94,6 +94,8 @@ void AWeaponShield::LeftClickAction()
     {
         APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 
+        Player_C->GetWeaponManagerComponent()->SetCanShot(false);
+
         UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
         if (AnimInst->Montage_IsPlaying(Wait_MTG))
