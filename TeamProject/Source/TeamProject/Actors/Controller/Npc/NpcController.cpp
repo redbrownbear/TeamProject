@@ -15,7 +15,7 @@ ANpcController::ANpcController()
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 	ConversationManager = CreateDefaultSubobject<UConversationManagerComponent>(TEXT("ConversationManager"));
 
-	// ½Ã¾ß ¼³Á¤
+	// ï¿½Ã¾ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UAISenseConfig_Sight* SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 	SightConfig->SightRadius = 1500.0f;
 	SightConfig->LoseSightRadius = 1800.0f;
@@ -57,7 +57,7 @@ void ANpcController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 		if (APlayerCharacter* DetectedPlayer = Cast<APlayerCharacter>(SeenActor))
 		{
 			Player = DetectedPlayer;
-			break; // ÇÃ·¹ÀÌ¾î °¨Áö
+			break; // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½
 		}
 	}
 
@@ -76,7 +76,7 @@ void ANpcController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimul
 {
 	if (Stimulus.WasSuccessfullySensed())
 	{
-		// °¨ÁöµÊ
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		APlayerCharacter* Player = Cast<APlayerCharacter>(Actor);
 		if (!Player) return;
 		NpcFSMComponent->SetPlayer(Player);

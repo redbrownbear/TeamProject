@@ -2,14 +2,14 @@
 
 
 #include "Animation/AnimNotify/Monster/AnimNotify_LynelAttack.h"
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Projectile/Projectile.h"
 
 void UAnimNotify_LynelAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
-	if (AMonster* Monster = Cast<AMonster>(MeshComp->GetOwner()))
+	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(MeshComp->GetOwner()))
 	{
 		UWorld* World = MeshComp->GetWorld();
 
@@ -19,7 +19,7 @@ void UAnimNotify_LynelAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 		FTransform NewTransform;
 		Projectile->SetData(ProjectileName::Monster_LynelAttack, CollisionProfileName::ToPlayer);
 
-		const USkeletalMeshComponent* Mesh = Monster->GetSkeletalMeshComponent();
+		const USkeletalMeshComponent* Mesh = Monster->GetMonsterMesh();
 		const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Weapon_R);
 		NewTransform.SetLocation(Location);
 

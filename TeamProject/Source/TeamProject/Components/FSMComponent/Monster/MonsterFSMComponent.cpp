@@ -3,13 +3,18 @@
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
-#include "Actors/Monster/Monster.h"
 #include "Actors/Object/PatrolPath.h"
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Object/CampFire.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Projectile/Projectile.h"
 #include "Actors/Item/WorldWeapon.h"
+#include "Actors/Monster/MonsterInterface.h"
+#include "Actors/Monster/CharacterMonster.h"
+#include "Actors/Monster/PawnMonster.h"
+#include "Actors/Object/CampFire.h"
+#include "Actors/Object/PatrolPath.h"
+
 
 #include "Navigation/PathFollowingComponent.h"
 
@@ -58,25 +63,74 @@ void UMonsterFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 void UMonsterFSMComponent::SheathMeleeWeapon()
 {
 	CurrentWeapon = nullptr;
-	MeleeWeapon->AttachToMonster(Owner, Monster_SocketName::Pod_Melee);
+	if (CharacterMonster)
+	{
+		MeleeWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Pod_Melee);
+	}
+	else if (PawnMonster)
+	{
+		MeleeWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Pod_Melee);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::SheathMeleeWeapon // No CharacterMonster or PawnMonster"));
+		check(false);
+	}
 }
 
 void UMonsterFSMComponent::SheathBowWeapon()
 {
 	CurrentWeapon = nullptr;
-	BowWeapon->AttachToMonster(Owner, Monster_SocketName::Pod_Bow);
+	if (CharacterMonster)
+	{ 
+		BowWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Pod_Bow);
+	}
+	else if (PawnMonster)
+	{
+		MeleeWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Pod_Bow);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::SheathBowWeapon // No CharacterMonster or PawnMonster"));
+		check(false);
+	}
 }
 
 void UMonsterFSMComponent::DrawMeleeWeapon()
 {
 	CurrentWeapon = MeleeWeapon;
-	MeleeWeapon->AttachToMonster(Owner, Monster_SocketName::Weapon_R);
+	if (CharacterMonster)
+	{
+		MeleeWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Weapon_R);
+	}
+	else if (PawnMonster)
+	{
+		MeleeWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Weapon_R);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::DrawMeleeWeapon // No CharacterMonster or PawnMonster"))
+		check(false);
+	}
 }
 
 void UMonsterFSMComponent::DrawBowWeapon()
 {
 	CurrentWeapon = BowWeapon;
-	BowWeapon->AttachToMonster(Owner, Monster_SocketName::Weapon_R);
+
+	if (CharacterMonster)
+	{
+		BowWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Weapon_R);
+	}
+	else if (PawnMonster)
+	{
+		BowWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Weapon_R);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::DrawBowWeapon // No CharacterMonster or PawnMonster"));
+		check(false);
+	}
 }
 
 void UMonsterFSMComponent::SetMonsterGroupType(EMonsterGroupType NewGroupType)
@@ -108,9 +162,9 @@ void UMonsterFSMComponent::SetMonsterGroupType(EMonsterGroupType NewGroupType)
 
 void UMonsterFSMComponent::HandleState(float DeltaTime)
 {
-	if (!Owner)
+	if (!CharacterMonster && !PawnMonster)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // No Owner"));
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // No MonsterInterface.GetInterface()"));
 		check(false);
 		return;
 	}
@@ -171,9 +225,14 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Alert:
 		break;
 	case EMonsterState::Combat:
-	{
-		Owner->SetSpeedWalk();
-	}
+		if (PawnMonster)
+		{
+			PawnMonster->SetSpeedRun();
+		}
+		else if (CharacterMonster)
+		{
+			CharacterMonster->SetSpeedRun();
+		}
 		break;
 	case EMonsterState::FindWeapon:
 		break;
@@ -187,7 +246,14 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Dance:
 		break;
 	case EMonsterState::Signal:
-		Owner->PlayMontage(EMonsterMontage::SIGNAL_END);
+		if (PawnMonster)
+		{
+			PawnMonster->PlayMontage(EMonsterMontage::SIGNAL_END);
+		}
+		else if (CharacterMonster)
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::SIGNAL_END);
+		}
 		break;
 	case EMonsterState::AimingBow:
 		break;
@@ -207,7 +273,14 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Suspicious:
 		break;
 	case EMonsterState::Alert:
-		Owner->PlayMontage(EMonsterMontage::FIND);
+		if (PawnMonster)
+		{
+			PawnMonster->PlayMontage(EMonsterMontage::FIND);
+		}
+		else if (CharacterMonster)
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::FIND);
+		}
 		break;
 	case EMonsterState::FindWeapon:
 		if (CurrentWeapon)
@@ -217,23 +290,44 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 
 		if (PrevState != EMonsterState::Combat)
 		{
-			Owner->PlayMontage(EMonsterMontage::ANGRY);
+			if (PawnMonster)
+			{
+				PawnMonster->PlayMontage(EMonsterMontage::ANGRY);
+				PawnMonster->SetSpeedRun();
+			}
+			else if (CharacterMonster)
+			{
+				CharacterMonster->PlayMontage(EMonsterMontage::ANGRY);
+				CharacterMonster->SetSpeedRun();
+			}
 		}
-		
-		Owner->SetSpeedRun();
 		break;
 	case EMonsterState::Combat:
 		break;
 	case EMonsterState::AimingBow:
 		break;
 	case EMonsterState::Dance:
-		Owner->PlayMontage(EMonsterMontage::DANCE_START);
+		if (PawnMonster)
+		{
+			PawnMonster->PlayMontage(EMonsterMontage::DANCE_START);
+		}
+		else if (CharacterMonster)
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::DANCE_START);
+		}
 		break;
 	case EMonsterState::Signal:
+	{
+		if (PawnMonster)
 		{
-			Owner->PlayMontage(EMonsterMontage::SIGNAL_START);
-			SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
+			PawnMonster->PlayMontage(EMonsterMontage::SIGNAL_START);
 		}
+		else if (CharacterMonster)
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::SIGNAL_START);
+		}
+		SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
+	}
 		break;
 	default:
 		break;
@@ -257,12 +351,38 @@ void UMonsterFSMComponent::UpdateIdle(float DeltaTime)
 
 void UMonsterFSMComponent::UpdateDance(float DeltaTime)
 {
-	if (AActor* CampFireActor = Owner->GetCampFire())
+	if (!CharacterMonster && !PawnMonster)
 	{
-		const FVector CampFireLocation = CampFireActor->GetActorLocation();
-		SmoothRotateActorToDirection(Owner, CampFireLocation, DeltaTime);
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdateDance // No CharacterMonster or PawnMonster"));
+		check(false);
+		return;
 	}
 
+	
+	this->StopMove();
+
+	if (PawnMonster)
+	{
+		if (AActor* CampFireActor = PawnMonster->GetCampFire())
+		{
+			const FVector CampFireLocation = CampFireActor->GetActorLocation();
+			SmoothRotateActorToDirection(PawnMonster, CampFireLocation, DeltaTime);
+		}
+	}
+	else if (CharacterMonster)
+	{
+		if (AActor* CampFireActor = CharacterMonster->GetCampFire())
+		{
+			const FVector CampFireLocation = CampFireActor->GetActorLocation();
+			SmoothRotateActorToDirection(CharacterMonster, CampFireLocation, DeltaTime);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdateDance // No CharacterMonster or PawnMonster"));
+		check(false);
+		return;
+	}
 
 	if (Player)
 	{
@@ -272,17 +392,41 @@ void UMonsterFSMComponent::UpdateDance(float DeltaTime)
 
 void UMonsterFSMComponent::UpdateToDance(float DeltaTime)
 {
-	if (AActor* CampFireActor = Owner->GetCampFire())
+	if (!CharacterMonster && !PawnMonster)
 	{
-		const FVector CampFireLocation = CampFireActor->GetActorLocation();
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdateDance // No CharacterMonster or PawnMonster"));
+		check(false);
+		return;
+	}
 
-		MoveToLocation(CampFireLocation);
-
-		float fDistance = FVector::Dist(Owner->GetActorLocation(), CampFireLocation);
-		if (fDistance < MONSTER_CAMPFIRE_MIN_LENGTH)
+	if (PawnMonster)
+	{
+		if (AActor* CampFireActor = PawnMonster->GetCampFire())
 		{
-			this->StopMove();
-			ChangeState(EMonsterState::Dance);
+			const FVector CampFireLocation = CampFireActor->GetActorLocation();
+			MoveToLocation(CampFireLocation);
+			AActor* TempActor = Cast<AActor>(PawnMonster);
+			float fDistance = FVector::Dist(TempActor->GetActorLocation(), CampFireLocation);
+			if (fDistance < MONSTER_CAMPFIRE_MIN_LENGTH)
+			{
+				this->StopMove();
+				ChangeState(EMonsterState::Dance);
+			}
+		}
+	}
+	else if (CharacterMonster)
+	{
+		if (AActor* CampFireActor = CharacterMonster->GetCampFire())
+		{
+			const FVector CampFireLocation = CampFireActor->GetActorLocation();
+			MoveToLocation(CampFireLocation);
+			AActor* TempActor = Cast<AActor>(CharacterMonster);
+			float fDistance = FVector::Dist(TempActor->GetActorLocation(), CampFireLocation);
+			if (fDistance < MONSTER_CAMPFIRE_MIN_LENGTH)
+			{
+				this->StopMove();
+				ChangeState(EMonsterState::Dance);
+			}
 		}
 	}
 
@@ -306,35 +450,45 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 	// 목표 위치 구하기
 	FVector Location = FVector();
 
-	if (APatrolPath* PatrolPath = Owner->GetPatrolPath())
+	if (PawnMonster)
 	{
-		Location = PatrolPath->GetSplinePointLocation(CurrentPatrolIndex);
+		if (PatrolPath)
+		{
+			Location = PatrolPath->GetSplinePointLocation(CurrentPatrolIndex);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdatePatrol // No PatrolPath"));
+			check(false);
+			return;
+		}
 	}
-	else
+	else if (CharacterMonster)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdatePatrol // No PatrolPath"));
-		//check(false);
-		return;
+		if (PatrolPath)
+		{
+			Location = PatrolPath->GetSplinePointLocation(CurrentPatrolIndex);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::UpdatePatrol // No PatrolPath"));
+			check(false);
+			return;
+		}
 	}
 
-	// 이동
-	if (Owner->IsPlayingMontage(EMonsterMontage::END))
-	{
-		this->StopMove();
-	}
-	else
-	{
-		MoveToLocation(Location);
-	}
+	MoveToLocation(Location);
 
 	// 다음 PatrolIndex 구하기
-	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), Location, 150.f);
+	AActor* TempActor = CharacterMonster ? Cast<AActor>(CharacterMonster) : Cast<AActor>(PawnMonster);
+
+	const bool bIsNear = FVector::PointsAreNear(TempActor->GetActorLocation(), Location, 150.f);
 
 	if (bIsNear)
 	{
 		++CurrentPatrolIndex;
 
-		if (APatrolPath* PatrolPath = Owner->GetPatrolPath())
+		if (PatrolPath)
 		{
 			if (CurrentPatrolIndex >= PatrolPath->GetSplineMaxIndex())
 			{
@@ -357,7 +511,9 @@ void UMonsterFSMComponent::UpdateSuspicious(float DeltaTime)
 		this->StopMove();
 		SuspicionGauge += DeltaTime * MONSTER_SUSPICIOUS_COEFFICIENT;
 
-		const FVector MonsterLocation = Owner->GetActorLocation();
+		AActor* TempActor = CharacterMonster ? Cast<AActor>(CharacterMonster) : Cast<AActor>(PawnMonster);
+
+		const FVector MonsterLocation = TempActor->GetActorLocation();
 		const FVector PlayerLocation = Player->GetActorLocation();
 		const float fDistance = FVector::Dist(MonsterLocation, PlayerLocation);
 
@@ -382,7 +538,7 @@ void UMonsterFSMComponent::UpdateSuspicious(float DeltaTime)
 			SuspicionGauge += DeltaTime;
 		}
 
-		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+		SmoothRotateActorToDirection(TempActor, PlayerLocation, DeltaTime);
 
 	}
 	else
@@ -424,8 +580,10 @@ void UMonsterFSMComponent::UpdateFindWeapon(float DeltaTime)
 
 		// 이동
 		// Get Target Location
+		AActor* TempActor = CharacterMonster ? Cast<AActor>(CharacterMonster) : Cast<AActor>(PawnMonster);
+
 		FVector WeaponLocation = ToCatchWeapon->GetActorLocation();
-		FVector MonsterLocation = Owner->GetActorLocation();
+		FVector MonsterLocation = TempActor->GetActorLocation();
 		FVector PlayerLocation = Player->GetActorLocation();
 
 		const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
@@ -438,7 +596,7 @@ void UMonsterFSMComponent::UpdateFindWeapon(float DeltaTime)
 		}
 
 
-		if (Owner->IsPlayingMontage(EMonsterMontage::END))
+		if (PawnMonster && PawnMonster->IsPlayingMontage(EMonsterMontage::END))
 		{
 			this->StopMove();
 		}
@@ -452,8 +610,11 @@ void UMonsterFSMComponent::UpdateFindWeapon(float DeltaTime)
 		if (bIsNear)
 		{
 			this->StopMove();
-			InstantRotateActorToDirection(Owner, WeaponLocation);
-			Owner->PlayMontage(EMonsterMontage::WEAPON_CATCH);
+			InstantRotateActorToDirection(TempActor, WeaponLocation);
+			if (PawnMonster)
+			{
+				PawnMonster->PlayMontage(EMonsterMontage::WEAPON_CATCH);
+			}
 		}
 	}
 	else
@@ -472,7 +633,9 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 
 	// Get Target Location
 	FVector Location = Player->GetActorLocation();
-	FVector MonsterLocation = Owner->GetActorLocation();
+	AActor* TempActor = CharacterMonster ? Cast<AActor>(CharacterMonster) : Cast<AActor>(PawnMonster);
+
+	FVector MonsterLocation = TempActor->GetActorLocation();
 
 	const float fDistance = FVector::Dist(Location, MonsterLocation);
 	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
@@ -483,11 +646,7 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 	}
 
 
-
-
-	// Move
-	// 이동
-	if (Owner->IsPlayingMontage(EMonsterMontage::END))
+	if (PawnMonster && PawnMonster->IsPlayingMontage(EMonsterMontage::END))
 	{
 		this->StopMove();
 	}
@@ -517,26 +676,54 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 				if (bIsNear)
 				{
 					CurrentAttackCoolTime = 0.f;
-					Owner->PlayMontage(EMonsterMontage::ATTACK_SWORD);
+					if (PawnMonster)
+					{
+						PawnMonster->PlayMontage(EMonsterMontage::ATTACK_SWORD);
+					}
+					else if (CharacterMonster)
+					{
+						CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_SWORD);
+					}
 				}
 				break;
 			case EWeaponKind::SPEAR:
 				if (bIsNear)
 				{
 					CurrentAttackCoolTime = 0.f;
-					Owner->PlayMontage(EMonsterMontage::ATTACK_SPEAR);
+					if (PawnMonster)
+					{
+						PawnMonster->PlayMontage(EMonsterMontage::ATTACK_SPEAR);
+					}
+					else if (CharacterMonster)
+					{
+						CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_SPEAR);
+					}
 				}
 				break;
 			case EWeaponKind::LSWORD:
 				if (bIsNear)
 				{
 					CurrentAttackCoolTime = 0.f;
-					Owner->PlayMontage(EMonsterMontage::ATTACK_LSWORD);
+					if (PawnMonster)
+					{
+						PawnMonster->PlayMontage(EMonsterMontage::ATTACK_LSWORD);
+					}
+					else if (CharacterMonster)
+					{
+						CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_LSWORD);
+					}
 				}
 				break;
 			case EWeaponKind::BOW:
 				CurrentAttackCoolTime = 0.f;
-				Owner->PlayMontage(EMonsterMontage::BOW_START);
+				if (PawnMonster)
+				{
+					PawnMonster->PlayMontage(EMonsterMontage::BOW_START);
+				}
+				else if (CharacterMonster)
+				{
+					CharacterMonster->PlayMontage(EMonsterMontage::BOW_START);
+				}
 				ChangeState(EMonsterState::AimingBow);
 				break;
 			case EWeaponKind::END:
@@ -553,7 +740,14 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 				if (bIsNear)
 				{
 					CurrentAttackCoolTime = 0.f;
-					Owner->PlayMontage(EMonsterMontage::ATTACK);
+					if (PawnMonster)
+					{
+						PawnMonster->PlayMontage(EMonsterMontage::ATTACK);
+					}
+					else if (CharacterMonster)
+					{
+						CharacterMonster->PlayMontage(EMonsterMontage::ATTACK);
+					}
 				}
 			}
 		}
@@ -564,9 +758,11 @@ void UMonsterFSMComponent::UpdateSignal(float DeltaTime)
 {
 	SignalElapsedTime += DeltaTime;
 	this->StopMove();
+	AActor* TempActor = CharacterMonster ? Cast<AActor>(CharacterMonster) : Cast<AActor>(PawnMonster);
+
 	const FVector PlayerLocation = Player->GetActorLocation();
 
-	SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+	SmoothRotateActorToDirection(TempActor, PlayerLocation, DeltaTime);
 	if (SignalElapsedTime > MONSTER_MAX_SIGNAL_TIME)
 	{
 		ChangeState(EMonsterState::Combat);
@@ -585,57 +781,105 @@ void UMonsterFSMComponent::UpdateAimingBow(float DeltaTime)
 	this->StopMove();
 	AimingBowElapsedTime += DeltaTime;
 	const FVector PlayerLocation = Player->GetActorLocation();
-	SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+	AActor* TempActor = CharacterMonster ? Cast<AActor>(CharacterMonster) : Cast<AActor>(PawnMonster);
+
+	SmoothRotateActorToDirection(TempActor, PlayerLocation, DeltaTime);
 
 	if (AimingBowElapsedTime > MONSTER_AIMINGBOW_MAX_TIME)
 	{
 		AimingBowElapsedTime = 0.f;
-		Owner->PlayMontage(EMonsterMontage::BOW_END);
+		if (PawnMonster)
+		{
+			PawnMonster->PlayMontage(EMonsterMontage::BOW_END);
+		}
+		else if (CharacterMonster)
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::BOW_END);
+		}
 	}
 }
 
 void UMonsterFSMComponent::MoveToLocation(const FVector& InLocation)
 {
-
-	if (AAIController* AIController = Cast<AAIController>(Owner->GetController()))
+	if (CharacterMonster)
 	{
-		FAIMoveRequest MoveRequest;
-		MoveRequest.SetGoalLocation(InLocation);
-		MoveRequest.SetAcceptanceRadius(50.f);
+		if (AAIController* AIController = Cast<AAIController>(CharacterMonster->GetController()))
+		{
+			FAIMoveRequest MoveRequest;
+			MoveRequest.SetGoalLocation(InLocation);
+			MoveRequest.SetAcceptanceRadius(50.f);
 
-		FNavPathSharedPtr NavPath;
-		AIController->MoveTo(MoveRequest, &NavPath);
+			FNavPathSharedPtr NavPath;
+			AIController->MoveTo(MoveRequest, &NavPath);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UMonsterFSMComponent::MoveToLocation // No AIController"));
+			check(false);
+		}
 	}
-	else
+	else if (PawnMonster)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UMonsterFSMComponent::MoveToLocation // No AIController"));
-		check(false);
+		if (AAIController* AIController = Cast<AAIController>(PawnMonster->GetController()))
+		{
+			FAIMoveRequest MoveRequest;
+			MoveRequest.SetGoalLocation(InLocation);
+			MoveRequest.SetAcceptanceRadius(50.f);
+
+			FNavPathSharedPtr NavPath;
+			AIController->MoveTo(MoveRequest, &NavPath);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::MoveToLocation // No AIController"));
+			check(false);
+		}
 	}
 }
 
 void UMonsterFSMComponent::StopMove()
 {
-	if (AAIController* AIController = Cast<AAIController>(Owner->GetController()))
+	AActor* TempActor = CharacterMonster ? Cast<AActor>(CharacterMonster) : Cast<AActor>(PawnMonster);
+
+	if (CharacterMonster)
 	{
-		AIController->StopMovement();
+		if (AAIController* AIController = Cast<AAIController>(CharacterMonster->GetController()))
+		{
+			AIController->StopMovement();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::StopMove // No AIController"));
+			check(false);
+		}
 	}
-	else
+	else if (PawnMonster)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::StopMove // No AIController"));
-		check(false);
+		if (AAIController* AIController = Cast<AAIController>(PawnMonster->GetController()))
+		{
+			AIController->StopMovement();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::StopMove // No AIController"));
+			check(false);
+		}
 	}
+
 }
 
 void UMonsterFSMComponent::SpawnProjectile(FName ProjectileName, FName CollisionProfileName)
 {
 	UWorld* World = GetWorld();
 
+	AActor* TempActor = CharacterMonster ? Cast<AActor>(CharacterMonster) : Cast<AActor>(PawnMonster);
+
 	AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
-		FTransform::Identity, Owner, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		FTransform::Identity, TempActor, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 	FTransform NewTransform;
 	Projectile->SetData(ProjectileName, CollisionProfileName);
-	const FVector Location = Owner->GetActorLocation();
+	const FVector Location = TempActor->GetActorLocation();
 
 	NewTransform.SetLocation(Location);
 	NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());

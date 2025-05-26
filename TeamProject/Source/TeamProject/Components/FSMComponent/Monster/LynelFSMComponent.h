@@ -26,6 +26,10 @@ protected:
 	EReadyToAttackStep eReadyToAttackStep = EReadyToAttackStep::RunToLink;
 	int32 LyenlTurnRightCount = 0;
 	int32 LyenlTurnLeftCount = 0;
+	float StunElapsedTime = 0.f;
+	float RodeoElapsedTime = 0.f;
+	int32 FireAttackTimes = 0;
+	bool bHornAttackPassed = false;
 
 public:
 	EMonsterState GetNextState() const { return eNextState; }
@@ -33,23 +37,11 @@ public:
 	void SetTurnLeftCount(int32 Count) { LyenlTurnLeftCount = Count; }
 	int32 GetTurnRightCount() const { return LyenlTurnRightCount; }
 	int32 GetTurnLeftCount() const { return LyenlTurnLeftCount; }	
-
-protected:
-	int32 FireAttackTimes = 0;
-public:
 	int32 GetFireAttackTimes() const { return FireAttackTimes; }
 	void SetFireAttack(int32 InTimes) { FireAttackTimes = InTimes; }
 
 protected:
 	FVector TargetLocation = FVector::Zero();
-
-
-protected:
-	bool bHornAttackPassed = false;
-
-protected:
-	float StunElapsedTime = 0.f;
-	float RodeoElapsedTime = 0.f;
 
 protected:
 	virtual void UpdateIdle(float DeltaTime) override;

@@ -4,7 +4,7 @@
 #include "Animation/AnimInstance/Monster/LynelAnimInstance.h"
 #include "Components/FSMComponent/Monster/LynelFSMComponent.h"
 
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/CharacterMonster.h"
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -24,8 +24,10 @@ void ULynelAnimInstance::NativeInitializeAnimation()
 	}
 	else if (!Pawn) { return; }
 
-	AMonster* Monster = Cast<AMonster>(Pawn);
-	FSMComponent = Cast<ULynelFSMComponent>(Monster->GetFSMComponent());
+	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(Pawn))
+	{
+		FSMComponent = Cast<ULynelFSMComponent>(Monster->GetFSMComponent());
+	}
 }
 
 void ULynelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -34,19 +36,19 @@ void ULynelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	FRootMotionMovementParams RootMotion = ConsumeExtractedRootMotion(DeltaSeconds);
 
-	if (RootMotion.bHasRootMotion)
-	{
-		if (APawn* Pawn = TryGetPawnOwner())
-		{
-			FTransform Transform = RootMotion.GetRootMotionTransform();
+	//if (RootMotion.bHasRootMotion)
+	//{
+	//	if (APawn* Pawn = TryGetPawnOwner())
+	//	{
+	//		FTransform Transform = RootMotion.GetRootMotionTransform();
 
-			Pawn->AddActorWorldOffset(Transform.GetTranslation(), true);
-			Pawn->AddActorWorldRotation(Transform.GetRotation().Rotator());
-		}
-	}
+	//		Pawn->AddActorWorldOffset(Transform.GetTranslation(), true);
+	//		Pawn->AddActorWorldRotation(Transform.GetRotation().Rotator());
+	//	}
+	//}
 
 
-	if (AMonster* Monster = Cast<AMonster>(TryGetPawnOwner()))
+	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(TryGetPawnOwner()))
 	{
 		FSMComponent = Cast<ULynelFSMComponent>(Monster->GetFSMComponent());
 	}

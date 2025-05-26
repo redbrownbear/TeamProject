@@ -3,7 +3,7 @@
 
 #include "Animation/AnimNotify/Monster/AnimNotify_MonsterCatchItem.h"
 
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/PawnMonster.h"
 #include "Actors/Projectile/Projectile.h"
 
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
@@ -13,7 +13,7 @@ void UAnimNotify_MonsterCatchItem::Notify(USkeletalMeshComponent* MeshComp, UAni
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
-	if (AMonster* Monster = Cast<AMonster>(MeshComp->GetOwner()))
+	if (APawnMonster* Monster = Cast<APawnMonster>(MeshComp->GetOwner()))
 	{
 		UWorld* World = MeshComp->GetWorld();
 

@@ -4,7 +4,7 @@
 #include "Animation/AnimInstance/Monster/MoriblinAnimInstance.h"
 #include "Components/FSMComponent/Monster/MoriblinFSMComponent.h"
 
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/PawnMonster.h"
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -25,7 +25,7 @@ void UMoriblinAnimInstance::NativeInitializeAnimation()
 	}
 	else if (!Pawn) { return; }
 
-	AMonster* Monster = Cast<AMonster>(Pawn);
+	APawnMonster* Monster = Cast<APawnMonster>(Pawn);
 	FSMComponent = Cast<UMoriblinFSMComponent>(Monster->GetFSMComponent());
 
 }
@@ -33,7 +33,7 @@ void UMoriblinAnimInstance::NativeInitializeAnimation()
 void UMoriblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-	if (AMonster* Monster = Cast<AMonster>(TryGetPawnOwner()))
+	if (APawnMonster* Monster = Cast<APawnMonster>(TryGetPawnOwner()))
 	{
 		FSMComponent = Cast<UMoriblinFSMComponent>(Monster->GetFSMComponent());
 	}
@@ -83,7 +83,7 @@ void UMoriblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		break;
 	case EMonsterState::Combat:
 	{
-		if (AMonster* Monster = Cast<AMonster>(TryGetPawnOwner()))
+		if (APawnMonster* Monster = Cast<APawnMonster>(TryGetPawnOwner()))
 		{
 			const double Speed = UKismetMathLibrary::VSizeXY(Monster->GetMovementComponent()->Velocity);
 			if (FMath::IsNearlyZero(Speed))

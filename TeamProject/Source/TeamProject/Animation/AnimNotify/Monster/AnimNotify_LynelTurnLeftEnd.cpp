@@ -3,12 +3,12 @@
 
 #include "AnimNotify_LynelTurnLeftEnd.h"
 
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/CharacterMonster.h"
 #include "Components/FSMComponent/Monster/LynelFSMComponent.h"
 
 void UAnimNotify_LynelTurnLeftEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-	if (AMonster* Monster = Cast<AMonster>(MeshComp->GetOwner()))
+	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(MeshComp->GetOwner()))
 	{
 		if (UMonsterFSMComponent* FSMComponent = Monster->GetFSMComponent())
 		{

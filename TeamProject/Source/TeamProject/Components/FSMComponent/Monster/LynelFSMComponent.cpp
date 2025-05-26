@@ -3,7 +3,8 @@
 
 #include "Components/FSMComponent/Monster/LynelFSMComponent.h"
 
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/MonsterInterface.h"
+#include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Item/WorldWeapon.h"
 
@@ -15,9 +16,9 @@ ULynelFSMComponent::ULynelFSMComponent()
 
 void ULynelFSMComponent::HandleState(float DeltaTime)
 {
-	if (!Owner)
+	if (!CharacterMonster)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // No Owner"));
+		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // No CharacterMonster"));
 		check(false);
 		return;
 	}
@@ -172,16 +173,16 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::Suspicious:
 	{
-		float ReturnValue = GetSideOfActor(Owner, Player);
+		float ReturnValue = GetSideOfActor(CharacterMonster, Player);
 		// RightSide
 		if (ReturnValue > 0.f)
-			Owner->PlayMontage(EMonsterMontage::TURN_180_R);
+			CharacterMonster->PlayMontage(EMonsterMontage::TURN_180_R);
 		else
-			Owner->PlayMontage(EMonsterMontage::TURN_180_L);
+			CharacterMonster->PlayMontage(EMonsterMontage::TURN_180_L);
 	}
 		break;
 	case EMonsterState::Alert:
-		Owner->PlayMontage(EMonsterMontage::SIGNAL_START);
+		CharacterMonster->PlayMontage(EMonsterMontage::SIGNAL_START);
 		// @TODO : Effect
 		break;
 	case EMonsterState::Combat:
@@ -236,22 +237,24 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::AimingBow:
 		if (CurrentWeapon)
 		{
+
+
 			// Holding Melee
 			if (CurrentWeapon->GetWorldWeaponKind() != EWeaponKind::BOW)
 			{
-				Owner->PlayMontage(EMonsterMontage::SWORD_TO_BOW);
+				CharacterMonster->PlayMontage(EMonsterMontage::SWORD_TO_BOW);
 				ChangeState(EMonsterState::Temp);
 				eNextState = EMonsterState::AimingBow;
 			}
 			// Holding Bow
 			else
 			{
-				Owner->PlayMontage(EMonsterMontage::BOW_START);
+				CharacterMonster->PlayMontage(EMonsterMontage::BOW_START);
 			}
 		}
 		else
 		{
-			Owner->PlayMontage(EMonsterMontage::DRAW_BOW);
+			CharacterMonster->PlayMontage(EMonsterMontage::DRAW_BOW);
 			ChangeState(EMonsterState::Temp);
 			eNextState = EMonsterState::AimingBow;
 		}
@@ -262,19 +265,19 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 			// Holding Melee
 			if (CurrentWeapon->GetWorldWeaponKind() != EWeaponKind::BOW)
 			{
-				Owner->PlayMontage(EMonsterMontage::SWORD_TO_BOW);
+				CharacterMonster->PlayMontage(EMonsterMontage::SWORD_TO_BOW);
 				ChangeState(EMonsterState::Temp);
 				eNextState = EMonsterState::AimingBowUpper;
 			}
 			// Holding Bow
 			else
 			{
-				Owner->PlayMontage(EMonsterMontage::BOW_UPPER_START);
+				CharacterMonster->PlayMontage(EMonsterMontage::BOW_UPPER_START);
 			}
 		}
 		else
 		{
-			Owner->PlayMontage(EMonsterMontage::DRAW_BOW);
+			CharacterMonster->PlayMontage(EMonsterMontage::DRAW_BOW);
 			ChangeState(EMonsterState::Temp);
 			eNextState = EMonsterState::AimingBowUpper;
 		}
@@ -296,7 +299,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 			case EWeaponKind::SWORD:
 			{
 				const FVector PlayerLocation = Player->GetActorLocation();
-				const FVector MonsterLocation = Owner->GetActorLocation();
+				const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 				FVector Direction = PlayerLocation - MonsterLocation;
 				Direction.Z = 0.f; // ignore Z
@@ -311,14 +314,14 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 
 				TargetLocation = PlayerLocation + (LeftDirection * LYNEL_DASH_GOAL_OFFSET);
 
-				Owner->PlayMontage(EMonsterMontage::ATTACK_DASH_SWORD_START);
+				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_DASH_SWORD_START);
 			}
 				break;
 			case EWeaponKind::SPEAR:
 			case EWeaponKind::LSWORD:
 			{
 				const FVector PlayerLocation = Player->GetActorLocation();
-				const FVector MonsterLocation = Owner->GetActorLocation();
+				const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 				FVector Direction = PlayerLocation - MonsterLocation;
 				Direction.Z = 0.f; // ignore Z
@@ -333,11 +336,11 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 
 				TargetLocation = PlayerLocation + (Direction * LYNEL_DASH_GOAL_OFFSET);
 
-				Owner->PlayMontage(EMonsterMontage::ATTACK_DASH_LSWORD_START);
+				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_DASH_LSWORD_START);
 			}
 				break;
 			case EWeaponKind::BOW:
-				Owner->PlayMontage(EMonsterMontage::BOW_TO_SWORD);
+				CharacterMonster->PlayMontage(EMonsterMontage::BOW_TO_SWORD);
 				eNextState = EMonsterState::DashAttack;
 				ChangeState(EMonsterState::Temp);
 				return;
@@ -350,7 +353,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		}
 		else
 		{
-			Owner->PlayMontage(EMonsterMontage::DRAW_LSWORD);
+			CharacterMonster->PlayMontage(EMonsterMontage::DRAW_LSWORD);
 			eNextState = EMonsterState::DashAttack;
 			ChangeState(EMonsterState::Temp);
 			return;
@@ -368,10 +371,10 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 			case EWeaponKind::SWORD:
 			case EWeaponKind::SPEAR:
 			case EWeaponKind::LSWORD:
-				Owner->PlayMontage(EMonsterMontage::ATTACK_EXPLOSION_START);
+				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_EXPLOSION_START);
 				break;
 			case EWeaponKind::BOW:
-				Owner->PlayMontage(EMonsterMontage::BOW_TO_SWORD);
+				CharacterMonster->PlayMontage(EMonsterMontage::BOW_TO_SWORD);
 				eNextState = EMonsterState::ExplosionAttack;
 				ChangeState(EMonsterState::Temp);
 				return;
@@ -384,7 +387,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		}
 		else
 		{
-			Owner->PlayMontage(EMonsterMontage::DRAW_LSWORD);
+			CharacterMonster->PlayMontage(EMonsterMontage::DRAW_LSWORD);
 			eNextState = EMonsterState::ExplosionAttack;
 			ChangeState(EMonsterState::Temp);
 			return;
@@ -402,11 +405,11 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 			case EWeaponKind::SWORD:
 			case EWeaponKind::SPEAR:
 			case EWeaponKind::LSWORD:
-				Owner->PlayMontage(EMonsterMontage::ATTACK_FIRE_START);
+				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_FIRE_START);
 				break;
 			case EWeaponKind::BOW:
 				eNextState = EMonsterState::FireAttack;
-				Owner->PlayMontage(EMonsterMontage::BOW_TO_SWORD);
+				CharacterMonster->PlayMontage(EMonsterMontage::BOW_TO_SWORD);
 				ChangeState(EMonsterState::Temp);
 				return;
 			case EWeaponKind::END:
@@ -419,7 +422,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		else
 		{
 			eNextState = EMonsterState::FireAttack;
-			Owner->PlayMontage(EMonsterMontage::DRAW_LSWORD);
+			CharacterMonster->PlayMontage(EMonsterMontage::DRAW_LSWORD);
 			ChangeState(EMonsterState::Temp);
 			return;
 		}
@@ -445,12 +448,12 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 			case EWeaponKind::SPEAR:
 			case EWeaponKind::LSWORD:
 				eNextState = EMonsterState::HornAttack;
-				Owner->PlayMontage(EMonsterMontage::SHEATH_LSWORD);
+				CharacterMonster->PlayMontage(EMonsterMontage::SHEATH_LSWORD);
 				ChangeState(EMonsterState::Temp);
 				return;
 			case EWeaponKind::BOW:
 				eNextState = EMonsterState::HornAttack;
-				Owner->PlayMontage(EMonsterMontage::SHEATH_BOW);
+				CharacterMonster->PlayMontage(EMonsterMontage::SHEATH_BOW);
 				ChangeState(EMonsterState::Temp);
 				return;
 			case EWeaponKind::END:
@@ -463,7 +466,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		else
 		{
 			const FVector PlayerLocation = Player->GetActorLocation();
-			const FVector MonsterLocation = Owner->GetActorLocation();
+			const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 			FVector Direction = PlayerLocation - MonsterLocation;
 			Direction.Z = 0.f; // ignore Z
@@ -471,7 +474,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 
 			TargetLocation = PlayerLocation + (Direction * LYNEL_DASH_GOAL_OFFSET);
 
-			Owner->PlayMontage(EMonsterMontage::ATTACK_HORN_START);
+			CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_HORN_START);
 		}
 
 	}
@@ -494,7 +497,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 			case EWeaponKind::SWORD:
 			{
 				const FVector PlayerLocation = Player->GetActorLocation();
-				const FVector MonsterLocation = Owner->GetActorLocation();
+				const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 				FVector Direction = PlayerLocation - MonsterLocation;
 				Direction.Z = 0.f; // ignore Z
@@ -509,14 +512,14 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 
 				TargetLocation = PlayerLocation + (LeftDirection * LYNEL_DASH_GOAL_OFFSET);
 
-				Owner->PlayMontage(EMonsterMontage::ATTACK_RUNNING_SWORD_START);
+				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_RUNNING_SWORD_START);
 			}
 			break;
 			case EWeaponKind::SPEAR:
 			case EWeaponKind::LSWORD:
 			{
 				const FVector PlayerLocation = Player->GetActorLocation();
-				const FVector MonsterLocation = Owner->GetActorLocation();
+				const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 				FVector Direction = PlayerLocation - MonsterLocation;
 				Direction.Z = 0.f; // ignore Z
@@ -531,11 +534,11 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 
 				TargetLocation = PlayerLocation + (Direction * LYNEL_DASH_GOAL_OFFSET);
 
-				Owner->PlayMontage(EMonsterMontage::ATTACK_RUNNING_LSWORD_START);
+				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_RUNNING_LSWORD_START);
 			}
 				break;
 			case EWeaponKind::BOW:
-				Owner->PlayMontage(EMonsterMontage::BOW_TO_SWORD);
+				CharacterMonster->PlayMontage(EMonsterMontage::BOW_TO_SWORD);
 				eNextState = EMonsterState::RunningAttack;
 				ChangeState(EMonsterState::Temp);
 				return;
@@ -548,7 +551,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		}
 		else
 		{
-			Owner->PlayMontage(EMonsterMontage::DRAW_LSWORD);
+			CharacterMonster->PlayMontage(EMonsterMontage::DRAW_LSWORD);
 			eNextState = EMonsterState::RunningAttack;
 			ChangeState(EMonsterState::Temp);
 			return;
@@ -556,15 +559,15 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 
 	}
 		break;
-	// Monster's Attack Blocked
+	// CharacterMonster's Attack Blocked
 	case EMonsterState::Rebound:
-		Owner->PlayMontage(EMonsterMontage::REBOUND);
+		CharacterMonster->PlayMontage(EMonsterMontage::REBOUND);
 		break;
 	case EMonsterState::Rodeo:
-		Owner->PlayMontage(EMonsterMontage::RODEO_START);
+		CharacterMonster->PlayMontage(EMonsterMontage::RODEO_START);
 		break;
 	case EMonsterState::Stun:
-		Owner->PlayMontage(EMonsterMontage::STUN_START);
+		CharacterMonster->PlayMontage(EMonsterMontage::STUN_START);
 		break;
 	case EMonsterState::ReadyToAttack:
 		break;
@@ -600,7 +603,7 @@ void ULynelFSMComponent::UpdateSuspicious(float DeltaTime)
 		this->StopMove();
 		SuspicionGauge += DeltaTime * MONSTER_SUSPICIOUS_COEFFICIENT;
 
-		const FVector MonsterLocation = Owner->GetActorLocation();
+		const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 		const FVector PlayerLocation = Player->GetActorLocation();
 		const float fDistance = FVector::Dist(MonsterLocation, PlayerLocation);
 
@@ -609,7 +612,7 @@ void ULynelFSMComponent::UpdateSuspicious(float DeltaTime)
 			)
 		{
 			SuspicionGauge = 0.f;
-			InstantRotateActorToDirection(Owner, PlayerLocation);
+			InstantRotateActorToDirection(CharacterMonster, PlayerLocation);
 			ChangeState(EMonsterState::Alert);
 			return;
 		}
@@ -624,7 +627,7 @@ void ULynelFSMComponent::UpdateSuspicious(float DeltaTime)
 			SuspicionGauge += DeltaTime;
 		}
 
-		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime, 10.f);
+		SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 10.f);
 
 	}
 	else
@@ -683,15 +686,16 @@ void ULynelFSMComponent::UpdateAimingBow(float DeltaTime)
 		return;
 	}
 
+
 	this->StopMove();
 	AimingBowElapsedTime += DeltaTime;
 	const FVector PlayerLocation = Player->GetActorLocation();
-	SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 
 	if (AimingBowElapsedTime > MONSTER_AIMINGBOW_MAX_TIME)
 	{
 		AimingBowElapsedTime = 0.f;
-		Owner->PlayMontage(EMonsterMontage::BOW_END);
+		CharacterMonster->PlayMontage(EMonsterMontage::BOW_END);
 	}
 }
 
@@ -707,19 +711,19 @@ void ULynelFSMComponent::UpdateAimingBowUpper(float DeltaTime)
 	this->StopMove();
 	AimingBowElapsedTime += DeltaTime;
 	const FVector PlayerLocation = Player->GetActorLocation();
-	SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 
 	if (AimingBowElapsedTime > MONSTER_AIMINGBOW_MAX_TIME)
 	{
 		AimingBowElapsedTime = 0.f;
-		Owner->PlayMontage(EMonsterMontage::BOW_UPPER_END);
+		CharacterMonster->PlayMontage(EMonsterMontage::BOW_UPPER_END);
 	}
 
 }
 
 void ULynelFSMComponent::UpdateDashAttack(float DeltaTime)
 {
-	// In this case, Lynel will dash to Link's left position
+	// In this case, CharacterMonster will dash to Link's left position
 
 	if (!Player)
 	{
@@ -728,9 +732,9 @@ void ULynelFSMComponent::UpdateDashAttack(float DeltaTime)
 	}
 
 	const FVector PlayerLocation = Player->GetActorLocation();
-	const FVector MonsterLocation = Owner->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
-	if (Owner->IsPlayingMontage(EMonsterMontage::END))
+	if (CharacterMonster->IsPlayingMontage(EMonsterMontage::END))
 	{
 		this->StopMove();
 	}
@@ -750,11 +754,11 @@ void ULynelFSMComponent::UpdateDashAttack(float DeltaTime)
 			switch (WeaponKind)
 			{
 			case EWeaponKind::SWORD:
-				Owner->PlayMontage(EMonsterMontage::ATTACK_DASH_SWORD_END);
+				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_DASH_SWORD_END);
 				break;
 			case EWeaponKind::SPEAR:
 			case EWeaponKind::LSWORD:
-				Owner->PlayMontage(EMonsterMontage::ATTACK_DASH_LSWORD_END);
+				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_DASH_LSWORD_END);
 				break;
 			case EWeaponKind::BOW:
 			case EWeaponKind::END:
@@ -791,7 +795,7 @@ void ULynelFSMComponent::UpdateFireAttack(float DeltaTime)
 
 	this->StopMove();
 	const FVector PlayerLocation = Player->GetActorLocation();
-	SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
+	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 }
 
 void ULynelFSMComponent::UpdateHornAttack(float DeltaTime)
@@ -803,9 +807,9 @@ void ULynelFSMComponent::UpdateHornAttack(float DeltaTime)
 	}
 
 	const FVector PlayerLocation = Player->GetActorLocation();
-	const FVector MonsterLocation = Owner->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
-	if (Owner->IsPlayingMontage(EMonsterMontage::ATTACK_HORN_START))
+	if (CharacterMonster->IsPlayingMontage(EMonsterMontage::ATTACK_HORN_START))
 	{
 		this->StopMove();
 	}
@@ -817,14 +821,14 @@ void ULynelFSMComponent::UpdateHornAttack(float DeltaTime)
 
 	if (bHornAttackPassed)
 	{
-		Owner->PlayMontage(EMonsterMontage::ATTACK_HORN_END);
+		CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_HORN_END);
 		return;
 		const float fDist = FVector::Dist(PlayerLocation, MonsterLocation);
 		//if (fDist > LYNEL_HORN_ATTACK_MAX_PASS_LENGTH)
 		//{
 		//	// End
 		//	bHornAttackPassed = false;
-		//	Owner->PlayMontage(EMonsterMontage::ATTACK_HORN_END);
+		//	CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_HORN_END);
 		//	return;
 		//}
 	}
@@ -839,7 +843,7 @@ void ULynelFSMComponent::UpdateHornAttack(float DeltaTime)
 
 void ULynelFSMComponent::UpdateRunningAttack(float DeltaTime)
 {
-	// In this case, Lynel will dash to Link's left position
+	// In this case, CharacterMonster will dash to Link's left position
 
 	if (!Player)
 	{
@@ -848,7 +852,7 @@ void ULynelFSMComponent::UpdateRunningAttack(float DeltaTime)
 	}
 
 	const FVector PlayerLocation = Player->GetActorLocation();
-	const FVector MonsterLocation = Owner->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 
 	FVector Direction = PlayerLocation - MonsterLocation;
@@ -876,11 +880,11 @@ void ULynelFSMComponent::UpdateRunningAttack(float DeltaTime)
 			switch (WeaponKind)
 			{
 			case EWeaponKind::SWORD:
-				Owner->PlayMontage(EMonsterMontage::ATTACK_RUNNING_SWORD_END);
+				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_RUNNING_SWORD_END);
 				break;
 			case EWeaponKind::SPEAR:
 			case EWeaponKind::LSWORD:
-				Owner->PlayMontage(EMonsterMontage::ATTACK_RUNNING_LSWORD_END);
+				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_RUNNING_LSWORD_END);
 				break;
 			case EWeaponKind::BOW:
 			case EWeaponKind::END:
@@ -915,7 +919,7 @@ void ULynelFSMComponent::UpdateRodeo(float DeltaTime)
 	if (RodeoElapsedTime > LYNEL_RODEO_MAX_TIME)
 	{
 		RodeoElapsedTime = 0.f;
-		Owner->PlayMontage(EMonsterMontage::RODEO_END);
+		CharacterMonster->PlayMontage(EMonsterMontage::RODEO_END);
 	}
 }
 
@@ -926,7 +930,7 @@ void ULynelFSMComponent::UpdateStun(float DeltaTime)
 	if (StunElapsedTime > LYNEL_STUN_MAX_TIME)
 	{
 		StunElapsedTime = 0.f;
-		Owner->PlayMontage(EMonsterMontage::STUN_END);
+		CharacterMonster->PlayMontage(EMonsterMontage::STUN_END);
 	}
 }
 
@@ -939,37 +943,37 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 	}
 
 	const FVector PlayerLocation = Player->GetActorLocation();
-	const FVector MonsterLocation = Owner->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 	switch (eReadyToAttackStep)
 	{
 	case EReadyToAttackStep::RunToLink:
 	{
-		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
-		if (!Owner->IsPlayingMontage(EMonsterMontage::GEAR_3_FORWARD))
+		SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
+		if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::GEAR_3_FORWARD))
 		{
-			Owner->PlayMontage(EMonsterMontage::GEAR_3_FORWARD);
+			CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_FORWARD);
 		}
 		const bool bIsNear = FVector::PointsAreNear(PlayerLocation, MonsterLocation, 300.f);
 		if (bIsNear)
 		{
 			eReadyToAttackStep = EReadyToAttackStep::TurnRight;
-			Owner->PlayMontage(EMonsterMontage::GEAR_3_RIGHT);
+			CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_RIGHT);
 		}
 	}	
 		break;
 	case EReadyToAttackStep::TurnRight:
 		if (LyenlTurnRightCount >= 2)
 		{
-			Owner->PlayMontage(EMonsterMontage::GEAR_3_FORWARD);
+			CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_FORWARD);
 			LyenlTurnRightCount = 0;
 			eReadyToAttackStep = EReadyToAttackStep::AwayFromLink;
 		}
 		else
 		{
-			if (!Owner->IsPlayingMontage(EMonsterMontage::GEAR_3_RIGHT))
+			if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::GEAR_3_RIGHT))
 			{
-				Owner->PlayMontage(EMonsterMontage::GEAR_3_RIGHT);
+				CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_RIGHT);
 			}
 		}
 		break;
@@ -982,18 +986,18 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 		FVector DirectionAwayFromPlayer = -NormalizedDirectionToPlayer;
 		float DistanceToMoveAway = LYNEL_AWAY_FROM_LINK_OFFSET;
 		FVector AwayLocation = MonsterLocation + (DirectionAwayFromPlayer * DistanceToMoveAway);
-		SmoothRotateActorToDirection(Owner, AwayLocation, DeltaTime);
+		SmoothRotateActorToDirection(CharacterMonster, AwayLocation, DeltaTime);
 
-		if (!Owner->IsPlayingMontage(EMonsterMontage::GEAR_3_FORWARD))
+		if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::GEAR_3_FORWARD))
 		{
-			Owner->PlayMontage(EMonsterMontage::GEAR_3_FORWARD);
+			CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_FORWARD);
 		}
 
 		float fDistance = FVector::Dist(MonsterLocation, PlayerLocation);
 		if (fDistance > LYNEL_AWAY_FROM_LINK_OFFSET)
 		{
 			eReadyToAttackStep = EReadyToAttackStep::TurnLeft;
-			Owner->PlayMontage(EMonsterMontage::GEAR_3_LEFT);
+			CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_LEFT);
 		}
 
 	}
@@ -1007,9 +1011,9 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 		}
 		else
 		{
-			if (!Owner->IsPlayingMontage(EMonsterMontage::GEAR_3_LEFT))
+			if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::GEAR_3_LEFT))
 			{
-				Owner->PlayMontage(EMonsterMontage::GEAR_3_LEFT);
+				CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_LEFT);
 			}
 		}
 		break;

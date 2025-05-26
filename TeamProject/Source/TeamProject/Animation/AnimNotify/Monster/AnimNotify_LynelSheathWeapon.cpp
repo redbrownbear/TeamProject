@@ -2,7 +2,7 @@
 
 
 #include "Animation/AnimNotify/Monster/AnimNotify_LynelSheathWeapon.h"
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/CharacterMonster.h"
 #include "Components/FSMComponent/Monster/LynelFSMComponent.h"
 #include "Actors/Item/WorldWeapon.h"
 #include "Misc/Utils.h"
@@ -10,7 +10,7 @@
 
 void UAnimNotify_LynelSheathWeapon::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-	if (AMonster* Monster = Cast<AMonster>(MeshComp->GetOwner()))
+	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(MeshComp->GetOwner()))
 	{
 		if (ULynelFSMComponent* FSMComponent = Cast<ULynelFSMComponent>(Monster->GetFSMComponent()))
 		{

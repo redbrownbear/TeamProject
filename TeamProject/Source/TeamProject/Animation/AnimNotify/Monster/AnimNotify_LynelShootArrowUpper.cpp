@@ -2,14 +2,14 @@
 
 
 #include "Animation/AnimNotify/Monster/AnimNotify_LynelShootArrowUpper.h"
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Projectile/Projectile.h"
 
 void UAnimNotify_LynelShootArrowUpper::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
-	if (AMonster* Monster = Cast<AMonster>(MeshComp->GetOwner()))
+	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(MeshComp->GetOwner()))
 	{
 		UWorld* World = MeshComp->GetWorld();
 

@@ -11,7 +11,8 @@ struct FItemData;
 class UShapeComponent;
 class UPhysicalMaterial;
 class UAIPerceptionStimuliSourceComponent;
-class AMonster;
+class IMonsterInterface;
+class ALynel;
 
 UCLASS()
 class TEAMPROJECT_API AWorldWeapon : public AActor
@@ -68,7 +69,7 @@ public:
 	FName GetWorldWeaponName() const;
 	EWeaponKind GetWorldWeaponKind() const;
 	void AddForce(FVector _Direction, float Force);
-	void AttachToMonster(AMonster* Monster, FName SocketName);
+	void AttachToMonster(IMonsterInterface* Monster, FName SocketName);
 
 protected:
 	bool bIsCatched = false;

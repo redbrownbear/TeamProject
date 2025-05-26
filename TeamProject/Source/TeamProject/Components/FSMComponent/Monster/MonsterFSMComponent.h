@@ -7,9 +7,13 @@
 #include "Misc/Utils.h"
 #include "MonsterFSMComponent.generated.h"
 
-class AMonster;
+class APawnMonster;
+class ACharacterMonster;
 class APlayerCharacter;
 class AWorldWeapon;
+class IMonsterInterface;
+class ACampFire;
+class APatrolPath;
 
 UCLASS()
 class TEAMPROJECT_API UMonsterFSMComponent : public UActorComponent
@@ -26,14 +30,18 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	void SetOwner(AMonster* InOwner) { Owner = InOwner; }
+	void SetPawnMonster(APawnMonster* InOwner) { PawnMonster = InOwner; }
+	void SetCharacterMonster(ACharacterMonster* InOwner) { CharacterMonster = InOwner; }
 	void SetPlayer(APlayerCharacter* InPlayer) { Player = InPlayer; }
+
 public:
 	void SetToCatchWeapon(AWorldWeapon* InWW) { ToCatchWeapon = InWW; }
 	void SetCatchedWeapon(AWorldWeapon* InWW) { CurrentWeapon = InWW; }
 	bool IsToCatchWeapon() { return ToCatchWeapon ? true : false; }
 	void SetMeleeWeapon(AWorldWeapon* InWW) { MeleeWeapon = InWW; }
 	void SetBowWeapon(AWorldWeapon* InWW) { BowWeapon = InWW; }
+	void SetPatrolPath(APatrolPath* InPatrolPath) { PatrolPath = InPatrolPath; }
+	void SetCampFire(ACampFire* InCampFire) { CampFire = InCampFire; }
 
 public:
 	void SheathMeleeWeapon();
@@ -44,7 +52,17 @@ public:
 
 protected:
 	UPROPERTY()
-	TObjectPtr<AMonster> Owner = nullptr;
+	TObjectPtr<ACharacterMonster> CharacterMonster = nullptr;
+	UPROPERTY()
+	TObjectPtr<APawnMonster> PawnMonster = nullptr;
+	UPROPERTY()
+	TObjectPtr<ACampFire> CampFire = nullptr;
+	UPROPERTY()
+	TObjectPtr<APatrolPath> PatrolPath = nullptr;
+
+
+
+
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> Player = nullptr;
 	UPROPERTY()
