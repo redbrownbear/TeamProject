@@ -101,18 +101,34 @@ void UNPCDialogue::OnConfirm()
 
     bool IsQuest = PC_InGame->Npc->GetDoQuest();
 
-    if (DialogueDataRow.bIsEndConversation && !IsQuest)
-    {
-        PC_InGame->Npc->SetDoQuest(true);
+    /*UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    TArray<TSharedPtr<const FNPCDialogueTableRow>> DialogueRows = QuestManager->GetDialogueData(CurQuestChar);
+    TSharedPtr<FNPCDialogueTableRow> FoundRow = nullptr; 
 
-        //DialogueDataRow.CurrentDialogueID = 101;
-    }
-    else
+    for (TSharedPtr<const FNPCDialogueTableRow> Row : DialogueRows)
     {
-        PC_InGame->Npc->SetDoQuest(false);
+        if (Row->CurrentDialogueID == DialogueDataRow.CurrentDialogueID)
+        {
+            FoundRow = MakeShared<FNPCDialogueTableRow>(*Row);
+            break;
+        }
+    }*/
 
-        //DialogueDataRow.CurrentDialogueID = 0;
-    }
+    //if (FoundRow.IsValid())
+    //{
+        if (DialogueDataRow.bIsEndConversation && !IsQuest)
+        {
+            PC_InGame->Npc->SetDoQuest(true);
+
+            //FoundRow->CurrentDialogueID = 101;
+        }
+        else
+        {
+            PC_InGame->Npc->SetDoQuest(false);
+
+            //FoundRow->CurrentDialogueID = 0;
+        }
+    //}
 }
 
 void UNPCDialogue::OnCancel()

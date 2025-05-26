@@ -261,21 +261,27 @@ void UNpcFSMComponent::HideFuriko()
 
 	if (Target && Owner)
 	{
+		//UE_LOG(LogTemp, Log, TEXT("Furiko Moves: %s, Location: %s"), *Target->GetName(), *Target->GetActorLocation().ToString());
+
 		SetHideLocation(Target->GetActorLocation());
 
 		// <푸리코와 놀자!> 퀘스트 UI 생성할까 말까 윤호오빠랑 얘기해보기
-
-		UE_LOG(LogTemp, Log, TEXT("Furiko가 HidePoint %s 로 순간이동했습니다."), *Target->GetName());
 	}
 }
 
 void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 {
 	if (!Owner) return;
+	
+	// 이동 방해 차단
+	if (Owner->GetController()) Owner->GetController()->StopMovement();
 
-	// 순간 이동
+	// 순간이동
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	Owner->SetIsHide(true);
+
+	// 위치 확인
+	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation 완료. Owner 위치: %s"), *Owner->GetActorLocation().ToString());
 }
 
 void UNpcFSMComponent::PlayInterectSequence()
