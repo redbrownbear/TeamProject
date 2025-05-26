@@ -44,14 +44,7 @@ void AProduct::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent
 	{
 		if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
 		{
-			/*PC->Npc = this;
-			bPlayerInRange = true;
-
-			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
-			{
-				HUD->ShowInteractWidget(bPlayerInRange);
-				HUD->ShowInteractName(bPlayerInRange, NpcData->NPCName);
-			}*/
+			
 		}
 		// Create Interact UI
 	}
@@ -63,14 +56,7 @@ void AProduct::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, 
 	{
 		if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
 		{
-			/*PC->Npc = nullptr;
-			bPlayerInRange = false;
-
-			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
-			{
-				HUD->ShowInteractWidget(bPlayerInRange);
-				HUD->ShowInteractName(bPlayerInRange, NpcData->NPCName);
-			}*/
+			
 		}
 	}
 }

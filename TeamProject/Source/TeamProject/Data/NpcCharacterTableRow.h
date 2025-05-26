@@ -19,6 +19,14 @@ enum class EQuestCharacter
 	End,
 };
 
+UENUM(BlueprintType)
+enum class EQuestCharDialogue : uint8
+{
+	Furiko = 0,
+	Furiko_Found = 100,
+	Store = 200,
+};
+
 USTRUCT()
 struct TEAMPROJECT_API FNpcCharacterTableRow : public FTableRowBase
 {

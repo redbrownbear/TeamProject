@@ -46,21 +46,22 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 		UIManager->ShowUI(UNPCDialogue::StaticClass());
 
 		EQuestCharacter QuestChar = Npc->GetData()->QuestCharacter;
+
 		if (QuestChar == EQuestCharacter::Furiko)
 		{
 			bool IsQuest = Npc->GetDoQuest();
 			if (!DialogueDataRow.bIsEndConversation && IsQuest)
 			{
-				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 100);
+				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko_Found));
 			}
 			else
 			{
-				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 0);
+				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko));
 			}
 		}				
 		else if (QuestChar == EQuestCharacter::Store)
 		{
-			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 200);
+			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
 
 			// @TODO Shopping List Widget이 생성 후, 구매에 따라 대화창 생성
 			//bool IsShopping = Npc->GetShopping();
