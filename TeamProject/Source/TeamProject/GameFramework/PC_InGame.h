@@ -148,6 +148,9 @@ public:
 
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
+	void OnMoveCancel(const FInputActionValue& InputActionValue);
+
+
 	void OnLook(const FInputActionValue& InputActionValue);
 	void LeftClick(const FInputActionValue& InputActionValue);
 	void RightClick(const FInputActionValue& InputActionValue);

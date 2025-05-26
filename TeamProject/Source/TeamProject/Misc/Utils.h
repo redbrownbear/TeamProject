@@ -83,6 +83,17 @@ enum class EMonsterMontage : uint8
 };
 
 UENUM()
+enum class EItemCategoryType : int8
+{
+    IT_Weapon,
+    IT_Arrow,
+    IT_Shield,
+    IT_Armor,
+    IT_Material,
+    IT_Food,
+};
+
+UENUM()
 enum class EWeaponKind : uint8
 {
     SWORD = 0,

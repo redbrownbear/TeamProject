@@ -14,6 +14,23 @@ class TEAMPROJECT_API AWeaponBow : public AWeaponBase
 {
 	GENERATED_BODY()
 	
+
+
+
+
+
 public:
 	AWeaponBow();
+
+	virtual void LeftClickAction() override;
+	virtual void RightClickAction(bool _bool) override;
+
+
+private:
+
+
+	UPROPERTY()
+	UAnimMontage* Attack_MTG;
+
+	bool bCanAttack = true;
 };

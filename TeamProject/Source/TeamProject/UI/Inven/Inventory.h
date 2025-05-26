@@ -10,6 +10,7 @@
 #include "Data/ItemDataRow.h"
 
 #include "UI/Inven/InventoryScroll.h"
+#include "UI/Inven/InventoryEquip.h"
 
 #include "UI/Base/BaseUI.h"
 #include "Inventory.generated.h"
@@ -42,6 +43,9 @@ private:
 	UFUNCTION()
 	void RefreshInventory(const FItemData& ItemData);
 
+private:
+	void RefreshEquip(const FItemData& ItemData);
+
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UDataTable* ItemDataTable;
@@ -49,6 +53,9 @@ protected:
 private:
 	UPROPERTY(meta = (BindWidget))
 	UInventoryScroll* BP_InvenScroll;
+
+	UPROPERTY(meta = (BindWidget))
+	UInventoryEquip* BP_InvenEquip;
 
 private:
 	UPROPERTY(meta = (BindWidget))
