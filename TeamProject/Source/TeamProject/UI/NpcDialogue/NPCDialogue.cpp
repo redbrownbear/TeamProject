@@ -99,15 +99,46 @@ void UNPCDialogue::OnConfirm()
 
     HideUI(UNPCDialogue::StaticClass());
 
-    bool IsQuest = PC_InGame->Npc->GetDoQuest();
+    if (CurQuestChar == EQuestCharacter::Furiko)
+    {
+        bool IsQuest = PC_InGame->Npc->GetDoQuest();
 
-    if (DialogueDataRow.bIsEndConversation && !IsQuest)
+        if (DialogueDataRow.bIsEndConversation && !IsQuest)
+        {
+            PC_InGame->Npc->SetDoQuest(true);
+        }
+        else
+        {
+            PC_InGame->Npc->SetDoQuest(false);
+        }
+    }   
+    else if (CurQuestChar == EQuestCharacter::Store)
     {
-        PC_InGame->Npc->SetDoQuest(true);
-    }
-    else
-    {
-        PC_InGame->Npc->SetDoQuest(false);
+        bool IsShopping = PC_InGame->Npc->GetShopping();
+        bool IsBuying = PC_InGame->Npc->GetBuy();
+
+        if (DialogueDataRow.bIsEndConversation && !IsShopping)
+        {
+            PC_InGame->Npc->SetShopping(true);
+            // Create 상품 리스트 UI: 이후 항목 클릭했을 때 산다/만다 대화 나오게
+            // 결정에 따라 SetBuy()에 인자 넣어주기
+        }
+        /*else if (DialogueDataRow.bIsEndConversation && IsShopping && IsBuying)
+        {
+            // 구매 했을 경우
+            PC_InGame->Npc->SetBuy(true);
+            PC_InGame->Npc->SetShopping(false);
+        }
+        else if (DialogueDataRow.bIsEndConversation && IsShopping && !IsBuying)
+        {
+            // 구매 안 할 경우
+            PC_InGame->Npc->SetBuy(false);
+            PC_InGame->Npc->SetShopping(false);
+        }*/
+        else
+        {
+            PC_InGame->Npc->SetShopping(false);
+        }
     }
 }
 

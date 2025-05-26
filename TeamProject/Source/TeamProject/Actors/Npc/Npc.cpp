@@ -23,7 +23,6 @@ ANpc::ANpc()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
-	SetRootComponent(CollisionComponent);
 	AIControllerClass = ANpcController::StaticClass();
 
 	BodyMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Body"));

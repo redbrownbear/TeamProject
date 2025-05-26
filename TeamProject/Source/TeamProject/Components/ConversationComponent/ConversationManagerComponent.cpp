@@ -20,7 +20,7 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 {
 	CurrentNpc = Npc;
 	CurrentPlayer = Player;
-	
+
 	//LockCharacters(Npc, Player);
 
 	APC_InGame* PC = Cast<APC_InGame>(CurrentPlayer->GetController());
@@ -29,9 +29,9 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 	AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD());
 	check(HUD)
 
-	if (PC && HUD)
-		HUD->ShowInteractWidget(false);
-			
+		if (PC && HUD)
+			HUD->ShowInteractWidget(false);
+
 	UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
@@ -43,21 +43,44 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 		if (QuestManager->IsConversation())
 			return;
 
-		UIManager->ShowUI(UNPCDialogue::StaticClass());	
+		UIManager->ShowUI(UNPCDialogue::StaticClass());
 
-		bool IsQuest = Npc->GetDoQuest();
-		if (!DialogueDataRow.bIsEndConversation && IsQuest)
+		EQuestCharacter QuestChar = Npc->GetData()->QuestCharacter;
+		if (QuestChar == EQuestCharacter::Furiko)
 		{
-			CurrentNpc->GetData()->QuestCharacter = EQuestCharacter::Furiko_Found;
-			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 101);
+			bool IsQuest = Npc->GetDoQuest();
+			if (!DialogueDataRow.bIsEndConversation && IsQuest)
+			{
+				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 100);
+			}
+			else
+			{
+				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 0);
+			}
+		}				
+		else if (QuestChar == EQuestCharacter::Store)
+		{
+			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 200);
+
+			// @TODO Shopping List Widget이 생성 후, 구매에 따라 대화창 생성
+			//bool IsShopping = Npc->GetShopping();
+			//bool IsBuying = Npc->GetBuy();
+			//if (!DialogueDataRow.bIsEndConversation && !IsShopping && !IsBuying)
+			//{
+			//	QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 200);
+			//}
+			//else if (!DialogueDataRow.bIsEndConversation && IsShopping && IsBuying)
+			//{
+			//	// 구매 시
+			//	QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 1000);
+			//}
+			//else if (!DialogueDataRow.bIsEndConversation && IsShopping && !IsBuying)
+			//{
+			//	// 구매 안 할 시
+			//	QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 1100);
+			//}
 		}
-		else 
-		{
-			CurrentNpc->GetData()->QuestCharacter = EQuestCharacter::Furiko;
-			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 0);
-		}			
 	}
-
 }
 
 void UConversationManagerComponent::EndConversation()

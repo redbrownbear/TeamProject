@@ -142,9 +142,11 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		if (Owner->GetIsHide())
 		{
 			Owner->PlayMontage(ENpcMontage::STAND);
+			Owner->PlayMontage(ENpcMontage::TALK);
 		}
 		// @TODO Play Sequence
 		//PlayInterectSequence();
+		Owner->PlayMontage(ENpcMontage::TALK);
 		Controller->GetConversationManager()->StartConversation(Owner, Player);
 		break;	
 	case ENpcState::Hide:
