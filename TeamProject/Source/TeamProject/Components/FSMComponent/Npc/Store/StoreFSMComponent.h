@@ -18,4 +18,8 @@ protected:
 	virtual void UpdateIdle(float DeltaTime) override;
 	virtual void UpdateTalk(float DeltaTime) override;
 	virtual void UpdateSell(float DeltaTime);
+
+private:
+	void LookAtPlayer(AActor* PlayerActor);
+	bool CanSeePlayer() const;
 };

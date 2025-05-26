@@ -20,7 +20,7 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 {
 	CurrentNpc = Npc;
 	CurrentPlayer = Player;
-	
+
 	//LockCharacters(Npc, Player);
 
 	APC_InGame* PC = Cast<APC_InGame>(CurrentPlayer->GetController());
@@ -29,9 +29,9 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 	AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD());
 	check(HUD)
 
-	if (PC && HUD)
-		HUD->ShowInteractWidget(false);
-			
+		if (PC && HUD)
+			HUD->ShowInteractWidget(false);
+
 	UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
@@ -44,9 +44,44 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 			return;
 
 		UIManager->ShowUI(UNPCDialogue::StaticClass());
-		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 0);
-	}
 
+		EQuestCharacter QuestChar = Npc->GetData()->QuestCharacter;
+
+		if (QuestChar == EQuestCharacter::Furiko)
+		{
+			bool IsQuest = Npc->GetDoQuest();
+			if (!DialogueDataRow.bIsEndConversation && IsQuest)
+			{
+				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko_Found));
+			}
+			else
+			{
+				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko));
+			}
+		}				
+		else if (QuestChar == EQuestCharacter::Store)
+		{
+			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
+
+			// @TODO Shopping List Widgetì´ ìƒì„± í›„, êµ¬ë§¤ì— ë”°ë¼ ëŒ€í™”ì°½ ìƒì„±
+			//bool IsShopping = Npc->GetShopping();
+			//bool IsBuying = Npc->GetBuy();
+			//if (!DialogueDataRow.bIsEndConversation && !IsShopping && !IsBuying)
+			//{
+			//	QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 200);
+			//}
+			//else if (!DialogueDataRow.bIsEndConversation && IsShopping && IsBuying)
+			//{
+			//	// êµ¬ë§¤ ì‹œ
+			//	QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 1000);
+			//}
+			//else if (!DialogueDataRow.bIsEndConversation && IsShopping && !IsBuying)
+			//{
+			//	// êµ¬ë§¤ ì•ˆ í•  ì‹œ
+			//	QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 1100);
+			//}
+		}
+	}
 }
 
 void UConversationManagerComponent::EndConversation()
@@ -72,14 +107,14 @@ void UConversationManagerComponent::BeginPlay()
 
 void UConversationManagerComponent::PlayTalkAnimations()
 {
-	// NPC ¡æ ¸ùÅ¸ÁÖ
+	// NPC ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½
 	if (UAnimInstance* NpcAnim = CurrentNpc->GetBodyMesh()->GetAnimInstance())
 	{
 		NpcAnim->Montage_Play(NpcTalkMontage);
 		//NpcAnim->Montage_Play(NpcIdleMontage);
 	}
 
-	// Player ¡æ ¸ùÅ¸ÁÖ // ÇÊ¿ä ¾øÀ» ¼öµµ?
+	// Player ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½ // ï¿½Ê¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½?
 	if (UAnimInstance* PlayerAnim = CurrentPlayer->GetMesh()->GetAnimInstance())
 	{
 		PlayerAnim->Montage_Play(PlayerTalkMontage); 
@@ -97,13 +132,13 @@ void UConversationManagerComponent::LockCharacters(ANpc* Npc, APlayerCharacter* 
 
 	if (Player)
 	{
-		// ÀÌµ¿¸¸ Á¦ÇÑ
+		// ï¿½Ìµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		if (UCharacterMovementComponent* MoveComp = Player->GetCharacterMovement())
 		{
-			MoveComp->SetMovementMode(MOVE_None); // ÀÌµ¿ ºÒ°¡ (Jump, °È±â µî ¸ðµÎ ¸·Èû)
+			MoveComp->SetMovementMode(MOVE_None); // ï¿½Ìµï¿½ ï¿½Ò°ï¿½ (Jump, ï¿½È±ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
 		}
 
-		// È¸Àüµµ ¼öµ¿ Á¦¾î·Î ¹Ù²Þ
+		// È¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½
 		Player->bUseControllerRotationYaw = false;
 	}
 }
@@ -114,7 +149,7 @@ void UConversationManagerComponent::UnlockCharacters(ANpc* Npc, APlayerCharacter
 	{
 		if (UCharacterMovementComponent* MoveComp = Player->GetCharacterMovement())
 		{
-			MoveComp->SetMovementMode(MOVE_Walking); // ÀÌµ¿ °¡´É »óÅÂ º¹¿ø
+			MoveComp->SetMovementMode(MOVE_Walking); // ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		}
 	}
 }
