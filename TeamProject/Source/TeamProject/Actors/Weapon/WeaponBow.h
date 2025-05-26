@@ -36,5 +36,4 @@ private:
 
 	TSubclassOf<class AProjectile_Arrow> ArrowClass;
 
-	bool bCanAttack = true;
 };

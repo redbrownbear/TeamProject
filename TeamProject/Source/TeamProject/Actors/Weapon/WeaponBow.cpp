@@ -77,8 +77,6 @@ void AWeaponBow::LeftClickAction()
 
     Player_C->GetWeaponManagerComponent()->SetCanShot(false);
 
-    Player_C->GetWeaponManagerComponent()->SetRightClick(false);
-
     AnimInst->bIsZoom = false;
     
     AnimInst->Montage_Resume(Attack_MTG);
@@ -108,11 +106,12 @@ void AWeaponBow::RightClickAction()
 
     UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
-    if (AnimInst->bIsZoom)
+    if (AnimInst->Montage_IsPlaying(EquipMontage))
     {
         return;
     }
-    if (AnimInst->Montage_IsPlaying(EquipMontage))
+    
+    if (AnimInst->bIsZoom)
     {
         return;
     }

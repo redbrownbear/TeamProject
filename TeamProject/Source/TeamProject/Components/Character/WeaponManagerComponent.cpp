@@ -4,6 +4,7 @@
 #include "Components/Character/WeaponManagerComponent.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Weapon/WeaponShield.h"
+#include "Animation/AnimInstance/PlayerAnimInstance.h"
 
 // Sets default values for this component's properties
 UWeaponManagerComponent::UWeaponManagerComponent()
@@ -175,6 +176,19 @@ void UWeaponManagerComponent::TryEquipWeapon()
 
 
 		}
+		else if (Equip_State == EEquip_State::Shield)
+		{
+			UAnimMontage* UnEquipMontage = Cast<AWeaponBase>(Shield->GetChildActor())->GetUnEquipMontage();
+			
+			UnEquipWeapons.Enqueue(EWeapon_Type::Shield);
+			AnimInstance->Montage_Play(UnEquipMontage);
+			FOnMontageEnded MontageEndedDelegate = FOnMontageEnded::CreateUObject<UWeaponManagerComponent>(
+				this,
+				&UWeaponManagerComponent::EquipWeapon
+			);
+			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, UnEquipMontage);
+
+		}
 		else
 		{
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
@@ -291,18 +305,17 @@ void UWeaponManagerComponent::LeftClickAction()
 
 	else if (Equip_State == EEquip_State::Sword_Shield)
 	{
-		if(bRightClick)
-		{ 
-			if (!bCanShot)
-			{
-				return;
-			}
+		if (bRightClick)
+		{
+
 			AWeaponShield* ShieldActor = Cast<AWeaponShield>(Shield->GetChildActor());
 			if (!ShieldActor)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("ShieldActor is not Valid"));
 			}
 			ShieldActor->LeftClickAction();
+			return;
+		
 		}
 		else
 		{
@@ -318,7 +331,7 @@ void UWeaponManagerComponent::LeftClickAction()
 			SwordActor->LeftClickAction();
 		}
 	}
-	else
+	else if(Equip_State == EEquip_State::Shield)
 	{
 		if (bRightClick)
 		{
@@ -360,4 +373,71 @@ void UWeaponManagerComponent::RightClickAction()
 		BowActor->RightClickAction();		
 	}
 
+	else
+	{
+
+		AWeaponShield* ShieldActor = Cast<AWeaponShield>(Shield->GetChildActor());
+
+		if (!ShieldActor)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("BowActor is not Valid"));
+			return;
+			check(ShieldActor);
+		}
+
+		ShieldActor->RightClickAction();
+	}
+	bRightClick = true;
+}
+
+void UWeaponManagerComponent::RightClickEnd()
+{
+
+
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+
+	if (Equip_State == EEquip_State::Bow)
+	{
+		if (AnimInst->bIsZoom)
+		{
+
+			AnimInst->Montage_Stop(0.f);
+
+			AnimInst->bIsZoom = false;
+
+			Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+
+			Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+
+
+			// 이동 방향으로 자동 회전 비활성화
+			Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+			Player_C->ZoomOut();
+		}
+	}
+	else if (Equip_State == EEquip_State::Shield || Equip_State == EEquip_State::Sword_Shield)
+	{
+		if (AnimInst->bIsWaitShield)
+		{
+			AnimInst->Montage_Stop(0.f);
+
+			AnimInst->bIsWaitShield = false;
+
+
+			Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+
+			Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+
+
+			// 이동 방향으로 자동 회전 비활성화
+			Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+			Player_C->ZoomOut();
+
+		}
+	}
+	bRightClick = false;
 }

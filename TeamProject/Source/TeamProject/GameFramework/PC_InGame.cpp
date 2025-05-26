@@ -278,7 +278,6 @@ void APC_InGame::RightClickEnd(const FInputActionValue& InputActionValue)
 
 	UWeaponManagerComponent* WeaponManagerComponent = Player_C->GetWeaponManagerComponent();
 
-	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
 	if (!WeaponManagerComponent)
 	{
@@ -286,22 +285,9 @@ void APC_InGame::RightClickEnd(const FInputActionValue& InputActionValue)
 		return;
 	}
 
+	WeaponManagerComponent->RightClickEnd();
+
 	
-
-	AnimInst->Montage_Stop(0.f);
-
-	AnimInst->bIsZoom = false;
-
-	Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
-
-	Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
-
-
-	// 이동 방향으로 자동 회전 비활성화
-	Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
-
-	Player_C->ZoomOut();
-
 }
 
 
