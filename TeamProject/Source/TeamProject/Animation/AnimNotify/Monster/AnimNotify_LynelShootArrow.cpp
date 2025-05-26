@@ -4,6 +4,7 @@
 #include "Animation/AnimNotify/Monster/AnimNotify_LynelShootArrow.h"
 #include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Projectile/Projectile.h"
+#include "Misc/Utils.h"
 
 void UAnimNotify_LynelShootArrow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {

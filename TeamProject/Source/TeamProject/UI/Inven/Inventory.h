@@ -10,6 +10,7 @@
 #include "Data/ItemDataRow.h"
 
 #include "UI/Inven/InventoryScroll.h"
+#include "UI/Inven/InventoryEquip.h"
 
 #include "UI/Base/BaseUI.h"
 #include "Inventory.generated.h"
@@ -24,10 +25,12 @@ class TEAMPROJECT_API UInventory : public UBaseUI
 	
 public:
 	virtual void OnCreated() override;
-	virtual void CloseUI() override;
+	virtual void ShowUI() override;
+	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
 private:
 	void InitUI();
+	void BindDelegates();
 
 public: //바인딩을 위해 퍼블릭선언
 	UFUNCTION()
@@ -40,6 +43,9 @@ private:
 	UFUNCTION()
 	void RefreshInventory(const FItemData& ItemData);
 
+private:
+	void RefreshEquip(const FItemData& ItemData);
+
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UDataTable* ItemDataTable;
@@ -47,6 +53,9 @@ protected:
 private:
 	UPROPERTY(meta = (BindWidget))
 	UInventoryScroll* BP_InvenScroll;
+
+	UPROPERTY(meta = (BindWidget))
+	UInventoryEquip* BP_InvenEquip;
 
 private:
 	UPROPERTY(meta = (BindWidget))

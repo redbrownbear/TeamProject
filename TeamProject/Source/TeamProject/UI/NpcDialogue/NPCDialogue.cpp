@@ -7,31 +7,22 @@
 #include "SubSystem/UI/UIManager.h"
 
 #include "GameFramework/PC_InGame.h"
+#include "Components/ConversationComponent/ConversationManagerComponent.h"
 
 void UNPCDialogue::OnCreated()
 {
-	Super::OnCreated();
-
     InitUI();
     BindDelegates();
 }
 
-void UNPCDialogue::CloseUI()
+void UNPCDialogue::ShowUI()
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
-    }
+    Super::ShowUI();
 
-    //Close ������ �Ʒ��� ������ �̹� Widget�� ������ ������ ��ġ������ 
-    bEndDialogue = true; // 2025-05-20 ��ȭ ���� Ȯ�� ���� �߰�
+    ConfirmButton->SetVisibility(ESlateVisibility::Hidden);
+    CancelButton->SetVisibility(ESlateVisibility::Hidden);
+    ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 
-    Super::CloseUI();
-}
-
-void UNPCDialogue::InitUI()
-{
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     {
@@ -46,19 +37,45 @@ void UNPCDialogue::InitUI()
         PC_InGame->SetInputMode(InputMode);
         PC_InGame->BindDialogueInput(this);
     }
+}
 
-    APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
-    if (PC)
+void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
+{
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    if (PC_InGame)
     {
-        FInputActionBinding& Bind = PC->InputComponent->BindAction("CloseInven", IE_Pressed, this, &UNPCDialogue::CloseUI);
+        PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
     }
-    
+
+    //Close ������ �Ʒ��� ������ �̹� Widget�� ������ ������ ��ġ������ 
+
+    if (PC_InGame->Npc)
+    {
+        ANpcController* Controller = Cast<ANpcController>(PC_InGame->Npc->GetController());
+        if (Controller)
+        {
+            UConversationManagerComponent* TalkManager = Controller->GetConversationManager();
+            if (TalkManager)
+            {
+                TalkManager->EndConversation();
+            }
+        }
+    }
+
+    UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+    if (QuestManager)
+    {
+        QuestManager->SetConversation(false);
+    }
+
+    Super::HideUI(UNPCDialogue::StaticClass());
+}
+
+void UNPCDialogue::InitUI()
+{
     ConfirmButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnConfirm);
     CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancel);
-
-    ConfirmButton->SetVisibility(ESlateVisibility::Hidden);
-    CancelButton->SetVisibility(ESlateVisibility::Hidden);
-    ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UNPCDialogue::BindDelegates()
@@ -77,12 +94,60 @@ void UNPCDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 
 void UNPCDialogue::OnConfirm()
 {
-    CloseUI();
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    PC_InGame->Npc->SetIsConfirmed(true);
+
+    HideUI(UNPCDialogue::StaticClass());
+
+    if (CurQuestChar == EQuestCharacter::Furiko)
+    {
+        bool IsQuest = PC_InGame->Npc->GetDoQuest();
+
+        if (DialogueDataRow.bIsEndConversation && !IsQuest)
+        {
+            PC_InGame->Npc->SetDoQuest(true);
+        }
+        else
+        {
+            PC_InGame->Npc->SetDoQuest(false);
+        }
+    }
+    else if (CurQuestChar == EQuestCharacter::Store)
+    {
+        bool IsShopping = PC_InGame->Npc->GetShopping();
+        bool IsBuying = PC_InGame->Npc->GetBuy();
+
+        if (DialogueDataRow.bIsEndConversation && !IsShopping)
+        {
+            PC_InGame->Npc->SetShopping(true);
+            // Create 상품 리스트 UI: 이후 항목 클릭했을 때 산다/만다 대화 나오게
+            // 결정에 따라 SetBuy()에 인자 넣어주기
+        }
+        /*else if (DialogueDataRow.bIsEndConversation && IsShopping && IsBuying)
+        {
+            // 구매 했을 경우
+            PC_InGame->Npc->SetBuy(true);
+            PC_InGame->Npc->SetShopping(false);
+        }
+        else if (DialogueDataRow.bIsEndConversation && IsShopping && !IsBuying)
+        {
+            // 구매 안 할 경우
+            PC_InGame->Npc->SetBuy(false);
+            PC_InGame->Npc->SetShopping(false);
+        }*/
+        else
+        {
+            PC_InGame->Npc->SetShopping(false);
+        }
+    }
 }
 
 void UNPCDialogue::OnCancel()
 {
-    CloseUI();
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    PC_InGame->Npc->SetIsConfirmed(false);
+
+    HideUI(UNPCDialogue::StaticClass());
 }
 
 void UNPCDialogue::OnNextDialogue(const FInputActionValue& InputActionValue)

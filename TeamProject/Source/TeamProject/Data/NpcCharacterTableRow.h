@@ -7,6 +7,26 @@
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 #include "NpcCharacterTableRow.generated.h"
 
+UENUM()
+enum class EQuestCharacter
+{
+	None,
+
+	Furiko,
+
+	Store,
+
+	End,
+};
+
+UENUM(BlueprintType)
+enum class EQuestCharDialogue : uint8
+{
+	Furiko = 0,
+	Furiko_Found = 100,
+	Store = 200,
+};
+
 USTRUCT()
 struct TEAMPROJECT_API FNpcCharacterTableRow : public FTableRowBase
 {
@@ -16,10 +36,22 @@ public:
 	FString NPCName;
 
 	UPROPERTY(EditAnywhere, Category = "Npc")
-	USkeletalMesh* SkeletalMesh = nullptr;
+	EQuestCharacter QuestCharacter = EQuestCharacter::None;
 
 	UPROPERTY(EditAnywhere, Category = "Npc")
-	FTransform MeshTransform = FTransform::Identity;
+	USkeletalMesh* SkeletalMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform MeshTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform HeadTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform HairTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform NoseTransform;
 	
 	UPROPERTY(EditAnywhere, Category = "Npc|Animation")
 	TSubclassOf<UAnimInstance> AnimClass;

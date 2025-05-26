@@ -36,21 +36,19 @@ void UStoreAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	eCurrentState = FSMComponent->GetNpcState();
 
+	bIsIdle = false;
+	bIsTalk = false;
+	bIsSell = false;
+
 	switch (eCurrentState)
 	{
 	case ENpcState::Idle:
 		bIsIdle = true;
-		bIsTalk = false;
-		bIsSell = false;
 		break;
 	case ENpcState::Talk:
 		bIsIdle = false;
-		bIsTalk = true;
-		bIsSell = false;
 		break;
 	case ENpcState::Sell:
-		bIsIdle = false;
-		bIsTalk = false;
 		bIsSell = true;
 		break;
 	default:

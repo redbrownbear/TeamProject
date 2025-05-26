@@ -5,9 +5,9 @@
 
 #include "SubSystem/UI/UIManager.h"
 
-void UTestPopupUI::OnCreated()
+void UTestPopupUI::ShowUI()
 {
-	Super::OnCreated();
+	Super::ShowUI();
 
 	//우선 보류
 	ExitButton->OnClicked.AddDynamic(this, &UTestPopupUI::OnMyButtonClicked);
@@ -29,13 +29,7 @@ void UTestPopupUI::ClosePopup()
 	if (!IsInViewport())
 		return;
 
-	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-	check(UIManager);
-
-	if (UIManager)
-	{
-		UIManager->RemoveUI(this);
-	}
+	HideUI(UTestPopupUI::StaticClass());
 }
 
 void UTestPopupUI::SetPopupText(FText title, FText main)

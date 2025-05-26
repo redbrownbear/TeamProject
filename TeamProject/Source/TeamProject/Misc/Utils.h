@@ -9,13 +9,15 @@
 
 namespace CollisionProfileName
 {
-	static inline FName Monster = TEXT("Monster");
     static inline FName Player = TEXT("Player");
     static inline FName ToPlayer = TEXT("ToPlayer");
+	static inline FName Monster = TEXT("Monster");
     static inline FName ToMonster = TEXT("ToMonster");
     static inline FName MapMesh = TEXT("MapMesh");
     static inline FName Item = TEXT("Item");
     static inline FName ToItem = TEXT("ToItem");
+    static inline FName NPC = TEXT("NPC");
+    static inline FName ToNPC = TEXT("ToNPC");
 }
 
 namespace ProjectileName
@@ -174,6 +176,17 @@ enum class EReadyToAttackStep : uint8
 
 
 UENUM()
+enum class EItemCategoryType : int8
+{
+    IT_Weapon,
+    IT_Arrow,
+    IT_Shield,
+    IT_Armor,
+    IT_Material,
+    IT_Food,
+};
+
+UENUM()
 enum class EWeaponKind : uint8
 {
     SWORD = 0,
@@ -276,7 +289,6 @@ enum class ENpcState : uint8
 {
     Idle = 0,
     Sit,
-    Stand,
     Walk,
     Run,
     Talk,

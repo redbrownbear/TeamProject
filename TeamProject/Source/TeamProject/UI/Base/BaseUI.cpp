@@ -7,10 +7,14 @@
 
 void UBaseUI::OnCreated()
 {
+}
+
+void UBaseUI::ShowUI()
+{
     PauseAllPausableActors(true);
 }
 
-void UBaseUI::CloseUI()
+void UBaseUI::HideUI(TSubclassOf<UBaseUI> UIClass)
 {
     if (!IsInViewport())
         return;
@@ -18,11 +22,9 @@ void UBaseUI::CloseUI()
     PauseAllPausableActors(false);
 
     UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-    check(UIManager);
-
     if (UIManager)
     {
-        UIManager->RemoveUI(this);
+        UIManager->HideUI(UIClass);
     }
 }
 

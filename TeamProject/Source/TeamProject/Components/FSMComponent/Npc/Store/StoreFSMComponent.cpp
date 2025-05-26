@@ -1,12 +1,21 @@
 #include "Components/FSMComponent/Npc/Store/StoreFSMComponent.h"
-#include "UI/NpcDialogue/NPCDialogue.h"
+#include "Actors/Controller/Npc/Store/StoreController.h"
 
 #include "Actors/Npc/Npc.h"
+#include "Actors/Character/PlayerCharacter.h"
+
+#include "UI/NpcDialogue/NPCDialogue.h"
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
 
 void UStoreFSMComponent::UpdateIdle(float DeltaTime)
 {
 	Super::UpdateIdle(DeltaTime);
+	
+	// Player ÃÄ´Ùº¸±â
+	if (Owner && Player)
+	{
+		LookAtPlayer(Player);
+	}
 }
 
 void UStoreFSMComponent::UpdateTalk(float DeltaTime)
@@ -15,14 +24,13 @@ void UStoreFSMComponent::UpdateTalk(float DeltaTime)
 
 	if (Player)
 	{
-		Owner->SetNpc(EQuestCharacter::Furiko);
-		Controller->GetConversationManager()->StartConversation(Owner, Player);
+		Owner->SetNpc(EQuestCharacter::Store);
 	}
 
-	/*if (!Dialogue->GetDialogueState())
+	if (Controller->GetConversationManager()->GetEndTalked())
 	{
 		ChangeState(ENpcState::Idle);
-	}*/
+	}
 }
 
 void UStoreFSMComponent::UpdateSell(float DeltaTime)
@@ -32,3 +40,36 @@ void UStoreFSMComponent::UpdateSell(float DeltaTime)
 	
 	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ÑµÚ¿ï¿½ Idleï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ù·ï¿½ Idle ï¿½ï¿½ï¿½Â·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 }
+
+void UStoreFSMComponent::LookAtPlayer(AActor* PlayerActor)
+{
+	if (!PlayerActor) return;
+
+	FVector NpcLocation = Owner->GetActorLocation();
+	FVector PlayerLocation = PlayerActor->GetActorLocation();
+
+	// Z°ª ¹«½ÃÇÏ°í ¼öÆò ¹æÇâ¸¸ °è»ê
+	FVector Direction = (PlayerLocation - NpcLocation);
+	Direction.Z = 0.f;
+
+	if (Direction.IsNearlyZero()) return;
+
+	FRotator LookRotation = Direction.Rotation();
+	FRotator CurrentRot = Owner->GetActorRotation();
+	FRotator TargetRot = LookRotation;
+	float Speed = 5.0f;
+
+	FRotator SmoothRot = FMath::RInterpTo(CurrentRot, TargetRot, GetWorld()->GetDeltaSeconds(), Speed);
+	Owner->SetActorRotation(SmoothRot);
+}
+
+bool UStoreFSMComponent::CanSeePlayer() const
+{
+	if (!Owner || !Player) return false;
+
+	AStoreController* KoroguCon = Cast<AStoreController>(Owner->GetController());
+	if (!KoroguCon) return false;
+
+	return KoroguCon->LineOfSightTo(Player);
+}
+

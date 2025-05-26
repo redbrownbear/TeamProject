@@ -7,17 +7,18 @@
 #include "BaseUI.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class TEAMPROJECT_API UBaseUI : public UUserWidget
 {
 	GENERATED_BODY()
 
-	
-protected:
-	virtual void OnCreated();	//����� �ʱ�ȭ
-	virtual void CloseUI();
+
+public:
+	virtual void OnCreated();
+	virtual void ShowUI();	//명시적 초기화
+	virtual void HideUI(TSubclassOf<UBaseUI> UIClass);
 
 	void PauseAllPausableActors(bool bPause);
 };

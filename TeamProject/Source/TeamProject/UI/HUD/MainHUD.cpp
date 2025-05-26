@@ -18,6 +18,11 @@ void AMainHUD::BeginPlay()
     }
 }
 
+void AMainHUD::SetMainHUDVisible(bool bIsShow)
+{
+    MainWidgetInstance->SetVisibility(bIsShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}
+
 void AMainHUD::ShowInteractWidget(bool bIsShow)
 {
     MainWidgetInstance->ShowInteractUI(bIsShow);

@@ -42,60 +42,29 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	eCurrentState = FSMComponent->GetNpcState();
 
+	bIsIdle = false;
+	bIsSit = false;
+	bIsStand = false;
+	bIsWalk = false;
+	bIsRun = false;
+	bIsTalk = false;
+	bIsHide = false;
+
 	switch (eCurrentState)
 	{
 	case ENpcState::Idle:
-		bIsIdle = true;
-		bIsSit = false;
-		bIsStand = false;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsTalk = false;
-		bIsHide = false;		
+		bIsIdle = true;	
 		break;
 	case ENpcState::Sit:
-		bIsIdle = false;
 		bIsSit = true;
-		bIsStand = false;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsTalk = false;
-		bIsHide = false;
-		break;
-	case ENpcState::Stand:
-		bIsIdle = false;
-		bIsSit = false;
-		bIsStand = true;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsTalk = false;
-		bIsHide = false;
 		break;
 	case ENpcState::Run:
-		bIsIdle = false;
-		bIsSit = false;
-		bIsStand = false;
-		bIsWalk = false;
 		bIsRun = true;
-		bIsTalk = false;
-		bIsHide = false;
 		break;
 	case ENpcState::Talk:
-		bIsIdle = false;
-		bIsSit = false;
-		bIsStand = false;
-		bIsWalk = false;
-		bIsRun = false;
 		bIsTalk = true;
-		bIsHide = false;
 		break;
 	case ENpcState::Hide:
-		bIsIdle = false;
-		bIsSit = false;
-		bIsStand = false;
-		bIsWalk = false;
-		bIsRun = false;
-		bIsTalk = false;
 		bIsHide = true;
 		break;
 	default:

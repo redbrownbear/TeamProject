@@ -253,3 +253,70 @@ void UWeaponManagerComponent::EquipWeapon(UAnimMontage* Montage, bool bInterrupt
 
 
 }
+
+void UWeaponManagerComponent::LeftClickAction()
+{
+	if (Equip_State == EEquip_State::Sword)
+	{
+		AWeaponSword* SwordActor = Cast<AWeaponSword>(Sword->GetChildActor());
+
+		if (!SwordActor)
+		{
+
+			UE_LOG(LogTemp, Warning, TEXT("SwordActor is not Valid"));
+			return;
+
+		}
+		SwordActor->LeftClickAction();
+
+	}
+	
+	else if (Equip_State == EEquip_State::Bow)
+	{
+		if (!bCanShot)
+		{
+			return;
+		}
+		AWeaponBow* BowActor = Cast<AWeaponBow>(Bow->GetChildActor());
+
+		if (!BowActor)
+		{
+
+			UE_LOG(LogTemp, Warning, TEXT("BowActor is not Valid"));
+			return;
+
+		}
+		BowActor->LeftClickAction();
+	}
+
+}
+
+void UWeaponManagerComponent::RightClickAction()
+{
+	if (Equip_State == EEquip_State::None || Equip_State == EEquip_State::Sword)
+	{
+		return;
+	}
+
+	else if(Equip_State == EEquip_State::Bow)
+	{
+
+		bRightClick = !bRightClick;
+
+		AWeaponBow* BowActor = Cast<AWeaponBow>(Bow->GetChildActor());
+
+		if (!BowActor)
+		{
+
+			UE_LOG(LogTemp, Warning, TEXT("BowActor is not Valid"));
+			return;
+
+		}
+
+		
+
+		BowActor->RightClickAction(bRightClick);
+		
+	}
+
+}

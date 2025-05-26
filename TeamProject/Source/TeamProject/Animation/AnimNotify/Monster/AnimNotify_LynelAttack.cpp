@@ -4,6 +4,8 @@
 #include "Animation/AnimNotify/Monster/AnimNotify_LynelAttack.h"
 #include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Projectile/Projectile.h"
+#include "Misc/Utils.h"
+
 
 void UAnimNotify_LynelAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {

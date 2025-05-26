@@ -52,5 +52,5 @@ void UAnimNotify_EquipWeapon::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 			WeaponManagerComponent->SetEquipState(EEquip_State::Sword_Shield);
 		}
 	}
-	PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
 }

@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
-#include "Data/NPCTableRow.h"
 #include "Data/NpcCharacterTableRow.h"
 #include "Misc/Utils.h"
 #include "Npc.generated.h"
@@ -59,17 +58,34 @@ public:
 
 	USkeletalMeshComponent* GetBodyMesh() const { return BodyMeshComponent; }
 
-	//USkeletalMesh* GetBodySkeletalMesh() const { return BodyMeshComponent ? BodyMeshComponent->SkeletalMesh : nullptr; }
-
-	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
-
-	void OnTalkKeyPressed(); // 대화 UI
-
 	bool GetCanTalk() { return bPlayerInRange; }
+
+	bool GetIsConfirmed() { return bIsConfirm; }
+
+	bool GetIsHide() { return bIsHide; }
+
+	bool GetDoQuest() { return bDoQuest; }
+
+	bool GetShopping() { return bShopping; }
+
+	bool GetBuy() { return bBuy; }
 
 	EQuestCharacter GetNpc() const { return QuestNpc; }
 
+public:
+	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }
+
 	void SetNpc(EQuestCharacter InQuestNpc) { QuestNpc = InQuestNpc; }
+
+	void SetIsConfirmed(bool IsConfirm) { bIsConfirm = IsConfirm; }
+
+	void SetIsHide(bool IsHide) { bIsHide = IsHide; }
+
+	void SetDoQuest(bool IsQuest) { bDoQuest = IsQuest; }
+
+	void SetShopping(bool IsShopping) { bShopping = IsShopping; }
+
+	void SetBuy(bool IsBuy) { bBuy = IsBuy; }
 
 	void AttachToSocket();
 
@@ -80,6 +96,7 @@ protected:
 
 public:
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+	FNpcCharacterTableRow* GetData() { return NpcData; }
 
 public:
 	void PlayMontage(ENpcMontage _InEnum, bool bIsLoop = false);
@@ -98,18 +115,34 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	USkeletalMesh* HeadMeshAsset;
+	TObjectPtr<USkeletalMesh> HeadMeshAsset;
 
 	UPROPERTY(EditAnywhere)
-	USkeletalMesh* HairMeshAsset;
+	TObjectPtr<USkeletalMesh> HairMeshAsset;
 
 	UPROPERTY(EditAnywhere)
-	USkeletalMesh* NoseMeshAsset;
+	TObjectPtr<USkeletalMesh> NoseMeshAsset;
 
 private:
 	// 상호작용 가능 변수
 	UPROPERTY()
 	bool bPlayerInRange = false;
+
+	UPROPERTY() // 퀘스트 수락 시 
+	bool bIsConfirm = false;
+
+	UPROPERTY()
+	bool bIsHide = false;
+
+	// 콘텐츠 변수
+	UPROPERTY()
+	bool bDoQuest = false;
+
+	UPROPERTY()
+	bool bShopping = false;
+
+	UPROPERTY()
+	bool bBuy = false;
 
 protected:
 	// 상호작용 

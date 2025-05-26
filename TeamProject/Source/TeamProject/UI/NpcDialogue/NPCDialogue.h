@@ -13,7 +13,7 @@
 #include "NPCDialogue.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class TEAMPROJECT_API UNPCDialogue : public UBaseUI
@@ -22,13 +22,14 @@ class TEAMPROJECT_API UNPCDialogue : public UBaseUI
 
 public:
 	virtual void OnCreated() override;
-	virtual void CloseUI() override;
+	virtual void ShowUI() override;
+	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
 private:
 	void InitUI();
 	void BindDelegates();
 
-public: //���ε��� ���� �ۺ������
+public: //바인딩을 위해 퍼블릭선언
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	UFUNCTION()
@@ -37,7 +38,6 @@ public: //���ε��� ���� �ۺ������
 	void OnCancel();
 	UFUNCTION()
 	void OnNextDialogue(const FInputActionValue& InputActionValue);
-
 
 private:
 	UFUNCTION()
@@ -64,21 +64,15 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ExtraText;
 
-public:
-	bool GetDialogueState() { return bEndDialogue; }
-
 private:
 	UPROPERTY()
 	FNPCDialogueTableRow DialogueDataRow;
 	EQuestCharacter CurQuestChar;
 	int32 NextDialogueID;
 
-	//�ѱ��ھ� ���̴� ����� ���� ����
+	//한글자씩 보이는 기능을 위한 변수
 	FString FullText;
 	int32 CurrentCharIndex = 0;
 	FTimerHandle TypingTimerHandle;
 	bool bIsTyping = false;
-	//---------------------------------
-
-	bool bEndDialogue = false; // 2025-05-20 ��ȭ ���� Ȯ�� ���� �߰�
 };

@@ -36,7 +36,7 @@ void UFurikoFSMComponent::UpdateRun(float DeltaTime)
 	MoveToLocation(TargetLocation);
 
 	// 도착 체크
-	const bool bIsNear = FVector::PointsAreNear(Owner->GetActorLocation(), TargetLocation, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(CurrentLocation, TargetLocation, 255.f);
 	if (bIsNear)
 	{
 		++CurrentStrollIndex;
@@ -54,25 +54,32 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 	if (Player)
 	{
 		Owner->SetNpc(EQuestCharacter::Furiko);
-		Controller->GetConversationManager()->StartConversation(Owner, Player);
 	}
 
-
-	// 퀘스트 수락 버튼 클릭 시
-	/*bool bAcceptQuest = Dialogue->OnClicked();
-	if (bAcceptQuest)
+	if (Controller->GetConversationManager()->GetEndTalked())
 	{
-		ChangeState(ENpcState::Hide);
-	}*/
-
-	// 퀘스트 안 함 + 대화 끝남(UI 삭제)
-	/*if (!bAcceptQuest && !Dialogue->GetDialogueState())
-	{
-		ChangeState(ENpcState::Idle);
-	}*/
+		bool IsConfirmed = Owner->GetIsConfirmed();
+		bool IsFound = Owner->GetIsHide();
+		if (!IsConfirmed || IsFound)
+		{
+			ChangeState(ENpcState::Run);
+			Owner->SetIsHide(false);
+		}
+		else
+		{
+			ChangeState(ENpcState::Hide);
+			Owner->SetIsConfirmed(false);
+		}		
+	}
 }
 
 void UFurikoFSMComponent::UpdateHide(float DeltaTime)
 {
 	Super::UpdateHide(DeltaTime);
+
+	if (Player)
+	{
+		Owner->SetNpc(EQuestCharacter::Furiko);
+	}
+	 
 }
