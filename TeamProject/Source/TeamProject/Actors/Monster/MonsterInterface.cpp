@@ -606,9 +606,11 @@ bool IMonsterInterface::IsPlayingMontage(EMonsterMontage _InEnum)
 		break;
 	case EMonsterMontage::GEAR_3_LEFT:
 		TempAnimMontage = MonsterData->Gear_3_Left;
+		//UE_LOG(LogTemp, Warning, TEXT("IsPlayingMontage EMonsterMontage::GEAR_3_LEFT "));
 		break;
 	case EMonsterMontage::GEAR_3_RIGHT:
 		TempAnimMontage = MonsterData->Gear_3_Right;
+		//UE_LOG(LogTemp, Warning, TEXT("IsPlayingMontage EMonsterMontage::GEAR_3_RIGHT "));
 		break;
 	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
@@ -617,7 +619,9 @@ bool IMonsterInterface::IsPlayingMontage(EMonsterMontage _InEnum)
 		break;
 	}
 
-	return AnimInstance->Montage_IsPlaying(TempAnimMontage);
+	bool bFlag = AnimInstance->Montage_IsPlaying(TempAnimMontage);
+	//UE_LOG(LogTemp, Warning, TEXT("IsPlayingMontage : %s"), bFlag ? TEXT("true") : TEXT("false"));
+	return bFlag;
 }
 
 

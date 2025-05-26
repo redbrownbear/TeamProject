@@ -976,15 +976,17 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 	}	
 		break;
 	case EReadyToAttackStep::TurnRight:
-		if (LyenlTurnRightCount >= 2)
+		if (LyenlTurnRightCount >= 5)
 		{
 			CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_FORWARD);
 			LyenlTurnRightCount = 0;
 			eReadyToAttackStep = EReadyToAttackStep::AwayFromLink;
+			UE_LOG(LogTemp, Warning, TEXT("Changed to EReadyToAttackStep::AwayFromLink"));
 		}
 		else
 		{
-			if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::GEAR_3_RIGHT))
+			bool bFlag = CharacterMonster->IsPlayingMontage(EMonsterMontage::GEAR_3_RIGHT);
+			if (!bFlag)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("ULynelFSMComponent::UpdateReadyToAttack // CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_RIGHT)"));
 				CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_RIGHT);
@@ -1011,6 +1013,8 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 		if (fDistance > LYNEL_AWAY_FROM_LINK_OFFSET)
 		{
 			eReadyToAttackStep = EReadyToAttackStep::TurnLeft;
+			UE_LOG(LogTemp, Warning, TEXT("Changed to EReadyToAttackStep::TurnLeft"));
+
 			if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::GEAR_3_LEFT))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("ULynelFSMComponent::UpdateReadyToAttack // CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_LEFT)"));
@@ -1021,11 +1025,12 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 	}
 		break;
 	case EReadyToAttackStep::TurnLeft:
-		if (LyenlTurnLeftCount >= 2)
+		if (LyenlTurnLeftCount >= 5)
 		{
 			LyenlTurnLeftCount = 0;
 			eReadyToAttackStep = EReadyToAttackStep::End;
 			ChangeState(eNextState); // Horn or Dash or Running Attack
+			UE_LOG(LogTemp, Warning, TEXT("Changed to EReadyToAttackStep::End"));
 		}
 		else
 		{
