@@ -286,6 +286,7 @@ void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 
 void UNpcFSMComponent::PlayInterectSequence()
 {
+	// Talk 시 캐릭터 위치만 고정되게 조정한 뒤 그 다음에 생성해야 할 듯
 	/*if (Player)
 	{
 		FVector PlayerLocation = Player->GetActorLocation();

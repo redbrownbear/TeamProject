@@ -48,10 +48,12 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 		bool IsQuest = Npc->GetDoQuest();
 		if (!DialogueDataRow.bIsEndConversation && IsQuest)
 		{
+			CurrentNpc->GetData()->QuestCharacter = EQuestCharacter::Furiko_Found;
 			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 101);
 		}
 		else 
 		{
+			CurrentNpc->GetData()->QuestCharacter = EQuestCharacter::Furiko;
 			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 0);
 		}			
 	}

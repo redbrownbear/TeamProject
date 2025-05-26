@@ -14,6 +14,8 @@ enum class EQuestCharacter
 
 	Furiko,
 
+	Furiko_Found,
+
 	Store,
 
 	End,
