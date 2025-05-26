@@ -154,6 +154,7 @@ protected:
 	void OnLook(const FInputActionValue& InputActionValue);
 	void LeftClick(const FInputActionValue& InputActionValue);
 	void RightClick(const FInputActionValue& InputActionValue);
+	void RightClickEnd(const FInputActionValue& InputActionValue);
 
 	// --------- Weapon Swap ------------------------------
 

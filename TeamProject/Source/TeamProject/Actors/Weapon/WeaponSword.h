@@ -32,6 +32,8 @@ public:
 
 	void SetCanMove();
 
+	void Attack();
+
 private:
 
 

@@ -70,7 +70,10 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LeftClick,
 		ETriggerEvent::Started, this, &ThisClass::LeftClick);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_RightClick,
-		ETriggerEvent::Started, this, &ThisClass::RightClick);
+		ETriggerEvent::Triggered, this, &ThisClass::RightClick);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_RightClick,
+		ETriggerEvent::Completed, this, &ThisClass::RightClickEnd);
+
 
 
 	// ------------ Weapon Swap -----------------
@@ -266,6 +269,44 @@ void APC_InGame::RightClick(const FInputActionValue& InputActionValue)
 	WeaponManagerComponent->RightClickAction();
 
 }
+
+void APC_InGame::RightClickEnd(const FInputActionValue& InputActionValue)
+{
+
+	APawn* PlayerPawn = GetPawn();
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(PlayerPawn);
+
+	UWeaponManagerComponent* WeaponManagerComponent = Player_C->GetWeaponManagerComponent();
+
+	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+
+	if (!WeaponManagerComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WeaponManagerComponent is Null"));
+		return;
+	}
+
+	
+
+	AnimInst->Montage_Stop(0.f);
+
+	AnimInst->bIsZoom = false;
+
+	Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+
+	Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+
+
+	// 이동 방향으로 자동 회전 비활성화
+	Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	Player_C->ZoomOut();
+
+}
+
+
+
+
 
 void APC_InGame::EquipSword(const FInputActionValue& InputActionValue)
 {

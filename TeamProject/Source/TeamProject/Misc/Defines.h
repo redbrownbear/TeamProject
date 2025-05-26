@@ -29,3 +29,9 @@
 #define MONSTER_ATTACK_COOLTIME														4.f
 
 #define MONSTER_ATTACK_PROJECTILE_OFFSET											100.f
+
+#define PLAYER_MOVE_NML																600.f
+#define	PLAYER_MOVE_BOW_ZOOM														300.f
+
+
+#define Arrow_Speed																	800.f

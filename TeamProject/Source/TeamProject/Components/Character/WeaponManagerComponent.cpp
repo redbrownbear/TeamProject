@@ -177,7 +177,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 		}
 		else
 		{
-			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Sword->GetChildActor());
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
 
 			AnimInstance->Montage_Play(EquipMontage);
@@ -216,7 +216,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 		}
 		else
 		{
-			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Shield->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
 
 			AnimInstance->Montage_Play(EquipMontage);
@@ -289,6 +289,52 @@ void UWeaponManagerComponent::LeftClickAction()
 		BowActor->LeftClickAction();
 	}
 
+	else if (Equip_State == EEquip_State::Sword_Shield)
+	{
+		if(bRightClick)
+		{ 
+			if (!bCanShot)
+			{
+				return;
+			}
+			AWeaponShield* ShieldActor = Cast<AWeaponShield>(Shield->GetChildActor());
+			if (!ShieldActor)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ShieldActor is not Valid"));
+			}
+			ShieldActor->LeftClickAction();
+		}
+		else
+		{
+			AWeaponSword* SwordActor = Cast<AWeaponSword>(Sword->GetChildActor());
+
+			if (!SwordActor)
+			{
+
+				UE_LOG(LogTemp, Warning, TEXT("SwordActor is not Valid"));
+				return;
+
+			}
+			SwordActor->LeftClickAction();
+		}
+	}
+	else
+	{
+		if (bRightClick)
+		{
+			if (!bCanShot)
+			{
+				return;
+			}
+			AWeaponShield* ShieldActor = Cast<AWeaponShield>(Shield->GetChildActor());
+			if (!ShieldActor)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ShieldActor is not Valid"));
+			}
+			ShieldActor->LeftClickAction();
+		}
+	}
+
 }
 
 void UWeaponManagerComponent::RightClickAction()
@@ -301,8 +347,6 @@ void UWeaponManagerComponent::RightClickAction()
 	else if(Equip_State == EEquip_State::Bow)
 	{
 
-		bRightClick = !bRightClick;
-
 		AWeaponBow* BowActor = Cast<AWeaponBow>(Bow->GetChildActor());
 
 		if (!BowActor)
@@ -313,10 +357,7 @@ void UWeaponManagerComponent::RightClickAction()
 
 		}
 
-		
-
-		BowActor->RightClickAction(bRightClick);
-		
+		BowActor->RightClickAction();		
 	}
 
 }
