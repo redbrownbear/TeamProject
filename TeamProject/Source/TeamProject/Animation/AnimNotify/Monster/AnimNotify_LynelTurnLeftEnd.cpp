@@ -14,6 +14,7 @@ void UAnimNotify_LynelTurnLeftEnd::Notify(USkeletalMeshComponent* MeshComp, UAni
 		{
 			if (ULynelFSMComponent* LynelFSMComponent = Cast<ULynelFSMComponent>(FSMComponent))
 			{
+				UE_LOG(LogTemp, Warning, TEXT("UAnimNotify_LynelTurnRightEnd::Notify"));
 				LynelFSMComponent->SetTurnLeftCount(LynelFSMComponent->GetTurnLeftCount() + 1);
 			}
 		}

@@ -105,6 +105,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		//CapsuleComp->SetSphereRadius(MonsterData->CollisionSphereRadius);
 		CapsuleComp->SetCollisionProfileName(CollisionProfileName::Monster);
 		CapsuleComp->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+		CapsuleComp->SetCapsuleHalfHeight(MonsterData->CollisionSphereRadius);
 		CapsuleComp->RegisterComponent();
 	}
 

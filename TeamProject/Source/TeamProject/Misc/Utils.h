@@ -153,12 +153,12 @@ UENUM()
 enum class ECombatIndex : uint8
 {
     AimingBow = 0, 
+    HornAttack, 
     DashAttack, 
+    RunningAttack,
     ExplosionAttack, 
     FireAttack, 
     AimingBowUpper, 
-    HornAttack, 
-    RunningAttack,
     End
 };
 

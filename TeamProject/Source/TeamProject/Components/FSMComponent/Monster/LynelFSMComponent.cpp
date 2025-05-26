@@ -143,14 +143,17 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::AimingBowUpper:
 		break;
 	case EMonsterState::DashAttack:
+		eReadyToAttackStep = EReadyToAttackStep::RunToLink;
 		break;
 	case EMonsterState::ExplosionAttack:
 		break;
 	case EMonsterState::FireAttack:
 		break;
 	case EMonsterState::HornAttack:
+		eReadyToAttackStep = EReadyToAttackStep::RunToLink;
 		break;
 	case EMonsterState::RunningAttack:
+		eReadyToAttackStep = EReadyToAttackStep::RunToLink;
 		break;
 	case EMonsterState::Rebound:
 		break;
@@ -748,31 +751,34 @@ void ULynelFSMComponent::UpdateDashAttack(float DeltaTime)
 
 	if (bIsNear)
 	{
-		if (CurrentWeapon)
+		if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::END))
 		{
-			EWeaponKind WeaponKind = CurrentWeapon->GetWorldWeaponKind();
-			switch (WeaponKind)
+			if (CurrentWeapon)
 			{
-			case EWeaponKind::SWORD:
-				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_DASH_SWORD_END);
-				break;
-			case EWeaponKind::SPEAR:
-			case EWeaponKind::LSWORD:
-				CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_DASH_LSWORD_END);
-				break;
-			case EWeaponKind::BOW:
-			case EWeaponKind::END:
-			default:
-				UE_LOG(LogTemp, Error, TEXT("LynelFSMComponent::UpdateDashAttack // Unexpected Weapon Kind"));
+				EWeaponKind WeaponKind = CurrentWeapon->GetWorldWeaponKind();
+				switch (WeaponKind)
+				{
+				case EWeaponKind::SWORD:
+					CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_DASH_SWORD_END);
+					break;
+				case EWeaponKind::SPEAR:
+				case EWeaponKind::LSWORD:
+					CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_DASH_LSWORD_END);
+					break;
+				case EWeaponKind::BOW:
+				case EWeaponKind::END:
+				default:
+					UE_LOG(LogTemp, Error, TEXT("LynelFSMComponent::UpdateDashAttack // Unexpected Weapon Kind"));
+					check(false);
+					return;
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("LynelFSMComponent::UpdateDashAttack // No CurrentWeapon"));
 				check(false);
 				return;
 			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("LynelFSMComponent::UpdateDashAttack // No CurrentWeapon"));
-			check(false);
-			return;
 		}
 	}
 }
@@ -821,9 +827,12 @@ void ULynelFSMComponent::UpdateHornAttack(float DeltaTime)
 
 	if (bHornAttackPassed)
 	{
-		CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_HORN_END);
+		if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::ATTACK_HORN_END))
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_HORN_END);
+		}
 		return;
-		const float fDist = FVector::Dist(PlayerLocation, MonsterLocation);
+		//const float fDist = FVector::Dist(PlayerLocation, MonsterLocation);
 		//if (fDist > LYNEL_HORN_ATTACK_MAX_PASS_LENGTH)
 		//{
 		//	// End
@@ -958,7 +967,11 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 		if (bIsNear)
 		{
 			eReadyToAttackStep = EReadyToAttackStep::TurnRight;
-			CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_RIGHT);
+			if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::GEAR_3_RIGHT))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ULynelFSMComponent::UpdateReadyToAttack // CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_RIGHT)"));
+				CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_RIGHT);
+			}
 		}
 	}	
 		break;
@@ -973,6 +986,7 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 		{
 			if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::GEAR_3_RIGHT))
 			{
+				UE_LOG(LogTemp, Warning, TEXT("ULynelFSMComponent::UpdateReadyToAttack // CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_RIGHT)"));
 				CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_RIGHT);
 			}
 		}
@@ -997,7 +1011,11 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 		if (fDistance > LYNEL_AWAY_FROM_LINK_OFFSET)
 		{
 			eReadyToAttackStep = EReadyToAttackStep::TurnLeft;
-			CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_LEFT);
+			if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::GEAR_3_LEFT))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("ULynelFSMComponent::UpdateReadyToAttack // CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_LEFT)"));
+				CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_LEFT);
+			}
 		}
 
 	}
@@ -1013,6 +1031,7 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 		{
 			if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::GEAR_3_LEFT))
 			{
+				UE_LOG(LogTemp, Warning, TEXT("ULynelFSMComponent::UpdateReadyToAttack // CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_LEFT)"));
 				CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_LEFT);
 			}
 		}
