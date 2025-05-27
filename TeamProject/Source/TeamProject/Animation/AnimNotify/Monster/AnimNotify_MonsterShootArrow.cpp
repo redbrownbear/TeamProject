@@ -2,14 +2,14 @@
 
 
 #include "AnimNotify_MonsterShootArrow.h"
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/PawnMonster.h"
 #include "Actors/Projectile/Projectile.h"
 
 void UAnimNotify_MonsterShootArrow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
-	if (AMonster* Monster = Cast<AMonster>(MeshComp->GetOwner()))
+	if (APawnMonster* Monster = Cast<APawnMonster>(MeshComp->GetOwner()))
 	{
 		UWorld* World = MeshComp->GetWorld();
 

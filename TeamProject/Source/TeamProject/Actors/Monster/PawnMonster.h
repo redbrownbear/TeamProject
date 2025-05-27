@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Actors/Monster/MonsterInterface.h"
 #include "Misc/Utils.h"
-#include "Monster.generated.h"
+#include "PawnMonster.generated.h"
 
 class UMonsterStatusComponent;
 class UAIPerceptionComponent;
@@ -19,12 +20,12 @@ class ACampFire;
 struct FMonsterTableRow;
 
 UCLASS()
-class TEAMPROJECT_API AMonster : public APawn
+class TEAMPROJECT_API APawnMonster : public APawn, public IMonsterInterface
 {
 	GENERATED_BODY()
 
 public:
-	AMonster();
+    APawnMonster();
 
 protected:
 	virtual void BeginPlay() override;
@@ -33,26 +34,27 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-    UPROPERTY(VisibleAnywhere)
-    TObjectPtr<UMonsterStatusComponent> StatusComponent;
     UPROPERTY(EditAnywhere)
     TObjectPtr<USphereComponent> CollisionComponent;
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UAdvancedFloatingPawnMovement> MovementComponent;
+    UPROPERTY(VisibleAnywhere)
+    TObjectPtr<UMonsterStatusComponent> StatusComponent;
 
-public:
-    UMonsterStatusComponent* GetStatusComponent() const { return StatusComponent; }
-    UMonsterFSMComponent* GetFSMComponent() const;
+protected:
+    UPROPERTY(EditAnywhere, meta = (RowType = "MonsterTableRow"))
+    FDataTableRowHandle DataTableRowHandle;
+    FMonsterTableRow* MonsterData;
+
 
 protected:
     UPROPERTY(EditAnywhere)
-    FDataTableRowHandle DataTableRowHandle;
-    TObjectPtr<FMonsterTableRow> MonsterData;
+    TObjectPtr<APatrolPath> PatrolPath;
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<ACampFire> CampFire;
 
-public:
-    virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
 
 protected:
     virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
@@ -61,22 +63,8 @@ protected:
     virtual void PostInitializeComponents() override;
     virtual void OnConstruction(const FTransform& Transform);
 
-protected:
-    UPROPERTY(EditAnywhere)
-    TObjectPtr<APatrolPath> PatrolPath;
 public:
-    APatrolPath* GetPatrolPath() const { return PatrolPath; }
-
-protected:
-    UPROPERTY(EditAnywhere)
-    TObjectPtr<ACampFire> CampFire;
-public:
-    ACampFire* GetCampFire() const { return CampFire; }
-
-public:
-    void PlayMontage(EMonsterMontage _InEnum, bool bIsLoop = false);
-    bool IsMontage(EMonsterMontage _InEnum);
-    bool IsPlayingMontage(EMonsterMontage _InEnum);
+    virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
 
 protected:
     UFUNCTION()
@@ -85,9 +73,16 @@ protected:
     virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:
-    void SetSpeedWalk();
-    void SetSpeedRun();
+    virtual UMonsterStatusComponent* GetStatusComponent() const { return StatusComponent; }
+    virtual APatrolPath* GetPatrolPath() const override;
+    virtual ACampFire* GetCampFire() const override;
+	virtual FMonsterTableRow* GetMonsterData() const { return MonsterData; }
 
-public:
-    USkeletalMeshComponent* GetSkeletalMeshComponent() const { return SkeletalMeshComponent; }
+
+    // No const to attach WorldWeapon to SkeletalMeshComponent
+    virtual UAnimInstance* GetAnimInstance() const;
+    virtual USkeletalMeshComponent* GetMonsterMesh() const override { return SkeletalMeshComponent; }
+    virtual UMonsterFSMComponent* GetFSMComponent() const;
+    virtual void SetSpeedWalk() override;
+    virtual void SetSpeedRun() override;
 };

@@ -11,6 +11,8 @@ struct FItemData;
 class UShapeComponent;
 class UPhysicalMaterial;
 class UAIPerceptionStimuliSourceComponent;
+class IMonsterInterface;
+class ALynel;
 
 UCLASS()
 class TEAMPROJECT_API AWorldWeapon : public AActor
@@ -50,7 +52,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UShapeComponent> CollisionComponent;
 	UPROPERTY(VisibleAnywhere)
-	class UStaticMeshComponent* StaticMeshComponent;
+	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UPhysicalMaterial> PhysicalMaterial;
 	UPROPERTY(VisibleAnywhere)
@@ -64,9 +66,10 @@ protected:
 	const FItemData* ItemTableRow;
 
 public:
-	FName GetWorldWeaponName();
-	EWeaponKind GetWorldWeaponKind();
+	FName GetWorldWeaponName() const;
+	EWeaponKind GetWorldWeaponKind() const;
 	void AddForce(FVector _Direction, float Force);
+	void AttachToMonster(IMonsterInterface* Monster, FName SocketName);
 
 protected:
 	bool bIsCatched = false;
