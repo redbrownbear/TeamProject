@@ -11,9 +11,7 @@ ATempleBall::ATempleBall()
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	RootComponent = CollisionComponent;
-	CollisionComponent->SetCollisionProfileName(TEXT("PhysicsActor"));
-	CollisionComponent->SetCanEverAffectNavigation(false);
-	CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
+	CollisionComponent->SetCollisionProfileName(TEXT("PhysicsActor"));		
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
@@ -26,6 +24,9 @@ ATempleBall::ATempleBall()
 void ATempleBall::BeginPlay()
 {
 	Super::BeginPlay();	
+
+	CollisionComponent->SetCanEverAffectNavigation(false);
+	CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
 
 	StaticMeshComponent->BodyInstance.bUseCCD = true;
 	StaticMeshComponent->SetSimulatePhysics(true);

@@ -21,6 +21,7 @@
 
 
 #include "Actors/Temple/Ice/IcePillar.h"
+#include "Actors/Temple/Ice/IcePreview.h"
 
 APC_InGame::APC_InGame()
 {
@@ -94,10 +95,10 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::OpenInventory);
 
 	// ------------ Supernatural -----------------
-	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Preview,
-		ETriggerEvent::Started, this, &ThisClass::IcePreview);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
-		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);
+		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
+		ETriggerEvent::Completed, this, &ThisClass::EndIcePreview);
 }
 
 void APC_InGame::ChangeInputContext(EInputContext NewContext)
@@ -344,19 +345,12 @@ void APC_InGame::ShowDialogueUI()
 
 }
 
-void APC_InGame::IcePreview()
-{
-}
-
 void APC_InGame::SpawnIcePillar()
 {
 	if (!IcePillarClass) return;
 
-	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
-	if (!PC) return;
-
 	FVector Start, Dir;
-	PC->DeprojectMousePositionToWorld(Start, Dir);
+	DeprojectMousePositionToWorld(Start, Dir);
 
 	FVector End = Start + Dir * TraceDistance;
 
@@ -393,6 +387,53 @@ void APC_InGame::ClearOldestPillar()
 	}
 
 	IceList.RemoveAt(0);;
+}
+
+void APC_InGame::BeginIcePreview(const FInputActionValue& Value)
+{
+	bIsQHeld = true;
+
+	if (!IcePreviewActor && IcePreviewClass)
+	{
+		IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
+		if (IcePreviewActor)
+		{
+			IcePreviewActor->SetActorEnableCollision(false);
+		}
+	}
+
+}
+
+void APC_InGame::EndIcePreview(const FInputActionValue& Value)
+{
+	bIsQHeld = false;
+
+	if (IcePreviewClass)
+	{
+		IcePreviewActor->Destroy();
+		IcePreviewActor = nullptr;
+	}
+
+	SpawnIcePillar();
+}
+
+void APC_InGame::UpdateIcePreview()
+{
+	if (!bIsQHeld || !IcePreviewClass) return;
+
+	FVector Start, Dir;
+	DeprojectMousePositionToWorld(Start, Dir);
+	FVector End = Start + Dir * TraceDistance;
+
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		FVector HitLoc = Hit.Location;
+		IcePreviewActor->SetActorLocation(HitLoc);
+	}
 }
 
 

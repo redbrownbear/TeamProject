@@ -46,6 +46,8 @@ void AIcePillar::BeginPlay()
 			FTimerHandle Handle;
 			GetWorld()->GetTimerManager().SetTimer(Handle, this, &AIcePillar::DestroyPillar, LifeTime, false);
 		});
+
+
 }
 
 // Called every frame

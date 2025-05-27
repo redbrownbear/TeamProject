@@ -9,6 +9,7 @@
 class UBoxComponent;
 class UTimelineComponent;
 class UNiagaraSystem;
+class UMaterialInterface;
 
 UCLASS()
 class TEAMPROJECT_API AIcePillar : public AActor
@@ -57,4 +58,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Cryonis")
 	TObjectPtr<UNiagaraSystem> BreakEffect;
+
+
 };
