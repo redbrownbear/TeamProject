@@ -29,7 +29,7 @@ class TEAMPROJECT_API APlayerCharacter : public ACharacter, public IGenericTeamA
 
 public:
 	// Sets default values for this character's properties
-	APlayerCharacter();
+	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	// Called when the game starts or when spawned

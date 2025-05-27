@@ -21,6 +21,8 @@ public:
 	virtual void LeftClickAction() override;
 	virtual void RightClickAction() override;
 
+	UAnimMontage* GetWaitMTG() { return Wait_MTG; }
+	UAnimMontage* GetJustMTG() { return Just_MTG; }
 private:
 
 

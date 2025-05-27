@@ -98,15 +98,28 @@ void AWeaponShield::LeftClickAction()
 
         UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
+        
+
         if (AnimInst->Montage_IsPlaying(Wait_MTG))
         {
 
             AnimInst->Montage_Stop(0.f);
             AnimInst->Montage_Play(Just_MTG);
+            AnimInst->bIsWaitShield = false;
 
         }
         Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+        Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+
+        Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+        Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+
+        Player_C->ZoomOut();
     }
+
+
 
 
 }

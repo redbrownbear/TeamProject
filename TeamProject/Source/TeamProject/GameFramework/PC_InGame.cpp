@@ -14,7 +14,7 @@
 #include "UI/Inven/Inventory.h"
 
 #include "Actors/Npc/Npc.h" 
-
+#include "Components/Character/PlayerMovementComponent.h"
 
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
@@ -85,7 +85,10 @@ void APC_InGame::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_EquipBow,
 		ETriggerEvent::Started, this, &ThisClass::EquipBow);
+	// ------------ Climb ------------------------
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Climb,
+		ETriggerEvent::Started, this, &ThisClass::Climb);
 
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Interact,
@@ -288,6 +291,16 @@ void APC_InGame::RightClickEnd(const FInputActionValue& InputActionValue)
 	WeaponManagerComponent->RightClickEnd();
 
 	
+}
+
+void APC_InGame::Climb(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+
+	Movement->DoCapsuleTraceMultiByObject();
+
 }
 
 

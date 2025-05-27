@@ -55,13 +55,28 @@ AWeaponBow::AWeaponBow()
 
         if (Asset.Object)
         {
-            Attack_MTG = Asset.Object;
+            ChargingMTG = Asset.Object;
         }
         else
         {
             UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
         }
     }
+    {
+        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Bow/Animation/Bow_Attack_Shoot.Bow_Attack_Shoot'"));
+
+        if (Asset.Object)
+        {
+            ShootMTG = Asset.Object;
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+        }
+    }
+
+
+
     {
         ArrowClass = AProjectile_Arrow::StaticClass();
     }
@@ -75,25 +90,27 @@ void AWeaponBow::LeftClickAction()
 
 
 
+    if (AnimInst->Montage_IsPlaying(ChargingMTG))
+    {
+
+        AnimInst->Montage_Stop(0.f);
+        AnimInst->Montage_Play(ShootMTG);
+        AnimInst->bIsWaitShield = false;
+
+    }
+    Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);
+
     Player_C->GetWeaponManagerComponent()->SetCanShot(false);
 
     AnimInst->bIsZoom = false;
-    
-    AnimInst->Montage_Resume(Attack_MTG);
-
-    Player_C->GetCharacterMovement()->MaxWalkSpeed = 600.f;
-
 
     Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
 
 
     // 이동 방향으로 자동 회전 비활성화
     Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
-
-    USpringArmComponent* C_SpringArm = Player_C->GetSpringArm();
   
     FireArrow();
-    
 
     Player_C->ZoomOut();
 }
@@ -119,7 +136,7 @@ void AWeaponBow::RightClickAction()
     AnimInst->bIsZoom = true;
     
 
-    AnimInst->Montage_Play(Attack_MTG);
+    AnimInst->Montage_Play(ChargingMTG);
     UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
 
     C_Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;

@@ -96,6 +96,11 @@ void UWeaponManagerComponent::TryEquipWeapon()
 	if (PlayingMontage)
 		return;
 	
+	if (CRT->GetCharacterMovement()->MovementMode == MOVE_None)
+	{
+		return;
+	}
+	
 
 	if (NextWeapon == EWeapon_Type::Sword)
 	{
@@ -307,7 +312,10 @@ void UWeaponManagerComponent::LeftClickAction()
 	{
 		if (bRightClick)
 		{
-
+			if (!bCanShot)
+			{
+				return;
+			}
 			AWeaponShield* ShieldActor = Cast<AWeaponShield>(Shield->GetChildActor());
 			if (!ShieldActor)
 			{
@@ -387,7 +395,7 @@ void UWeaponManagerComponent::RightClickAction()
 
 		if (!ShieldActor)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("BowActor is not Valid"));
+			UE_LOG(LogTemp, Warning, TEXT("Shield is not Valid"));
 			return;
 			check(ShieldActor);
 		}
@@ -423,6 +431,14 @@ void UWeaponManagerComponent::RightClickEnd()
 			Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
 
 			Player_C->ZoomOut();
+
+
+			AWeaponBow* WBow = Cast<AWeaponBow>(Bow->GetChildActor());
+
+			if (AnimInst->Montage_IsPlaying(WBow->GetChargingMTG()))
+			{
+				AnimInst->Montage_Stop(0.f);
+			}
 		}
 	}
 	else if (Equip_State == EEquip_State::Shield || Equip_State == EEquip_State::Sword_Shield)
@@ -444,7 +460,14 @@ void UWeaponManagerComponent::RightClickEnd()
 
 			Player_C->ZoomOut();
 
+			AWeaponShield* WShield = Cast<AWeaponShield>(Shield->GetChildActor());
+
+			if (AnimInst->Montage_IsPlaying(WShield->GetWaitMTG()))
+			{
+				AnimInst->Montage_Stop(0.f);
+			}
 		}
 	}
 	bRightClick = false;
+	bCanShot = false;
 }

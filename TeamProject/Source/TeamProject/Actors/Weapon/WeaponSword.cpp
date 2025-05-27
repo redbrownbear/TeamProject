@@ -75,10 +75,18 @@ void AWeaponSword::LeftClickAction()
 
     {
         APlayerCharacter* Player_C = Cast<APlayerCharacter>(OwnerActor);
+        UAnimInstance* AnimInstance= Player_C->GetMesh()->GetAnimInstance();
+        UAnimMontage* PlayingMontage = AnimInstance->GetCurrentActiveMontage();
+        if (PlayingMontage)
+        {
+            if(PlayingMontage != Arr_Sword_Attack_MTG[PrevComboIndex])
+                return;
+        }
+        
+        AnimInstance->Montage_Play(Arr_Sword_Attack_MTG[CurrentComboIndex]);
+
         CurrentComboIndex += 1;
         CurrentComboIndex = (MaxComboIndex <= CurrentComboIndex) ? 0 : CurrentComboIndex;
-
-        Player_C->GetMesh()->GetAnimInstance()->Montage_Play(Arr_Sword_Attack_MTG[CurrentComboIndex]);
         Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);
 
     }
