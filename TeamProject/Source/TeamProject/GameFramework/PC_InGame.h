@@ -20,7 +20,6 @@ enum class EInputContext
 	IC_Inventory,
 	IC_Dialogue,
 	//필요하면 추가해서 사용합니다.
-	IC_Supernatural,
 
 	IC_End,
 };
@@ -43,10 +42,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
 	UInputMappingContext* IMC_Dialogue = nullptr;
 
-	//Supernatural
-	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
-	UInputMappingContext* IMC_Supernatural = nullptr;
-
 	//Player
 public:
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
@@ -60,7 +55,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_RightClick = nullptr;
 
-	
+
 
 
 
@@ -111,6 +106,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_IceMaker = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_Build = nullptr;
+
 	void CheckValid() const
 	{
 		check(IMC_InGame);
@@ -133,7 +131,8 @@ public:
 		check(IA_DialogueConfirm);
 		check(IA_DialogueCancel);
 		check(IA_DialogueNext);
-		check(IA_IceMaker);
+		check(IA_IceMaker);		
+		check(IA_Build);
 	}
 };
 
@@ -141,13 +140,13 @@ public:
 class AIcePillar;
 class AIcePreview;
 /**
- * 
+ *
  */
 UCLASS()
 class TEAMPROJECT_API APC_InGame : public APlayerController
 {
 	GENERATED_BODY()
-	
+
 public:
 	APC_InGame();
 protected:
@@ -170,8 +169,8 @@ protected:
 	void RightClick(const FInputActionValue& InputActionValue);
 	void RightClickEnd(const FInputActionValue& InputActionValue);
 	void Climb(const FInputActionValue& InputActionValue);
-	
-	
+
+
 	// --------- Weapon Swap ------------------------------
 
 	void EquipSword(const FInputActionValue& InputActionValue);
@@ -182,13 +181,18 @@ protected:
 	void OnInteract(const FInputActionValue& InputActionValue);
 	void OpenInventory(const FInputActionValue& InputActionValue);
 
+	// --------- Ice Maker ------------------------------
+
+	void BeginIcePreview(const FInputActionValue& InputActionValue);
+	void EndIcePreview(const FInputActionValue& InputActionValue);
+
 
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
 
 public:
 	UPROPERTY(EditAnywhere)
-	UPC_InGameDataAsset* PC_InGameDataAsset;	
+	UPC_InGameDataAsset* PC_InGameDataAsset;
 
 	UPROPERTY()
 	TObjectPtr<class ANpc> Npc = nullptr;
@@ -197,19 +201,11 @@ public:
 
 	// --------- Supernatural ----------
 protected:
-	// 우클릭 누르고 있을 때 호출
-	UFUNCTION()
-	void BeginIcePreview(const FInputActionValue& Value);
-
-	// 우클릭 뗄 때 호출
-	UFUNCTION()
-	void EndIcePreview(const FInputActionValue& Value);
-
 	UFUNCTION()
 	void SpawnIcePillar();
 
 	UFUNCTION()
-	void ClearOldestPillar(); 
+	void ClearOldestPillar();
 
 	// 매 프레임 업데이트
 	void UpdateIcePreview();
@@ -221,18 +217,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
 	TSubclassOf<AIcePreview> IcePreviewClass;
 
+	UPROPERTY(EditAnywhere, Category = "Cryonis")
+	float TraceDistance = 300.0f;
+
 	UPROPERTY()
 	TObjectPtr<AIcePreview> IcePreviewActor = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	float TraceDistance = 300.0f;
 
 private:
 	TArray<TWeakObjectPtr<AIcePillar>> IceList;
 	uint64 MaxIceCount = 3; // 한 번에 만들 수 있는 얼음 기둥 개수
 
-private:
-	UPROPERTY()
-	bool bIsQHeld = false;
-
+	bool bQPressed = false;
 };

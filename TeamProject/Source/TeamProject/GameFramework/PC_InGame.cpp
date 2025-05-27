@@ -43,7 +43,7 @@ void APC_InGame::BeginPlay()
 	Super::BeginPlay();
 
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-	if(UIManager)
+	if (UIManager)
 		UIManager->PostWorldInitialize();
 
 	ChangeInputContext(EInputContext::IC_InGame);
@@ -59,7 +59,7 @@ void APC_InGame::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
 		ETriggerEvent::Triggered, this, &ThisClass::OnMove);
-	
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
 		ETriggerEvent::Completed, this, &ThisClass::OnMoveCancel);
 
@@ -103,8 +103,9 @@ void APC_InGame::SetupInputComponent()
 	// ------------ Supernatural -----------------
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
 		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
-	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
-		ETriggerEvent::Completed, this, &ThisClass::EndIcePreview);
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Build,
+		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);
 }
 
 void APC_InGame::ChangeInputContext(EInputContext NewContext)
@@ -135,11 +136,6 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;
 		break;
-	case EInputContext::IC_Supernatural:
-		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Supernatural, 3);
-		SetInputMode(FInputModeUIOnly());
-		bShowMouseCursor = true;
-		break;
 
 	}
 
@@ -154,7 +150,7 @@ void APC_InGame::BindInventoryInput(UInventory* Inventory)
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenNavigate, ETriggerEvent::Started, Inventory, &UInventory::OnNavigate);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenConfirm, ETriggerEvent::Started, Inventory, &UInventory::OnConfirm);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenCancel, ETriggerEvent::Started, Inventory, &UInventory::OnCancel);
-		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started ,Inventory, &UInventory::OnCreateItemTest);
+		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started, Inventory, &UInventory::OnCreateItemTest);
 	}
 }
 
@@ -173,7 +169,7 @@ void APC_InGame::BindDialogueInput(UNPCDialogue* NpcDialogue)
 void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 {
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
-	if(!Player_C)
+	if (!Player_C)
 	{
 		return;
 	}
@@ -181,19 +177,19 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	{
 		return;
 	}
-	
+
 
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
-	
+
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
-	
+
 	const FRotator Rotation = K2_GetActorRotation();
 	const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
 	const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
 	const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
-	
+
 
 	P_Anim->ActionValue = ActionValue;
 
@@ -246,9 +242,9 @@ void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
-	
+
 	P_Anim->SetPitch();
-	
+
 }
 
 void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
@@ -304,13 +300,13 @@ void APC_InGame::RightClickEnd(const FInputActionValue& InputActionValue)
 
 	WeaponManagerComponent->RightClickEnd();
 
-	
+
 }
 
 void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 {
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
-	
+
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 
 }
@@ -362,9 +358,9 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 	{
 		if (UNpcFSMComponent* FSM = Npc->GetFSMComponent())
 		{
-			FSM->ChangeState(ENpcState::Talk);			
+			FSM->ChangeState(ENpcState::Talk);
 		}
-	}	
+	}
 }
 
 void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
@@ -387,6 +383,8 @@ void APC_InGame::SpawnIcePillar()
 {
 	if (!IcePillarClass) return;
 
+	if (!bQPressed) return;
+	
 	FVector Start, Dir;
 	DeprojectMousePositionToWorld(Start, Dir);
 
@@ -427,9 +425,9 @@ void APC_InGame::ClearOldestPillar()
 	IceList.RemoveAt(0);;
 }
 
-void APC_InGame::BeginIcePreview(const FInputActionValue& Value)
+void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 {
-	bIsQHeld = true;
+	bQPressed = true; 
 
 	if (!IcePreviewActor && IcePreviewClass)
 	{
@@ -442,9 +440,9 @@ void APC_InGame::BeginIcePreview(const FInputActionValue& Value)
 
 }
 
-void APC_InGame::EndIcePreview(const FInputActionValue& Value)
+void APC_InGame::EndIcePreview(const FInputActionValue& InputActionValue)
 {
-	bIsQHeld = false;
+	bQPressed = false;
 
 	if (IcePreviewClass)
 	{
@@ -457,7 +455,7 @@ void APC_InGame::EndIcePreview(const FInputActionValue& Value)
 
 void APC_InGame::UpdateIcePreview()
 {
-	if (!bIsQHeld || !IcePreviewClass) return;
+	if (!IcePreviewClass) return;
 
 	FVector Start, Dir;
 	DeprojectMousePositionToWorld(Start, Dir);
