@@ -116,7 +116,6 @@ void AWeaponShield::LeftClickAction()
 
         Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
 
-        Player_C->ZoomOut();
     }
 
 
@@ -159,8 +158,5 @@ void AWeaponShield::RightClickAction()
     USpringArmComponent* C_SpringArm = Player_C->GetSpringArm();
 
 
-
-
-    Player_C->ZoomIn();
 
 }

@@ -19,21 +19,11 @@ public:
 
 	GENERATED_BODY()
 	
-	TArray<FHitResult> DoCapsuleTraceMultiByObject(const FVector& Start, const FVector& End, bool bShowDebugSphere);
-
-	void TraceFromEyeHeight(float TraceDistance, float TraceStartOffset);
-
-	void DoLineTraceSingleByObject(FVector Start, FVector End, bool bShowDebugLine);
+	void ClimbingLineTrace();
+	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
 
 
-public:
-
-	UPROPERTY(EditAnywhere, category = "Climb")
-	float ClimbCapsuleTraceRadius;
-	UPROPERTY(EditAnywhere, category = "Climb")
-	float ClimbCapsuleTraceHalfHeight;
-	UPROPERTY(EditAnywhere, category = "Climb")
-	TArray<TEnumAsByte<EObjectTypeQuery>> ClimbableSurfaceTraceTypes;
+	
 
 
 };
