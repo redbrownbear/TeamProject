@@ -210,6 +210,51 @@ void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 		TempAnimMontage = MonsterData->Gear_3_Right;
 		UE_LOG(LogTemp, Warning, TEXT("EMonsterMontage::GEAR_3_RIGHT"));
 		break;
+	case EMonsterMontage::DEAD:
+		TempAnimMontage = MonsterData->Dead;
+		break;
+	case EMonsterMontage::FOOT:
+		TempAnimMontage = MonsterData->Foot;
+		break;
+	case EMonsterMontage::HANDCLAP:
+		TempAnimMontage = MonsterData->HandClap;
+		break;
+	case EMonsterMontage::HIPDROP:
+		TempAnimMontage = MonsterData->HipDrop;
+		break;
+	case EMonsterMontage::LEFTHAND:
+		TempAnimMontage = MonsterData->LeftHand;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_START:
+		TempAnimMontage = MonsterData->Damage_Eye_Start;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_END:
+		TempAnimMontage = MonsterData->Damage_Eye_End;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_L:
+		TempAnimMontage = MonsterData->Damage_Foot_L;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_R:
+		TempAnimMontage = MonsterData->Damage_Foot_R;
+		break;
+	case EMonsterMontage::RUN_CURVE_R:
+		TempAnimMontage = MonsterData->Run_Curve_R;
+		break;
+	case EMonsterMontage::RUN_CURVE_L:
+		TempAnimMontage = MonsterData->Run_Curve_L;
+		break;
+	case EMonsterMontage::SLEEP_START:
+		TempAnimMontage = MonsterData->Sleep_Start;
+		break;
+	case EMonsterMontage::SLEEP_END:
+		TempAnimMontage = MonsterData->Sleep_End;
+		break;
+	case EMonsterMontage::THROW_STONE_START:
+		TempAnimMontage = MonsterData->Throw_Stone_Start;
+		break;
+	case EMonsterMontage::THROW_STONE_END:
+		TempAnimMontage = MonsterData->Throw_Stone_End;
+		break;
 	case EMonsterMontage::END:
 	default:
 		check(false);
@@ -419,6 +464,51 @@ bool IMonsterInterface::IsMontage(EMonsterMontage _InEnum)
 	case EMonsterMontage::GEAR_3_RIGHT:
 		TempAnimMontage = MonsterData->Gear_3_Right;
 		break;
+	case EMonsterMontage::DEAD:
+		TempAnimMontage = MonsterData->Dead;
+		break;
+	case EMonsterMontage::FOOT:
+		TempAnimMontage = MonsterData->Foot;
+		break;
+	case EMonsterMontage::HANDCLAP:
+		TempAnimMontage = MonsterData->HandClap;
+		break;
+	case EMonsterMontage::HIPDROP:
+		TempAnimMontage = MonsterData->HipDrop;
+		break;
+	case EMonsterMontage::LEFTHAND:
+		TempAnimMontage = MonsterData->LeftHand;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_START:
+		TempAnimMontage = MonsterData->Damage_Eye_Start;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_END:
+		TempAnimMontage = MonsterData->Damage_Eye_End;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_L:
+		TempAnimMontage = MonsterData->Damage_Foot_L;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_R:
+		TempAnimMontage = MonsterData->Damage_Foot_R;
+		break;
+	case EMonsterMontage::RUN_CURVE_R:
+		TempAnimMontage = MonsterData->Run_Curve_R;
+		break;
+	case EMonsterMontage::RUN_CURVE_L:
+		TempAnimMontage = MonsterData->Run_Curve_L;
+		break;
+	case EMonsterMontage::SLEEP_START:
+		TempAnimMontage = MonsterData->Sleep_Start;
+		break;
+	case EMonsterMontage::SLEEP_END:
+		TempAnimMontage = MonsterData->Sleep_End;
+		break;
+	case EMonsterMontage::THROW_STONE_START:
+		TempAnimMontage = MonsterData->Throw_Stone_Start;
+		break;
+	case EMonsterMontage::THROW_STONE_END:
+		TempAnimMontage = MonsterData->Throw_Stone_End;
+		break;
 	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;
@@ -618,6 +708,53 @@ bool IMonsterInterface::IsPlayingMontage(EMonsterMontage _InEnum)
 		TempAnimMontage = MonsterData->Gear_3_Right;
 		//UE_LOG(LogTemp, Warning, TEXT("IsPlayingMontage EMonsterMontage::GEAR_3_RIGHT "));
 		break;
+	case EMonsterMontage::DEAD:
+		TempAnimMontage = MonsterData->Dead;
+		break;
+	case EMonsterMontage::FOOT:
+		TempAnimMontage = MonsterData->Foot;
+		break;
+	case EMonsterMontage::HANDCLAP:
+		TempAnimMontage = MonsterData->HandClap;
+		break;
+	case EMonsterMontage::HIPDROP:
+		TempAnimMontage = MonsterData->HipDrop;
+		break;
+	case EMonsterMontage::LEFTHAND:
+		TempAnimMontage = MonsterData->LeftHand;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_START:
+		TempAnimMontage = MonsterData->Damage_Eye_Start;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_END:
+		TempAnimMontage = MonsterData->Damage_Eye_End;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_L:
+		TempAnimMontage = MonsterData->Damage_Foot_L;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_R:
+		TempAnimMontage = MonsterData->Damage_Foot_R;
+		break;
+	case EMonsterMontage::RUN_CURVE_R:
+		TempAnimMontage = MonsterData->Run_Curve_R;
+		break;
+	case EMonsterMontage::RUN_CURVE_L:
+		TempAnimMontage = MonsterData->Run_Curve_L;
+		break;
+	case EMonsterMontage::SLEEP_START:
+		TempAnimMontage = MonsterData->Sleep_Start;
+		break;
+	case EMonsterMontage::SLEEP_END:
+		TempAnimMontage = MonsterData->Sleep_End;
+		break;
+	case EMonsterMontage::THROW_STONE_START:
+		TempAnimMontage = MonsterData->Throw_Stone_Start;
+		break;
+	case EMonsterMontage::THROW_STONE_END:
+		TempAnimMontage = MonsterData->Throw_Stone_End;
+		break;
+
+
 	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;

@@ -6,7 +6,7 @@
 
 #include "Actors/Monster/CharacterMonster.h"
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
-#include "Kismet/KismetMathLibrary.h"
+//#include "Kismet/KismetMathLibrary.h"
 
 ULynelAnimInstance::ULynelAnimInstance()
 {
@@ -33,20 +33,6 @@ void ULynelAnimInstance::NativeInitializeAnimation()
 void ULynelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-
-	FRootMotionMovementParams RootMotion = ConsumeExtractedRootMotion(DeltaSeconds);
-
-	//if (RootMotion.bHasRootMotion)
-	//{
-	//	if (APawn* Pawn = TryGetPawnOwner())
-	//	{
-	//		FTransform Transform = RootMotion.GetRootMotionTransform();
-
-	//		Pawn->AddActorWorldOffset(Transform.GetTranslation(), true);
-	//		Pawn->AddActorWorldRotation(Transform.GetRotation().Rotator());
-	//	}
-	//}
-
 
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(TryGetPawnOwner()))
 	{

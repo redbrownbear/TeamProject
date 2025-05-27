@@ -29,6 +29,8 @@
 #define MONSTER_ATTACK_COOLTIME														4.f
 
 #define MONSTER_ATTACK_PROJECTILE_OFFSET											100.f
+#define MONSTER_DEFAULT_NEAR_DISTANCE												150.f		
+
 
 #define LYNEL_DASH_GOAL_OFFSET														100.f
 #define LYNEL_FIRE_ATTACK_MAX_TIMES													3
@@ -36,6 +38,8 @@
 #define LYNEL_RODEO_MAX_TIME														3.f
 #define LYNEL_HORN_ATTACK_MAX_PASS_LENGTH											300.f
 #define LYNEL_AWAY_FROM_LINK_OFFSET													1000.f
+
+#define HINOX_DAMAGE_EYE_MAX_TIME													5.f
 
 #define NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS										1000.f
 #define NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS									1500.f

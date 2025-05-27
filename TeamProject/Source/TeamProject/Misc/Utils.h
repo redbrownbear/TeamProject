@@ -82,6 +82,7 @@ enum class EMonsterState : uint8
     Rodeo,
     Stun,
     ReadyToAttack,
+    Damage_Eye,
     Temp,
     End,
 };
@@ -149,11 +150,29 @@ enum class EMonsterMontage : uint8
     GEAR_3_LEFT,
     GEAR_3_RIGHT,
     DEAD,
+    FOOT,
+	HANDCLAP,
+	HIPDROP,
+    LEFTHAND,
+	DAMAGE_EYE_START,
+	DAMAGE_EYE_END,
+    DAMAGE_FOOT_L,
+	DAMAGE_FOOT_R,
+    RUN,
+    RUN_CURVE_R,
+	RUN_CURVE_L,
+	SLEEP_START,
+	SLEEP_END,
+	THROW_STONE_START,
+	THROW_STONE_END,
+
+
+
     END,
 };
 
 UENUM()
-enum class ECombatIndex : uint8
+enum class ELynelCombatIndex : uint8
 {
     AimingBow = 0, 
     HornAttack, 
@@ -164,6 +183,17 @@ enum class ECombatIndex : uint8
     AimingBowUpper, 
     End
 };
+
+UENUM()
+enum class EHinoxCombatIndex : uint8
+{
+    Foot = 0,
+    HandClap,
+    LeftHand,
+    Hipdrop,
+    End
+};
+
 
 UENUM()
 enum class EReadyToAttackStep : uint8

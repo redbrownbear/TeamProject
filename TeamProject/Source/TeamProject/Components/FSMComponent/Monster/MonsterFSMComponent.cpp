@@ -488,7 +488,7 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 	// 다음 PatrolIndex 구하기
 	AActor* TempActor = CharacterMonster ? Cast<AActor>(CharacterMonster) : Cast<AActor>(PawnMonster);
 
-	const bool bIsNear = FVector::PointsAreNear(TempActor->GetActorLocation(), Location, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(TempActor->GetActorLocation(), Location, MONSTER_DEFAULT_NEAR_DISTANCE);
 
 	if (bIsNear)
 	{
@@ -611,7 +611,7 @@ void UMonsterFSMComponent::UpdateFindWeapon(float DeltaTime)
 			MoveToLocation(WeaponLocation);
 		}
 
-		const bool bIsNear = FVector::PointsAreNear(MonsterLocation, WeaponLocation, 150.f);
+		const bool bIsNear = FVector::PointsAreNear(MonsterLocation, WeaponLocation, MONSTER_DEFAULT_NEAR_DISTANCE);
 
 		if (bIsNear)
 		{
@@ -667,7 +667,7 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 
 
 	// Check if it's arrived
-	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, Location, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, Location, MONSTER_DEFAULT_NEAR_DISTANCE);
 
 	if (bIsNear) this->StopMove();
 

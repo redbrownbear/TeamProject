@@ -21,7 +21,7 @@ public:
 	virtual void ChangeState(EMonsterState NewState) override;
 
 protected:
-	ECombatIndex eCombatIndex = ECombatIndex::AimingBow;
+	ELynelCombatIndex eCombatIndex = ELynelCombatIndex::AimingBow;
 	EMonsterState eNextState = EMonsterState::End;
 	EReadyToAttackStep eReadyToAttackStep = EReadyToAttackStep::RunToLink;
 	int32 LyenlTurnRightCount = 0;
