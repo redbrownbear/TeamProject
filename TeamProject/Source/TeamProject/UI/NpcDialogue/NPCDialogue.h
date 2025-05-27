@@ -28,6 +28,7 @@ public:
 private:
 	void InitUI();
 	void BindDelegates();
+	void RemoveDelegates();
 
 public: //ë°”ì¸ë”©ì„ ìœ„í•´ í¼ë¸”ë¦­ì„ ì–¸
 	UFUNCTION()
@@ -45,6 +46,19 @@ private:
 
 	void UpdateTyping();
 	void OnNextButtonClicked();
+
+
+private:
+	UPROPERTY()
+	FNPCDialogueTableRow DialogueDataRow;
+	EQuestCharacter CurQuestChar;
+	int32 NextDialogueID;
+
+	//ÇÑ±ÛÀÚ¾¿ º¸ÀÌ´Â ±â´ÉÀ» À§ÇÑ º¯¼ö
+	FString FullText;
+	int32 CurrentCharIndex = 0;
+	FTimerHandle TypingTimerHandle;
+	bool bIsTyping = false;
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -64,15 +78,4 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ExtraText;
 
-private:
-	UPROPERTY()
-	FNPCDialogueTableRow DialogueDataRow;
-	EQuestCharacter CurQuestChar;
-	int32 NextDialogueID;
-
-	//í•œê¸€ìì”© ë³´ì´ëŠ” ê¸°ëŠ¥ì„ ìœ„í•œ ë³€ìˆ˜
-	FString FullText;
-	int32 CurrentCharIndex = 0;
-	FTimerHandle TypingTimerHandle;
-	bool bIsTyping = false;
 };

@@ -4,6 +4,7 @@
 #include "UI/NpcDialogue/NPCDialogue.h"
 
 #include "SubSystem/UI/QuestDialogueManager.h"
+#include "SubSystem/UI/ShopManager.h"
 #include "SubSystem/UI/UIManager.h"
 
 #include "GameFramework/PC_InGame.h"
@@ -12,7 +13,6 @@
 void UNPCDialogue::OnCreated()
 {
     InitUI();
-    BindDelegates();
 }
 
 void UNPCDialogue::ShowUI()
@@ -37,6 +37,8 @@ void UNPCDialogue::ShowUI()
         PC_InGame->SetInputMode(InputMode);
         PC_InGame->BindDialogueInput(this);
     }
+
+    BindDelegates();
 }
 
 void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
@@ -46,8 +48,6 @@ void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
     {
         PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
     }
-
-    //Close ������ �Ʒ��� ������ �̹� Widget�� ������ ������ ��ġ������ 
 
     if (PC_InGame->Npc)
     {
@@ -69,6 +69,8 @@ void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
         QuestManager->SetConversation(false);
     }
 
+    RemoveDelegates();
+
     Super::HideUI(UNPCDialogue::StaticClass());
 }
 
@@ -85,6 +87,16 @@ void UNPCDialogue::BindDelegates()
     if (QuestManager)
     {
         QuestManager->OnDialogueUpdated.AddDynamic(this, &UNPCDialogue::RefreshDialogue);
+    }
+}
+
+void UNPCDialogue::RemoveDelegates()
+{
+    UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+    if (QuestManager)
+    {
+        QuestManager->OnDialogueUpdated.RemoveDynamic(this, &UNPCDialogue::RefreshDialogue);
     }
 }
 
@@ -111,33 +123,54 @@ void UNPCDialogue::OnConfirm()
         {
             PC_InGame->Npc->SetDoQuest(false);
         }
-    }
-    else if (CurQuestChar == EQuestCharacter::Store)
-    {
-        bool IsShopping = PC_InGame->Npc->GetShopping();
-        bool IsBuying = PC_InGame->Npc->GetBuy();
+    }   
 
-        if (DialogueDataRow.bIsEndConversation && !IsShopping)
+    if (PC_InGame->Npc->GetData()->DialogType == EDialogType::Shop)
+    {	
+        //임시
+		FShopDataRow datarow;
+
+        UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
+        check(UIManager);
+
+        UShopManager* ShopManager = GetWorld()->GetGameInstance()->GetSubsystem<UShopManager>();
+        check(ShopManager);
+
+        UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+        check(QuestManager);
+
+        if (UIManager && ShopManager && QuestManager)
         {
-            PC_InGame->Npc->SetShopping(true);
-            // Create 상품 리스트 UI: 이후 항목 클릭했을 때 산다/만다 대화 나오게
-            // 결정에 따라 SetBuy()에 인자 넣어주기
-        }
-        /*else if (DialogueDataRow.bIsEndConversation && IsShopping && IsBuying)
-        {
-            // 구매 했을 경우
-            PC_InGame->Npc->SetBuy(true);
-            PC_InGame->Npc->SetShopping(false);
-        }
-        else if (DialogueDataRow.bIsEndConversation && IsShopping && !IsBuying)
-        {
-            // 구매 안 할 경우
-            PC_InGame->Npc->SetBuy(false);
-            PC_InGame->Npc->SetShopping(false);
-        }*/
-        else
-        {
-            PC_InGame->Npc->SetShopping(false);
+
+            UIManager->ShowUI(UShop::StaticClass());
+            ShopManager->UpdateShopData(PC_InGame->Npc->GetData()->QuestCharacter, datarow);
+            QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
+
+            bool IsShopping = PC_InGame->Npc->GetShopping();
+            bool IsBuying = PC_InGame->Npc->GetBuy();
+
+            if (DialogueDataRow.bIsEndConversation && !IsShopping)
+            {
+                PC_InGame->Npc->SetShopping(true);
+                // Create 상품 리스트 UI: 이후 항목 클릭했을 때 산다/만다 대화 나오게
+                // 결정에 따라 SetBuy()에 인자 넣어주기
+            }
+            /*else if (DialogueDataRow.bIsEndConversation && IsShopping && IsBuying)
+            {
+                // 구매 했을 경우
+                PC_InGame->Npc->SetBuy(true);
+                PC_InGame->Npc->SetShopping(false);
+            }
+            else if (DialogueDataRow.bIsEndConversation && IsShopping && !IsBuying)
+            {
+                // 구매 안 할 경우
+                PC_InGame->Npc->SetBuy(false);
+                PC_InGame->Npc->SetShopping(false);
+            }*/
+            else
+            {
+                PC_InGame->Npc->SetShopping(false);
+            }
         }
     }
 }
@@ -175,7 +208,6 @@ void UNPCDialogue::UpdateTyping()
 {
     if (CurrentCharIndex >= FullText.Len())
     {
-        // ��� �Ϸ�
         GetWorld()->GetTimerManager().ClearTimer(TypingTimerHandle);
         bIsTyping = false;
         return;

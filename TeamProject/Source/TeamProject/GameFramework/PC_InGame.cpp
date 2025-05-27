@@ -9,9 +9,7 @@
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
-
-#include "UI/NpcDialogue/NPCDialogue.h"
-#include "UI/Inven/Inventory.h"
+#include "SubSystem/UI/ShopManager.h"
 
 #include "Actors/Npc/Npc.h" 
 #include "Components/Character/PlayerMovementComponent.h"
@@ -141,6 +139,12 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		bShowMouseCursor = true;
 		break;
 
+	case EInputContext::IC_Shop:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Shop, 3);
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+		break;
+
 	}
 
 	CurrentInputContext = NewContext;
@@ -167,6 +171,18 @@ void APC_InGame::BindDialogueInput(UNPCDialogue* NpcDialogue)
 		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, NpcDialogue, &UNPCDialogue::OnConfirm);
 		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, NpcDialogue, &UNPCDialogue::OnCancel);
 		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, NpcDialogue, &UNPCDialogue::OnNextDialogue);
+	}
+}
+
+void APC_InGame::BindShopInput(UShop* Shop)
+{
+	// 인풋 바인딩
+	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, Shop, &UShop::OnNavigate);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, Shop, &UShop::OnConfirm);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, Shop, &UShop::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, Shop, &UShop::OnNextDialogue);
 	}
 }
 
@@ -362,7 +378,14 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 	{
 		if (UNpcFSMComponent* FSM = Npc->GetFSMComponent())
 		{
-			FSM->ChangeState(ENpcState::Talk);			
+			if(Npc->GetData()->DialogType == EDialogType::Shop)
+			{
+				FSM->ChangeState(ENpcState::Sell);
+			}
+			else
+			{
+				FSM->ChangeState(ENpcState::Talk);
+			}			
 		}
 	}	
 }

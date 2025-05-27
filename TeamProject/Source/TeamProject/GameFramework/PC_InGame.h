@@ -9,6 +9,7 @@
 
 #include "UI/Inven/Inventory.h"
 #include "UI/NpcDialogue/NPCDialogue.h"
+#include "UI/Shop/Shop.h"
 
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
@@ -19,6 +20,7 @@ enum class EInputContext
 	IC_InGame,
 	IC_Inventory,
 	IC_Dialogue,
+	IC_Shop,
 	//필요하면 추가해서 사용합니다.
 	IC_Supernatural,
 
@@ -43,9 +45,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
 	UInputMappingContext* IMC_Dialogue = nullptr;
 
+<<<<<<< HEAD
+	//Dialogue
+	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
+	UInputMappingContext* IMC_Shop = nullptr;
+=======
 	//Supernatural
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
 	UInputMappingContext* IMC_Supernatural = nullptr;
+>>>>>>> main
 
 	//Player
 public:
@@ -158,6 +166,7 @@ public:
 	void ChangeInputContext(EInputContext NewContext);
 	void BindInventoryInput(UInventory* Inventory);
 	void BindDialogueInput(UNPCDialogue* NpcDialogue);
+	void BindShopInput(UShop* Shop);
 	void ShowDialogueUI();
 
 protected:

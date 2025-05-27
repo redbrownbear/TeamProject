@@ -6,8 +6,6 @@
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/InventoryManager.h"
 
-#include "UI/HUD/MainHUD.h"
-
 #include "GameFramework/PC_InGame.h"
 
 
@@ -15,7 +13,6 @@
 void UInventory::OnCreated()
 {
     InitUI();
-    BindDelegates();
 }
 
 void UInventory::ShowUI()
@@ -35,35 +32,26 @@ void UInventory::ShowUI()
 
         PC_InGame->SetInputMode(InputMode);
         PC_InGame->BindInventoryInput(this);
-
-        //HUD가리기
-        AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
-        if(HUD)
-            HUD->SetMainHUDVisible(false);
     }
+
+    BindDelegates();
 }
 
 void UInventory::HideUI(TSubclassOf<UBaseUI> UIClass)
 {
-    //HUD가리기
-
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     {
         PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
-
-        AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
-        if (HUD)
-            HUD->SetMainHUDVisible(true);
-
     }
 
+    RemoveDelegate();
     Super::HideUI(UInventory::StaticClass());
 }
 
 void UInventory::InitUI()
 {
-    check(BP_InvenScroll); // BindWidget이 잘 됐는지 확인
+    check(BP_InvenScroll);
     check(BP_InvenEquip);
 }
 
@@ -74,6 +62,16 @@ void UInventory::BindDelegates()
     if (InvenManager)
     {
         InvenManager->OnInventoryUpdated.AddDynamic(this, &UInventory::RefreshInventory);
+    }
+}
+
+void UInventory::RemoveDelegate()
+{
+    UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
+    check(InvenManager);
+    if (InvenManager)
+    {
+        InvenManager->OnInventoryUpdated.RemoveDynamic(this, &UInventory::RefreshInventory);
     }
 }
 
