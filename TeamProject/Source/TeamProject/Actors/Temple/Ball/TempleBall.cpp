@@ -1,6 +1,5 @@
 #include "Actors/Temple/Ball/TempleBall.h"
 #include "Components/SphereComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "BallTriggerVolume.h"
 

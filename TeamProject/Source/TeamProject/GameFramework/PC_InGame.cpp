@@ -19,6 +19,9 @@
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 
+
+#include "Actors/Temple/Ice/IcePillar.h"
+
 APC_InGame::APC_InGame()
 {
 	{
@@ -90,6 +93,11 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Inventory,
 		ETriggerEvent::Started, this, &ThisClass::OpenInventory);
 
+	// ------------ Supernatural -----------------
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Preview,
+		ETriggerEvent::Started, this, &ThisClass::IcePreview);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
+		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);
 }
 
 void APC_InGame::ChangeInputContext(EInputContext NewContext)
@@ -117,6 +125,11 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 
 	case EInputContext::IC_Dialogue:
 		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 2);
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+		break;
+	case EInputContext::IC_Supernatural:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Supernatural, 3);
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;
 		break;
@@ -329,6 +342,57 @@ void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
 void APC_InGame::ShowDialogueUI()
 {
 
+}
+
+void APC_InGame::IcePreview()
+{
+}
+
+void APC_InGame::SpawnIcePillar()
+{
+	if (!IcePillarClass) return;
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+	if (!PC) return;
+
+	FVector Start, Dir;
+	PC->DeprojectMousePositionToWorld(Start, Dir);
+
+	FVector End = Start + Dir * TraceDistance;
+
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	// 수면 체크: 지형 위라면 충돌, 월드 정적에 한정
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		FVector SpawnLoc = Hit.Location;
+
+		// 최대 개수 초과 시 제거
+		if (IceList.Num() >= MaxIceCount)
+		{
+			ClearOldestPillar();
+		}
+
+		AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass, SpawnLoc, FRotator::ZeroRotator);
+		if (NewPillar)
+		{
+			IceList.Add(NewPillar);
+		}
+	}
+}
+
+void APC_InGame::ClearOldestPillar()
+{
+	if (IceList.Num() == 0) return;
+
+	if (IceList[0].IsValid())
+	{
+		IceList[0]->Destroy();
+	}
+
+	IceList.RemoveAt(0);;
 }
 
 
