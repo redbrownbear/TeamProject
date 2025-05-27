@@ -18,10 +18,19 @@ void UAnimNotify_BowChargeEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 		return;
 	}
 	
+	
+
 	UWeaponManagerComponent* WeaponManagerComponent = Player_C->GetWeaponManagerComponent();
 	
-	WeaponManagerComponent->SetCanShot(true);
+	EEquip_State EState = WeaponManagerComponent->GetEquipState();
 
-	MeshComp->GetAnimInstance()->Montage_Pause();
+	if (EState == EEquip_State::Bow || EState == EEquip_State::Shield || EState == EEquip_State::Sword_Shield)
+
+	{
+
+		WeaponManagerComponent->SetCanShot(true);
+
+	}
+
 
 }

@@ -12,9 +12,16 @@
 UCLASS()
 class TEAMPROJECT_API AWeaponArrow : public AWeaponBase
 {
-	AWeaponArrow();
 
 
 	GENERATED_BODY()
-	
+
+public:
+
+	AWeaponArrow();
+
+
+
+
+
 };

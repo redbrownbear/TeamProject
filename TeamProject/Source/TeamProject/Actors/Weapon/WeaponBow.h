@@ -23,14 +23,17 @@ public:
 	AWeaponBow();
 
 	virtual void LeftClickAction() override;
-	virtual void RightClickAction(bool _bool) override;
+	virtual void RightClickAction() override;
+	UAnimMontage* GetChargingMTG() { return ChargingMTG; }
 
+	void FireArrow();
 
 private:
 
 
 	UPROPERTY()
-	UAnimMontage* Attack_MTG;
+	UAnimMontage* ChargingMTG;
+	UAnimMontage* ShootMTG;
+	TSubclassOf<class AProjectile_Arrow> ArrowClass;
 
-	bool bCanAttack = true;
 };

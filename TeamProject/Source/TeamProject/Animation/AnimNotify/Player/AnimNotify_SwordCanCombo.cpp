@@ -1,11 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Animation/AnimNotify/Player/AnimNotify_SwordAttack0.h"
+#include "Animation/AnimNotify/Player/AnimNotify_SwordCanCombo.h"
 #include "Actors/Character/PlayerCharacter.h"
-#include "Components/AttackComponent/WeaponComponent.h"
 
-void UAnimNotify_SwordAttack0::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+void UAnimNotify_SwordCanCombo::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 

@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
-#include "AnimNotify_SetMovementNone.generated.h"
+#include "AnimNotify_SwordCanCombo.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TEAMPROJECT_API UAnimNotify_SetMovementNone : public UAnimNotify
+class TEAMPROJECT_API UAnimNotify_SwordCanCombo : public UAnimNotify
 {
 	GENERATED_BODY()
 	
