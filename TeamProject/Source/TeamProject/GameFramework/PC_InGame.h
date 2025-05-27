@@ -49,16 +49,20 @@ public:
 
 	//Player
 public:
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_Move = nullptr;
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_LookMouse = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
+	UInputAction* IA_Climb = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_LeftClick = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_RightClick = nullptr;
+
+	
+
+
 
 
 	// --------- Weapon Swap-----------------------------
@@ -164,7 +168,10 @@ protected:
 	void OnLook(const FInputActionValue& InputActionValue);
 	void LeftClick(const FInputActionValue& InputActionValue);
 	void RightClick(const FInputActionValue& InputActionValue);
-
+	void RightClickEnd(const FInputActionValue& InputActionValue);
+	void Climb(const FInputActionValue& InputActionValue);
+	
+	
 	// --------- Weapon Swap ------------------------------
 
 	void EquipSword(const FInputActionValue& InputActionValue);
@@ -174,6 +181,7 @@ protected:
 
 	void OnInteract(const FInputActionValue& InputActionValue);
 	void OpenInventory(const FInputActionValue& InputActionValue);
+
 
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }

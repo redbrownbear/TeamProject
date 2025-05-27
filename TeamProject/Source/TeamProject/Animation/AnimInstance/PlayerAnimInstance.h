@@ -45,7 +45,11 @@ public:
 	bool bIsZoom = false;
 
 	UPROPERTY(BlueprintReadOnly)
+	bool bIsWaitShield = false;
+
+	UPROPERTY(BlueprintReadOnly)
 	FRotator Rotator;
+
 
 
 

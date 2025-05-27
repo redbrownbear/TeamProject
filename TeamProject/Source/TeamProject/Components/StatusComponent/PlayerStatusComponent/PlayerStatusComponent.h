@@ -20,22 +20,16 @@ class TEAMPROJECT_API UPlayerStatusComponent : public UStatusComponent
 	int32 Health;
 	UPROPERTY()
 	int32 Damage;
-	UPROPERTY()
-	EWeapon_Type Next_Weapon;
+	
 
 public:
 	UPlayerStatusComponent();
-	void Equip_Sword();
-	void Equip_Shield();
-	void Equip_Bow();
-	void UnEquip_Sword();
-	void UnEquip_Shield();
-	void UnEquip_Bow();
+
 	
 	
 	
-	EWeapon_Type GetNextWeaponType() { return Next_Weapon; }
-	void SetNextWeaponType(EWeapon_Type _Type) { Next_Weapon = _Type; }
+	
+	
 
 
 

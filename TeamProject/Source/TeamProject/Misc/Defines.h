@@ -30,6 +30,11 @@
 
 #define MONSTER_ATTACK_PROJECTILE_OFFSET											100.f
 
+#define PLAYER_MOVE_NML																600.f
+#define	PLAYER_MOVE_BOW_ZOOM														300.f
+
+
+#define Arrow_Speed																	800.f
 #define LYNEL_DASH_GOAL_OFFSET														100.f
 #define LYNEL_FIRE_ATTACK_MAX_TIMES													3
 #define LYNEL_STUN_MAX_TIME															4.f
