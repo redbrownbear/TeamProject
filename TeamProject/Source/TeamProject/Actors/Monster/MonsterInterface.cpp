@@ -7,6 +7,7 @@
 #include "Actors/Projectile/Projectile.h"
 
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
+#include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
 #include "Data/MonsterTableRow.h"
 #include "Data/ItemDataRow.h"
@@ -624,6 +625,12 @@ bool IMonsterInterface::IsPlayingMontage(EMonsterMontage _InEnum)
 	return bFlag;
 }
 
-
-
-
+void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	UMonsterStatusComponent * UMonsterStatusComponent = GetStatusComponent();
+	const float fDamage = UMonsterStatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	if (fDamage > 0.f)
+	{
+		PlayMontage(EMonsterMontage::DAMAGE);
+	}
+}
