@@ -69,7 +69,6 @@ void UNpcFSMComponent::BeginPlay()
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("HidePoints ìžë™ ìˆ˜ì§‘ ì™„ë£Œ: %dê°œ"), HidePoints.Num());
 }
 
 void UNpcFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -252,11 +251,11 @@ void UNpcFSMComponent::HideFuriko()
 {
 	if (HidePoints.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HidePoints ë°°ì—´ì´ ë¹„ì–´ìžˆìŠµë‹ˆë‹¤."));
+		UE_LOG(LogTemp, Warning, TEXT("HidePoints ë°°ì—´??ë¹„ì–´?ˆìŠµ?ˆë‹¤."));
 		return;
 	}
 
-	// ëžœë¤ ì¸ë±ìŠ¤ ì„ íƒ
+	// ?œë¤ ?¸ë±??? íƒ
 	const int32 Index = FMath::RandRange(0, HidePoints.Num() - 1);
 	AHidePoint* Target = HidePoints[Index];
 
@@ -266,11 +265,7 @@ void UNpcFSMComponent::HideFuriko()
 
 		SetHideLocation(Target->GetActorLocation());
 
-<<<<<<< HEAD
 		// <Çª¸®ÄÚ¿Í ³îÀÚ!> Äù½ºÆ® UI »ý¼ºÇÒ±î ¸»±î À±È£¿Àºü¶û ¾ê±âÇØº¸±â
-=======
-		// <í‘¸ë¦¬ì½”ì™€ ë†€ìž!> í€˜ìŠ¤íŠ¸ UI ìƒì„±í• ê¹Œ ë§ê¹Œ ìœ¤í˜¸ì˜¤ë¹ ëž‘ ì–˜ê¸°í•´ë³´ê¸°
->>>>>>> main
 	}
 }
 
@@ -281,33 +276,29 @@ void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 	// ÀÌµ¿ ¹æÇØ Â÷´Ü
 	if (Owner->GetController()) Owner->GetController()->StopMovement();
 
-<<<<<<< HEAD
 	// ¼ø°£ÀÌµ¿
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	Owner->SetIsHide(true);
 
 	// À§Ä¡ È®ÀÎ
 	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation ¿Ï·á. Owner À§Ä¡: %s"), *Owner->GetActorLocation().ToString());
-=======
-	// ì´ë™ ë°©í•´ ì°¨ë‹¨
+	// ?´ë™ ë°©í•´ ì°¨ë‹¨
 	if (Owner->GetController()) Owner->GetController()->StopMovement();
 
-	// ìˆœê°„ì´ë™
+	// ?œê°„?´ë™
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	Owner->SetIsHide(true);
 
-	// ìœ„ì¹˜ í™•ì¸
-	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation ì™„ë£Œ. Owner ìœ„ì¹˜: %s"), *Owner->GetActorLocation().ToString());
->>>>>>> main
+	// ?„ì¹˜ ?•ì¸
+	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation ?„ë£Œ. Owner ?„ì¹˜: %s"), *Owner->GetActorLocation().ToString());
 }
 
 void UNpcFSMComponent::PlayInterectSequence()
 {
-<<<<<<< HEAD
 	// Talk ½Ã Ä³¸¯ÅÍ À§Ä¡¸¸ °íÁ¤µÇ°Ô Á¶Á¤ÇÑ µÚ ±× ´ÙÀ½¿¡ »ý¼ºÇØ¾ß ÇÒ µí
-=======
-	// Talk ì‹œ ìºë¦­í„° ìœ„ì¹˜ë§Œ ê³ ì •ë˜ê²Œ ì¡°ì •í•œ ë’¤ ê·¸ ë‹¤ìŒì— ìƒì„±í•´ì•¼ í•  ë“¯
->>>>>>> main
+
+	// Talk ??ìºë¦­???„ì¹˜ë§?ê³ ì •?˜ê²Œ ì¡°ì •????ê·??¤ìŒ???ì„±?´ì•¼ ????
+
 	/*if (Player)
 	{
 		FVector PlayerLocation = Player->GetActorLocation();
