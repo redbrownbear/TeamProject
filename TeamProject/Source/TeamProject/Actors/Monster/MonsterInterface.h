@@ -30,7 +30,6 @@ class TEAMPROJECT_API IMonsterInterface
 {
 	GENERATED_BODY()
 	
-
 public:
 	virtual UMonsterStatusComponent* GetStatusComponent() const = 0;
 
@@ -57,6 +56,9 @@ public:
 public:
 	virtual void TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
+protected:
+	virtual void OnDie();
+	virtual void OnDeadEnd();
 
 protected:
 	UFUNCTION()

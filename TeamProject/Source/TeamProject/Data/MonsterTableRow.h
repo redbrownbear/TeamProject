@@ -163,7 +163,9 @@ public:
 	TSubclassOf<AMonsterAIController> AIControllerClass;
 
 public:
-	UPROPERTY(EditAnywhere, Category = "NiagaraEffect", meta = (RowType = "NiagaraEffectTableRow"))
+	UPROPERTY(EditAnywhere, Category = "Effect", meta = (RowType = "ParticleEffectTableRow"))
+	FDataTableRowHandle ParticleEffectTableRowHandle;
+	UPROPERTY(EditAnywhere, Category = "Effect", meta = (RowType = "NiagaraEffectTableRow"))
 	FDataTableRowHandle NiagaraEffectTableRowHandle;
 
 public:

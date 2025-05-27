@@ -148,6 +148,7 @@ enum class EMonsterMontage : uint8
     GEAR_3_FORWARD,
     GEAR_3_LEFT,
     GEAR_3_RIGHT,
+    DEAD,
     END,
 };
 

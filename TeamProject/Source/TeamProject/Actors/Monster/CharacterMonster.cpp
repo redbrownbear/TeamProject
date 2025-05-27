@@ -55,6 +55,8 @@ void ACharacterMonster::BeginPlay()
 			LynelFSMComponent->SetCharacterMonster(this);
 		}
 	}
+
+	StatusComponent->OnDie.AddDynamic(this, &ACharacterMonster::OnDie);
 }
 
 // Called every frame
@@ -256,4 +258,15 @@ void ACharacterMonster::SetSpeedWalk()
 void ACharacterMonster::SetSpeedRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = MonsterData->RunMovementMaxSpeed;
+}
+
+void ACharacterMonster::OnDie()
+{
+	IMonsterInterface::OnDie();
+}
+
+void ACharacterMonster::OnDeadEnd()
+{
+	// it would call by AnimNotify 
+	IMonsterInterface::OnDeadEnd();
 }

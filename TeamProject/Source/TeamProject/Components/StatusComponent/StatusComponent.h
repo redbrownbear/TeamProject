@@ -42,6 +42,4 @@ public:
 	FOnHPChanged OnHPChanged;
 	UPROPERTY(BlueprintAssignable)
 	FOnDie OnDie;
-
-
 };

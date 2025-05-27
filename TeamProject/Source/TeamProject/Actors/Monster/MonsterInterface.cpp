@@ -5,12 +5,17 @@
 #include "Actors/Item/WorldWeapon.h"
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Projectile/Projectile.h"
+#include "Actors/Effect/NiagaraEffect.h"
+#include "Actors/Effect/ParticleEffect.h"
+
 
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
 #include "Data/MonsterTableRow.h"
 #include "Data/ItemDataRow.h"
+#include "Data/NiagaraEffectTableRow.h"
+#include "Data/ParticleEffectTableRow.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -632,5 +637,54 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 	if (fDamage > 0.f)
 	{
 		PlayMontage(EMonsterMontage::DAMAGE);
+	}
+
+}
+
+void IMonsterInterface::OnDie()
+{
+	GetFSMComponent()->ChangeState(EMonsterState::Dead);
+	PlayMontage(EMonsterMontage::DAMAGE);
+}
+
+void IMonsterInterface::OnDeadEnd()
+{
+	FMonsterTableRow* MonsterData = GetMonsterData();
+	UObject* Object = Cast<UObject>(this);
+
+	const FDataTableRowHandle ParticleEffectDataTable = MonsterData->ParticleEffectTableRowHandle;
+	if (AActor* Actor = Cast<AActor>(Object))
+	{
+		if (!ParticleEffectDataTable.IsNull())
+		{
+			{
+				UWorld* World = Actor->GetWorld();
+
+				AParticleEffect* Effect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+					FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+				FTransform NewTransform;
+				Effect->SetData(MonsterData->ParticleEffectTableRowHandle);
+				NewTransform.SetLocation(Actor->GetActorLocation());
+				NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
+				Effect->FinishSpawning(NewTransform);
+			}
+		}
+
+		const FDataTableRowHandle NiagaraEffectDataTable = MonsterData->NiagaraEffectTableRowHandle;
+		if (!NiagaraEffectDataTable.IsNull())
+		{
+			UWorld* World = Actor->GetWorld();
+
+			ANiagaraEffect* Effect = World->SpawnActorDeferred<ANiagaraEffect>(ANiagaraEffect::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+			FTransform NewTransform;
+			Effect->SetData(MonsterData->ParticleEffectTableRowHandle);
+			NewTransform.SetLocation(Actor->GetActorLocation());
+			NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
+			Effect->FinishSpawning(NewTransform);
+		}
+		Actor->Destroy();
 	}
 }

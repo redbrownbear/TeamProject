@@ -82,4 +82,10 @@ public:
     virtual UMonsterFSMComponent* GetFSMComponent() const;
     virtual void SetSpeedWalk() override;
     virtual void SetSpeedRun() override;
+
+
+protected:
+    virtual void OnDie() override;
+    virtual void OnDeadEnd() override;
+
 };

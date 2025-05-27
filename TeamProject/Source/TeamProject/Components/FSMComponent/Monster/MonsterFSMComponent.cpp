@@ -201,6 +201,9 @@ void UMonsterFSMComponent::HandleState(float DeltaTime)
 	case EMonsterState::Signal:
 		UpdateSignal(DeltaTime);
 		break;
+	case EMonsterState::Dead:
+		UpdateDying(DeltaTime);
+		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // Unexpected MonsterState"));
 		check(false);
@@ -321,14 +324,17 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 		if (PawnMonster)
 		{
 			PawnMonster->PlayMontage(EMonsterMontage::SIGNAL_START);
+			SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
 		}
 		else if (CharacterMonster)
 		{
 			CharacterMonster->PlayMontage(EMonsterMontage::SIGNAL_START);
 		}
-		SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
 	}
 		break;
+	case EMonsterState::Dead:
+		break;
+
 	default:
 		break;
 	}
@@ -797,6 +803,11 @@ void UMonsterFSMComponent::UpdateAimingBow(float DeltaTime)
 			CharacterMonster->PlayMontage(EMonsterMontage::BOW_END);
 		}
 	}
+}
+
+void UMonsterFSMComponent::UpdateDying(float DeltaTime)
+{
+	this->StopMove();
 }
 
 void UMonsterFSMComponent::MoveToLocation(const FVector& InLocation)
