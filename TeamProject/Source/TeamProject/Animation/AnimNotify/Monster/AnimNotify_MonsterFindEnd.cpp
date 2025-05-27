@@ -3,7 +3,7 @@
 
 #include "Animation/AnimNotify/Monster/AnimNotify_MonsterFindEnd.h"
 
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/PawnMonster.h"
 #include "Actors/Projectile/Projectile.h"
 
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
@@ -17,7 +17,7 @@ void UAnimNotify_MonsterFindEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
-    if (AMonster* Monster = Cast<AMonster>(MeshComp->GetOwner()))
+    if (APawnMonster* Monster = Cast<APawnMonster>(MeshComp->GetOwner()))
     {
         if (UMonsterFSMComponent* FSMComponent = Monster->GetFSMComponent())
         {

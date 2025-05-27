@@ -13,7 +13,7 @@
 #include "NPCDialogue.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class TEAMPROJECT_API UNPCDialogue : public UBaseUI
@@ -29,7 +29,7 @@ private:
 	void InitUI();
 	void BindDelegates();
 
-public: //¹ÙÀÎµùÀ» À§ÇØ ÆÛºí¸¯¼±¾ğ
+public: //ë°”ì¸ë”©ì„ ìœ„í•´ í¼ë¸”ë¦­ì„ ì–¸
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	UFUNCTION()
@@ -70,7 +70,7 @@ private:
 	EQuestCharacter CurQuestChar;
 	int32 NextDialogueID;
 
-	//ÇÑ±ÛÀÚ¾¿ º¸ÀÌ´Â ±â´ÉÀ» À§ÇÑ º¯¼ö
+	//í•œê¸€ìì”© ë³´ì´ëŠ” ê¸°ëŠ¥ì„ ìœ„í•œ ë³€ìˆ˜
 	FString FullText;
 	int32 CurrentCharIndex = 0;
 	FTimerHandle TypingTimerHandle;
