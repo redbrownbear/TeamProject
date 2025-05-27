@@ -14,8 +14,6 @@
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
 
-// 2025-05-19 Yunjung: 임시로 대화 IMC 등록 시키는 중(현석 오빠랑 의논 필요)
-
 enum class EInputContext
 {
 	IC_Start,
@@ -24,6 +22,7 @@ enum class EInputContext
 	IC_Dialogue,
 	IC_Shop,
 	//필요하면 추가해서 사용합니다.
+	IC_Supernatural,
 
 	IC_End,
 };
@@ -46,9 +45,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
 	UInputMappingContext* IMC_Dialogue = nullptr;
 
+<<<<<<< HEAD
 	//Dialogue
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
 	UInputMappingContext* IMC_Shop = nullptr;
+=======
+	//Supernatural
+	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
+	UInputMappingContext* IMC_Supernatural = nullptr;
+>>>>>>> main
 
 	//Player
 public:
@@ -109,7 +114,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_DialogueNext = nullptr;
 
-
+	//Supernatural
+public:
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_IceMaker = nullptr;
 
 	void CheckValid() const
 	{
@@ -133,9 +141,13 @@ public:
 		check(IA_DialogueConfirm);
 		check(IA_DialogueCancel);
 		check(IA_DialogueNext);
+		check(IA_IceMaker);
 	}
 };
 
+
+class AIcePillar;
+class AIcePreview;
 /**
  * 
  */
@@ -191,5 +203,45 @@ public:
 	TObjectPtr<class ANpc> Npc = nullptr;
 
 	EInputContext CurrentInputContext = EInputContext::IC_Start;
+
+	// --------- Supernatural ----------
+protected:
+	// 우클릭 누르고 있을 때 호출
+	UFUNCTION()
+	void BeginIcePreview(const FInputActionValue& Value);
+
+	// 우클릭 뗄 때 호출
+	UFUNCTION()
+	void EndIcePreview(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void SpawnIcePillar();
+
+	UFUNCTION()
+	void ClearOldestPillar(); 
+
+	// 매 프레임 업데이트
+	void UpdateIcePreview();
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "Cryonis")
+	TSubclassOf<AIcePillar> IcePillarClass;
+
+	UPROPERTY(EditAnywhere, Category = "Cryonis")
+	TSubclassOf<AIcePreview> IcePreviewClass;
+
+	UPROPERTY()
+	TObjectPtr<AIcePreview> IcePreviewActor = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Cryonis")
+	float TraceDistance = 300.0f;
+
+private:
+	TArray<TWeakObjectPtr<AIcePillar>> IceList;
+	uint64 MaxIceCount = 3; // 한 번에 만들 수 있는 얼음 기둥 개수
+
+private:
+	UPROPERTY()
+	bool bIsQHeld = false;
 
 };
