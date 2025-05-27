@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "TempleBallSpawner.generated.h"
 
+class ATempleBall;
+
 UCLASS()
 class TEAMPROJECT_API ATempleBallSpawner : public AActor
 {
@@ -19,20 +21,16 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-    UPROPERTY(EditAnywhere, Category = "Spawning")
-    TSubclassOf<AActor> BallClass;
+	UFUNCTION()
+	void SpawnBall();
 
-    UPROPERTY(EditAnywhere, Category = "Spawning")
-    FVector SpawnAreaMin;
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	TSubclassOf<ATempleBall> BallClass;
 
-    UPROPERTY(EditAnywhere, Category = "Spawning")
-    FVector SpawnAreaMax;
-
-    UPROPERTY(EditAnywhere, Category = "Spawning")
-    float SpawnInterval = 2.0f;
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	float SpawnInterval = 2.0f;
 
 private:
-    void SpawnBall();
-    FTimerHandle SpawnTimerHandle;
+    FTimerHandle SpawnTimer;
 
 };

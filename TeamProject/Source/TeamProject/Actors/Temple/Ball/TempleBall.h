@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "TempleBall.generated.h"
 
-class USceneComponent;
+class USphereComponent;
 class UStaticMeshComponent;
 class UPhysicalMaterial;
 
@@ -23,18 +23,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
-	virtual void Tick(float DeltaTime) override;
-
-private:
-	FVector Cliff = FVector(0.0f, 0.0f, -1000.0f); // 삭제 기준 지점
-	float Distance = 100.0f; // Cliff로 오면 삭제
-
 protected:
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USceneComponent> DefaultSceneRoot;
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UShapeComponent> CollisionComponent;
+	TObjectPtr<USphereComponent> CollisionComponent;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 	UPROPERTY(VisibleAnywhere)

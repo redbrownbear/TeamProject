@@ -9,7 +9,7 @@
 
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
 
-#include "Actors/HidePoint/HidePoint.h"
+#include "Actors/TargetPoint/HidePoint.h"
 
 UNpcFSMComponent::UNpcFSMComponent()
 {
