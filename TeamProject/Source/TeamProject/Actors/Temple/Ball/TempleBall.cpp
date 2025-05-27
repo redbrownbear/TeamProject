@@ -16,8 +16,9 @@ ATempleBall::ATempleBall()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
-	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/Ball/BP_TempleBall.BP_TempleBall"));
+	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/Ball/DgnObj_AncientBallL_01.DgnObj_AncientBallL_01"));
 	PhysicalMaterial = PhysMaterial.Object;
+
 }
 
 // Called when the game starts or when spawned
