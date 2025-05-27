@@ -7,9 +7,13 @@
 #include "Misc/Utils.h"
 #include "MonsterFSMComponent.generated.h"
 
-class AMonster;
+class APawnMonster;
+class ACharacterMonster;
 class APlayerCharacter;
 class AWorldWeapon;
+class IMonsterInterface;
+class ACampFire;
+class APatrolPath;
 
 UCLASS()
 class TEAMPROJECT_API UMonsterFSMComponent : public UActorComponent
@@ -26,21 +30,49 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	void SetOwner(AMonster* InOwner) { Owner = InOwner; }
+	void SetPawnMonster(APawnMonster* InOwner) { PawnMonster = InOwner; }
+	void SetCharacterMonster(ACharacterMonster* InOwner) { CharacterMonster = InOwner; }
 	void SetPlayer(APlayerCharacter* InPlayer) { Player = InPlayer; }
+
+public:
 	void SetToCatchWeapon(AWorldWeapon* InWW) { ToCatchWeapon = InWW; }
-	void SetCatchedWeapon(AWorldWeapon* InWW) { CatchedWeapon = InWW; }
+	void SetCatchedWeapon(AWorldWeapon* InWW) { CurrentWeapon = InWW; }
 	bool IsToCatchWeapon() { return ToCatchWeapon ? true : false; }
+	void SetMeleeWeapon(AWorldWeapon* InWW) { MeleeWeapon = InWW; }
+	void SetBowWeapon(AWorldWeapon* InWW) { BowWeapon = InWW; }
+	void SetPatrolPath(APatrolPath* InPatrolPath) { PatrolPath = InPatrolPath; }
+	void SetCampFire(ACampFire* InCampFire) { CampFire = InCampFire; }
+
+public:
+	void SheathMeleeWeapon();
+	void SheathBowWeapon();
+	void DrawMeleeWeapon();
+	void DrawBowWeapon();
+	const AWorldWeapon* GetCurrentWeapon() const { return CurrentWeapon; }
 
 protected:
 	UPROPERTY()
-	TObjectPtr<AMonster> Owner = nullptr;
+	TObjectPtr<ACharacterMonster> CharacterMonster = nullptr;
+	UPROPERTY()
+	TObjectPtr<APawnMonster> PawnMonster = nullptr;
+	UPROPERTY()
+	TObjectPtr<ACampFire> CampFire = nullptr;
+	UPROPERTY()
+	TObjectPtr<APatrolPath> PatrolPath = nullptr;
+
+
+
+
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> Player = nullptr;
 	UPROPERTY()
 	TObjectPtr<AWorldWeapon> ToCatchWeapon = nullptr;
 	UPROPERTY()
-	TObjectPtr<AWorldWeapon> CatchedWeapon = nullptr;
+	TObjectPtr<AWorldWeapon> CurrentWeapon = nullptr;
+	UPROPERTY()
+	TObjectPtr<AWorldWeapon> MeleeWeapon = nullptr;
+	UPROPERTY()
+	TObjectPtr<AWorldWeapon> BowWeapon = nullptr;
 
 protected:
 	EMonsterState			eCurrentState;
@@ -52,11 +84,8 @@ public:
 
 	void SetMonsterState(EMonsterState NewState) { eCurrentState = NewState; }	
 	void SetMonsterGroupType(EMonsterGroupType NewGroupType);
-
 protected:
 	float SuspicionGauge = 0.0f;
-	float MaxSuspicionGauge = MONSTER_MAX_SUSPICIOUS_GAUGE;
-
 	float SignalElapsedTime = 0.f;
 	float AimingBowElapsedTime = 0.f;
 
@@ -67,10 +96,10 @@ protected:
 protected:
 	float CurrentAttackCoolTime = 0.f;
 
-private:
-	void HandleState(float DeltaTime);
+protected:
+	virtual void HandleState(float DeltaTime);
 public:
-	void ChangeState(EMonsterState NewState);
+	virtual void ChangeState(EMonsterState NewState);
 
 protected:
 	virtual void UpdateIdle(float DeltaTime);

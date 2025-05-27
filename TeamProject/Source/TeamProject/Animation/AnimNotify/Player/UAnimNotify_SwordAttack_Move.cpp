@@ -14,9 +14,9 @@ void UUAnimNotify_SwordAttack_Move::Notify(USkeletalMeshComponent* MeshComp, UAn
 
 	if (Player_C)
 	{
+		
 		Player_C->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 
-		MeshComp->GetAnimInstance()->Montage_Stop(0.f);
 	}
 
 }

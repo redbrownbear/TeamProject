@@ -2,12 +2,13 @@
 
 
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/PawnMonster.h"
+#include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Item/WorldWeapon.h"
 
-
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
+#include "Components/FSMComponent/Monster/LynelFSMComponent.h"
 
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
@@ -43,7 +44,21 @@ void AMonsterAIController::BeginPlay()
 
 	if (MonsterFSMComponent)
 	{
-		MonsterFSMComponent->SetOwner(Cast<AMonster>(GetPawn()));
+		APawn* TempPawn = GetPawn();
+		if (APawnMonster* Monster = Cast<APawnMonster>(TempPawn))
+		{
+			MonsterFSMComponent->SetPawnMonster(Monster);
+			MonsterFSMComponent->SetPatrolPath(Monster->GetPatrolPath());
+			MonsterFSMComponent->SetCampFire(Monster->GetCampFire());
+		}
+		else if (ACharacterMonster* CharacterMonster = Cast<ACharacterMonster>(TempPawn))
+		{
+			if (ULynelFSMComponent* LynelFSMComponent = Cast<ULynelFSMComponent>(CharacterMonster->GetFSMComponent()))
+			{
+				LynelFSMComponent->SetCharacterMonster(CharacterMonster);
+			}
+		}
+
 		MonsterFSMComponent->SetPlayer(nullptr);
 	}
 }

@@ -12,7 +12,7 @@
 #include "SubSystem/UI/ShopManager.h"
 
 #include "Actors/Npc/Npc.h" 
-
+#include "Components/Character/PlayerMovementComponent.h"
 
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
@@ -68,7 +68,10 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LeftClick,
 		ETriggerEvent::Started, this, &ThisClass::LeftClick);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_RightClick,
-		ETriggerEvent::Started, this, &ThisClass::RightClick);
+		ETriggerEvent::Triggered, this, &ThisClass::RightClick);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_RightClick,
+		ETriggerEvent::Completed, this, &ThisClass::RightClickEnd);
+
 
 
 	// ------------ Weapon Swap -----------------
@@ -80,7 +83,10 @@ void APC_InGame::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_EquipBow,
 		ETriggerEvent::Started, this, &ThisClass::EquipBow);
+	// ------------ Climb ------------------------
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Climb,
+		ETriggerEvent::Started, this, &ThisClass::Climb);
 
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Interact,
@@ -282,6 +288,38 @@ void APC_InGame::RightClick(const FInputActionValue& InputActionValue)
 	WeaponManagerComponent->RightClickAction();
 
 }
+
+void APC_InGame::RightClickEnd(const FInputActionValue& InputActionValue)
+{
+
+	APawn* PlayerPawn = GetPawn();
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(PlayerPawn);
+
+	UWeaponManagerComponent* WeaponManagerComponent = Player_C->GetWeaponManagerComponent();
+
+
+	if (!WeaponManagerComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WeaponManagerComponent is Null"));
+		return;
+	}
+
+	WeaponManagerComponent->RightClickEnd();
+
+	
+}
+
+void APC_InGame::Climb(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+
+}
+
+
+
+
 
 void APC_InGame::EquipSword(const FInputActionValue& InputActionValue)
 {

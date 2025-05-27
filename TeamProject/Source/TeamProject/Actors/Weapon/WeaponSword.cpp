@@ -11,11 +11,13 @@ AWeaponSword::AWeaponSword()
 {
     {
 
+
         PrimaryActorTick.bCanEverTick = true;
 
         DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
         RootComponent = DefaultSceneRoot;
-
+        
+        
 
         ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Sword/Weapon_Sword_001.Weapon_Sword_001'"));
 
@@ -24,59 +26,41 @@ AWeaponSword::AWeaponSword()
         SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         SkeletalMeshComponent->SetSkeletalMesh(Asset.Object);
     }
-
+    for (int32 i = 1; i <= 4; ++i)
     {
-        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Sword_Attack/Sword_Attack_Charge_L_Montage.Sword_Attack_Charge_L_Montage'"));
+        FString IndexStr = FString::FromInt(i);
 
-        if (Asset.Object)
+        FString Path = FString::Printf(
+            TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/NormalAttack/Sword_Attack_Montage_S%d.Sword_Attack_Montage_S%d'"),
+            i, i
+        );
+
+        ConstructorHelpers::FObjectFinder<UAnimMontage> Montage(*Path);
+        if (Montage.Succeeded())
         {
-            Arr_Sword_Attack_MTG.Add(Asset.Object);
+            Arr_Sword_Attack_MTG.Add(Montage.Object);
             MaxComboIndex += 1;
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+            UE_LOG(LogTemp, Warning, TEXT("Montage %d 로드 실패!"), i);
         }
     }
-
+    
     {
-        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Sword_Attack/Sword_Attack_Charge_Montage.Sword_Attack_Charge_Montage'"));
 
-        if (Asset.Object)
-        {
-            Arr_Sword_Attack_MTG.Add(Asset.Object);
-            MaxComboIndex += 1;
-        }
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
-        }
-    }
-
-    {
         ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Sword/Animation/Equip_Sword_On_Natural_Montage.Equip_Sword_On_Natural_Montage'"));
-
         if (Asset.Object)
         {
             EquipMontage = Asset.Object;
         }
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
-        }
     }
-
     {
-        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Sword/Animation/Equip_Sword_Off_Montage.Equip_Sword_Off_Montage'"));
 
+        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Sword/Animation/Equip_Sword_Off_Montage.Equip_Sword_Off_Montage'"));
         if (Asset.Object)
         {
             UnEquipMontage = Asset.Object;
-            
-        }
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
         }
     }
 
@@ -91,18 +75,46 @@ void AWeaponSword::LeftClickAction()
 
     {
         APlayerCharacter* Player_C = Cast<APlayerCharacter>(OwnerActor);
+        UAnimInstance* AnimInstance= Player_C->GetMesh()->GetAnimInstance();
+        UAnimMontage* PlayingMontage = AnimInstance->GetCurrentActiveMontage();
+        if (PlayingMontage)
+        {
+            if(PlayingMontage != Arr_Sword_Attack_MTG[PrevComboIndex])
+                return;
+        }
+        
+        AnimInstance->Montage_Play(Arr_Sword_Attack_MTG[CurrentComboIndex]);
+        PrevComboIndex = CurrentComboIndex;
         CurrentComboIndex += 1;
         CurrentComboIndex = (MaxComboIndex <= CurrentComboIndex) ? 0 : CurrentComboIndex;
-
-        Player_C->GetMesh()->GetAnimInstance()->Montage_Play(Arr_Sword_Attack_MTG[CurrentComboIndex]);
         Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);
 
     }
 
 
+    bCanAttack = false;
+    
+}
 
 
+void AWeaponSword::SetCanAttack()
+{
+    bCanAttack = true;
+
+}
+
+void AWeaponSword::SetCanMove()
+{
+    AActor* ActorPlayer = GetOwner();
+    ACharacter* Character = Cast<ACharacter>(ActorPlayer);
+
+    Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+}
+
+void AWeaponSword::Attack()
+{
     {
+        AActor* OwnerActor = GetOwner();
 
         FVector ActorLocation = OwnerActor->GetActorLocation();
         FRotator ActorRotation = OwnerActor->GetActorRotation();
@@ -167,23 +179,6 @@ void AWeaponSword::LeftClickAction()
             }
         }
     }
-    bCanAttack = false;
-    
-}
-
-
-void AWeaponSword::SetCanAttack()
-{
-    bCanAttack = true;
-
-}
-
-void AWeaponSword::SetCanMove()
-{
-    AActor* ActorPlayer = GetOwner();
-    ACharacter* Character = Cast<ACharacter>(ActorPlayer);
-
-    Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
 

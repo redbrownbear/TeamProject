@@ -17,7 +17,7 @@ void UNPCDialogue::OnCreated()
 
 void UNPCDialogue::ShowUI()
 {
-	Super::ShowUI();
+    Super::ShowUI();
 
     ConfirmButton->SetVisibility(ESlateVisibility::Hidden);
     CancelButton->SetVisibility(ESlateVisibility::Hidden);
@@ -57,7 +57,7 @@ void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
             UConversationManagerComponent* TalkManager = Controller->GetConversationManager();
             if (TalkManager)
             {
-                TalkManager->EndConversation();  
+                TalkManager->EndConversation();
             }
         }
     }

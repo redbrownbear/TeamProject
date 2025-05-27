@@ -16,4 +16,19 @@ class TEAMPROJECT_API AWeaponShield : public AWeaponBase
 	
 public:
 	AWeaponShield();
+
+public:
+	virtual void LeftClickAction() override;
+	virtual void RightClickAction() override;
+
+	UAnimMontage* GetWaitMTG() { return Wait_MTG; }
+	UAnimMontage* GetJustMTG() { return Just_MTG; }
+private:
+
+
+	UPROPERTY()
+	UAnimMontage* Wait_MTG;
+	UPROPERTY()
+	UAnimMontage* Just_MTG;
+
 };

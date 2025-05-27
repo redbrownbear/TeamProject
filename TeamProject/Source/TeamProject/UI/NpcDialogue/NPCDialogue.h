@@ -13,7 +13,7 @@
 #include "NPCDialogue.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class TEAMPROJECT_API UNPCDialogue : public UBaseUI
@@ -30,7 +30,7 @@ private:
 	void BindDelegates();
 	void RemoveDelegates();
 
-public: //¹ÙÀÎµùÀ» À§ÇØ ÆÛºí¸¯¼±¾ğ
+public: //ë°”ì¸ë”©ì„ ìœ„í•´ í¼ë¸”ë¦­ì„ ì–¸
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	UFUNCTION()
