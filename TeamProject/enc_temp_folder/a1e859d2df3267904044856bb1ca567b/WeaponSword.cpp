@@ -84,7 +84,7 @@ void AWeaponSword::LeftClickAction()
         }
         
         AnimInstance->Montage_Play(Arr_Sword_Attack_MTG[CurrentComboIndex]);
-        PrevComboIndex = CurrentComboIndex;
+
         CurrentComboIndex += 1;
         CurrentComboIndex = (MaxComboIndex <= CurrentComboIndex) ? 0 : CurrentComboIndex;
         Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);

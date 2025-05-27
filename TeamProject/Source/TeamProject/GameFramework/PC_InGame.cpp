@@ -299,8 +299,6 @@ void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 	
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 
-	Movement->DoCapsuleTraceMultiByObject();
-
 }
 
 
