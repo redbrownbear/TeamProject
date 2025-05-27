@@ -3,7 +3,7 @@
 
 #include "Actors/Item/WorldWeapon.h"
 #include "Actors/Projectile/Projectile.h"
-#include "Actors/Monster/Monster.h"
+#include "Actors/Monster/MonsterInterface.h"
 
 #include "Data/ItemDataRow.h"
 
@@ -213,7 +213,7 @@ void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	{
 		if (ProjectileName::Monster_CatchItem == Proj->GetProjectileName())
 		{
-			if (AMonster* Monster = Cast<AMonster>(Proj->GetInstigator()))
+			if (IMonsterInterface* Monster = Cast<IMonsterInterface>(Proj->GetInstigator()))
 			{
 				if (UMonsterFSMComponent* FSMComponent = Monster->GetFSMComponent())
 				{
@@ -228,9 +228,9 @@ void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 					// Offset Changed to fix outlook
 					StaticMeshComponent->SetRelativeLocation(FVector::Zero());
 					bool bSucceeded = this->AttachToComponent(
-						Monster->GetSkeletalMeshComponent(),
+						Monster->GetMonsterMesh(),
 						FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-						TEXT("RightWeapon"));
+						Monster_SocketName::Weapon_R);
 
 
 					Proj->Destroy();
@@ -246,12 +246,12 @@ void AWorldWeapon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-FName AWorldWeapon::GetWorldWeaponName()
+FName AWorldWeapon::GetWorldWeaponName() const
 {
 	return DataTableRowHandle.RowName;
 }
 
-EWeaponKind AWorldWeapon::GetWorldWeaponKind()
+EWeaponKind AWorldWeapon::GetWorldWeaponKind() const
 {
 	return ItemTableRow->eWeaponKind;
 }
@@ -261,3 +261,26 @@ void AWorldWeapon::AddForce(FVector _Direction, float Force)
 	CollisionComponent->AddForce(Force * _Direction);
 }
 
+void AWorldWeapon::AttachToMonster(IMonsterInterface* Monster, FName SocketName)
+{
+	if (!Monster) { return; }
+
+	if (UMonsterFSMComponent* FSMComponent = Monster->GetFSMComponent())
+	{
+		bIsCatched = true;
+
+		// if PhyscisSimulates activated, AttachToComponent will fail
+		CollisionComponent->SetSimulatePhysics(false);
+		// Offset Changed to fix outlook
+		StaticMeshComponent->SetRelativeLocation(FVector::Zero());
+		const bool bSucceeded = this->AttachToComponent(
+			Monster->GetMonsterMesh(),
+			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+			SocketName);
+
+		if (!bSucceeded)
+		{
+			check(false);
+		}
+	}
+}

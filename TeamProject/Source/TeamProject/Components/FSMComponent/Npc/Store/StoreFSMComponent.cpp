@@ -35,10 +35,10 @@ void UStoreFSMComponent::UpdateTalk(float DeltaTime)
 
 void UStoreFSMComponent::UpdateSell(float DeltaTime)
 {
-	// ¹°°Ç ±¸¸Å ½Ã
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 	ChangeState(ENpcState::Talk); 
 	
-	// ±¸¸Å ¤£¤£ÇÑµÚ¿¡ Idle·Î µ¹¸±Áö »ç°í ¹Ù·Î Idle »óÅÂ·Î µ¹¸± Áö
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ÑµÚ¿ï¿½ Idleï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ù·ï¿½ Idle ï¿½ï¿½ï¿½Â·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 }
 
 void UStoreFSMComponent::LookAtPlayer(AActor* PlayerActor)
