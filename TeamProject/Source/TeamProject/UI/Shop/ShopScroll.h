@@ -9,7 +9,11 @@
 #include "Components/VerticalBox.h"
 #include "UI/Shop/ShopSlot.h"
 
+#include "Data/ShopDataRow.h"
+
 #include "ShopScroll.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHighlightChanged, int32, HighlightedIndex);
 
 /**
  * 
@@ -25,11 +29,21 @@ protected:
 	void InitializePool(int32 PreloadCount);
 
 public:
-	void UpdateSlots(const TArray<FItemData>& NewItemList);
+	void UpdateSlots(const TArray<FShopDataRow>& ShopList);
 
 public:
 	void MoveSelection(FIntPoint Direction);
 	void SelectInit();
+
+public:
+	FItemData GetItemDataAtIndex (int32 Index) const;
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnHighlightChanged OnHighlightChanged;
+
+private:
+	int32 CurrentIndex = 0;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -47,6 +61,4 @@ private:
 
 	UPROPERTY()
 	TArray<UShopSlot*> PooledSlots;
-
-	int32 CurrentIndex = 0;
 };

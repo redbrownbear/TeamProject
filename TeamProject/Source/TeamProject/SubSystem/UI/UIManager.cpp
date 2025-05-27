@@ -52,4 +52,17 @@ void UUIManager::LoadUIClass()
             CachedUIs.Add(UNPCDialogue::StaticClass(), CachedDialogueClass);
         }
     }
+
+    if (!CachedShopClass)
+    {
+        CachedShopClass = CreateWidget<UShop>(World, LoadClass<UShop>(nullptr, TEXT("/Game/Blueprint/UI/Shop/BP_ShopMain.BP_ShopMain_C")));
+        if (CachedShopClass)
+        {
+            CachedShopClass->AddToViewport();
+            CachedShopClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedShopClass->OnCreated();
+            CachedUIs.Add(UShop::StaticClass(), CachedShopClass);
+        }
+    }
+
 }

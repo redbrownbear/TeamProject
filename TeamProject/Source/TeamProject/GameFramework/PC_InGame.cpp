@@ -9,6 +9,7 @@
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
+#include "SubSystem/UI/ShopManager.h"
 
 #include "Actors/Npc/Npc.h" 
 
@@ -119,7 +120,7 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		break;
 
 	case EInputContext::IC_Shop:
-		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 3);
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Shop, 3);
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;
 		break;

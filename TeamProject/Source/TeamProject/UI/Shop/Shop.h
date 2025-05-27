@@ -33,6 +33,14 @@ private:
 	void BindDelegates();
 	void RemoveDelegates();
 
+private:
+	//대화 이후 상점 오픈
+	void SetShopOpen();
+
+	//상품 고르고 구매?
+	void SetItemBuy();
+
+
 public: //바인딩을 위해 퍼블릭선언
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
@@ -44,8 +52,13 @@ public: //바인딩을 위해 퍼블릭선언
 	void OnNextDialogue(const FInputActionValue& InputActionValue);
 
 private:
+	UFUNCTION()
 	void RefreshDialogue(const FNPCDialogueTableRow& QuestData);
-	void RefreshDescription(const FItemData& ItemData);
+	UFUNCTION()
+	void RefreshDescription(int32 CurrentIdx);
+
+	UFUNCTION()
+	void RefreshShopList(const TArray<FShopDataRow>& ShopList);
 
 private:
 	UPROPERTY(meta = (BindWidget))

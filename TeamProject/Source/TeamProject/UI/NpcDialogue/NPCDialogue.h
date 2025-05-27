@@ -47,6 +47,19 @@ private:
 	void UpdateTyping();
 	void OnNextButtonClicked();
 
+
+private:
+	UPROPERTY()
+	FNPCDialogueTableRow DialogueDataRow;
+	EQuestCharacter CurQuestChar;
+	int32 NextDialogueID;
+
+	//한글자씩 보이는 기능을 위한 변수
+	FString FullText;
+	int32 CurrentCharIndex = 0;
+	FTimerHandle TypingTimerHandle;
+	bool bIsTyping = false;
+
 private:
 	UPROPERTY(meta = (BindWidget))
 	UMultiLineEditableTextBox* TextBox;
@@ -65,15 +78,4 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ExtraText;
 
-private:
-	UPROPERTY()
-	FNPCDialogueTableRow DialogueDataRow;
-	EQuestCharacter CurQuestChar;
-	int32 NextDialogueID;
-
-	//한글자씩 보이는 기능을 위한 변수
-	FString FullText;
-	int32 CurrentCharIndex = 0;
-	FTimerHandle TypingTimerHandle;
-	bool bIsTyping = false;
 };

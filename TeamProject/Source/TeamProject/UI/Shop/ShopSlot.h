@@ -24,8 +24,13 @@ protected:
 
 public:
 	void SetItemData(const FItemData& Item);
-
 	void SetSelected(bool bIsSelected);
+
+public:
+	const FItemData& GetItemData() const { return ItemData; }
+
+private:
+	FItemData ItemData;
 
 private:
 	UPROPERTY(meta = (BindWidget))

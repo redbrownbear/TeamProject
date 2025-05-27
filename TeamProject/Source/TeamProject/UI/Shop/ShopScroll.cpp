@@ -20,7 +20,7 @@ void UShopScroll::InitializePool(int32 PreloadCount)
     }
 }
 
-void UShopScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
+void UShopScroll::UpdateSlots(const TArray<FShopDataRow>& ShopList)
 {
     for (UShopSlot* ActiveSlot : ActiveSlots)
     {
@@ -29,7 +29,7 @@ void UShopScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
     }
     ActiveSlots.Empty();
 
-    for (const FItemData& Item : NewItemList)
+    for (const FShopDataRow& ShopItem : ShopList)
     {
         UShopSlot* NewSlot = nullptr;
 
@@ -41,6 +41,8 @@ void UShopScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
         {
             NewSlot = CreateWidget<UShopSlot>(GetWorld(), SlotWidgetClass);
         }
+
+        FItemData Item = ShopItem.ItemData;
 
         NewSlot->SetItemData(Item);
         ItemVerticalBox->AddChildToVerticalBox(NewSlot);
@@ -79,6 +81,8 @@ void UShopScroll::MoveSelection(FIntPoint Direction)
         ActiveSlots[NextIndex]->SetSelected(true);
         CurrentIndex = NextIndex;
     }
+
+    OnHighlightChanged.Broadcast(CurrentIndex);
 }
 
 void UShopScroll::SelectInit()
@@ -92,4 +96,16 @@ void UShopScroll::SelectInit()
     }
 
     ActiveSlots[CurrentIndex]->SetSelected(true);
+
+    OnHighlightChanged.Broadcast(CurrentIndex);
+}
+
+FItemData UShopScroll::GetItemDataAtIndex(int32 Index) const
+{
+    if (ActiveSlots.IsValidIndex(Index) && ActiveSlots[Index] != nullptr)
+    {
+        return ActiveSlots[Index]->GetItemData();
+    }
+
+    return FItemData();
 }

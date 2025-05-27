@@ -5,12 +5,46 @@
 
 #include "SubSystem/UI/UIManager.h"
 
-void UShopDialogue::InitUI()
+void UShopDialogue::NativeConstruct()
 {
+    ConfirmButton->OnClicked.AddDynamic(this, &UShopDialogue::OnConfirm);
+    CancelButton->OnClicked.AddDynamic(this, &UShopDialogue::OnCancel);
 }
 
-void UShopDialogue::SetData()
+void UShopDialogue::InitUI()
 {
+    ConfirmButton->SetVisibility(ESlateVisibility::Collapsed);
+    CancelButton->SetVisibility(ESlateVisibility::Collapsed);
+    ExtraButton->SetVisibility(ESlateVisibility::Collapsed);
+
+    ActionLay->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UShopDialogue::SetBuy()
+{
+    ConfirmButton->SetVisibility(ESlateVisibility::Visible);
+    CancelButton->SetVisibility(ESlateVisibility::Visible);
+
+    ActionLay->SetVisibility(ESlateVisibility::Hidden);
+
+    //인풋 바인드!
+}
+
+void UShopDialogue::OnNavigate(const FInputActionValue& InputActionValue)
+{
+
+}
+
+void UShopDialogue::OnConfirm()
+{
+    //구매 완료
+}
+
+void UShopDialogue::OnCancel()
+{
+    InitUI();
+
+    //바인드 돌리기
 }
 
 void UShopDialogue::RefreshDialogue(const FNPCDialogueTableRow& QuestData)

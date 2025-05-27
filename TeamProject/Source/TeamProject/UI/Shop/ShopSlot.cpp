@@ -10,6 +10,9 @@ void UShopSlot::NativeConstruct()
 
 void UShopSlot::SetItemData(const FItemData& Item)
 {
+    //데이터 처리 후 UI 처리
+    ItemData = Item;
+
     // 갯수를 어떻게 처리할 것인가?
     UTexture2D* LoadedTexture = Item.ItemIcon.LoadSynchronous();
     if (LoadedTexture)

@@ -21,9 +21,20 @@ class TEAMPROJECT_API UShopDialogue : public UUserWidget
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void NativeConstruct() override;
+
 public:
 	void InitUI();
-	void SetData();
+	void SetBuy();
+
+public: //바인딩을 위해 퍼블릭선언
+	UFUNCTION()
+	void OnNavigate(const FInputActionValue& InputActionValue);
+	UFUNCTION()
+	void OnConfirm();
+	UFUNCTION()
+	void OnCancel();
 
 public:
 	void RefreshDialogue(const FNPCDialogueTableRow& QuestData);

@@ -5,7 +5,7 @@
 
 void UShopDescription::RefreshUI(const FItemData& ItemData)
 {
-	UTexture2D* LoadedTexture = ItemData.CategoryIcon.LoadSynchronous();
+	UTexture2D* LoadedTexture = ItemData.ItemIcon.LoadSynchronous();
 	if (LoadedTexture)
 	{
 		ItemImg->SetBrushFromTexture(LoadedTexture);

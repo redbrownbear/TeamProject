@@ -4,6 +4,7 @@
 #include "UI/NpcDialogue/NPCDialogue.h"
 
 #include "SubSystem/UI/QuestDialogueManager.h"
+#include "SubSystem/UI/ShopManager.h"
 #include "SubSystem/UI/UIManager.h"
 
 #include "GameFramework/PC_InGame.h"
@@ -123,35 +124,55 @@ void UNPCDialogue::OnConfirm()
             PC_InGame->Npc->SetDoQuest(false);
         }
     }   
-    //상점 기능 X
-    //else if (CurQuestChar == EQuestCharacter::Store)
-    //{
-    //    bool IsShopping = PC_InGame->Npc->GetShopping();
-    //    bool IsBuying = PC_InGame->Npc->GetBuy();
 
-    //    if (DialogueDataRow.bIsEndConversation && !IsShopping)
-    //    {
-    //        PC_InGame->Npc->SetShopping(true);
-    //        // Create 상품 리스트 UI: 이후 항목 클릭했을 때 산다/만다 대화 나오게
-    //        // 결정에 따라 SetBuy()에 인자 넣어주기
-    //    }
-    //    /*else if (DialogueDataRow.bIsEndConversation && IsShopping && IsBuying)
-    //    {
-    //        // 구매 했을 경우
-    //        PC_InGame->Npc->SetBuy(true);
-    //        PC_InGame->Npc->SetShopping(false);
-    //    }
-    //    else if (DialogueDataRow.bIsEndConversation && IsShopping && !IsBuying)
-    //    {
-    //        // 구매 안 할 경우
-    //        PC_InGame->Npc->SetBuy(false);
-    //        PC_InGame->Npc->SetShopping(false);
-    //    }*/
-    //    else
-    //    {
-    //        PC_InGame->Npc->SetShopping(false);
-    //    }
-    //}
+    if (PC_InGame->Npc->GetData()->DialogType == EDialogType::Shop)
+    {	
+        //임시
+		FShopDataRow datarow;
+
+        UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
+        check(UIManager);
+
+        UShopManager* ShopManager = GetWorld()->GetGameInstance()->GetSubsystem<UShopManager>();
+        check(ShopManager);
+
+        UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+        check(QuestManager);
+
+        if (UIManager && ShopManager && QuestManager)
+        {
+
+            UIManager->ShowUI(UShop::StaticClass());
+            ShopManager->UpdateShopData(PC_InGame->Npc->GetData()->QuestCharacter, datarow);
+            QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
+
+            bool IsShopping = PC_InGame->Npc->GetShopping();
+            bool IsBuying = PC_InGame->Npc->GetBuy();
+
+            if (DialogueDataRow.bIsEndConversation && !IsShopping)
+            {
+                PC_InGame->Npc->SetShopping(true);
+                // Create 상품 리스트 UI: 이후 항목 클릭했을 때 산다/만다 대화 나오게
+                // 결정에 따라 SetBuy()에 인자 넣어주기
+            }
+            /*else if (DialogueDataRow.bIsEndConversation && IsShopping && IsBuying)
+            {
+                // 구매 했을 경우
+                PC_InGame->Npc->SetBuy(true);
+                PC_InGame->Npc->SetShopping(false);
+            }
+            else if (DialogueDataRow.bIsEndConversation && IsShopping && !IsBuying)
+            {
+                // 구매 안 할 경우
+                PC_InGame->Npc->SetBuy(false);
+                PC_InGame->Npc->SetShopping(false);
+            }*/
+            else
+            {
+                PC_InGame->Npc->SetShopping(false);
+            }
+        }
+    }
 }
 
 void UNPCDialogue::OnCancel()
