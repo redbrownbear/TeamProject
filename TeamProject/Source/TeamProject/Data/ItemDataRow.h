@@ -6,17 +6,6 @@
 #include "Misc/Utils.h"
 #include "ItemDataRow.generated.h"
 
-UENUM()
-enum class ItemCategoryType : int8
-{
-	IT_Weapon,
-	IT_Arrow,
-	IT_Shield,
-	IT_Armor,
-	IT_Material,
-	IT_Food,
-};
-
 /**
  *
  */
@@ -30,10 +19,16 @@ public:
     FString Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	ItemCategoryType ItemCategory;
+	EItemCategoryType ItemCategory;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSoftObjectPtr<UTexture2D> Icon;
+	TSoftObjectPtr<UTexture2D> ItemIcon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSoftObjectPtr<UTexture2D> CategoryIcon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	FString Description;
 
 
 public:

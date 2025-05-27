@@ -42,6 +42,14 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	eCurrentState = FSMComponent->GetNpcState();
 
+	bIsIdle = false;
+	bIsSit = false;
+	bIsStand = false;
+	bIsWalk = false;
+	bIsRun = false;
+	bIsTalk = false;
+	bIsHide = false;
+
 	switch (eCurrentState)
 	{
 	case ENpcState::Idle:
@@ -49,9 +57,6 @@ void UFurikoAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		break;
 	case ENpcState::Sit:
 		bIsSit = true;
-		break;
-	case ENpcState::Stand:
-		bIsStand = true;
 		break;
 	case ENpcState::Run:
 		bIsRun = true;

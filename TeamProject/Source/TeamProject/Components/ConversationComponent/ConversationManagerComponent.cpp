@@ -21,7 +21,7 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 	CurrentNpc = Npc;
 	CurrentPlayer = Player;
 	
-	LockCharacters(Npc, Player);
+	//LockCharacters(Npc, Player);
 
 	APC_InGame* PC = Cast<APC_InGame>(CurrentPlayer->GetController());
 	check(PC);
@@ -51,9 +51,9 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 
 void UConversationManagerComponent::EndConversation()
 {	
-	UnlockCharacters(CurrentNpc, CurrentPlayer);	
+	//UnlockCharacters(CurrentNpc, CurrentPlayer);	
 	
-	bStateChange = true;
+	bEndTalk = true;
 }
 
 void UConversationManagerComponent::BeginPlay()

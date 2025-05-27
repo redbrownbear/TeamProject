@@ -30,7 +30,8 @@ public:
 	void LockCharacters(ANpc* Npc, APlayerCharacter* Player);
 	void UnlockCharacters(ANpc* Npc, APlayerCharacter* Player);
 
-	bool GetStateChanged() { return bStateChange; }
+	void SetEndTalked(bool IsEndTalked) { bEndTalk = IsEndTalked; }
+	bool GetEndTalked() { return bEndTalk; }
 
 private:
 	UPROPERTY()
@@ -50,6 +51,6 @@ private:
 	UAnimMontage* PlayerTalkMontage = nullptr;
 
 private:
-	bool bStateChange = false;
+	bool bEndTalk = false;
 
 };

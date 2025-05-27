@@ -9,6 +9,7 @@ class ANpc;
 class APlayerCharacter;
 class ANpcController;
 class UNPCDialogue;
+class AHidePoint;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TEAMPROJECT_API UNpcFSMComponent : public UActorComponent
@@ -63,8 +64,6 @@ protected:
 	void ChangeState(ENpcState NewState);
 
 	virtual void UpdateIdle(float DeltaTime);
-	virtual void UpdateSit(float DeltaTime);
-	virtual void UpdateStand(float DeltaTime);
 	virtual void UpdateWalk(float DeltaTime);
 	virtual void UpdateRun(float DeltaTime);
 	virtual void UpdateTalk(float DeltaTime);
@@ -75,7 +74,19 @@ protected:
 protected:
 	void MoveToLocation(const FVector& InLocation);
 
+	void HideFuriko();
+	void SetHideLocation(FVector InLocation);
+
+	void PlayInterectSequence();
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Teleport")
+	TArray<FVector> TeleportLocations;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HidePoint")
+	TArray<AHidePoint*> HidePoints;
+
 private:
-	float AcceptanceRadius = 50.0f;
+	float AcceptanceRadius = 150.0f;
 
 };

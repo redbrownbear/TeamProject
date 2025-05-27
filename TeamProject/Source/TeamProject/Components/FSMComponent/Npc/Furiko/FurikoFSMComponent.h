@@ -22,5 +22,4 @@ protected:
 
 private:
 	int32 CurrentStrollIndex = 0;
-
 };

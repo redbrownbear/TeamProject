@@ -86,18 +86,11 @@ void UQuestDialogueManager::ShowDialogue(EQuestCharacter QuestChar, int32 Dialog
 
     if (!FoundRow)
     {
-        TSharedPtr<FNPCDialogueTableRow> DummyRow = MakeShared<FNPCDialogueTableRow>();
-        DummyRow->QuestCharacter = QuestChar;
-        DummyRow->CurrentDialogueID = 0;
-        DummyRow->NextDialogueID = 0;
-        DummyRow->DialogueString = TEXT("0");
-        DummyRow->bIsEndConversation = true;
-
-        FoundRow = DummyRow;
+        check(FoundRow);
+        return;
     }
 
     SetConversation(true);
-
     OnDialogueUpdated.Broadcast(*FoundRow);
 }
 
