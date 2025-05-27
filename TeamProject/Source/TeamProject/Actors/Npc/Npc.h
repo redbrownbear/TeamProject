@@ -64,6 +64,12 @@ public:
 
 	bool GetIsHide() { return bIsHide; }
 
+	bool GetDoQuest() { return bDoQuest; }
+
+	bool GetShopping() { return bShopping; }
+
+	bool GetBuy() { return bBuy; }
+
 	EQuestCharacter GetNpc() const { return QuestNpc; }
 
 public:
@@ -74,6 +80,12 @@ public:
 	void SetIsConfirmed(bool IsConfirm) { bIsConfirm = IsConfirm; }
 
 	void SetIsHide(bool IsHide) { bIsHide = IsHide; }
+
+	void SetDoQuest(bool IsQuest) { bDoQuest = IsQuest; }
+
+	void SetShopping(bool IsShopping) { bShopping = IsShopping; }
+
+	void SetBuy(bool IsBuy) { bBuy = IsBuy; }
 
 	void AttachToSocket();
 
@@ -121,6 +133,16 @@ private:
 
 	UPROPERTY()
 	bool bIsHide = false;
+
+	// 콘텐츠 변수
+	UPROPERTY()
+	bool bDoQuest = false;
+
+	UPROPERTY()
+	bool bShopping = false;
+
+	UPROPERTY()
+	bool bBuy = false;
 
 protected:
 	// 상호작용 

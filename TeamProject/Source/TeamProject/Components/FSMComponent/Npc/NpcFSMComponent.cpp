@@ -145,6 +145,7 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		}
 		// @TODO Play Sequence
 		//PlayInterectSequence();
+		Owner->PlayMontage(ENpcMontage::TALK);
 		Controller->GetConversationManager()->StartConversation(Owner, Player);
 		break;	
 	case ENpcState::Hide:
@@ -261,25 +262,32 @@ void UNpcFSMComponent::HideFuriko()
 
 	if (Target && Owner)
 	{
+		//UE_LOG(LogTemp, Log, TEXT("Furiko Moves: %s, Location: %s"), *Target->GetName(), *Target->GetActorLocation().ToString());
+
 		SetHideLocation(Target->GetActorLocation());
 
 		// <푸리코와 놀자!> 퀘스트 UI 생성할까 말까 윤호오빠랑 얘기해보기
-
-		UE_LOG(LogTemp, Log, TEXT("Furiko가 HidePoint %s 로 순간이동했습니다."), *Target->GetName());
 	}
 }
 
 void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 {
 	if (!Owner) return;
+	
+	// 이동 방해 차단
+	if (Owner->GetController()) Owner->GetController()->StopMovement();
 
-	// 순간 이동
+	// 순간이동
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	Owner->SetIsHide(true);
+
+	// 위치 확인
+	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation 완료. Owner 위치: %s"), *Owner->GetActorLocation().ToString());
 }
 
 void UNpcFSMComponent::PlayInterectSequence()
 {
+	// Talk 시 캐릭터 위치만 고정되게 조정한 뒤 그 다음에 생성해야 할 듯
 	/*if (Player)
 	{
 		FVector PlayerLocation = Player->GetActorLocation();

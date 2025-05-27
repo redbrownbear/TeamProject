@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	FString Description;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	int32 price;
+
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")

@@ -28,6 +28,7 @@ public:
 private:
 	void InitUI();
 	void BindDelegates();
+	void RemoveDelegates();
 
 public: //바인딩을 위해 퍼블릭선언
 	UFUNCTION()

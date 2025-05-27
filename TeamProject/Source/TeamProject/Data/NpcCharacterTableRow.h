@@ -8,15 +8,33 @@
 #include "NpcCharacterTableRow.generated.h"
 
 UENUM()
+enum class EDialogType
+{
+	None,
+	Quest,
+	Shop,
+	End
+};
+
+UENUM()
 enum class EQuestCharacter
 {
 	None,
 
 	Furiko,
-
-	Store,
+	Korok,
+	//여기는 캐릭터만
+	//Store,
 
 	End,
+};
+
+UENUM(BlueprintType)
+enum class EQuestCharDialogue : uint8
+{
+	Furiko = 0,
+	Furiko_Found = 100,
+	Store = 200,
 };
 
 USTRUCT()
@@ -26,6 +44,9 @@ struct TEAMPROJECT_API FNpcCharacterTableRow : public FTableRowBase
 public:
 	UPROPERTY(EditAnywhere, Category = "Npc")
 	FString NPCName;
+
+	UPROPERTY(EditAnywhere, Category = "Npc")
+	EDialogType DialogType = EDialogType::None;
 
 	UPROPERTY(EditAnywhere, Category = "Npc")
 	EQuestCharacter QuestCharacter = EQuestCharacter::None;
