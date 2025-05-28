@@ -17,9 +17,9 @@ public:
     void StartPreview();
     void StopPreview();
 
-    void AnimateRise(float Value);
-
-    void UpdateLocation(const FVector& WorldLocation);
+public:
+    UMaterialInstanceDynamic* GetMaterialInstance() { return DynamicMaterialInstance; }
+    void SetMaterialInstance(UMaterialInstanceDynamic* InMaterialInstance) { DynamicMaterialInstance = InMaterialInstance; }
 
 protected:
     virtual void BeginPlay() override;
@@ -29,15 +29,15 @@ protected:
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
-    UPROPERTY()
-    TObjectPtr<UTimelineComponent> PreviewTimeline;
-
-    UPROPERTY(EditDefaultsOnly)
-    TObjectPtr<UCurveFloat> RiseCurve;
-
 private:
-    bool bIsAnimating = false;
+    float RiseSpeed = 3.f;            // 1초에 올라갈 속도 (cm/sec)
+    float RiseDistance = 250.f;         // 총 올라갈 거리
 
+    FVector StartLocation;
+    FVector TargetLocation;
+    float CurrentRise = 0.f;
+    bool bIsRising = false;
+    
 protected:
     UMaterialInterface* MaterialInterface;
     UMaterialInstanceDynamic* DynamicMaterialInstance;

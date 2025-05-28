@@ -36,6 +36,8 @@ protected:
     TObjectPtr<APatrolPath> PatrolPath;
     UPROPERTY(EditAnywhere)
     TObjectPtr<ACampFire> CampFire;
+    UPROPERTY(EditAnywhere)
+    TArray<USphereComponent*> AdditionalColliders;
 
 protected:
     UPROPERTY(EditAnywhere, meta = (RowType = "MonsterTableRow"))
@@ -82,4 +84,17 @@ public:
     virtual UMonsterFSMComponent* GetFSMComponent() const;
     virtual void SetSpeedWalk() override;
     virtual void SetSpeedRun() override;
+
+
+protected:
+    UFUNCTION()
+    virtual void OnDie() override;
+    UFUNCTION()
+    virtual void OnDeadEnd() override;
+
+protected:
+    TObjectPtr<AActor> ThrownObject = nullptr;
+public:
+    void SetThrownObject(AActor * InThrownObject) { ThrownObject = InThrownObject; }
+    void DeleteThrownObject() { if (ThrownObject) ThrownObject->Destroy(); }
 };

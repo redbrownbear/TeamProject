@@ -46,7 +46,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsWaitShield = false;
-
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsCliming = false;
 	UPROPERTY(BlueprintReadOnly)
 	FRotator Rotator;
 

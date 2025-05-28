@@ -57,6 +57,8 @@ void APawnMonster::BeginPlay()
 	{
 		FSMComponent->SetPawnMonster(this);
 	}
+
+	StatusComponent->OnDie.AddDynamic(this, &ThisClass::OnDie);
 }
 
 // Called every frame
@@ -210,6 +212,18 @@ void APawnMonster::SetSpeedWalk()
 void APawnMonster::SetSpeedRun()
 {
 	MovementComponent->MaxSpeed = MonsterData->RunMovementMaxSpeed;
+}
+
+void APawnMonster::OnDie()
+{
+	IMonsterInterface::OnDie();
+	// Maybe there's no Dead Montage;
+	OnDeadEnd();
+}
+
+void APawnMonster::OnDeadEnd()
+{
+	IMonsterInterface::OnDeadEnd();
 }
 
 UAnimInstance* APawnMonster::GetAnimInstance() const
