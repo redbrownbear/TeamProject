@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Actors/Npc/Npc.h"
+#include "Data/NPCDialogueTableRow.h"
 #include "ConversationManagerComponent.generated.h"
 
 class APlayerCharacter;
@@ -42,6 +43,9 @@ private:
 
 	UPROPERTY()
 	UQuestDialogueManager* QuestDialogueManager = nullptr;
+
+	UPROPERTY()
+	FNPCDialogueTableRow DialogueDataRow;
 
 private:
 	UPROPERTY()

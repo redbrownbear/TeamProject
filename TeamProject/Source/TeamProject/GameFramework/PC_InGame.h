@@ -9,11 +9,10 @@
 
 #include "UI/Inven/Inventory.h"
 #include "UI/NpcDialogue/NPCDialogue.h"
+#include "UI/Shop/Shop.h"
 
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
-
-// 2025-05-19 Yunjung: 임시로 대화 IMC 등록 시키는 중(현석 오빠랑 의논 필요)
 
 enum class EInputContext
 {
@@ -21,6 +20,7 @@ enum class EInputContext
 	IC_InGame,
 	IC_Inventory,
 	IC_Dialogue,
+	IC_Shop,
 	//필요하면 추가해서 사용합니다.
 
 	IC_End,
@@ -44,6 +44,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
 	UInputMappingContext* IMC_Dialogue = nullptr;
 
+	//Dialogue
+	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
+	UInputMappingContext* IMC_Shop = nullptr;\
+
+	//Supernatural
+	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
+	UInputMappingContext* IMC_Supernatural = nullptr;
+
 	//Player
 public:
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
@@ -57,7 +65,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_RightClick = nullptr;
 
-	
+
 
 
 
@@ -103,7 +111,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_DialogueNext = nullptr;
 
+	//Supernatural
+public:
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_IceMaker = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_Build = nullptr;
 
 	void CheckValid() const
 	{
@@ -127,17 +141,22 @@ public:
 		check(IA_DialogueConfirm);
 		check(IA_DialogueCancel);
 		check(IA_DialogueNext);
+		check(IA_IceMaker);		
+		check(IA_Build);
 	}
 };
 
+
+class AIcePillar;
+class AIcePreview;
 /**
- * 
+ *
  */
 UCLASS()
 class TEAMPROJECT_API APC_InGame : public APlayerController
 {
 	GENERATED_BODY()
-	
+
 public:
 	APC_InGame();
 protected:
@@ -145,9 +164,13 @@ protected:
 	virtual void SetupInputComponent() override;
 
 public:
+	virtual void Tick(float DeltaSeconds) override;
+
+public:
 	void ChangeInputContext(EInputContext NewContext);
 	void BindInventoryInput(UInventory* Inventory);
 	void BindDialogueInput(UNPCDialogue* NpcDialogue);
+	void BindShopInput(UShop* Shop);
 	void ShowDialogueUI();
 
 protected:
@@ -160,8 +183,8 @@ protected:
 	void RightClick(const FInputActionValue& InputActionValue);
 	void RightClickEnd(const FInputActionValue& InputActionValue);
 	void Climb(const FInputActionValue& InputActionValue);
-	
-	
+
+
 	// --------- Weapon Swap ------------------------------
 
 	void EquipSword(const FInputActionValue& InputActionValue);
@@ -172,17 +195,59 @@ protected:
 	void OnInteract(const FInputActionValue& InputActionValue);
 	void OpenInventory(const FInputActionValue& InputActionValue);
 
+	// --------- Ice Maker ------------------------------
 
+	void BeginIcePreview(const FInputActionValue& InputActionValue);
+	void SpawnIcePillar(const FInputActionValue& InputActionValue);
+	
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
 
 public:
 	UPROPERTY(EditAnywhere)
-	UPC_InGameDataAsset* PC_InGameDataAsset;	
+	UPC_InGameDataAsset* PC_InGameDataAsset;
 
 	UPROPERTY()
 	TObjectPtr<class ANpc> Npc = nullptr;
 
 	EInputContext CurrentInputContext = EInputContext::IC_Start;
 
+	// --------- Supernatural ----------
+protected:
+	// 프리뷰 종료
+	UFUNCTION()
+	void EndIcePreview();
+
+	// 매 프레임 업데이트
+	UFUNCTION()
+	void UpdateIcePreview();
+
+	// 충돌 체크
+	UFUNCTION()
+	void CheckCollision();
+
+	// 수면 체크
+	UFUNCTION()
+	void CheckSurface();
+
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "Cryonis")
+	TSubclassOf<AIcePillar> IcePillarClass;
+
+	UPROPERTY(EditAnywhere, Category = "Cryonis")
+	TSubclassOf<AIcePreview> IcePreviewClass;
+
+	UPROPERTY(EditAnywhere, Category = "Cryonis")
+	float TraceDistance = 300.0f;
+
+	UPROPERTY()
+	TObjectPtr<AIcePreview> IcePreviewActor = nullptr;
+
+private:
+	bool bQPressed = false;
+	bool bCanSpawn = false;
+	bool bHitResult = false;
+
+	FHitResult Hit;
 };

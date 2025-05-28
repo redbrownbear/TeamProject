@@ -19,6 +19,9 @@ public:
     FString Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	int32 ItemID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	EItemCategoryType ItemCategory;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
@@ -29,6 +32,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	FString Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	int32 price;
 
 
 public:

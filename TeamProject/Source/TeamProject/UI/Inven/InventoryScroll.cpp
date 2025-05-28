@@ -123,6 +123,7 @@ void UInventoryScroll::SelectInit()
     }
 
     ActiveSlots[CurrentIndex]->SetSelected(true);
+
 }
 
 void UInventoryScroll::InitCategory()

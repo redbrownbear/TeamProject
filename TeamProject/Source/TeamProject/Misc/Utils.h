@@ -26,7 +26,60 @@ namespace ProjectileName
     static inline FName Monster_PlayerAlert = TEXT("Monster_PlayerAlert");
     static inline FName Monster_CatchItem = TEXT("Monster_CatchItem");
     static inline FName Monster_Arrow = TEXT("Monster_Arrow");
+    static inline FName Monster_LynelAttack = TEXT("Monster_LynelAttack");
+    static inline FName Monster_LynelExplosion = TEXT("Monster_LynelExplosion");
+    static inline FName Monster_LynelFire = TEXT("Monster_LynelFire");
+    static inline FName Monster_LynelArrow = TEXT("Monster_LynelArrow");
+    static inline FName Monster_HinoxAttack = TEXT("Monster_HinoxAttack");
+    static inline FName Monster_HinoxGrab = TEXT("Monster_HinoxGrab");
+    static inline FName Monster_HinoxStone = TEXT("Monster_HinoxStone");
+    static inline FName Monster_HinoxLink = TEXT("Monster_HinoxLink");
+    static inline FName Monster_HinoxHipDrop = TEXT("Monster_HinoxHipDrop");
 }
+
+namespace Monster_SocketName
+{
+    static inline FName Weapon_R = TEXT("Weapon_R");
+    static inline FName Weapon_L = TEXT("Weapon_L");
+    static inline FName Pod_A = TEXT("Pod_A");
+    static inline FName Pod_B = TEXT("Pod_B");
+    static inline FName Pod_C = TEXT("Pod_C");
+    static inline FName Pod_D = TEXT("Pod_D");
+    static inline FName Pod_Melee = TEXT("Pod_Melee");
+    static inline FName Pod_Bow = TEXT("Pod_Bow");
+    static inline FName Chin = TEXT("Chin");
+    static inline FName Center_1 = TEXT("Center_1");
+    static inline FName Center_2 = TEXT("Center_2");
+    static inline FName Leg_1_R = TEXT("Leg_1_R");
+    static inline FName Leg_2_R = TEXT("Leg_2_R");
+    static inline FName Leg_1_L = TEXT("Leg_1_L");
+    static inline FName Leg_2_L = TEXT("Leg_2_L");
+    static inline FName Toe_R = TEXT("Toe_R");
+    static inline FName Toe_L = TEXT("Toe_L");
+    static inline FName EyeBall = TEXT("EyeBall");
+}
+
+enum class EAdditionalCollider : uint8
+{
+    Chin = 0,
+    Center_1,
+    Center_2,
+    Leg_1_R,
+    Leg_2_R,
+    Leg_1_L,
+    Leg_2_L,
+    Toe_R,
+    Toe_L,
+    Eye_Ball,
+    End
+};
+
+namespace ThrownObject
+{
+    static inline FName HinoxRock = TEXT("HinoxRock");
+    static inline FName SmallRock = TEXT("SmallRock");
+}
+
 
 
 
@@ -55,6 +108,18 @@ enum class EMonsterState : uint8
     Dance,
     Signal,
     AimingBow,
+    AimingBowUpper,
+    DashAttack,
+    ExplosionAttack,
+    FireAttack,
+    HornAttack,
+    RunningAttack,
+    Rebound,
+    Rodeo,
+    Stun,
+    ReadyToAttack,
+    Damage_Eye,
+    Temp,
     End,
 };
 
@@ -73,14 +138,110 @@ enum class EMonsterMontage : uint8
     BOW_START,
     BOW_END,
     THROW,
+    SEARCH,
     DANCE_START,
     DANCE_END,
     WEAPON_CATCH,
     FIND,
     SIGNAL_START,
     SIGNAL_END,
+    APPEAR,
+    BOW_UPPER_START,
+    BOW_UPPER_END,
+    ATTACK_DASH_LSWORD_START,
+    ATTACK_DASH_LSWORD_END,
+    ATTACK_DASH_SWORD_START,
+    ATTACK_DASH_SWORD_END,
+    ATTACK_EXPLOSION_START,
+    ATTACK_EXPLOSION_END,
+    ATTACK_FIRE_START,
+    ATTACK_FIRE,
+    ATTACK_FIRE_END,
+    ATTACK_HORN_START,
+    ATTACK_HORN_END,
+    ATTACK_RUNNING_LSWORD_START,
+    ATTACK_RUNNING_LSWORD_END,
+    ATTACK_RUNNING_SWORD_START,
+    ATTACK_RUNNING_SWORD_END,
+    REBOUND,
+    RODEO_START,
+    RODEO_END,
+    STUN_START,
+    STUN_END,
+    TURN_180_L,
+    TURN_180_R,
+    DRAW_BOW,
+    SHEATH_BOW,
+    BOW_TO_SWORD,
+    SWORD_TO_BOW,
+    DRAW_LSWORD,
+    SHEATH_LSWORD,
+    GEAR_1_FORWARD,
+    GEAR_1_LEFT,
+    GEAR_1_RIGHT,
+    GEAR_2_FORWARD,
+    GEAR_2_LEFT,
+    GEAR_2_RIGHT,
+    GEAR_3_FORWARD,
+    GEAR_3_LEFT,
+    GEAR_3_RIGHT,
+    DEAD,
+    FOOT,
+	HANDCLAP,
+	HIPDROP,
+    LEFTHAND,
+	DAMAGE_EYE_START,
+	DAMAGE_EYE_END,
+    DAMAGE_FOOT_L,
+	DAMAGE_FOOT_R,
+    RUN,
+    RUN_CURVE_R,
+	RUN_CURVE_L,
+	SLEEP_START,
+	SLEEP_END,
+	THROW_STONE_START,
+	THROW_STONE_END,
+
+
+
     END,
 };
+
+UENUM()
+enum class ELynelCombatIndex : uint8
+{
+    AimingBow = 0, 
+    HornAttack, 
+    DashAttack, 
+    RunningAttack,
+    ExplosionAttack, 
+    FireAttack, 
+    AimingBowUpper, 
+    End
+};
+
+UENUM()
+enum class EHinoxCombatIndex : uint8
+{
+    Foot = 0,
+    HandClap,
+    LeftHand,
+    Hipdrop,
+    ThrowStone,
+    End
+};
+
+
+UENUM()
+enum class EReadyToAttackStep : uint8
+{
+    RunToLink = 0,
+    TurnRight,
+    AwayFromLink,
+    TurnLeft,
+    End
+};
+
 
 UENUM()
 enum class EItemCategoryType : int8
@@ -143,6 +304,33 @@ inline void SmoothRotateActorToDirection(AActor* TargetActor, const FVector& Tar
     FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaTime, InterpSpeed);
     TargetActor->SetActorRotation(NewRot);
 }
+
+inline float GetSideOfActor(AActor* A_Actor, AActor* B_Actor)
+{
+    if (!A_Actor || !B_Actor)
+    {
+        UE_LOG(LogTemp, Error, TEXT("GetSideOfActor // A_Actor or B_Actor is null"));
+        return 0.f;
+    }
+
+    FVector A_ForwardVector = A_Actor->GetActorForwardVector();
+    A_ForwardVector.Z = 0.f;
+    A_ForwardVector.Normalize();
+
+    FVector A_To_B_Vector = B_Actor->GetActorLocation() - A_Actor->GetActorLocation();
+    A_To_B_Vector.Z = 0.f;
+    A_To_B_Vector.Normalize();
+
+    FVector A_RightVector = A_Actor->GetActorRightVector();
+    A_RightVector.Z = 0.f;
+    A_RightVector.Normalize();
+
+    float DotProductResult = FVector::DotProduct(A_To_B_Vector, A_RightVector);
+
+    return DotProductResult;
+}
+
+
 
 UENUM()
 enum class EWeapon_Type

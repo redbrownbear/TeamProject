@@ -9,7 +9,7 @@
 
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
 
-#include "Actors/HidePoint/HidePoint.h"
+#include "Actors/TargetPoint/HidePoint.h"
 
 UNpcFSMComponent::UNpcFSMComponent()
 {
@@ -20,7 +20,7 @@ UNpcFSMComponent::UNpcFSMComponent()
 void UNpcFSMComponent::BeginPlay()
 {
 	Super::BeginPlay();
-		
+
 	if (!Owner)
 	{
 		Controller = Cast<ANpcController>(GetOwner());
@@ -69,7 +69,6 @@ void UNpcFSMComponent::BeginPlay()
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("HidePoints ÀÚµ¿ ¼öÁý ¿Ï·á: %d°³"), HidePoints.Num());
 }
 
 void UNpcFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -114,11 +113,11 @@ void UNpcFSMComponent::HandleState(float DeltaTime)
 	default:
 		break;
 	}
-	
+
 }
 
 void UNpcFSMComponent::ChangeState(ENpcState NewState)
-{	
+{
 	if (eCurrentState == NewState) { return; }
 
 	eCurrentState = NewState;
@@ -145,8 +144,9 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		}
 		// @TODO Play Sequence
 		//PlayInterectSequence();
+		Owner->PlayMontage(ENpcMontage::TALK);
 		Controller->GetConversationManager()->StartConversation(Owner, Player);
-		break;	
+		break;
 	case ENpcState::Hide:
 		Owner->PlayMontage(ENpcMontage::HIDE);
 		HideFuriko();
@@ -182,13 +182,13 @@ void UNpcFSMComponent::UpdateWalk(float DeltaTime)
 }
 
 void UNpcFSMComponent::UpdateRun(float DeltaTime)
-{	
+{
 	if (eCurrentState != ENpcState::Run)
 	{
 		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Run'"));
 		return;
 	}
-	
+
 }
 
 void UNpcFSMComponent::UpdateTalk(float DeltaTime)
@@ -197,7 +197,7 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 	{
 		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Talk'"));
 		return;
-	}		
+	}
 
 }
 
@@ -251,35 +251,54 @@ void UNpcFSMComponent::HideFuriko()
 {
 	if (HidePoints.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HidePoints ¹è¿­ÀÌ ºñ¾îÀÖ½À´Ï´Ù."));
+		UE_LOG(LogTemp, Warning, TEXT("HidePoints ë°°ì—´??ë¹„ì–´?ˆìŠµ?ˆë‹¤."));
 		return;
 	}
 
-	// ·£´ý ÀÎµ¦½º ¼±ÅÃ
+	// ?œë¤ ?¸ë±??? íƒ
 	const int32 Index = FMath::RandRange(0, HidePoints.Num() - 1);
 	AHidePoint* Target = HidePoints[Index];
 
 	if (Target && Owner)
 	{
+		//UE_LOG(LogTemp, Log, TEXT("Furiko Moves: %s, Location: %s"), *Target->GetName(), *Target->GetActorLocation().ToString());
+
 		SetHideLocation(Target->GetActorLocation());
 
 		// <Çª¸®ÄÚ¿Í ³îÀÚ!> Äù½ºÆ® UI »ý¼ºÇÒ±î ¸»±î À±È£¿Àºü¶û ¾ê±âÇØº¸±â
-
-		UE_LOG(LogTemp, Log, TEXT("Furiko°¡ HidePoint %s ·Î ¼ø°£ÀÌµ¿Çß½À´Ï´Ù."), *Target->GetName());
 	}
 }
 
 void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 {
 	if (!Owner) return;
+	
+	// ÀÌµ¿ ¹æÇØ Â÷´Ü
+	if (Owner->GetController()) Owner->GetController()->StopMovement();
 
-	// ¼ø°£ ÀÌµ¿
+	// ¼ø°£ÀÌµ¿
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	Owner->SetIsHide(true);
+
+	// À§Ä¡ È®ÀÎ
+	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation ¿Ï·á. Owner À§Ä¡: %s"), *Owner->GetActorLocation().ToString());
+	// ?´ë™ ë°©í•´ ì°¨ë‹¨
+	if (Owner->GetController()) Owner->GetController()->StopMovement();
+
+	// ?œê°„?´ë™
+	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
+	Owner->SetIsHide(true);
+
+	// ?„ì¹˜ ?•ì¸
+	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation ?„ë£Œ. Owner ?„ì¹˜: %s"), *Owner->GetActorLocation().ToString());
 }
 
 void UNpcFSMComponent::PlayInterectSequence()
 {
+	// Talk ½Ã Ä³¸¯ÅÍ À§Ä¡¸¸ °íÁ¤µÇ°Ô Á¶Á¤ÇÑ µÚ ±× ´ÙÀ½¿¡ »ý¼ºÇØ¾ß ÇÒ µí
+
+	// Talk ??ìºë¦­???„ì¹˜ë§?ê³ ì •?˜ê²Œ ì¡°ì •????ê·??¤ìŒ???ì„±?´ì•¼ ????
+
 	/*if (Player)
 	{
 		FVector PlayerLocation = Player->GetActorLocation();

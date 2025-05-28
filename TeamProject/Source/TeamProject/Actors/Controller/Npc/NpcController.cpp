@@ -15,11 +15,11 @@ ANpcController::ANpcController()
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 	ConversationManager = CreateDefaultSubobject<UConversationManagerComponent>(TEXT("ConversationManager"));
 
-	// ½Ã¾ß ¼³Á¤
+	// ï¿½Ã¾ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UAISenseConfig_Sight* SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
-	SightConfig->SightRadius = MONSTER_AISENSECONFIG_SIGHT_SIGHTRADIUS;
-	SightConfig->LoseSightRadius = MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS;
-	SightConfig->PeripheralVisionAngleDegrees = MONSTER_SIGHT_ANGLE;
+	SightConfig->SightRadius = NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS;
+	SightConfig->LoseSightRadius = NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS;
+	SightConfig->PeripheralVisionAngleDegrees = NPC_SIGHT_ANGLE;
 
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
@@ -57,7 +57,7 @@ void ANpcController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 		if (APlayerCharacter* DetectedPlayer = Cast<APlayerCharacter>(SeenActor))
 		{
 			Player = DetectedPlayer;
-			break; // ÇÃ·¹ÀÌ¾î °¨Áö
+			break; // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½
 		}
 	}
 
@@ -76,7 +76,7 @@ void ANpcController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimul
 {
 	if (Stimulus.WasSuccessfullySensed())
 	{
-		// °¨ÁöµÊ
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		APlayerCharacter* Player = Cast<APlayerCharacter>(Actor);
 		if (!Player) return;
 		NpcFSMComponent->SetPlayer(Player);

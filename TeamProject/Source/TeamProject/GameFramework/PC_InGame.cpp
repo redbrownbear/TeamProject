@@ -9,15 +9,17 @@
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
-
-#include "UI/NpcDialogue/NPCDialogue.h"
-#include "UI/Inven/Inventory.h"
+#include "SubSystem/UI/ShopManager.h"
 
 #include "Actors/Npc/Npc.h" 
 #include "Components/Character/PlayerMovementComponent.h"
 
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
+
+
+#include "Actors/Temple/Ice/IcePillar.h"
+#include "Actors/Temple/Ice/IcePreview.h"
 
 APC_InGame::APC_InGame()
 {
@@ -32,6 +34,10 @@ APC_InGame::APC_InGame()
 	PlayerCameraManagerClass = ACM_InGame::StaticClass();
 
 
+	{
+		IcePillarClass = AIcePillar::StaticClass();
+		IcePreviewClass = AIcePreview::StaticClass();
+	}
 }
 
 void APC_InGame::BeginPlay()
@@ -39,7 +45,7 @@ void APC_InGame::BeginPlay()
 	Super::BeginPlay();
 
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-	if(UIManager)
+	if (UIManager)
 		UIManager->PostWorldInitialize();
 
 	ChangeInputContext(EInputContext::IC_InGame);
@@ -55,7 +61,7 @@ void APC_InGame::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
 		ETriggerEvent::Triggered, this, &ThisClass::OnMove);
-	
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
 		ETriggerEvent::Completed, this, &ThisClass::OnMoveCancel);
 
@@ -96,6 +102,34 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Inventory,
 		ETriggerEvent::Started, this, &ThisClass::OpenInventory);
 
+	// ------------ Supernatural -----------------
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
+		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Build,
+		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);		
+}
+
+void APC_InGame::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (bQPressed)
+	{
+		if (!IcePreviewActor && IcePreviewClass)
+		{
+			IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
+			if (IcePreviewActor)
+			{
+				IcePreviewActor->SetActorEnableCollision(false);
+			}
+		}
+
+		if (IcePreviewActor)
+		{
+			UpdateIcePreview();
+		}
+	}
 }
 
 void APC_InGame::ChangeInputContext(EInputContext NewContext)
@@ -127,6 +161,12 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		bShowMouseCursor = true;
 		break;
 
+	case EInputContext::IC_Shop:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Shop, 3);
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+		break;
+
 	}
 
 	CurrentInputContext = NewContext;
@@ -140,7 +180,7 @@ void APC_InGame::BindInventoryInput(UInventory* Inventory)
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenNavigate, ETriggerEvent::Started, Inventory, &UInventory::OnNavigate);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenConfirm, ETriggerEvent::Started, Inventory, &UInventory::OnConfirm);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenCancel, ETriggerEvent::Started, Inventory, &UInventory::OnCancel);
-		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started ,Inventory, &UInventory::OnCreateItemTest);
+		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started, Inventory, &UInventory::OnCreateItemTest);
 	}
 }
 
@@ -156,10 +196,22 @@ void APC_InGame::BindDialogueInput(UNPCDialogue* NpcDialogue)
 	}
 }
 
+void APC_InGame::BindShopInput(UShop* Shop)
+{
+	// 인풋 바인딩
+	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, Shop, &UShop::OnNavigate);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, Shop, &UShop::OnConfirm);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, Shop, &UShop::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, Shop, &UShop::OnNextDialogue);
+	}
+}
+
 void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 {
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
-	if(!Player_C)
+	if (!Player_C)
 	{
 		return;
 	}
@@ -175,6 +227,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		FHitResult HitResult;
 		
 		Movement->TrySetMoveClimb();
+
 
 		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
@@ -203,6 +256,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	else
 	{
 		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+
 
 		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
@@ -269,9 +323,9 @@ void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
-	
+
 	P_Anim->SetPitch();
-	
+
 }
 
 void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
@@ -327,7 +381,7 @@ void APC_InGame::RightClickEnd(const FInputActionValue& InputActionValue)
 
 	WeaponManagerComponent->RightClickEnd();
 
-	
+
 }
 
 void APC_InGame::Climb(const FInputActionValue& InputActionValue)
@@ -399,9 +453,16 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 	{
 		if (UNpcFSMComponent* FSM = Npc->GetFSMComponent())
 		{
-			FSM->ChangeState(ENpcState::Talk);			
+			if(Npc->GetData()->DialogType == EDialogType::Shop)
+			{
+				FSM->ChangeState(ENpcState::Sell);
+			}
+			else
+			{
+				FSM->ChangeState(ENpcState::Talk);
+			}			
 		}
-	}	
+	}
 }
 
 void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
@@ -420,4 +481,127 @@ void APC_InGame::ShowDialogueUI()
 
 }
 
+void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
+{
+	if (!IcePillarClass) return;
+
+	if (!bQPressed) return;
+
+	// 수면 체크: 지형 위라면 충돌, 월드 정적에 한정
+	CheckSurface();
+
+	if (!bCanSpawn) return;
+
+	EndIcePreview();
+
+	FVector SpawnLoc = Hit.Location;
+	FVector Normal = Hit.Normal;
+
+	// 표면 기울기 따라서 얼음 생성되게
+	FRotator SpawnRot = FRotationMatrix::MakeFromZ(Normal).Rotator();
+
+	AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(
+		IcePillarClass,
+		SpawnLoc,
+		SpawnRot
+	);	
+
+	bCanSpawn = false;
+
+}
+
+void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
+{
+	if (!IcePreviewActor)
+	{
+		bQPressed = true;
+	}
+	else
+	{
+		EndIcePreview();
+		bQPressed = false;
+	}
+}
+
+void APC_InGame::EndIcePreview()
+{
+	if (IcePreviewClass && IcePreviewActor)
+	{
+		IcePreviewActor->StopPreview();
+		IcePreviewActor->Destroy();
+		IcePreviewActor = nullptr;
+	}
+}
+
+void APC_InGame::UpdateIcePreview()
+{
+	if (!IcePreviewActor) return;
+
+	CheckSurface();
+
+	if (bHitResult)
+	{
+		IcePreviewActor->SetActorLocation(Hit.Location);
+
+		// 노멀 방향 회전 적용
+		FRotator PreviewRot = FRotationMatrix::MakeFromZ(Hit.Normal).Rotator();
+		IcePreviewActor->SetActorRotation(PreviewRot);
+
+		IcePreviewActor->SetActorHiddenInGame(false); // 보이도록
+
+		IcePreviewActor->StartPreview();
+	}
+	else
+	{
+		IcePreviewActor->SetActorHiddenInGame(true); // 일시적으로 숨김 
+	}
+}
+
+void APC_InGame::CheckCollision()
+{
+	FHitResult HitResult;
+	bHitResult = this->GetHitResultUnderCursorByChannel(
+		UEngineTypes::ConvertToTraceType(ECC_Visibility),
+		false,
+		HitResult);
+
+	if (bHitResult)
+	{
+		Hit = HitResult;
+	}
+}
+
+void APC_InGame::CheckSurface()
+{
+	CheckCollision();
+
+	if (bHitResult)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor) return;
+
+#if WITH_EDITOR
+		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
+#else
+		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
+#endif
+
+		if (!ActorName.StartsWith(TEXT("Surface")))
+		{
+			bCanSpawn = false;
+			if (IcePreviewActor)
+			{
+				IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", 1.0f);
+			}
+			return;
+		}
+
+		if (IcePreviewActor)
+		{
+			IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", 0.0f);
+		}
+
+		bCanSpawn = true;
+	}
+}
 

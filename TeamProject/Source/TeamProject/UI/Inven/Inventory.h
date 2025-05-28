@@ -31,6 +31,7 @@ public:
 private:
 	void InitUI();
 	void BindDelegates();
+	void RemoveDelegate();
 
 public: //바인딩을 위해 퍼블릭선언
 	UFUNCTION()
@@ -60,7 +61,4 @@ private:
 private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CoinText;
-	UPROPERTY(meta = (BindWidget))
-	UImage* CoinImg;
-
 };

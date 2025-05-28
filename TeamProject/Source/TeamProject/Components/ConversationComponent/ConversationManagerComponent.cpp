@@ -5,6 +5,7 @@
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
+#include "SubSystem/UI/ShopManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PC_InGame.h"
 #include "UI/HUD/MainHUD.h"
@@ -20,7 +21,7 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 {
 	CurrentNpc = Npc;
 	CurrentPlayer = Player;
-	
+
 	//LockCharacters(Npc, Player);
 
 	APC_InGame* PC = Cast<APC_InGame>(CurrentPlayer->GetController());
@@ -29,9 +30,9 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 	AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD());
 	check(HUD)
 
-	if (PC && HUD)
-		HUD->ShowInteractWidget(false);
-			
+		if (PC && HUD)
+			HUD->ShowInteractWidget(false);
+
 	UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
@@ -43,10 +44,47 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 		if (QuestManager->IsConversation())
 			return;
 
-		UIManager->ShowUI(UNPCDialogue::StaticClass());
-		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 0);
-	}
+		EDialogType DialogType = Npc->GetData()->DialogType;
+		//if (DialogType == EDialogType::Shop)
+		//{
+		//	
+		//	if (!DialogueDataRow.bIsEndConversation && !IsShopping && !IsBuying)
+		//	{
+		//		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 200);
+		//	}
+		//	else if (!DialogueDataRow.bIsEndConversation && IsShopping && IsBuying)
+		//	{
+		//		// 구매 시
+		//		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 1000);
+		//	}
+		//	else if (!DialogueDataRow.bIsEndConversation && IsShopping && !IsBuying)
+		//	{
+		//		// 구매 안 할 시
+		//		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, 1100);
+		//	}
 
+		//}				
+		//else
+		{
+
+			//로직 수정 해야함
+
+			UIManager->ShowUI(UNPCDialogue::StaticClass());
+			bool IsQuest = Npc->GetDoQuest();
+			if (!DialogueDataRow.bIsEndConversation && IsQuest)
+			{
+				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko_Found));
+			}
+			else
+			{
+				//상점으로 우선감
+				//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko));
+
+				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(200));
+				
+			}
+		}
+	}
 }
 
 void UConversationManagerComponent::EndConversation()

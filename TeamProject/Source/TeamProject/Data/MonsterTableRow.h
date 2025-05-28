@@ -77,14 +77,135 @@ public: // Animation
 	UAnimMontage* SignalStartMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* SignalEndMontage = nullptr;
-
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* APPEAR = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* BOW_UPPER_START = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* BOW_UPPER_END = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_DASH_LSWORD_START = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_DASH_LSWORD_END = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_DASH_SWORD_START = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_DASH_SWORD_END = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_EXPLOSION_START = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_EXPLOSION_END = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_FIRE_START = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_FIRE = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_FIRE_END = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_HORN_START = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_HORN_END = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_RUNNING_LSWORD_START = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_RUNNING_LSWORD_END = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_RUNNING_SWORD_START = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_RUNNING_SWORD_END = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* REBOUND = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* RODEO_START = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* RODEO_END = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* STUN_START = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* STUN_END = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* TURN_180_L = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* TURN_180_R = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* DRAW_BOW = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* SHEATH_BOW = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* BOW_TO_SWORD = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* SWORD_TO_BOW = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* DRAW_LSWORD = nullptr;
+    UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* SHEATH_LSWORD = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_1_Forward = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_1_Left = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_1_Right = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_2_Forward = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_2_Left = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_2_Right = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_3_Forward = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_3_Left = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Gear_3_Right = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Dead = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Foot = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* HandClap = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* HipDrop = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* LeftHand = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Damage_Eye_Start = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Damage_Eye_End = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Damage_Foot_L = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Damage_Foot_R = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Run = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Run_Curve_R = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Run_Curve_L = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Sleep_Start = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Sleep_End = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Throw_Stone_Start = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Throw_Stone_End = nullptr;
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Monster|AI")
 	TSubclassOf<AMonsterAIController> AIControllerClass;
 
 public:
-	UPROPERTY(EditAnywhere, Category = "NiagaraEffect", meta = (RowType = "NiagaraEffectTableRow"))
+	UPROPERTY(EditAnywhere, Category = "Effect", meta = (RowType = "ParticleEffectTableRow"))
+	FDataTableRowHandle ParticleEffectTableRowHandle;
+	UPROPERTY(EditAnywhere, Category = "Effect", meta = (RowType = "NiagaraEffectTableRow"))
 	FDataTableRowHandle NiagaraEffectTableRowHandle;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Weapon", meta = (RowType = "ItemData"))
+	FDataTableRowHandle MeleeWeaponTableRowHandle;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Weapon", meta = (RowType = "ItemData"))
+	FDataTableRowHandle BowWeaponTableRowHandle;
 
 };
