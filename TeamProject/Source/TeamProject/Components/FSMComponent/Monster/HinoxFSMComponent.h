@@ -34,4 +34,6 @@ protected:
 	virtual void UpdateDead(float DeltaTime);
 	virtual void UpdateTemp(float DeltaTime);
 
+public:
+	void UpdateCombatIndex();
 };

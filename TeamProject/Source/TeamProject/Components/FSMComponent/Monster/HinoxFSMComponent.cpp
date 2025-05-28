@@ -131,6 +131,11 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 void UHinoxFSMComponent::UpdateIdle(float DeltaTime)
 {
 	this->StopMove();
+
+	if (Player)
+	{
+		ChangeState(EMonsterState::Combat);
+	}
 }
 
 void UHinoxFSMComponent::UpdateAlert(float DeltaTime)
@@ -152,10 +157,15 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 
 	if (CharacterMonster->IsPlayingMontage(EMonsterMontage::END))
 	{
+		if (CharacterMonster->IsPlayingMontage(EMonsterMontage::THROW_STONE_END))
+		{
+			SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 3.f);
+		}
 		this->StopMove();
+		return;
 	}
 
-	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, PlayerLocation, 250.f);
+	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, PlayerLocation, HINOX_NEAR_INSTANCE);
 
 	if (bIsNear)
 	{
@@ -166,6 +176,34 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 				|| CharacterMonster->IsPlayingMontage(EMonsterMontage::RUN_CURVE_R)
 				|| CharacterMonster->IsPlayingMontage(EMonsterMontage::RUN_CURVE_L))
 			{
+				FVector ToPlayer = PlayerLocation - CharacterMonster->GetActorLocation();
+				ToPlayer.Z = 0.0f; // 수평 방향만 비교
+				ToPlayer.Normalize();
+
+				FVector Forward = CharacterMonster->GetActorForwardVector();
+				Forward.Z = 0.0f;
+				Forward.Normalize();
+
+				// 오른쪽 기준 벡터 (몬스터의 오른쪽)
+				FVector Right = FVector::CrossProduct(FVector::UpVector, Forward);
+
+				float ForwardDot = FVector::DotProduct(Forward, ToPlayer);
+				float RightDot = FVector::DotProduct(Right, ToPlayer);
+
+				if (RightDot > 0.3f)
+				{
+					//SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 10.f);
+					CharacterMonster->PlayMontage(EMonsterMontage::TURN_180_R); // 오른쪽
+					return;
+				}
+				else if (RightDot < -0.3f)
+				{
+					//SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 10.f);
+					CharacterMonster->PlayMontage(EMonsterMontage::TURN_180_L); // 왼쪽
+					return;
+				}
+
+
 
 				switch (eCombatIndex)
 				{
@@ -206,6 +244,17 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 					if (CharacterMonster)
 					{
 						CharacterMonster->PlayMontage(EMonsterMontage::HIPDROP);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::ChangeState // No CharacterMonster"));
+						check(false);
+					}
+					break;
+				case EHinoxCombatIndex::ThrowStone:
+					if (CharacterMonster)
+					{
+						CharacterMonster->PlayMontage(EMonsterMontage::THROW_STONE_START);
 					}
 					else
 					{
@@ -282,4 +331,28 @@ void UHinoxFSMComponent::UpdateDead(float DeltaTime)
 void UHinoxFSMComponent::UpdateTemp(float DeltaTime)
 {
 	this->StopMove();
+}
+
+void UHinoxFSMComponent::UpdateCombatIndex()
+{
+	switch (eCombatIndex)
+	{
+	case EHinoxCombatIndex::Foot:
+		eCombatIndex = EHinoxCombatIndex::HandClap;
+		break;
+	case EHinoxCombatIndex::HandClap:
+		eCombatIndex = EHinoxCombatIndex::LeftHand;
+		break;
+	case EHinoxCombatIndex::LeftHand:
+		eCombatIndex = EHinoxCombatIndex::Hipdrop;
+		break;
+	case EHinoxCombatIndex::Hipdrop:
+		eCombatIndex = EHinoxCombatIndex::ThrowStone;
+		break;
+	case EHinoxCombatIndex::ThrowStone:
+		eCombatIndex = EHinoxCombatIndex::Foot;
+		break;
+	default:
+		break;
+	}
 }

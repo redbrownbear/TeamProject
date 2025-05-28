@@ -176,6 +176,8 @@ public: // Animation
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* Damage_Foot_R = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Run = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* Run_Curve_R = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* Run_Curve_L = nullptr;

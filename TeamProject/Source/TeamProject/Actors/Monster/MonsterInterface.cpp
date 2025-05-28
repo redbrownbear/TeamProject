@@ -237,6 +237,9 @@ void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 	case EMonsterMontage::DAMAGE_FOOT_R:
 		TempAnimMontage = MonsterData->Damage_Foot_R;
 		break;
+	case EMonsterMontage::RUN:
+		TempAnimMontage = MonsterData->Run;
+		break;
 	case EMonsterMontage::RUN_CURVE_R:
 		TempAnimMontage = MonsterData->Run_Curve_R;
 		break;
@@ -491,6 +494,9 @@ bool IMonsterInterface::IsMontage(EMonsterMontage _InEnum)
 	case EMonsterMontage::DAMAGE_FOOT_R:
 		TempAnimMontage = MonsterData->Damage_Foot_R;
 		break;
+	case EMonsterMontage::RUN:
+		TempAnimMontage = MonsterData->Run;
+		break;
 	case EMonsterMontage::RUN_CURVE_R:
 		TempAnimMontage = MonsterData->Run_Curve_R;
 		break;
@@ -734,6 +740,9 @@ bool IMonsterInterface::IsPlayingMontage(EMonsterMontage _InEnum)
 		break;
 	case EMonsterMontage::DAMAGE_FOOT_R:
 		TempAnimMontage = MonsterData->Damage_Foot_R;
+		break;
+	case EMonsterMontage::RUN:
+		TempAnimMontage = MonsterData->Run;
 		break;
 	case EMonsterMontage::RUN_CURVE_R:
 		TempAnimMontage = MonsterData->Run_Curve_R;

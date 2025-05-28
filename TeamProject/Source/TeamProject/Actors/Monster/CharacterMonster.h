@@ -92,4 +92,9 @@ protected:
     UFUNCTION()
     virtual void OnDeadEnd() override;
 
+protected:
+    TObjectPtr<AActor> ThrownObject = nullptr;
+public:
+    void SetThrownObject(AActor * InThrownObject) { ThrownObject = InThrownObject; }
+    void DeleteThrownObject() { if (ThrownObject) ThrownObject->Destroy(); }
 };

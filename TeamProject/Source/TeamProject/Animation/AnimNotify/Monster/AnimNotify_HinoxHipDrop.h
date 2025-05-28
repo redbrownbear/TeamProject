@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
-#include "AnimNotify_DeadEnd.generated.h"
+#include "AnimNotify_HinoxHipDrop.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TEAMPROJECT_API UAnimNotify_DeadEnd : public UAnimNotify
+class TEAMPROJECT_API UAnimNotify_HinoxHipDrop : public UAnimNotify
 {
 	GENERATED_BODY()
 public:

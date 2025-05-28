@@ -140,7 +140,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
 	}
 
-	// 근접 무기 스폰 로직 (현재 코드 유지)
+
 	if (!(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
 	{
 		if (UWorld* World = GetWorld())
@@ -161,7 +161,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		}
 	}
 
-	// 활 무기 스폰 로직 (현재 코드 유지)
+
 	if (!(MonsterData->BowWeaponTableRowHandle.IsNull()))
 	{
 		if (UWorld* World = GetWorld())
@@ -182,12 +182,6 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		}
 	}
 
-	// --- 몬스터 타입에 따른 추가 콜리전 생성 및 부착 ---
-	// DataTableRowHandle.RowName이 동적으로 변경될 수 있고, 이 함수가 BeginPlay 이후 호출될 수 있으므로
-	// NewObject와 AttachToComponent를 사용하는 것이 올바른 접근 방식입니다.
-
-	// 기존 AdditionalColliders를 초기화하여 중복 생성을 방지합니다.
-	// 이미 생성된 컴포넌트가 있다면 DestroyComponent()를 호출하여 메모리에서 해제해야 합니다.
 	for (USphereComponent* ExistingCollider : AdditionalColliders)
 	{
 		if (ExistingCollider && ExistingCollider->IsValidLowLevelFast()) // 유효성 확인

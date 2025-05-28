@@ -30,12 +30,17 @@ namespace ProjectileName
     static inline FName Monster_LynelExplosion = TEXT("Monster_LynelExplosion");
     static inline FName Monster_LynelFire = TEXT("Monster_LynelFire");
     static inline FName Monster_LynelArrow = TEXT("Monster_LynelArrow");
+    static inline FName Monster_HinoxAttack = TEXT("Monster_HinoxAttack");
+    static inline FName Monster_HinoxGrab = TEXT("Monster_HinoxGrab");
+    static inline FName Monster_HinoxStone = TEXT("Monster_HinoxStone");
+    static inline FName Monster_HinoxLink = TEXT("Monster_HinoxLink");
+    static inline FName Monster_HinoxHipDrop = TEXT("Monster_HinoxHipDrop");
 }
 
 namespace Monster_SocketName
 {
-    static inline FName Weapon_R = TEXT("Weapon_Right");
-    static inline FName Weapon_L = TEXT("Weapon_Light");
+    static inline FName Weapon_R = TEXT("Weapon_R");
+    static inline FName Weapon_L = TEXT("Weapon_L");
     static inline FName Pod_A = TEXT("Pod_A");
     static inline FName Pod_B = TEXT("Pod_B");
     static inline FName Pod_C = TEXT("Pod_C");
@@ -68,6 +73,12 @@ enum class EAdditionalCollider : uint8
     Eye_Ball,
     End
 };
+
+namespace ThrownObject
+{
+    static inline FName HinoxRock = TEXT("HinoxRock");
+    static inline FName SmallRock = TEXT("SmallRock");
+}
 
 
 
@@ -216,6 +227,7 @@ enum class EHinoxCombatIndex : uint8
     HandClap,
     LeftHand,
     Hipdrop,
+    ThrowStone,
     End
 };
 
