@@ -107,7 +107,7 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Build,
-		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);
+		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);		
 }
 
 void APC_InGame::Tick(float DeltaSeconds)
@@ -442,11 +442,19 @@ void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
 	EndIcePreview();
 
 	FVector SpawnLoc = Hit.Location;
+	FVector Normal = Hit.Normal;
 
-	AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass, SpawnLoc, FRotator::ZeroRotator);
+	// 표면 기울기 따라서 얼음 생성되게
+	FRotator SpawnRot = FRotationMatrix::MakeFromZ(Normal).Rotator();
 
-	bQPressed = false;
+	AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(
+		IcePillarClass,
+		SpawnLoc,
+		SpawnRot
+	);	
+
 	bCanSpawn = false;
+
 }
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
@@ -466,6 +474,7 @@ void APC_InGame::EndIcePreview()
 {
 	if (IcePreviewClass && IcePreviewActor)
 	{
+		IcePreviewActor->StopPreview();
 		IcePreviewActor->Destroy();
 		IcePreviewActor = nullptr;
 	}
@@ -475,12 +484,19 @@ void APC_InGame::UpdateIcePreview()
 {
 	if (!IcePreviewActor) return;
 
-	CheckCollision();
+	CheckSurface();
 
 	if (bHitResult)
 	{
 		IcePreviewActor->SetActorLocation(Hit.Location);
+
+		// 노멀 방향 회전 적용
+		FRotator PreviewRot = FRotationMatrix::MakeFromZ(Hit.Normal).Rotator();
+		IcePreviewActor->SetActorRotation(PreviewRot);
+
 		IcePreviewActor->SetActorHiddenInGame(false); // 보이도록
+
+		IcePreviewActor->StartPreview();
 	}
 	else
 	{
@@ -498,7 +514,7 @@ void APC_InGame::CheckCollision()
 
 	if (bHitResult)
 	{
-		Hit = HitResult; 
+		Hit = HitResult;
 	}
 }
 
@@ -519,9 +535,17 @@ void APC_InGame::CheckSurface()
 
 		if (!ActorName.StartsWith(TEXT("Surface")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("IcePillar cannot be spawned. Hit Actor is not a Surface."));
 			bCanSpawn = false;
+			if (IcePreviewActor)
+			{
+				IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", 1.0f);
+			}
 			return;
+		}
+
+		if (IcePreviewActor)
+		{
+			IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", 0.0f);
 		}
 
 		bCanSpawn = true;

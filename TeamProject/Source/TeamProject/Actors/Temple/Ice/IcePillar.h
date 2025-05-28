@@ -29,37 +29,30 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	// 얼음 기둥 상승 처리
-	UFUNCTION()
-	void AnimateRise(float Value);
-
 	// 파괴 처리
 	UFUNCTION()
 	void DestroyPillar(); 
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UBoxComponent> CollisionComponent;
-
-	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Cryonis")
-	TObjectPtr<UCurveFloat> RiseCurve;
-
-	UPROPERTY()
-	TObjectPtr<UTimelineComponent> RiseTimeline;
+	UPROPERTY(EditAnywhere, Category = "Cryonis")
+	float MaxSpeed = 100.f;
 
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
 	float MaxHeight = 300.0f; // 매크로로 바꿀까
 
-	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	float LifeTime = 10.0f; // 매크로로 바꿀까
-
-	UPROPERTY(EditDefaultsOnly, Category = "Cryonis")
-	TObjectPtr<UNiagaraSystem> BreakEffect;
+	/*UPROPERTY(EditDefaultsOnly, Category = "Cryonis")
+	TObjectPtr<UNiagaraSystem> BreakEffect;*/
 
 protected:
 	UMaterialInterface* MaterialInterface;
 	UMaterialInstanceDynamic* DynamicMaterialInstance;
+
+private:
+	FVector StartLocation;
+	float CurrentRise = 0.f;
+	bool bIsRising = true;
+
 };

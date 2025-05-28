@@ -17,18 +17,13 @@ AIcePillar::AIcePillar()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
-	RootComponent = CollisionComponent;
-	CollisionComponent->SetCollisionProfileName(TEXT("PhysicsActor"));
-
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
-	StaticMeshComponent->SetupAttachment(RootComponent);
-
-	RiseTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RiseTimeline"));
+	RootComponent = StaticMeshComponent;
+	//StaticMeshComponent->SetupAttachment(RootComponent);
+	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> PillarMesh(TEXT("/Game/Resources/Map/Dungeon/DgnObj_Ice.DgnObj_Ice"));
 	StaticMeshComponent->SetStaticMesh(PillarMesh.Object);
-
 
 	MaterialInterface = StaticMeshComponent->GetMaterial(0);
 	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
@@ -41,21 +36,11 @@ AIcePillar::AIcePillar()
 void AIcePillar::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (RiseCurve)
-	{
-		FOnTimelineFloat Progress;
-		Progress.BindUFunction(this, FName("AnimateRise"));
-		RiseTimeline->AddInterpFloat(RiseCurve, Progress);
-		RiseTimeline->PlayFromStart();
-	}
 
-	//// 일정 시간 후 자동 파괴
-	//GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
-	//	{
-	//		FTimerHandle Handle;
-	//		GetWorld()->GetTimerManager().SetTimer(Handle, this, &AIcePillar::DestroyPillar, LifeTime, false);
-	//	});
+	StartLocation = GetActorLocation();
+	SetActorLocation(StartLocation - FVector(0, 0, MaxHeight));
+	CurrentRise = 0.f;
+	bIsRising = true;
 
 }
 
@@ -64,27 +49,28 @@ void AIcePillar::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (RiseTimeline)
-	{
-		RiseTimeline->TickComponent(DeltaTime, ELevelTick::LEVELTICK_TimeOnly, nullptr);
-	}
-}
+	if (!bIsRising) return;
 
-void AIcePillar::AnimateRise(float Value)
-{
-	FVector Location = GetActorLocation();
-	Location.Z = Location.Z + (MaxHeight * Value);
-	SetActorLocation(Location);
+	float DeltaZ = MaxSpeed * DeltaTime;
+	CurrentRise += DeltaZ;
+
+	if (CurrentRise >= MaxHeight)
+	{
+		DeltaZ -= (CurrentRise - MaxHeight); // 초과 제거
+		bIsRising = false;
+	}
+
+	AddActorWorldOffset(FVector(0, 0, DeltaZ));
 }
 
 void AIcePillar::DestroyPillar()
 {
-	if (BreakEffect)
+	/*if (BreakEffect)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(), BreakEffect, GetActorLocation(), FRotator::ZeroRotator
 		);
-	}
+	}*/
 
 	Destroy();
 }

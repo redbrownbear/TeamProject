@@ -244,7 +244,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<AIcePreview> IcePreviewActor = nullptr;
 
-
 private:
 	bool bQPressed = false;
 	bool bCanSpawn = false;
