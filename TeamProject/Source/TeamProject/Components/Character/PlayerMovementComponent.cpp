@@ -98,7 +98,17 @@ void UPlayerMovementComponent::SetClimbMode(bool _bool)
 
 	bIsClimbing = _bool;
 
-	Player_C->GetSpringArm()->bUsePawnControlRotation = !_bool;
+	MaxFlySpeed = _bool ? 100 : PLAYER_MOVE_NML;
+
+	USpringArmComponent* SpringArm = Player_C->GetSpringArm();
+
+	SpringArm->bUsePawnControlRotation = !_bool;
+
+	SpringArm->bEnableCameraRotationLag = _bool;
+
+	SpringArm->CameraLagSpeed = 5.f;
+
+	SpringArm->CameraLagMaxDistance = 100.f;
 
 }
 
