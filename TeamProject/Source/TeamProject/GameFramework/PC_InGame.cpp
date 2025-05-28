@@ -446,19 +446,25 @@ void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
 	AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass, SpawnLoc, FRotator::ZeroRotator);
 
 	bQPressed = false;
-	bShowMouseCursor = false;
+	bCanSpawn = false;
 }
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 {
-	bQPressed = true;
-	bShowMouseCursor = true;
-
+	if (!IcePreviewActor)
+	{
+		bQPressed = true;
+	}
+	else
+	{
+		EndIcePreview();
+		bQPressed = false;
+	}
 }
 
 void APC_InGame::EndIcePreview()
 {
-	if (IcePreviewClass)
+	if (IcePreviewClass && IcePreviewActor)
 	{
 		IcePreviewActor->Destroy();
 		IcePreviewActor = nullptr;
@@ -478,21 +484,22 @@ void APC_InGame::UpdateIcePreview()
 	}
 	else
 	{
-		// 히트 실패 시에도 미리 보이도록 하려면 화면상에 위치 고정
 		IcePreviewActor->SetActorHiddenInGame(true); // 일시적으로 숨김 
 	}
 }
 
 void APC_InGame::CheckCollision()
 {
-	FVector Start, Dir;
-	DeprojectMousePositionToWorld(Start, Dir);
-	FVector End = Start + Dir * TraceDistance;
+	FHitResult HitResult;
+	bHitResult = this->GetHitResultUnderCursorByChannel(
+		UEngineTypes::ConvertToTraceType(ECC_Visibility),
+		false,
+		HitResult);
 
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	bHitResult = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
+	if (bHitResult)
+	{
+		Hit = HitResult; 
+	}
 }
 
 void APC_InGame::CheckSurface()
@@ -513,7 +520,7 @@ void APC_InGame::CheckSurface()
 		if (!ActorName.StartsWith(TEXT("Surface")))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("IcePillar cannot be spawned. Hit Actor is not a Surface."));
-
+			bCanSpawn = false;
 			return;
 		}
 
