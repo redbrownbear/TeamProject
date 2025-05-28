@@ -5,11 +5,17 @@
 #include "Actors/Item/WorldWeapon.h"
 #include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Projectile/Projectile.h"
+#include "Actors/Effect/NiagaraEffect.h"
+#include "Actors/Effect/ParticleEffect.h"
+
 
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
+#include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
 #include "Data/MonsterTableRow.h"
 #include "Data/ItemDataRow.h"
+#include "Data/NiagaraEffectTableRow.h"
+#include "Data/ParticleEffectTableRow.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -203,6 +209,54 @@ void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 	case EMonsterMontage::GEAR_3_RIGHT:
 		TempAnimMontage = MonsterData->Gear_3_Right;
 		UE_LOG(LogTemp, Warning, TEXT("EMonsterMontage::GEAR_3_RIGHT"));
+		break;
+	case EMonsterMontage::DEAD:
+		TempAnimMontage = MonsterData->Dead;
+		break;
+	case EMonsterMontage::FOOT:
+		TempAnimMontage = MonsterData->Foot;
+		break;
+	case EMonsterMontage::HANDCLAP:
+		TempAnimMontage = MonsterData->HandClap;
+		break;
+	case EMonsterMontage::HIPDROP:
+		TempAnimMontage = MonsterData->HipDrop;
+		break;
+	case EMonsterMontage::LEFTHAND:
+		TempAnimMontage = MonsterData->LeftHand;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_START:
+		TempAnimMontage = MonsterData->Damage_Eye_Start;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_END:
+		TempAnimMontage = MonsterData->Damage_Eye_End;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_L:
+		TempAnimMontage = MonsterData->Damage_Foot_L;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_R:
+		TempAnimMontage = MonsterData->Damage_Foot_R;
+		break;
+	case EMonsterMontage::RUN:
+		TempAnimMontage = MonsterData->Run;
+		break;
+	case EMonsterMontage::RUN_CURVE_R:
+		TempAnimMontage = MonsterData->Run_Curve_R;
+		break;
+	case EMonsterMontage::RUN_CURVE_L:
+		TempAnimMontage = MonsterData->Run_Curve_L;
+		break;
+	case EMonsterMontage::SLEEP_START:
+		TempAnimMontage = MonsterData->Sleep_Start;
+		break;
+	case EMonsterMontage::SLEEP_END:
+		TempAnimMontage = MonsterData->Sleep_End;
+		break;
+	case EMonsterMontage::THROW_STONE_START:
+		TempAnimMontage = MonsterData->Throw_Stone_Start;
+		break;
+	case EMonsterMontage::THROW_STONE_END:
+		TempAnimMontage = MonsterData->Throw_Stone_End;
 		break;
 	case EMonsterMontage::END:
 	default:
@@ -413,6 +467,54 @@ bool IMonsterInterface::IsMontage(EMonsterMontage _InEnum)
 	case EMonsterMontage::GEAR_3_RIGHT:
 		TempAnimMontage = MonsterData->Gear_3_Right;
 		break;
+	case EMonsterMontage::DEAD:
+		TempAnimMontage = MonsterData->Dead;
+		break;
+	case EMonsterMontage::FOOT:
+		TempAnimMontage = MonsterData->Foot;
+		break;
+	case EMonsterMontage::HANDCLAP:
+		TempAnimMontage = MonsterData->HandClap;
+		break;
+	case EMonsterMontage::HIPDROP:
+		TempAnimMontage = MonsterData->HipDrop;
+		break;
+	case EMonsterMontage::LEFTHAND:
+		TempAnimMontage = MonsterData->LeftHand;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_START:
+		TempAnimMontage = MonsterData->Damage_Eye_Start;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_END:
+		TempAnimMontage = MonsterData->Damage_Eye_End;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_L:
+		TempAnimMontage = MonsterData->Damage_Foot_L;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_R:
+		TempAnimMontage = MonsterData->Damage_Foot_R;
+		break;
+	case EMonsterMontage::RUN:
+		TempAnimMontage = MonsterData->Run;
+		break;
+	case EMonsterMontage::RUN_CURVE_R:
+		TempAnimMontage = MonsterData->Run_Curve_R;
+		break;
+	case EMonsterMontage::RUN_CURVE_L:
+		TempAnimMontage = MonsterData->Run_Curve_L;
+		break;
+	case EMonsterMontage::SLEEP_START:
+		TempAnimMontage = MonsterData->Sleep_Start;
+		break;
+	case EMonsterMontage::SLEEP_END:
+		TempAnimMontage = MonsterData->Sleep_End;
+		break;
+	case EMonsterMontage::THROW_STONE_START:
+		TempAnimMontage = MonsterData->Throw_Stone_Start;
+		break;
+	case EMonsterMontage::THROW_STONE_END:
+		TempAnimMontage = MonsterData->Throw_Stone_End;
+		break;
 	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;
@@ -612,6 +714,56 @@ bool IMonsterInterface::IsPlayingMontage(EMonsterMontage _InEnum)
 		TempAnimMontage = MonsterData->Gear_3_Right;
 		//UE_LOG(LogTemp, Warning, TEXT("IsPlayingMontage EMonsterMontage::GEAR_3_RIGHT "));
 		break;
+	case EMonsterMontage::DEAD:
+		TempAnimMontage = MonsterData->Dead;
+		break;
+	case EMonsterMontage::FOOT:
+		TempAnimMontage = MonsterData->Foot;
+		break;
+	case EMonsterMontage::HANDCLAP:
+		TempAnimMontage = MonsterData->HandClap;
+		break;
+	case EMonsterMontage::HIPDROP:
+		TempAnimMontage = MonsterData->HipDrop;
+		break;
+	case EMonsterMontage::LEFTHAND:
+		TempAnimMontage = MonsterData->LeftHand;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_START:
+		TempAnimMontage = MonsterData->Damage_Eye_Start;
+		break;
+	case EMonsterMontage::DAMAGE_EYE_END:
+		TempAnimMontage = MonsterData->Damage_Eye_End;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_L:
+		TempAnimMontage = MonsterData->Damage_Foot_L;
+		break;
+	case EMonsterMontage::DAMAGE_FOOT_R:
+		TempAnimMontage = MonsterData->Damage_Foot_R;
+		break;
+	case EMonsterMontage::RUN:
+		TempAnimMontage = MonsterData->Run;
+		break;
+	case EMonsterMontage::RUN_CURVE_R:
+		TempAnimMontage = MonsterData->Run_Curve_R;
+		break;
+	case EMonsterMontage::RUN_CURVE_L:
+		TempAnimMontage = MonsterData->Run_Curve_L;
+		break;
+	case EMonsterMontage::SLEEP_START:
+		TempAnimMontage = MonsterData->Sleep_Start;
+		break;
+	case EMonsterMontage::SLEEP_END:
+		TempAnimMontage = MonsterData->Sleep_End;
+		break;
+	case EMonsterMontage::THROW_STONE_START:
+		TempAnimMontage = MonsterData->Throw_Stone_Start;
+		break;
+	case EMonsterMontage::THROW_STONE_END:
+		TempAnimMontage = MonsterData->Throw_Stone_End;
+		break;
+
+
 	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;
@@ -624,6 +776,61 @@ bool IMonsterInterface::IsPlayingMontage(EMonsterMontage _InEnum)
 	return bFlag;
 }
 
+void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	UMonsterStatusComponent * UMonsterStatusComponent = GetStatusComponent();
+	const float fDamage = UMonsterStatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	if (fDamage > 0.f)
+	{
+		PlayMontage(EMonsterMontage::DAMAGE);
+	}
 
+}
 
+void IMonsterInterface::OnDie()
+{
+	GetFSMComponent()->ChangeState(EMonsterState::Dead);
+	PlayMontage(EMonsterMontage::DAMAGE);
+}
 
+void IMonsterInterface::OnDeadEnd()
+{
+	FMonsterTableRow* MonsterData = GetMonsterData();
+	UObject* Object = Cast<UObject>(this);
+
+	const FDataTableRowHandle ParticleEffectDataTable = MonsterData->ParticleEffectTableRowHandle;
+	if (AActor* Actor = Cast<AActor>(Object))
+	{
+		if (!ParticleEffectDataTable.IsNull())
+		{
+			{
+				UWorld* World = Actor->GetWorld();
+
+				AParticleEffect* Effect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+					FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+				FTransform NewTransform;
+				Effect->SetData(MonsterData->ParticleEffectTableRowHandle);
+				NewTransform.SetLocation(Actor->GetActorLocation());
+				NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
+				Effect->FinishSpawning(NewTransform);
+			}
+		}
+
+		const FDataTableRowHandle NiagaraEffectDataTable = MonsterData->NiagaraEffectTableRowHandle;
+		if (!NiagaraEffectDataTable.IsNull())
+		{
+			UWorld* World = Actor->GetWorld();
+
+			ANiagaraEffect* Effect = World->SpawnActorDeferred<ANiagaraEffect>(ANiagaraEffect::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+			FTransform NewTransform;
+			Effect->SetData(MonsterData->ParticleEffectTableRowHandle);
+			NewTransform.SetLocation(Actor->GetActorLocation());
+			NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
+			Effect->FinishSpawning(NewTransform);
+		}
+		Actor->Destroy();
+	}
+}
