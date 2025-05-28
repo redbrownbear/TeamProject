@@ -431,7 +431,7 @@ void APC_InGame::OpenQuest(const FInputActionValue& InputActionValue)
 	UQuestManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestManager>();
 	if (QuestManager)
 	{
-		QuestManager->ShowData();
+		QuestManager->ShowUI();
 	}
 }
 
