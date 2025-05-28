@@ -2,6 +2,8 @@
 
 
 #include "WeaponShield.h"
+#include "Actors/Character/PlayerCharacter.h"
+#include "Animation/AnimInstance/PlayerAnimInstance.h"
 
 AWeaponShield::AWeaponShield()
 {
@@ -48,4 +50,117 @@ AWeaponShield::AWeaponShield()
             UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
         }
     }
+
+    {
+        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Shield_Just/Shield_Guard_Wait_Montage.Shield_Guard_Wait_Montage'"));
+
+        if (Asset.Object)
+        {
+            Wait_MTG = Asset.Object;
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Shield_Wait_Montage"));
+            check(Wait_MTG);
+        }
+
+
+    }
+
+
+
+    {
+
+        ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Shield_Just/Shield_Guard_Just_Montage.Shield_Guard_Just_Montage'"));
+
+        if (Asset.Object)
+        {
+            Just_MTG = Asset.Object;
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Shield_Wait_Montage"));
+            check(Just_MTG);
+        }
+
+    }
+
+}
+
+void AWeaponShield::LeftClickAction()
+{
+
+    
+    {
+        APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+        Player_C->GetWeaponManagerComponent()->SetCanShot(false);
+
+        UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+
+        
+
+        if (AnimInst->Montage_IsPlaying(Wait_MTG))
+        {
+
+            AnimInst->Montage_Stop(0.f);
+            AnimInst->Montage_Play(Just_MTG);
+            AnimInst->bIsWaitShield = false;
+
+        }
+        Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+        Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+
+        Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+        Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+
+        Player_C->ZoomOut();
+    }
+
+
+
+
+}
+
+void AWeaponShield::RightClickAction()
+{
+
+    APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+    UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+
+    if (AnimInst->Montage_IsPlaying(EquipMontage))
+    {
+        return;
+    }
+
+    if (AnimInst->bIsWaitShield)
+    {
+        return;
+    }
+
+    
+    
+
+    AnimInst->bIsWaitShield = true;
+
+    AnimInst->Montage_Play(Wait_MTG);
+    UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
+
+    C_Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
+
+    Player_C->bUseControllerRotationYaw = true; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+
+    // 이동 방향으로 자동 회전 비활성화
+    C_Movement->bOrientRotationToMovement = false;
+
+    USpringArmComponent* C_SpringArm = Player_C->GetSpringArm();
+
+
+
+
+    Player_C->ZoomIn();
+
 }

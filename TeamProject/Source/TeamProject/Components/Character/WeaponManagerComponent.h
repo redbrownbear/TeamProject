@@ -63,6 +63,7 @@ public:
 	void LeftClickAction();
 	void RightClickAction();
 
+	void RightClickEnd();
 
 
 

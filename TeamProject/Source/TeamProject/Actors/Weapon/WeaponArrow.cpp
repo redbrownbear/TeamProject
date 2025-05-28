@@ -2,6 +2,7 @@
 
 
 #include "WeaponArrow.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 AWeaponArrow::AWeaponArrow()
 {
@@ -17,3 +18,5 @@ AWeaponArrow::AWeaponArrow()
     SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     SkeletalMeshComponent->SetSkeletalMesh(Asset.Object);
 }
+
+

@@ -10,6 +10,7 @@
 
 #include "UI/Inven/Inventory.h"
 #include "UI/NpcDialogue/NPCDialogue.h"
+#include "UI/Shop/Shop.h"
 
 #include "UIManager.generated.h"
 
@@ -89,6 +90,9 @@ public:
     UInventory* CachedInventoryClass;
     UPROPERTY()
     UNPCDialogue* CachedDialogueClass;
+    UPROPERTY()
+    UShop* CachedShopClass;
+
 
 public:
     UPROPERTY(BlueprintAssignable)

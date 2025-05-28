@@ -69,7 +69,6 @@ void UNpcFSMComponent::BeginPlay()
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("HidePoints 자동 수집 완료: %d개"), HidePoints.Num());
 }
 
 void UNpcFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -252,11 +251,11 @@ void UNpcFSMComponent::HideFuriko()
 {
 	if (HidePoints.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HidePoints 배열이 비어있습니다."));
+		UE_LOG(LogTemp, Warning, TEXT("HidePoints 배열??비어?�습?�다."));
 		return;
 	}
 
-	// 랜덤 인덱스 선택
+	// ?�덤 ?�덱???�택
 	const int32 Index = FMath::RandRange(0, HidePoints.Num() - 1);
 	AHidePoint* Target = HidePoints[Index];
 
@@ -266,28 +265,40 @@ void UNpcFSMComponent::HideFuriko()
 
 		SetHideLocation(Target->GetActorLocation());
 
-		// <푸리코와 놀자!> 퀘스트 UI 생성할까 말까 윤호오빠랑 얘기해보기
+		// <Ǫ���ڿ� ����!> ����Ʈ UI �����ұ� ���� ��ȣ������ ����غ���
 	}
 }
 
 void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 {
 	if (!Owner) return;
-
-	// 이동 방해 차단
+	
+	// �̵� ���� ����
 	if (Owner->GetController()) Owner->GetController()->StopMovement();
 
-	// 순간이동
+	// �����̵�
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	Owner->SetIsHide(true);
 
-	// 위치 확인
-	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation 완료. Owner 위치: %s"), *Owner->GetActorLocation().ToString());
+	// ��ġ Ȯ��
+	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation �Ϸ�. Owner ��ġ: %s"), *Owner->GetActorLocation().ToString());
+	// ?�동 방해 차단
+	if (Owner->GetController()) Owner->GetController()->StopMovement();
+
+	// ?�간?�동
+	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
+	Owner->SetIsHide(true);
+
+	// ?�치 ?�인
+	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation ?�료. Owner ?�치: %s"), *Owner->GetActorLocation().ToString());
 }
 
 void UNpcFSMComponent::PlayInterectSequence()
 {
-	// Talk 시 캐릭터 위치만 고정되게 조정한 뒤 그 다음에 생성해야 할 듯
+	// Talk �� ĳ���� ��ġ�� �����ǰ� ������ �� �� ������ �����ؾ� �� ��
+
+	// Talk ??캐릭???�치�?고정?�게 조정????�??�음???�성?�야 ????
+
 	/*if (Player)
 	{
 		FVector PlayerLocation = Player->GetActorLocation();

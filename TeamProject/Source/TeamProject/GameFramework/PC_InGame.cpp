@@ -9,15 +9,17 @@
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
-
-#include "UI/NpcDialogue/NPCDialogue.h"
-#include "UI/Inven/Inventory.h"
+#include "SubSystem/UI/ShopManager.h"
 
 #include "Actors/Npc/Npc.h" 
-
+#include "Components/Character/PlayerMovementComponent.h"
 
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
+
+
+#include "Actors/Temple/Ice/IcePillar.h"
+#include "Actors/Temple/Ice/IcePreview.h"
 
 APC_InGame::APC_InGame()
 {
@@ -39,7 +41,7 @@ void APC_InGame::BeginPlay()
 	Super::BeginPlay();
 
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-	if(UIManager)
+	if (UIManager)
 		UIManager->PostWorldInitialize();
 
 	ChangeInputContext(EInputContext::IC_InGame);
@@ -55,7 +57,7 @@ void APC_InGame::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
 		ETriggerEvent::Triggered, this, &ThisClass::OnMove);
-	
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
 		ETriggerEvent::Completed, this, &ThisClass::OnMoveCancel);
 
@@ -70,7 +72,10 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LeftClick,
 		ETriggerEvent::Started, this, &ThisClass::LeftClick);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_RightClick,
-		ETriggerEvent::Started, this, &ThisClass::RightClick);
+		ETriggerEvent::Triggered, this, &ThisClass::RightClick);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_RightClick,
+		ETriggerEvent::Completed, this, &ThisClass::RightClickEnd);
+
 
 
 	// ------------ Weapon Swap -----------------
@@ -82,7 +87,10 @@ void APC_InGame::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_EquipBow,
 		ETriggerEvent::Started, this, &ThisClass::EquipBow);
+	// ------------ Climb ------------------------
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Climb,
+		ETriggerEvent::Started, this, &ThisClass::Climb);
 
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Interact,
@@ -90,6 +98,12 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Inventory,
 		ETriggerEvent::Started, this, &ThisClass::OpenInventory);
 
+	// ------------ Supernatural -----------------
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
+		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Build,
+		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);
 }
 
 void APC_InGame::ChangeInputContext(EInputContext NewContext)
@@ -121,6 +135,12 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		bShowMouseCursor = true;
 		break;
 
+	case EInputContext::IC_Shop:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Shop, 3);
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+		break;
+
 	}
 
 	CurrentInputContext = NewContext;
@@ -134,7 +154,7 @@ void APC_InGame::BindInventoryInput(UInventory* Inventory)
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenNavigate, ETriggerEvent::Started, Inventory, &UInventory::OnNavigate);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenConfirm, ETriggerEvent::Started, Inventory, &UInventory::OnConfirm);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenCancel, ETriggerEvent::Started, Inventory, &UInventory::OnCancel);
-		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started ,Inventory, &UInventory::OnCreateItemTest);
+		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started, Inventory, &UInventory::OnCreateItemTest);
 	}
 }
 
@@ -150,10 +170,22 @@ void APC_InGame::BindDialogueInput(UNPCDialogue* NpcDialogue)
 	}
 }
 
+void APC_InGame::BindShopInput(UShop* Shop)
+{
+	// 인풋 바인딩
+	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, Shop, &UShop::OnNavigate);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, Shop, &UShop::OnConfirm);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, Shop, &UShop::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, Shop, &UShop::OnNextDialogue);
+	}
+}
+
 void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 {
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
-	if(!Player_C)
+	if (!Player_C)
 	{
 		return;
 	}
@@ -161,19 +193,19 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	{
 		return;
 	}
-	
+
 
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
-	
+
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
-	
+
 	const FRotator Rotation = K2_GetActorRotation();
 	const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
 	const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
 	const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
-	
+
 
 	P_Anim->ActionValue = ActionValue;
 
@@ -226,9 +258,9 @@ void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
-	
+
 	P_Anim->SetPitch();
-	
+
 }
 
 void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
@@ -266,6 +298,38 @@ void APC_InGame::RightClick(const FInputActionValue& InputActionValue)
 	WeaponManagerComponent->RightClickAction();
 
 }
+
+void APC_InGame::RightClickEnd(const FInputActionValue& InputActionValue)
+{
+
+	APawn* PlayerPawn = GetPawn();
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(PlayerPawn);
+
+	UWeaponManagerComponent* WeaponManagerComponent = Player_C->GetWeaponManagerComponent();
+
+
+	if (!WeaponManagerComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WeaponManagerComponent is Null"));
+		return;
+	}
+
+	WeaponManagerComponent->RightClickEnd();
+
+
+}
+
+void APC_InGame::Climb(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+
+}
+
+
+
+
 
 void APC_InGame::EquipSword(const FInputActionValue& InputActionValue)
 {
@@ -310,9 +374,16 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 	{
 		if (UNpcFSMComponent* FSM = Npc->GetFSMComponent())
 		{
-			FSM->ChangeState(ENpcState::Talk);			
+			if(Npc->GetData()->DialogType == EDialogType::Shop)
+			{
+				FSM->ChangeState(ENpcState::Sell);
+			}
+			else
+			{
+				FSM->ChangeState(ENpcState::Talk);
+			}			
 		}
-	}	
+	}
 }
 
 void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
@@ -329,6 +400,99 @@ void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
 void APC_InGame::ShowDialogueUI()
 {
 
+}
+
+void APC_InGame::SpawnIcePillar()
+{
+	if (!IcePillarClass) return;
+
+	if (!bQPressed) return;
+	
+	FVector Start, Dir;
+	DeprojectMousePositionToWorld(Start, Dir);
+
+	FVector End = Start + Dir * TraceDistance;
+
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	// 수면 체크: 지형 위라면 충돌, 월드 정적에 한정
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		FVector SpawnLoc = Hit.Location;
+
+		// 최대 개수 초과 시 제거
+		if (IceList.Num() >= MaxIceCount)
+		{
+			ClearOldestPillar();
+		}
+
+		AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass, SpawnLoc, FRotator::ZeroRotator);
+		if (NewPillar)
+		{
+			IceList.Add(NewPillar);
+		}
+	}
+}
+
+void APC_InGame::ClearOldestPillar()
+{
+	if (IceList.Num() == 0) return;
+
+	if (IceList[0].IsValid())
+	{
+		IceList[0]->Destroy();
+	}
+
+	IceList.RemoveAt(0);;
+}
+
+void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
+{
+	bQPressed = true; 
+
+	if (!IcePreviewActor && IcePreviewClass)
+	{
+		IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
+		if (IcePreviewActor)
+		{
+			IcePreviewActor->SetActorEnableCollision(false);
+		}
+	}
+
+}
+
+void APC_InGame::EndIcePreview(const FInputActionValue& InputActionValue)
+{
+	bQPressed = false;
+
+	if (IcePreviewClass)
+	{
+		IcePreviewActor->Destroy();
+		IcePreviewActor = nullptr;
+	}
+
+	SpawnIcePillar();
+}
+
+void APC_InGame::UpdateIcePreview()
+{
+	if (!IcePreviewClass) return;
+
+	FVector Start, Dir;
+	DeprojectMousePositionToWorld(Start, Dir);
+	FVector End = Start + Dir * TraceDistance;
+
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{
+		FVector HitLoc = Hit.Location;
+		IcePreviewActor->SetActorLocation(HitLoc);
+	}
 }
 
 

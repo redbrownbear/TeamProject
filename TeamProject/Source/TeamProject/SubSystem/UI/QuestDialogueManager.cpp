@@ -36,7 +36,6 @@ void UQuestDialogueManager::LoadDialogueData(UDataTable* DataTable)
         FNPCDialogueTableRow* Row = DataTable->FindRow<FNPCDialogueTableRow>(RowName, "Populate QuestRowMap");
         if (Row)
         {
-            // ���� Row ���纻 ����
             FNPCDialogueTableRow* NewRow = new FNPCDialogueTableRow(*Row);
             TSharedPtr<const FNPCDialogueTableRow> SharedRow = MakeShareable(NewRow);
 
@@ -63,8 +62,8 @@ TArray<TSharedPtr<const FNPCDialogueTableRow>> UQuestDialogueManager::GetDialogu
     if (!FoundRowsPtr)
     {
         UE_LOG(LogTemp, Warning, TEXT("No dialogue found for character: %s"), *UEnum::GetValueAsString(QuestChar));
-
-        return  TArray<TSharedPtr<const FNPCDialogueTableRow>>{}; // �� �迭 ��ȯ
+        
+        return  TArray<TSharedPtr<const FNPCDialogueTableRow>>{};
     }
 
     return *FoundRowsPtr;

@@ -7,7 +7,6 @@
 #include "TempleBall.generated.h"
 
 class USphereComponent;
-class UStaticMeshComponent;
 class UPhysicalMaterial;
 
 UCLASS()

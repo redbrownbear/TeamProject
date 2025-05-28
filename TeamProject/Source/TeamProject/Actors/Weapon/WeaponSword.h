@@ -32,6 +32,8 @@ public:
 
 	void SetCanMove();
 
+	void Attack();
+
 private:
 
 
@@ -40,6 +42,9 @@ private:
 
 	UPROPERTY()
 	int32 CurrentComboIndex = 0;
+
+	UPROPERTY()
+	int32 PrevComboIndex = 0;
 
 	UPROPERTY()
 	int32 MaxComboIndex = 0;
