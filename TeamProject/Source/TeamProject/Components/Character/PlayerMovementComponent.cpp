@@ -5,6 +5,8 @@
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Animation/AnimInstance/PlayerAnimInstance.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& ObjectInitializer)
 {
@@ -45,14 +47,20 @@ bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
 	return Returnbool;
 }
 
-void UPlayerMovementComponent::TrySetMoveClimb()
+bool UPlayerMovementComponent::TrySetMoveClimb()
 {
 	FHitResult HitResult;
+
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
 	if (ClimbingLineTrace(HitResult))
 	{
+		
+		
+
 		FRotator Normal_Rot = FRotationMatrix::MakeFromX(HitResult.ImpactNormal).Rotator();
 
-		FRotator Player_Rot = GetOwner()->GetActorRotation();
+		FRotator Player_Rot = Player_C->GetActorRotation();
 
 		FVector SurfaceNormal = HitResult.ImpactNormal;
 
@@ -62,16 +70,29 @@ void UPlayerMovementComponent::TrySetMoveClimb()
 
 		FVector SurfacePoint = HitResult.ImpactPoint;
 
-		FVector NewLocation = SurfacePoint + SurfaceNormal * 10;
+		FVector NewLocation = SurfacePoint + SurfaceNormal * 5;
 
 		bOrientRotationToMovement = false;
 
-		GetOwner()->SetActorRotation(FRotator(Player_Rot));
+		Player_C->SetActorRotation(FRotator(Player_Rot));
 
-		GetOwner()->SetActorLocation(NewLocation);
+		Player_C->SetActorLocation(NewLocation);
 
 		SetMovementClimb();
+
+		
+
+		return true;
 	}
+	MovementMode = MOVE_Walking;
+
+	Cast<UPlayerAnimInstance>((Player_C->GetMesh()->GetAnimInstance()))->bIsCliming = false;
+
+	bIsClimbing = false;
+
+	bOrientRotationToMovement = true;
+
+	return false;
 }
 
 void UPlayerMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

@@ -25,7 +25,7 @@ public:
 	void SetMovementClimb() { MovementMode=MOVE_Flying; bIsClimbing = true; }
 	bool IsClimbing() { return bIsClimbing; }
 
-	void TrySetMoveClimb();
+	bool TrySetMoveClimb();
 
 private:
 	bool bIsClimbing = false;

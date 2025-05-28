@@ -337,9 +337,19 @@ void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
-	FHitResult HitResult;
 	
-	Movement->TrySetMoveClimb();
+	
+	if (AnimInst->bIsCliming)
+	{
+		AnimInst->bIsCliming;
+	}
+
+	else
+	{
+		Movement->TrySetMoveClimb();
+
+		AnimInst->bIsCliming = true;
+	}
 }
 
 
