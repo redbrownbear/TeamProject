@@ -24,7 +24,8 @@ void UStoreFSMComponent::UpdateTalk(float DeltaTime)
 
 	if (Player)
 	{
-		Owner->SetNpc(EQuestCharacter::Store);
+		//수정필요
+		Owner->SetNpc(EQuestCharacter::None);
 	}
 
 	if (Controller->GetConversationManager()->GetEndTalked())

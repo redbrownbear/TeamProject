@@ -41,15 +41,13 @@ public:
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnDisPlayDialogueUpdated OnDialogueUpdated;
-
-public:
+	
+private:
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* QuestDataTable;
 
-private:
 	TMap<EQuestCharacter, TArray<TSharedPtr<const FNPCDialogueTableRow>>> QuestRowMap;
 
-private:
 	bool bIsNowConversation = false;
 
 };
