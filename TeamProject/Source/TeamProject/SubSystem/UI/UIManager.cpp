@@ -65,4 +65,16 @@ void UUIManager::LoadUIClass()
         }
     }
 
+    if (!CachedQuestClass)
+    {
+        CachedQuestClass = CreateWidget<UQuest>(World, LoadClass<UQuest>(nullptr, TEXT("/Game/Blueprint/UI/Quest/BP_QuestMain.BP_QuestMain_C")));
+        if (CachedQuestClass)
+        {
+            CachedQuestClass->AddToViewport();
+            CachedQuestClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedQuestClass->OnCreated();
+            CachedUIs.Add(UQuest::StaticClass(), CachedQuestClass);
+        }
+    }
+
 }

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Misc/Utils.h"
-#include "Data/NPCDialogueTableRow.h"
+#include "Data/NpcCharacterTableRow.h"
 #include "Data/ItemDataRow.h"
 
 #include "ShopDataRow.generated.h"
