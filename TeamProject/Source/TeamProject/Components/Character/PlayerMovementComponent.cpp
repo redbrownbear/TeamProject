@@ -74,10 +74,6 @@ bool UPlayerMovementComponent::TrySetMoveClimb()
 
 		Player_C->SetActorLocation(NewLocation);
 
-		SetMovementClimb();
-
-		
-
 		return true;
 	}
 	

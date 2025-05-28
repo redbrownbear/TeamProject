@@ -339,7 +339,7 @@ void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 	
 	
-	if (AnimInst->bIsCliming)
+	if (Movement->IsClimbing())
 	{
 		Movement->SetClimbMode(false);
 	}
@@ -347,7 +347,7 @@ void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 	else
 	{
 		Movement->TrySetMoveClimb();
-
+		
 		Movement->SetClimbMode(true);
 	}
 }
