@@ -15,6 +15,8 @@
 #include "Components/FSMComponent/Monster/HinoxFSMComponent.h"
 #include "Components/CapsuleComponent.h"
 
+#include "Shakes/DefaultCameraShakeBase.h"
+
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
@@ -306,6 +308,11 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 
 			}
 		}
+	}
+
+	if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+	{
+		DefaultCameraShakeBase = NewObject<UDefaultCameraShakeBase>(this, UDefaultCameraShakeBase::StaticClass(), TEXT("DefaultCameraShakeBase"));
 	}
 }
 void ACharacterMonster::PostDuplicate(EDuplicateMode::Type DuplicateMode)
