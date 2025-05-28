@@ -10,7 +10,6 @@ AIcePreview::AIcePreview()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	RootComponent = StaticMeshComponent;
 
-	PreviewTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("PreviewTimeline"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMesh(TEXT("/Game/Resources/Map/Dungeon/DgnObj_Ice.DgnObj_Ice"));
 	StaticMeshComponent->SetStaticMesh(StaticMesh.Object);
 }
@@ -19,14 +18,6 @@ AIcePreview::AIcePreview()
 void AIcePreview::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (RiseCurve)
-	{
-		FOnTimelineFloat Progress;
-		Progress.BindUFunction(this, FName("StartPreview"));
-		PreviewTimeline->AddInterpFloat(RiseCurve, Progress);
-		PreviewTimeline->PlayFromStart();
-	}
 
 	MaterialInterface = StaticMeshComponent->GetMaterial(0);
 	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
@@ -40,21 +31,38 @@ void AIcePreview::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FVector Location = GetActorLocation();
+	UE_LOG(LogTemp, Warning, TEXT("IcePreview Z: %f"), Location.Z);
+
+	if (bIsRising)
+	{
+		float DeltaZ = RiseSpeed * DeltaTime;
+		CurrentRise += DeltaZ;
+
+		if (CurrentRise >= RiseDistance)
+		{
+			DeltaZ -= (CurrentRise - RiseDistance); // 초과분 제거
+			bIsRising = false;
+		}
+
+		FVector NewLocation = GetActorLocation() + FVector(0.f, 0.f, DeltaZ);
+		SetActorLocation(NewLocation);
+	}
 }
 
 void AIcePreview::StartPreview()
 {
-	// Play Growing Ice Montage
+	if (bIsRising) return; 
+
+	StartLocation = GetActorLocation() - FVector(0.f, 0.f, RiseDistance);
+	SetActorLocation(StartLocation);
+	CurrentRise = 0.f;
+	bIsRising = true;
 }
 
 void AIcePreview::StopPreview()
 {
-	// Delete Growing Ice Montage
-	bIsAnimating = false;
+	bIsRising = false;
 }
 
-void AIcePreview::UpdateLocation(const FVector& WorldLocation)
-{
-
-}
 

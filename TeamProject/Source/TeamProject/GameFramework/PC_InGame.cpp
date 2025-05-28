@@ -34,6 +34,10 @@ APC_InGame::APC_InGame()
 	PlayerCameraManagerClass = ACM_InGame::StaticClass();
 
 
+	{
+		IcePillarClass = AIcePillar::StaticClass();
+		IcePreviewClass = AIcePreview::StaticClass();
+	}
 }
 
 void APC_InGame::BeginPlay()
@@ -103,7 +107,29 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Build,
-		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);
+		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);		
+}
+
+void APC_InGame::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (bQPressed)
+	{
+		if (!IcePreviewActor && IcePreviewClass)
+		{
+			IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
+			if (IcePreviewActor)
+			{
+				IcePreviewActor->SetActorEnableCollision(false);
+			}
+		}
+
+		if (IcePreviewActor)
+		{
+			UpdateIcePreview();
+		}
+	}
 }
 
 void APC_InGame::ChangeInputContext(EInputContext NewContext)
@@ -189,30 +215,65 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	{
 		return;
 	}
-	if (Player_C->GetCharacterMovement()->MovementMode == MOVE_None)
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+	if (Movement->MovementMode == MOVE_None)
 	{
 		return;
 	}
+	// 클라이밍 상태일 때의 캐릭터 무브
+	if (Movement->IsClimbing())
+	{
+	
+		FHitResult HitResult;
+		
+		Movement->TrySetMoveClimb();
 
 
-	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
-	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
-	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+		FVector Normal_Vec = HitResult.Normal;
 
-	const FRotator Rotation = K2_GetActorRotation();
-	const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
-	const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
-	const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
+		
+
+		const FRotator Rotation = Player_C->K2_GetActorRotation();
+		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+		
+		const FVector UpVector = UKismetMathLibrary::GetUpVector(Rotation);
+		const FVector RightVector = UKismetMathLibrary::GetRightVector(Rotation);
 
 
-	P_Anim->ActionValue = ActionValue;
+		P_Anim->ActionValue = ActionValue;
 
-	APawn* ControlledPawn = GetPawn();
-	ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
-	ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
+		APawn* ControlledPawn = GetPawn();
+		ControlledPawn->AddMovementInput(UpVector, ActionValue.X);
+		ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
 
+	}
+	
+	// 노말 상태일 때의 캐릭터 무브
+	else
+	{
+		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+
+
+		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+
+		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+
+		const FRotator Rotation = K2_GetActorRotation();
+		const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
+		const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
+		const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
+
+
+		P_Anim->ActionValue = ActionValue;
+
+		APawn* ControlledPawn = GetPawn();
+		ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
+		ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
+	}
 }
 
 void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
@@ -226,6 +287,11 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	{
 		return;
 	}
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+	if (Movement->IsClimbing())
+	{
+		Movement->Velocity = FVector::ZeroVector;
+	}
 
 
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
@@ -235,7 +301,6 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	const FVector2D ActionValue = FVector2D();
 
 	P_Anim->ActionValue = ActionValue;
-
 }
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
@@ -322,9 +387,23 @@ void APC_InGame::RightClickEnd(const FInputActionValue& InputActionValue)
 void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 {
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	
+	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+	
+	
+	if (Movement->IsClimbing())
+	{
+		Movement->SetClimbMode(false);
+	}
 
+	else
+	{
+		Movement->TrySetMoveClimb();
+		
+		Movement->SetClimbMode(true);
+	}
 }
 
 
@@ -402,97 +481,127 @@ void APC_InGame::ShowDialogueUI()
 
 }
 
-void APC_InGame::SpawnIcePillar()
+void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
 {
 	if (!IcePillarClass) return;
 
 	if (!bQPressed) return;
-	
-	FVector Start, Dir;
-	DeprojectMousePositionToWorld(Start, Dir);
-
-	FVector End = Start + Dir * TraceDistance;
-
-	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
 
 	// 수면 체크: 지형 위라면 충돌, 월드 정적에 한정
-	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
-	{
-		FVector SpawnLoc = Hit.Location;
+	CheckSurface();
 
-		// 최대 개수 초과 시 제거
-		if (IceList.Num() >= MaxIceCount)
-		{
-			ClearOldestPillar();
-		}
+	if (!bCanSpawn) return;
 
-		AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass, SpawnLoc, FRotator::ZeroRotator);
-		if (NewPillar)
-		{
-			IceList.Add(NewPillar);
-		}
-	}
-}
+	EndIcePreview();
 
-void APC_InGame::ClearOldestPillar()
-{
-	if (IceList.Num() == 0) return;
+	FVector SpawnLoc = Hit.Location;
+	FVector Normal = Hit.Normal;
 
-	if (IceList[0].IsValid())
-	{
-		IceList[0]->Destroy();
-	}
+	// 표면 기울기 따라서 얼음 생성되게
+	FRotator SpawnRot = FRotationMatrix::MakeFromZ(Normal).Rotator();
 
-	IceList.RemoveAt(0);;
+	AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(
+		IcePillarClass,
+		SpawnLoc,
+		SpawnRot
+	);	
+
+	bCanSpawn = false;
+
 }
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 {
-	bQPressed = true; 
-
-	if (!IcePreviewActor && IcePreviewClass)
+	if (!IcePreviewActor)
 	{
-		IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
-		if (IcePreviewActor)
-		{
-			IcePreviewActor->SetActorEnableCollision(false);
-		}
+		bQPressed = true;
 	}
-
+	else
+	{
+		EndIcePreview();
+		bQPressed = false;
+	}
 }
 
-void APC_InGame::EndIcePreview(const FInputActionValue& InputActionValue)
+void APC_InGame::EndIcePreview()
 {
-	bQPressed = false;
-
-	if (IcePreviewClass)
+	if (IcePreviewClass && IcePreviewActor)
 	{
+		IcePreviewActor->StopPreview();
 		IcePreviewActor->Destroy();
 		IcePreviewActor = nullptr;
 	}
-
-	SpawnIcePillar();
 }
 
 void APC_InGame::UpdateIcePreview()
 {
-	if (!IcePreviewClass) return;
+	if (!IcePreviewActor) return;
 
-	FVector Start, Dir;
-	DeprojectMousePositionToWorld(Start, Dir);
-	FVector End = Start + Dir * TraceDistance;
+	CheckSurface();
 
-	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	if (bHitResult)
 	{
-		FVector HitLoc = Hit.Location;
-		IcePreviewActor->SetActorLocation(HitLoc);
+		IcePreviewActor->SetActorLocation(Hit.Location);
+
+		// 노멀 방향 회전 적용
+		FRotator PreviewRot = FRotationMatrix::MakeFromZ(Hit.Normal).Rotator();
+		IcePreviewActor->SetActorRotation(PreviewRot);
+
+		IcePreviewActor->SetActorHiddenInGame(false); // 보이도록
+
+		IcePreviewActor->StartPreview();
+	}
+	else
+	{
+		IcePreviewActor->SetActorHiddenInGame(true); // 일시적으로 숨김 
 	}
 }
 
+void APC_InGame::CheckCollision()
+{
+	FHitResult HitResult;
+	bHitResult = this->GetHitResultUnderCursorByChannel(
+		UEngineTypes::ConvertToTraceType(ECC_Visibility),
+		false,
+		HitResult);
+
+	if (bHitResult)
+	{
+		Hit = HitResult;
+	}
+}
+
+void APC_InGame::CheckSurface()
+{
+	CheckCollision();
+
+	if (bHitResult)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor) return;
+
+#if WITH_EDITOR
+		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
+#else
+		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
+#endif
+
+		if (!ActorName.StartsWith(TEXT("Surface")))
+		{
+			bCanSpawn = false;
+			if (IcePreviewActor)
+			{
+				IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", 1.0f);
+			}
+			return;
+		}
+
+		if (IcePreviewActor)
+		{
+			IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", 0.0f);
+		}
+
+		bCanSpawn = true;
+	}
+}
 
