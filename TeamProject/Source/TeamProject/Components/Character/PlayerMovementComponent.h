@@ -27,6 +27,12 @@ public:
 
 	bool TrySetMoveClimb();
 
+
+	void SetClimbMode(bool _bool);
+
+
+
+
 private:
 	bool bIsClimbing = false;
 	

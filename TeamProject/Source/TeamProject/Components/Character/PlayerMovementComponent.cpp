@@ -56,8 +56,6 @@ bool UPlayerMovementComponent::TrySetMoveClimb()
 	if (ClimbingLineTrace(HitResult))
 	{
 		
-		
-
 		FRotator Normal_Rot = FRotationMatrix::MakeFromX(HitResult.ImpactNormal).Rotator();
 
 		FRotator Player_Rot = Player_C->GetActorRotation();
@@ -70,9 +68,7 @@ bool UPlayerMovementComponent::TrySetMoveClimb()
 
 		FVector SurfacePoint = HitResult.ImpactPoint;
 
-		FVector NewLocation = SurfacePoint + SurfaceNormal * 5;
-
-		bOrientRotationToMovement = false;
+		FVector NewLocation = SurfacePoint + SurfaceNormal * 20;
 
 		Player_C->SetActorRotation(FRotator(Player_Rot));
 
@@ -84,15 +80,30 @@ bool UPlayerMovementComponent::TrySetMoveClimb()
 
 		return true;
 	}
-	MovementMode = MOVE_Walking;
+	
 
-	Cast<UPlayerAnimInstance>((Player_C->GetMesh()->GetAnimInstance()))->bIsCliming = false;
-
-	bIsClimbing = false;
-
-	bOrientRotationToMovement = true;
+	SetClimbMode(false);
 
 	return false;
+}
+
+void UPlayerMovementComponent::SetClimbMode(bool _bool)
+{
+	
+	MovementMode = _bool ? MOVE_Flying : MOVE_Walking;
+
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+
+	bOrientRotationToMovement = !_bool;
+
+	AnimInst->bIsCliming = _bool;
+
+	bIsClimbing = _bool;
+
+	Player_C->GetSpringArm()->bUsePawnControlRotation = !_bool;
+
 }
 
 void UPlayerMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

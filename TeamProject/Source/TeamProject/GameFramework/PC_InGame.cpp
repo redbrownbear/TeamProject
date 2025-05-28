@@ -341,14 +341,14 @@ void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 	
 	if (AnimInst->bIsCliming)
 	{
-		AnimInst->bIsCliming;
+		Movement->SetClimbMode(false);
 	}
 
 	else
 	{
 		Movement->TrySetMoveClimb();
 
-		AnimInst->bIsCliming = true;
+		Movement->SetClimbMode(true);
 	}
 }
 
