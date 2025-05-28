@@ -25,6 +25,9 @@ AIcePillar::AIcePillar()
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
 	RiseTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RiseTimeline"));
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> PillarMesh(TEXT("/Game/Resources/Map/Dungeon/DgnObj_Ice.DgnObj_Ice"));
+	StaticMeshComponent->SetStaticMesh(PillarMesh.Object);
 }
 
 // Called when the game starts or when spawned

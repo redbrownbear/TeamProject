@@ -30,7 +30,8 @@ void AIcePreview::BeginPlay()
 
 	MaterialInterface = StaticMeshComponent->GetMaterial(0);
 	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
-	DynamicMaterialInstance->SetScalarParameterValue("Alpha", 0.0f);
+	StaticMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+	DynamicMaterialInstance->SetScalarParameterValue("Alpha", 0.1f);
 
 }
 
