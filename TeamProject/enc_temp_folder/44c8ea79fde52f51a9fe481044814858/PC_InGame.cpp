@@ -174,15 +174,11 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	
 		FHitResult HitResult;
 		
-		Movement->TrySetMoveClimb();
+
 
 		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
 		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
-
-		FVector Normal_Vec = HitResult.Normal;
-
-		
 
 		const FRotator Rotation = Player_C->K2_GetActorRotation();
 		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
@@ -233,11 +229,6 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	{
 		return;
 	}
-	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
-	if (Movement->IsClimbing())
-	{
-		Movement->Velocity = FVector::ZeroVector;
-	}
 
 
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
@@ -247,6 +238,7 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	const FVector2D ActionValue = FVector2D();
 
 	P_Anim->ActionValue = ActionValue;
+
 }
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)

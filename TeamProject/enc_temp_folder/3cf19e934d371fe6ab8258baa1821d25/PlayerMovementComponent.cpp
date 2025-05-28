@@ -9,9 +9,7 @@
 UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& ObjectInitializer)
 {
 
-	BrakingDecelerationFlying = 10000.f;
-	AirControl = 0.f;
-	
+
 }
 
 bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)

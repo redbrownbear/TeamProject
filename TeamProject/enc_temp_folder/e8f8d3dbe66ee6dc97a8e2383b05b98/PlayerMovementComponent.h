@@ -22,7 +22,7 @@ public:
 	bool ClimbingLineTrace(FHitResult& HitResult);
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
 
-	void SetMovementClimb() { MovementMode=MOVE_Flying; bIsClimbing = true; }
+	void SetMovementClimb() { GravityScale = 0.f; bIsClimbing = true; }
 	bool IsClimbing() { return bIsClimbing; }
 
 	void TrySetMoveClimb();
