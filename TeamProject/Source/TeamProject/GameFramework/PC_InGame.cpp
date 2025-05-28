@@ -10,6 +10,7 @@
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "SubSystem/UI/ShopManager.h"
+#include "SubSystem/UI/QuestManager.h"
 
 #include "Actors/Npc/Npc.h" 
 #include "Components/Character/PlayerMovementComponent.h"
@@ -111,6 +112,8 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::OnInteract);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Inventory,
 		ETriggerEvent::Started, this, &ThisClass::OpenInventory);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Quest,
+		ETriggerEvent::Started, this, &ThisClass::OpenQuest);
 
 	// ------------ Supernatural -----------------
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
@@ -168,44 +171,62 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		bShowMouseCursor = true;
 		break;
 
+	case EInputContext::IC_Quest:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Quest, 4);
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+		break;
+
 	}
 
 	CurrentInputContext = NewContext;
 }
 
-void APC_InGame::BindInventoryInput(UInventory* Inventory)
+void APC_InGame::BindInventoryInput()
 {
 	// 인풋 바인딩
 	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		EIC->BindAction(PC_InGameDataAsset->IA_InvenNavigate, ETriggerEvent::Started, Inventory, &UInventory::OnNavigate);
-		EIC->BindAction(PC_InGameDataAsset->IA_InvenConfirm, ETriggerEvent::Started, Inventory, &UInventory::OnConfirm);
-		EIC->BindAction(PC_InGameDataAsset->IA_InvenCancel, ETriggerEvent::Started, Inventory, &UInventory::OnCancel);
-		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started, Inventory, &UInventory::OnCreateItemTest);
+		EIC->BindAction(PC_InGameDataAsset->IA_InvenNavigate, ETriggerEvent::Started, this, &APC_InGame::OnNavigate);
+		EIC->BindAction(PC_InGameDataAsset->IA_InvenConfirm, ETriggerEvent::Started, this, &APC_InGame::OnConfirm);
+		EIC->BindAction(PC_InGameDataAsset->IA_InvenCancel, ETriggerEvent::Started, this, &APC_InGame::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started, this, &APC_InGame::OnCreateItemTest);
 	}
 }
 
-void APC_InGame::BindDialogueInput(UNPCDialogue* NpcDialogue)
+void APC_InGame::BindDialogueInput()
 {
 	// 인풋 바인딩
 	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, NpcDialogue, &UNPCDialogue::OnNavigate);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, NpcDialogue, &UNPCDialogue::OnConfirm);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, NpcDialogue, &UNPCDialogue::OnCancel);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, NpcDialogue, &UNPCDialogue::OnNextDialogue);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, this, &APC_InGame::OnNavigate);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, this, &APC_InGame::OnConfirm);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, this, &APC_InGame::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, this, &APC_InGame::OnNextDialogue);
 	}
 }
 
-void APC_InGame::BindShopInput(UShop* Shop)
+void APC_InGame::BindShopInput()
 {
 	// 인풋 바인딩
 	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, Shop, &UShop::OnNavigate);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, Shop, &UShop::OnConfirm);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, Shop, &UShop::OnCancel);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, Shop, &UShop::OnNextDialogue);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, this, &APC_InGame::OnNavigate);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, this, &APC_InGame::OnConfirm);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, this, &APC_InGame::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, this, &APC_InGame::OnNextDialogue);
+	}
+}
+
+void APC_InGame::BindQuestInput()
+{
+	// 인풋 바인딩
+	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
+	{
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, this, &APC_InGame::OnNavigate);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, this, &APC_InGame::OnConfirm);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, this, &APC_InGame::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, this, &APC_InGame::OnNextDialogue);
 	}
 }
 
@@ -216,30 +237,65 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	{
 		return;
 	}
-	if (Player_C->GetCharacterMovement()->MovementMode == MOVE_None)
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+	if (Movement->MovementMode == MOVE_None)
 	{
 		return;
 	}
+	// 클라이밍 상태일 때의 캐릭터 무브
+	if (Movement->IsClimbing())
+	{
+	
+		FHitResult HitResult;
+		
+		Movement->TrySetMoveClimb();
 
 
-	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
-	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
-	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+		FVector Normal_Vec = HitResult.Normal;
 
-	const FRotator Rotation = K2_GetActorRotation();
-	const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
-	const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
-	const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
+		
+
+		const FRotator Rotation = Player_C->K2_GetActorRotation();
+		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+		
+		const FVector UpVector = UKismetMathLibrary::GetUpVector(Rotation);
+		const FVector RightVector = UKismetMathLibrary::GetRightVector(Rotation);
 
 
-	P_Anim->ActionValue = ActionValue;
+		P_Anim->ActionValue = ActionValue;
 
-	APawn* ControlledPawn = GetPawn();
-	ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
-	ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
+		APawn* ControlledPawn = GetPawn();
+		ControlledPawn->AddMovementInput(UpVector, ActionValue.X);
+		ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
 
+	}
+	
+	// 노말 상태일 때의 캐릭터 무브
+	else
+	{
+		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+
+
+		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+
+		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+
+		const FRotator Rotation = K2_GetActorRotation();
+		const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
+		const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
+		const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
+
+
+		P_Anim->ActionValue = ActionValue;
+
+		APawn* ControlledPawn = GetPawn();
+		ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
+		ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
+	}
 }
 
 void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
@@ -253,6 +309,11 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	{
 		return;
 	}
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+	if (Movement->IsClimbing())
+	{
+		Movement->Velocity = FVector::ZeroVector;
+	}
 
 
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
@@ -262,7 +323,6 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	const FVector2D ActionValue = FVector2D();
 
 	P_Anim->ActionValue = ActionValue;
-
 }
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
@@ -349,9 +409,23 @@ void APC_InGame::RightClickEnd(const FInputActionValue& InputActionValue)
 void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 {
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	
+	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+	
+	
+	if (Movement->IsClimbing())
+	{
+		Movement->SetClimbMode(false);
+	}
 
+	else
+	{
+		Movement->TrySetMoveClimb();
+		
+		Movement->SetClimbMode(true);
+	}
 }
 
 
@@ -424,9 +498,21 @@ void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
 	}
 }
 
-void APC_InGame::ShowDialogueUI()
+void APC_InGame::OpenQuest(const FInputActionValue& InputActionValue)
 {
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
 
+	if (UIManager)
+	{
+		UIManager->ShowUI(UQuest::StaticClass());
+	}
+
+	UQuestManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestManager>();
+	if (QuestManager)
+	{
+		QuestManager->ShowUI();
+	}
 }
 
 void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
@@ -470,6 +556,168 @@ void APC_InGame::EndIcePreview()
 {
 	bQPressed = false;
 
+}
+
+void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	UInventory* InvenUI = nullptr;
+	UShop* ShopUI = nullptr;
+	UNPCDialogue* DialogUI = nullptr;
+	UQuest* QuestUI = nullptr;
+
+	switch (CurrentInputContext)
+	{
+	case EInputContext::IC_Inventory:
+		InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI)	
+			InvenUI->OnNavigate(InputActionValue);
+		
+		break;
+	case EInputContext::IC_Shop:
+		ShopUI = UIManager->FindUI<UShop>();
+		if (ShopUI)		
+			ShopUI->OnNavigate(InputActionValue);
+		
+		break;
+	case EInputContext::IC_Dialogue:
+		DialogUI = UIManager->FindUI<UNPCDialogue>();
+		if (DialogUI)
+			DialogUI->OnNavigate(InputActionValue);
+		
+		break;
+	case EInputContext::IC_Quest:
+		QuestUI = UIManager->FindUI<UQuest>();
+		if (QuestUI)
+			QuestUI->OnNavigate(InputActionValue);
+		
+		break;
+	}
+}
+
+void APC_InGame::OnConfirm(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	UInventory* InvenUI = nullptr;
+	UShop* ShopUI = nullptr;
+	UNPCDialogue* DialogUI = nullptr;
+	UQuest* QuestUI = nullptr;
+
+	switch (CurrentInputContext)
+	{
+	case EInputContext::IC_Inventory:
+		 InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI)
+			InvenUI->OnConfirm(InputActionValue);
+		
+		break;
+	case EInputContext::IC_Shop:
+		 ShopUI = UIManager->FindUI<UShop>();
+		if (ShopUI)
+			ShopUI->OnConfirm();
+		
+		break;
+	case EInputContext::IC_Dialogue:
+		 DialogUI = UIManager->FindUI<UNPCDialogue>();
+		if (DialogUI)
+			DialogUI->OnConfirm();
+
+		break;
+	case EInputContext::IC_Quest:
+		QuestUI = UIManager->FindUI<UQuest>();
+		if (QuestUI)
+			QuestUI->OnConfirm();
+
+		break;
+	}
+}
+
+void APC_InGame::OnCancel(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	UInventory* InvenUI = nullptr;
+	UShop* ShopUI = nullptr;
+	UNPCDialogue* DialogUI = nullptr;
+	UQuest* QuestUI = nullptr;
+
+	switch (CurrentInputContext)
+	{
+	case EInputContext::IC_Inventory:
+		InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI)	
+			InvenUI->OnCancel(InputActionValue);
+		
+		break;
+	case EInputContext::IC_Shop:
+		ShopUI = UIManager->FindUI<UShop>();
+		if (ShopUI)	
+			ShopUI->OnCancel();
+		
+		break;
+	case EInputContext::IC_Dialogue:
+		DialogUI = UIManager->FindUI<UNPCDialogue>();
+		if (DialogUI)	
+			DialogUI->OnCancel();
+		
+		break;
+
+	case EInputContext::IC_Quest:
+		QuestUI = UIManager->FindUI<UQuest>();
+		if (QuestUI)
+			QuestUI->OnCancel();
+
+		break;
+	}
+}
+
+void APC_InGame::OnNextDialogue(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	UNPCDialogue* DialogUI = nullptr;
+
+	switch (CurrentInputContext)
+	{
+	case EInputContext::IC_Inventory:
+		break;
+	case EInputContext::IC_Shop:
+		break;
+	case EInputContext::IC_Dialogue:
+		DialogUI = UIManager->FindUI<UNPCDialogue>();
+		if (DialogUI)	
+			DialogUI->OnNextDialogue(InputActionValue);
+		
+		break;
+	}
+}
+
+void APC_InGame::OnCreateItemTest(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	UInventory* InvenUI = nullptr;
+
+	switch (CurrentInputContext)
+	{
+	case EInputContext::IC_Inventory:
+		InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI)	
+			InvenUI->OnCreateItemTest(InputActionValue);
+		
+		break;
+	case EInputContext::IC_Shop:
+		break;
+	case EInputContext::IC_Dialogue:
+		break;
+	}
 }
 
 void APC_InGame::UpdateIcePreview()

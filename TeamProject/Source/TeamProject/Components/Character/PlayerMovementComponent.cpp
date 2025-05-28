@@ -4,63 +4,118 @@
 #include "Components/Character/PlayerMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Animation/AnimInstance/PlayerAnimInstance.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& ObjectInitializer)
 {
 
-
+	BrakingDecelerationFlying = 10000.f;
+	AirControl = 0.f;
+	
 }
 
-TArray<FHitResult> UPlayerMovementComponent::DoCapsuleTraceMultiByObject(const FVector& Start, const FVector& End, bool bShowDebugSphere)
+bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
 {
-
-    TArray<FHitResult> OutCapsuleTraceHitResult;
-
-    UKismetSystemLibrary::CapsuleTraceMultiForObjects(
-        this, Start, End, ClimbCapsuleTraceRadius, ClimbCapsuleTraceHalfHeight,
-        ClimbableSurfaceTraceTypes, false, TArray<AActor*>(),
-        bShowDebugSphere ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None,
-        OutCapsuleTraceHitResult, false
+	AActor* ComponentOwner = GetOwner();
+	
+	const FVector OwnerLocation = ComponentOwner->GetActorLocation();
+	const FRotator OwnerLotator = ComponentOwner->GetActorRotation();
 
 
-    );
+	FVector OwnerForwardVector = ComponentOwner->GetActorForwardVector();
+	
+	FVector Start = OwnerLocation;
+	FVector End = OwnerLocation + OwnerForwardVector * 50;
 
+	
 
-    return OutCapsuleTraceHitResult;
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(ComponentOwner);
+
+	bool Returnbool = GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		Start,
+		End,
+		ECollisionChannel::ECC_Visibility,
+		TraceParams
+	);
+
+	DrawDebugLine(GetWorld(), Start, End,FColor::Red,false, 2.f);
+
+	return Returnbool;
 }
 
-void UPlayerMovementComponent::TraceFromEyeHeight(float TraceDistance, float TraceStartOffset)
+bool UPlayerMovementComponent::TrySetMoveClimb()
 {
-    const FVector ComponentLocation = UpdatedComponent->GetComponentLocation();
-    const FVector EyeHeightOffset = UpdatedComponent->GetUpVector() * (CharacterOwner->BaseEyeHeight + TraceStartOffset);
-    const FVector Start = UpdatedComponent->GetComponentLocation() + EyeHeightOffset;
-    const FVector End = Start + UpdatedComponent->GetForwardVector() * TraceDistance;
+	FHitResult HitResult;
 
-    DoLineTraceSingleByObject(Start, End, true);
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 
+	if (ClimbingLineTrace(HitResult))
+	{
+		
+		FRotator Normal_Rot = FRotationMatrix::MakeFromX(HitResult.ImpactNormal).Rotator();
 
+		FRotator Player_Rot = Player_C->GetActorRotation();
+
+		FVector SurfaceNormal = HitResult.ImpactNormal;
+
+		Player_Rot.Yaw = Normal_Rot.Yaw + 180.f;
+
+		Player_Rot.Pitch = -Normal_Rot.Pitch;
+
+		FVector SurfacePoint = HitResult.ImpactPoint;
+
+		FVector NewLocation = SurfacePoint + SurfaceNormal * 20;
+
+		Player_C->SetActorRotation(FRotator(Player_Rot));
+
+		Player_C->SetActorLocation(NewLocation);
+
+		return true;
+	}
+	
+
+	SetClimbMode(false);
+
+	return false;
 }
 
-void UPlayerMovementComponent::DoLineTraceSingleByObject(FVector Start, FVector End, bool bShowDebugLine)
+void UPlayerMovementComponent::SetClimbMode(bool _bool)
 {
-    TArray<FHitResult> HitResults;
-    TArray<AActor*> ActorsToIgnore;
-    ActorsToIgnore.Add(GetOwner()); // 자기 자신 무시
+	
+	MovementMode = _bool ? MOVE_Flying : MOVE_Walking;
 
-    FHitResult OutLineTraceHitResult;
-    UKismetSystemLibrary::LineTraceMulti(
-        this,
-        Start,
-        End,
-        UEngineTypes::ConvertToTraceType(ECC_Visibility), // Trace 채널
-        false,                    // 복잡한 충돌 사용 여부
-        ActorsToIgnore,          // 무시할 액터 목록
-        EDrawDebugTrace::ForDuration, // 디버그 선 그리기
-        HitResults,
-        true,                    // 자신 무시
-        FLinearColor::Red,       // 선 색
-        FLinearColor::Green,     // 히트 선 색
-        2.0f                     // 디버그 선 유지 시간
-    );
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+
+	bOrientRotationToMovement = !_bool;
+
+	AnimInst->bIsCliming = _bool;
+
+	bIsClimbing = _bool;
+
+	MaxFlySpeed = _bool ? 100 : PLAYER_MOVE_NML;
+
+	USpringArmComponent* SpringArm = Player_C->GetSpringArm();
+
+	SpringArm->bUsePawnControlRotation = !_bool;
+
+	SpringArm->bEnableCameraRotationLag = _bool;
+
+	SpringArm->CameraLagSpeed = 5.f;
+
+	SpringArm->CameraLagMaxDistance = 100.f;
 
 }
+
+void UPlayerMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+}
+
+

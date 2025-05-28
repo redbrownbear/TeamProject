@@ -134,9 +134,8 @@ void APlayerCharacter::TimelineProgress(float Value)
 	float Length = FMath::Lerp(300.f, 150.f, Value);
 
 	FVector SpringArmLocation = FVector::Zero();
-	float Y = FMath::Lerp(0.f, 30.f, Value);
 	float Z = FMath::Lerp(30.f, 40.f, Value);
-	SpringArmLocation.Y = Y;
+	
 	SpringArmLocation.Z = Z;
 	SpringArm->SetRelativeLocation(SpringArmLocation);
 	SpringArm->TargetArmLength = Length;

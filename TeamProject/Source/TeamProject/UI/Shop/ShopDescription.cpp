@@ -11,7 +11,7 @@ void UShopDescription::RefreshUI(const FItemData& ItemData)
 		ItemImg->SetBrushFromTexture(LoadedTexture);
 	}
 
-	PriceText->SetText(FText::FromString(FString::SanitizeFloat(ItemData.price)));
+	PriceText->SetText(FText::FromString(FString::FromInt(ItemData.price)));
 	
 	InfoTitle->SetText(FText::FromString(ItemData.Name));
 	InfoDescription->SetText(FText::FromString(ItemData.Description));
