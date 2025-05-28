@@ -27,7 +27,7 @@ protected:
 
 protected:
     UPROPERTY(EditAnywhere, Category = "Cryonis")
-    float MaxSpeed = 150.f;            // 1초에 올라갈 속도 (cm/sec)
+    float MaxSpeed = 300.f;            // 1초에 올라갈 속도 (cm/sec)
 
     UPROPERTY(EditAnywhere, Category = "Cryonis")
     float MaxHeight = 300.0f;         // 총 올라갈 거리

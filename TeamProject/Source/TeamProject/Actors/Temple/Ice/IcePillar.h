@@ -42,7 +42,7 @@ protected:
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	float MaxSpeed = 100.f;
+	float MaxSpeed = 300.f;
 
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
 	float MaxHeight = 300.0f; // 매크로로 바꿀까

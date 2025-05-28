@@ -16,11 +16,11 @@ ATempleBall::ATempleBall()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
-	/*static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/Ball/DgnObj_AncientBallL_01.DgnObj_AncientBallL_01"));
-	PhysicalMaterial = PhysMaterial.Object;*/
+	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/Ball/PM_TempleBall.PM_TempleBall"));
+	PhysicalMaterial = PhysMaterial.Object;
 
-	/*static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> BallMesh(TEXT("/Game/Temple/Ball/DgnObj_AncientBallL_01.DgnObj_AncientBallL_01"));
-	StaticMeshComponent->SetStaticMesh(BallMesh.Object);*/
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> BallMesh(TEXT("/Game/Temple/Ball/DgnObj_AncientBallL_01.DgnObj_AncientBallL_01"));
+	StaticMeshComponent->SetStaticMesh(BallMesh.Object);
 
 }
 
@@ -32,7 +32,13 @@ void ATempleBall::BeginPlay()
 	CollisionComponent->SetCanEverAffectNavigation(false);
 	CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
 
+	/*StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);*/
+
 	StaticMeshComponent->BodyInstance.bUseCCD = true;
 	StaticMeshComponent->SetSimulatePhysics(true);
 	StaticMeshComponent->SetEnableGravity(true);
+
+	StaticMeshComponent->SetVisibility(true);
+	StaticMeshComponent->SetHiddenInGame(false);
 }

@@ -526,8 +526,6 @@ void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
 
 	if (!bCanSpawn) return;
 
-	EndIcePreview();
-
 	FVector SpawnLoc = Hit.Location;
 	FVector Normal = Hit.Normal;
 
@@ -541,22 +539,27 @@ void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
 	FRotator SpawnRot = FRotationMatrix::MakeFromZ(Hit.Normal).Rotator();
 	IcePillarActor->SetActorRotation(SpawnRot);
 	IcePillarActor->SetActorHiddenInGame(false); // 보이도록	
+	IcePreviewActor->SetActorHiddenInGame(true);
 
 	bCanSpawn = false;
-
 }
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 {	
-	bQPressed = true;
+	bQPressed = !bQPressed;
 
+	if (bQPressed)
+	{
+		// show icepreview
+		IcePreviewActor->SetActorHiddenInGame(false);
+	}
+	else
+	{
+		// hide icepreview
+		IcePreviewActor->SetActorHiddenInGame(true);
+	}
 }
 
-void APC_InGame::EndIcePreview()
-{
-	bQPressed = false;
-
-}
 
 void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)
 {

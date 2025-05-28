@@ -54,10 +54,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
 	UInputMappingContext* IMC_Quest = nullptr;
 
-	//Supernatural
-	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
-	UInputMappingContext* IMC_Supernatural = nullptr;
-
 	//Player
 public:
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
@@ -237,10 +233,6 @@ public:
 
 	// --------- Supernatural ----------
 protected:
-	// 프리뷰 종료
-	UFUNCTION()
-	void EndIcePreview();
-
 	// 매 프레임 업데이트
 	UFUNCTION()
 	void UpdateIcePreview();
