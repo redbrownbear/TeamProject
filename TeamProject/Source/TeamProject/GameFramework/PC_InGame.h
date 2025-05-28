@@ -164,6 +164,9 @@ protected:
 	virtual void SetupInputComponent() override;
 
 public:
+	virtual void Tick(float DeltaSeconds) override;
+
+public:
 	void ChangeInputContext(EInputContext NewContext);
 	void BindInventoryInput(UInventory* Inventory);
 	void BindDialogueInput(UNPCDialogue* NpcDialogue);
@@ -195,9 +198,8 @@ protected:
 	// --------- Ice Maker ------------------------------
 
 	void BeginIcePreview(const FInputActionValue& InputActionValue);
-	void EndIcePreview(const FInputActionValue& InputActionValue);
-
-
+	void SpawnIcePillar(const FInputActionValue& InputActionValue);
+	
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
 
@@ -212,14 +214,22 @@ public:
 
 	// --------- Supernatural ----------
 protected:
+	// 프리뷰 종료
 	UFUNCTION()
-	void SpawnIcePillar();
-
-	UFUNCTION()
-	void ClearOldestPillar();
+	void EndIcePreview();
 
 	// 매 프레임 업데이트
+	UFUNCTION()
 	void UpdateIcePreview();
+
+	// 충돌 체크
+	UFUNCTION()
+	void CheckCollision();
+
+	// 수면 체크
+	UFUNCTION()
+	void CheckSurface();
+
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
@@ -236,8 +246,9 @@ protected:
 
 
 private:
-	TArray<TWeakObjectPtr<AIcePillar>> IceList;
-	uint64 MaxIceCount = 3; // 한 번에 만들 수 있는 얼음 기둥 개수
-
 	bool bQPressed = false;
+	bool bCanSpawn = false;
+	bool bHitResult = false;
+
+	FHitResult Hit;
 };

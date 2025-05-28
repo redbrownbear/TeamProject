@@ -34,6 +34,10 @@ APC_InGame::APC_InGame()
 	PlayerCameraManagerClass = ACM_InGame::StaticClass();
 
 
+	{
+		IcePillarClass = AIcePillar::StaticClass();
+		IcePreviewClass = AIcePreview::StaticClass();
+	}
 }
 
 void APC_InGame::BeginPlay()
@@ -104,6 +108,28 @@ void APC_InGame::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Build,
 		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);
+}
+
+void APC_InGame::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (bQPressed)
+	{
+		if (!IcePreviewActor && IcePreviewClass)
+		{
+			IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
+			if (IcePreviewActor)
+			{
+				IcePreviewActor->SetActorEnableCollision(false);
+			}
+		}
+
+		if (IcePreviewActor)
+		{
+			UpdateIcePreview();
+		}
+	}
 }
 
 void APC_InGame::ChangeInputContext(EInputContext NewContext)
@@ -402,97 +428,96 @@ void APC_InGame::ShowDialogueUI()
 
 }
 
-void APC_InGame::SpawnIcePillar()
+void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
 {
 	if (!IcePillarClass) return;
 
 	if (!bQPressed) return;
-	
-	FVector Start, Dir;
-	DeprojectMousePositionToWorld(Start, Dir);
-
-	FVector End = Start + Dir * TraceDistance;
-
-	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
 
 	// 수면 체크: 지형 위라면 충돌, 월드 정적에 한정
-	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
-	{
-		FVector SpawnLoc = Hit.Location;
+	CheckSurface();
 
-		// 최대 개수 초과 시 제거
-		if (IceList.Num() >= MaxIceCount)
-		{
-			ClearOldestPillar();
-		}
+	if (!bCanSpawn) return;
 
-		AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass, SpawnLoc, FRotator::ZeroRotator);
-		if (NewPillar)
-		{
-			IceList.Add(NewPillar);
-		}
-	}
-}
+	EndIcePreview();
 
-void APC_InGame::ClearOldestPillar()
-{
-	if (IceList.Num() == 0) return;
+	FVector SpawnLoc = Hit.Location;
 
-	if (IceList[0].IsValid())
-	{
-		IceList[0]->Destroy();
-	}
+	AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass, SpawnLoc, FRotator::ZeroRotator);
 
-	IceList.RemoveAt(0);;
+	bQPressed = false;
+	bShowMouseCursor = false;
 }
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 {
-	bQPressed = true; 
-
-	if (!IcePreviewActor && IcePreviewClass)
-	{
-		IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
-		if (IcePreviewActor)
-		{
-			IcePreviewActor->SetActorEnableCollision(false);
-		}
-	}
+	bQPressed = true;
+	bShowMouseCursor = true;
 
 }
 
-void APC_InGame::EndIcePreview(const FInputActionValue& InputActionValue)
+void APC_InGame::EndIcePreview()
 {
-	bQPressed = false;
-
 	if (IcePreviewClass)
 	{
 		IcePreviewActor->Destroy();
 		IcePreviewActor = nullptr;
 	}
-
-	SpawnIcePillar();
 }
 
 void APC_InGame::UpdateIcePreview()
 {
-	if (!IcePreviewClass) return;
+	if (!IcePreviewActor) return;
 
+	CheckCollision();
+
+	if (bHitResult)
+	{
+		IcePreviewActor->SetActorLocation(Hit.Location);
+		IcePreviewActor->SetActorHiddenInGame(false); // 보이도록
+	}
+	else
+	{
+		// 히트 실패 시에도 미리 보이도록 하려면 화면상에 위치 고정
+		IcePreviewActor->SetActorHiddenInGame(true); // 일시적으로 숨김 
+	}
+}
+
+void APC_InGame::CheckCollision()
+{
 	FVector Start, Dir;
 	DeprojectMousePositionToWorld(Start, Dir);
 	FVector End = Start + Dir * TraceDistance;
 
-	FHitResult Hit;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 
-	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
-	{
-		FVector HitLoc = Hit.Location;
-		IcePreviewActor->SetActorLocation(HitLoc);
-	}
+	bHitResult = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
 }
 
+void APC_InGame::CheckSurface()
+{
+	CheckCollision();
+
+	if (bHitResult)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor) return;
+
+#if WITH_EDITOR
+		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
+#else
+		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
+#endif
+
+		if (!ActorName.StartsWith(TEXT("Surface")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("IcePillar cannot be spawned. Hit Actor is not a Surface."));
+
+			return;
+		}
+
+		bCanSpawn = true;
+	}
+}
 

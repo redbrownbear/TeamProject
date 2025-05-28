@@ -28,6 +28,13 @@ AIcePillar::AIcePillar()
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> PillarMesh(TEXT("/Game/Resources/Map/Dungeon/DgnObj_Ice.DgnObj_Ice"));
 	StaticMeshComponent->SetStaticMesh(PillarMesh.Object);
+
+
+	MaterialInterface = StaticMeshComponent->GetMaterial(0);
+	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+	StaticMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+	DynamicMaterialInstance->SetScalarParameterValue("Alpha", 1.0f);
+
 }
 
 // Called when the game starts or when spawned
@@ -43,13 +50,12 @@ void AIcePillar::BeginPlay()
 		RiseTimeline->PlayFromStart();
 	}
 
-	// 일정 시간 후 자동 파괴
-	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
-		{
-			FTimerHandle Handle;
-			GetWorld()->GetTimerManager().SetTimer(Handle, this, &AIcePillar::DestroyPillar, LifeTime, false);
-		});
-
+	//// 일정 시간 후 자동 파괴
+	//GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+	//	{
+	//		FTimerHandle Handle;
+	//		GetWorld()->GetTimerManager().SetTimer(Handle, this, &AIcePillar::DestroyPillar, LifeTime, false);
+	//	});
 
 }
 

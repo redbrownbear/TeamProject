@@ -59,5 +59,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Cryonis")
 	TObjectPtr<UNiagaraSystem> BreakEffect;
 
-
+protected:
+	UMaterialInterface* MaterialInterface;
+	UMaterialInstanceDynamic* DynamicMaterialInstance;
 };
