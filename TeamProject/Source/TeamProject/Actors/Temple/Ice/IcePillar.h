@@ -28,10 +28,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-protected:
+public:
 	// ÆÄ±« Ã³¸®
 	UFUNCTION()
 	void DestroyPillar(); 
+
+	void SetRiseDirection(FVector InDirection);
+	void SetPivotLocation(FVector InPosition);
+	void SetCanSpawn(bool bFlag) { bCanSpawn = bFlag; }
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -54,5 +58,8 @@ private:
 	FVector StartLocation;
 	float CurrentRise = 0.f;
 	bool bIsRising = true;
+	bool bCanSpawn = false;
 
+	FVector RiseDirection;
+	FVector PivotLocation;
 };

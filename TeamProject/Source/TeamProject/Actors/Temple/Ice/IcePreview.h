@@ -14,12 +14,8 @@ class TEAMPROJECT_API AIcePreview : public AActor
 public:
     AIcePreview();
 
-    void StartPreview();
-    void StopPreview();
-
 public:
     UMaterialInstanceDynamic* GetMaterialInstance() { return DynamicMaterialInstance; }
-    void SetMaterialInstance(UMaterialInstanceDynamic* InMaterialInstance) { DynamicMaterialInstance = InMaterialInstance; }
 
 protected:
     virtual void BeginPlay() override;
@@ -29,17 +25,27 @@ protected:
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
-private:
-    float RiseSpeed = 3.f;            // 1초에 올라갈 속도 (cm/sec)
-    float RiseDistance = 250.f;         // 총 올라갈 거리
+protected:
+    UPROPERTY(EditAnywhere, Category = "Cryonis")
+    float MaxSpeed = 150.f;            // 1초에 올라갈 속도 (cm/sec)
 
-    FVector StartLocation;
-    FVector TargetLocation;
-    float CurrentRise = 0.f;
-    bool bIsRising = false;
-    
+    UPROPERTY(EditAnywhere, Category = "Cryonis")
+    float MaxHeight = 300.0f;         // 총 올라갈 거리
+
 protected:
     UMaterialInterface* MaterialInterface;
     UMaterialInstanceDynamic* DynamicMaterialInstance;
 
+private:
+    FVector StartLocation;
+    float CurrentRise = 0.f;
+    bool bIsRising = false;
+    bool bCanSpawn = false;
+
+    FVector RiseDirection;
+    FVector PivotLocation;
+public:
+    void SetRiseDirection(FVector InDirection);
+    void SetPivotLocation(FVector InPosition);
+    void SetCanSpawn(bool bFlag) { bCanSpawn = bFlag; }
 };

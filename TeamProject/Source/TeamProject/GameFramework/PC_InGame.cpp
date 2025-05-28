@@ -49,6 +49,16 @@ void APC_InGame::BeginPlay()
 		UIManager->PostWorldInitialize();
 
 	ChangeInputContext(EInputContext::IC_InGame);
+
+	if (!IcePreviewActor && IcePreviewClass)
+	{
+		IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
+		if (IcePreviewActor)
+		{
+			IcePreviewActor->SetActorEnableCollision(false);
+		}
+	}
+
 }
 
 void APC_InGame::SetupInputComponent()
@@ -107,7 +117,7 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Build,
-		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);		
+		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);	
 }
 
 void APC_InGame::Tick(float DeltaSeconds)
@@ -116,15 +126,6 @@ void APC_InGame::Tick(float DeltaSeconds)
 
 	if (bQPressed)
 	{
-		if (!IcePreviewActor && IcePreviewClass)
-		{
-			IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
-			if (IcePreviewActor)
-			{
-				IcePreviewActor->SetActorEnableCollision(false);
-			}
-		}
-
 		if (IcePreviewActor)
 		{
 			UpdateIcePreview();
@@ -444,40 +445,31 @@ void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
 	FVector SpawnLoc = Hit.Location;
 	FVector Normal = Hit.Normal;
 
-	// 표면 기울기 따라서 얼음 생성되게
-	FRotator SpawnRot = FRotationMatrix::MakeFromZ(Normal).Rotator();
+	AIcePillar* IcePillarActor = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass);
 
-	AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(
-		IcePillarClass,
-		SpawnLoc,
-		SpawnRot
-	);	
+	// 호출 순서 중요
+	IcePillarActor->SetRiseDirection(Hit.Normal);
+	IcePillarActor->SetPivotLocation(Hit.Location);
+
+	// 노멀 방향 회전 적용
+	FRotator SpawnRot = FRotationMatrix::MakeFromZ(Hit.Normal).Rotator();
+	IcePillarActor->SetActorRotation(SpawnRot);
+	IcePillarActor->SetActorHiddenInGame(false); // 보이도록	
 
 	bCanSpawn = false;
 
 }
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
-{
-	if (!IcePreviewActor)
-	{
-		bQPressed = true;
-	}
-	else
-	{
-		EndIcePreview();
-		bQPressed = false;
-	}
+{	
+	bQPressed = true;
+
 }
 
 void APC_InGame::EndIcePreview()
 {
-	if (IcePreviewClass && IcePreviewActor)
-	{
-		IcePreviewActor->StopPreview();
-		IcePreviewActor->Destroy();
-		IcePreviewActor = nullptr;
-	}
+	bQPressed = false;
+
 }
 
 void APC_InGame::UpdateIcePreview()
@@ -488,15 +480,14 @@ void APC_InGame::UpdateIcePreview()
 
 	if (bHitResult)
 	{
-		IcePreviewActor->SetActorLocation(Hit.Location);
+		IcePreviewActor->SetPivotLocation(Hit.Location);
 
 		// 노멀 방향 회전 적용
 		FRotator PreviewRot = FRotationMatrix::MakeFromZ(Hit.Normal).Rotator();
 		IcePreviewActor->SetActorRotation(PreviewRot);
+		IcePreviewActor->SetActorHiddenInGame(false); // 보이도록	
 
-		IcePreviewActor->SetActorHiddenInGame(false); // 보이도록
-
-		IcePreviewActor->StartPreview();
+		IcePreviewActor->SetRiseDirection(Hit.Normal);
 	}
 	else
 	{
@@ -536,6 +527,7 @@ void APC_InGame::CheckSurface()
 		if (!ActorName.StartsWith(TEXT("Surface")))
 		{
 			bCanSpawn = false;
+			IcePreviewActor->SetCanSpawn(bCanSpawn);
 			if (IcePreviewActor)
 			{
 				IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", 1.0f);
@@ -549,6 +541,7 @@ void APC_InGame::CheckSurface()
 		}
 
 		bCanSpawn = true;
+		IcePreviewActor->SetCanSpawn(bCanSpawn);
 	}
 }
 

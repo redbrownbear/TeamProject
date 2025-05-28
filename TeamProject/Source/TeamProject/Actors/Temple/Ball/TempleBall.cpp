@@ -16,8 +16,11 @@ ATempleBall::ATempleBall()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
-	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Script/Engine.StaticMesh'/Game/Temple/Ball/DgnObj_AncientBallL_01.DgnObj_AncientBallL_01'"));
-	PhysicalMaterial = PhysMaterial.Object;
+	/*static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/Ball/DgnObj_AncientBallL_01.DgnObj_AncientBallL_01"));
+	PhysicalMaterial = PhysMaterial.Object;*/
+
+	/*static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> BallMesh(TEXT("/Game/Temple/Ball/DgnObj_AncientBallL_01.DgnObj_AncientBallL_01"));
+	StaticMeshComponent->SetStaticMesh(BallMesh.Object);*/
 
 }
 

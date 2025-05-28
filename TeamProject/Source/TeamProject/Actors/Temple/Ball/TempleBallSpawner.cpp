@@ -9,6 +9,8 @@ ATempleBallSpawner::ATempleBallSpawner()
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+
+	BallClass = ATempleBall::StaticClass();
 }
 
 // Called when the game starts or when spawned
