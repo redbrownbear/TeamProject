@@ -43,7 +43,32 @@ namespace Monster_SocketName
     static inline FName Pod_Melee = TEXT("Pod_Melee");
     static inline FName Pod_Bow = TEXT("Pod_Bow");
     static inline FName Chin = TEXT("Chin");
+    static inline FName Center_1 = TEXT("Center_1");
+    static inline FName Center_2 = TEXT("Center_2");
+    static inline FName Leg_1_R = TEXT("Leg_1_R");
+    static inline FName Leg_2_R = TEXT("Leg_2_R");
+    static inline FName Leg_1_L = TEXT("Leg_1_L");
+    static inline FName Leg_2_L = TEXT("Leg_2_L");
+    static inline FName Toe_R = TEXT("Toe_R");
+    static inline FName Toe_L = TEXT("Toe_L");
+    static inline FName EyeBall = TEXT("EyeBall");
 }
+
+enum class EAdditionalCollider : uint8
+{
+    Chin = 0,
+    Center_1,
+    Center_2,
+    Leg_1_R,
+    Leg_2_R,
+    Leg_1_L,
+    Leg_2_L,
+    Toe_R,
+    Toe_L,
+    Eye_Ball,
+    End
+};
+
 
 
 

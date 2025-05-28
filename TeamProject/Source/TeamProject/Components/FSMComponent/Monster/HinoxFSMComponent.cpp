@@ -53,7 +53,6 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 	if (!CharacterMonster)
 	{
 		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::ChangeState // No CharacterMonster"));
-		check(false);
 		return;
 	}
 

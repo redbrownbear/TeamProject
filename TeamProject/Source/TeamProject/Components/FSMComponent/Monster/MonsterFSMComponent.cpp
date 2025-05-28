@@ -39,8 +39,8 @@ void UMonsterFSMComponent::BeginPlay()
 		ChangeState(EMonsterState::Idle);
 		break;
 	case EMonsterGroupType::Alone:
-		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::BeginPlay // No GroupType"));
-		check(false);
+		//UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::BeginPlay // No GroupType"));
+		//check(false);
 		break;
 	case EMonsterGroupType::End:
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::BeginPlay // No GroupType"));

@@ -36,6 +36,8 @@ protected:
     TObjectPtr<APatrolPath> PatrolPath;
     UPROPERTY(EditAnywhere)
     TObjectPtr<ACampFire> CampFire;
+    UPROPERTY(EditAnywhere)
+    TArray<USphereComponent*> AdditionalColliders;
 
 protected:
     UPROPERTY(EditAnywhere, meta = (RowType = "MonsterTableRow"))
@@ -85,7 +87,9 @@ public:
 
 
 protected:
+    UFUNCTION()
     virtual void OnDie() override;
+    UFUNCTION()
     virtual void OnDeadEnd() override;
 
 };
