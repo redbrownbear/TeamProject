@@ -25,14 +25,14 @@ bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
 	FVector OwnerForwardVector = ComponentOwner->GetActorForwardVector();
 	
 	FVector Start = OwnerLocation;
-	FVector End = OwnerLocation + OwnerForwardVector * 40;
+	FVector End = OwnerLocation + OwnerForwardVector * 50;
 
 	
 
 	FCollisionQueryParams TraceParams;
 	TraceParams.AddIgnoredActor(ComponentOwner);
 
-	return GetWorld()->LineTraceSingleByChannel(
+	bool Returnbool = GetWorld()->LineTraceSingleByChannel(
 		HitResult,
 		Start,
 		End,
@@ -40,8 +40,9 @@ bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
 		TraceParams
 	);
 
+	DrawDebugLine(GetWorld(), Start, End,FColor::Red,false, 2.f);
 
-
+	return Returnbool;
 }
 
 void UPlayerMovementComponent::TrySetMoveClimb()
@@ -49,18 +50,25 @@ void UPlayerMovementComponent::TrySetMoveClimb()
 	FHitResult HitResult;
 	if (ClimbingLineTrace(HitResult))
 	{
-		FRotator Normal_Rot = FRotationMatrix::MakeFromX(HitResult.Normal).Rotator();
+		FRotator Normal_Rot = FRotationMatrix::MakeFromX(HitResult.ImpactNormal).Rotator();
 
 		FRotator Player_Rot = GetOwner()->GetActorRotation();
+
+		FVector SurfaceNormal = HitResult.ImpactNormal;
 
 		Player_Rot.Yaw = Normal_Rot.Yaw + 180.f;
 
 		Player_Rot.Pitch = -Normal_Rot.Pitch;
 
+		FVector SurfacePoint = HitResult.ImpactPoint;
+
+		FVector NewLocation = SurfacePoint + SurfaceNormal * 10;
 
 		bOrientRotationToMovement = false;
 
 		GetOwner()->SetActorRotation(FRotator(Player_Rot));
+
+		GetOwner()->SetActorLocation(NewLocation);
 
 		SetMovementClimb();
 	}
