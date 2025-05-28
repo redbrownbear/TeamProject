@@ -39,8 +39,8 @@ void UMonsterFSMComponent::BeginPlay()
 		ChangeState(EMonsterState::Idle);
 		break;
 	case EMonsterGroupType::Alone:
-		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::BeginPlay // No GroupType"));
-		check(false);
+		//UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::BeginPlay // No GroupType"));
+		//check(false);
 		break;
 	case EMonsterGroupType::End:
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::BeginPlay // No GroupType"));
@@ -201,6 +201,9 @@ void UMonsterFSMComponent::HandleState(float DeltaTime)
 	case EMonsterState::Signal:
 		UpdateSignal(DeltaTime);
 		break;
+	case EMonsterState::Dead:
+		UpdateDying(DeltaTime);
+		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // Unexpected MonsterState"));
 		check(false);
@@ -321,14 +324,17 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 		if (PawnMonster)
 		{
 			PawnMonster->PlayMontage(EMonsterMontage::SIGNAL_START);
+			SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
 		}
 		else if (CharacterMonster)
 		{
 			CharacterMonster->PlayMontage(EMonsterMontage::SIGNAL_START);
 		}
-		SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
 	}
 		break;
+	case EMonsterState::Dead:
+		break;
+
 	default:
 		break;
 	}
@@ -482,7 +488,7 @@ void UMonsterFSMComponent::UpdatePatrol(float DeltaTime)
 	// 다음 PatrolIndex 구하기
 	AActor* TempActor = CharacterMonster ? Cast<AActor>(CharacterMonster) : Cast<AActor>(PawnMonster);
 
-	const bool bIsNear = FVector::PointsAreNear(TempActor->GetActorLocation(), Location, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(TempActor->GetActorLocation(), Location, MONSTER_DEFAULT_NEAR_DISTANCE);
 
 	if (bIsNear)
 	{
@@ -605,7 +611,7 @@ void UMonsterFSMComponent::UpdateFindWeapon(float DeltaTime)
 			MoveToLocation(WeaponLocation);
 		}
 
-		const bool bIsNear = FVector::PointsAreNear(MonsterLocation, WeaponLocation, 150.f);
+		const bool bIsNear = FVector::PointsAreNear(MonsterLocation, WeaponLocation, MONSTER_DEFAULT_NEAR_DISTANCE);
 
 		if (bIsNear)
 		{
@@ -661,7 +667,7 @@ void UMonsterFSMComponent::UpdateCombat(float DeltaTime)
 
 
 	// Check if it's arrived
-	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, Location, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, Location, MONSTER_DEFAULT_NEAR_DISTANCE);
 
 	if (bIsNear) this->StopMove();
 
@@ -797,6 +803,11 @@ void UMonsterFSMComponent::UpdateAimingBow(float DeltaTime)
 			CharacterMonster->PlayMontage(EMonsterMontage::BOW_END);
 		}
 	}
+}
+
+void UMonsterFSMComponent::UpdateDying(float DeltaTime)
+{
+	this->StopMove();
 }
 
 void UMonsterFSMComponent::MoveToLocation(const FVector& InLocation)

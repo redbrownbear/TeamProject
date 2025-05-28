@@ -157,13 +157,47 @@ public: // Animation
 	UAnimMontage* Gear_3_Left = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* Gear_3_Right = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Dead = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Foot = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* HandClap = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* HipDrop = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* LeftHand = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Damage_Eye_Start = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Damage_Eye_End = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Damage_Foot_L = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Damage_Foot_R = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Run = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Run_Curve_R = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Run_Curve_L = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Sleep_Start = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Sleep_End = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Throw_Stone_Start = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* Throw_Stone_End = nullptr;
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Monster|AI")
 	TSubclassOf<AMonsterAIController> AIControllerClass;
 
 public:
-	UPROPERTY(EditAnywhere, Category = "NiagaraEffect", meta = (RowType = "NiagaraEffectTableRow"))
+	UPROPERTY(EditAnywhere, Category = "Effect", meta = (RowType = "ParticleEffectTableRow"))
+	FDataTableRowHandle ParticleEffectTableRowHandle;
+	UPROPERTY(EditAnywhere, Category = "Effect", meta = (RowType = "NiagaraEffectTableRow"))
 	FDataTableRowHandle NiagaraEffectTableRowHandle;
 
 public:

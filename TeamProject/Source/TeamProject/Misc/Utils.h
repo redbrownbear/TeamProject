@@ -30,12 +30,17 @@ namespace ProjectileName
     static inline FName Monster_LynelExplosion = TEXT("Monster_LynelExplosion");
     static inline FName Monster_LynelFire = TEXT("Monster_LynelFire");
     static inline FName Monster_LynelArrow = TEXT("Monster_LynelArrow");
+    static inline FName Monster_HinoxAttack = TEXT("Monster_HinoxAttack");
+    static inline FName Monster_HinoxGrab = TEXT("Monster_HinoxGrab");
+    static inline FName Monster_HinoxStone = TEXT("Monster_HinoxStone");
+    static inline FName Monster_HinoxLink = TEXT("Monster_HinoxLink");
+    static inline FName Monster_HinoxHipDrop = TEXT("Monster_HinoxHipDrop");
 }
 
 namespace Monster_SocketName
 {
-    static inline FName Weapon_R = TEXT("Weapon_Right");
-    static inline FName Weapon_L = TEXT("Weapon_Light");
+    static inline FName Weapon_R = TEXT("Weapon_R");
+    static inline FName Weapon_L = TEXT("Weapon_L");
     static inline FName Pod_A = TEXT("Pod_A");
     static inline FName Pod_B = TEXT("Pod_B");
     static inline FName Pod_C = TEXT("Pod_C");
@@ -43,7 +48,38 @@ namespace Monster_SocketName
     static inline FName Pod_Melee = TEXT("Pod_Melee");
     static inline FName Pod_Bow = TEXT("Pod_Bow");
     static inline FName Chin = TEXT("Chin");
+    static inline FName Center_1 = TEXT("Center_1");
+    static inline FName Center_2 = TEXT("Center_2");
+    static inline FName Leg_1_R = TEXT("Leg_1_R");
+    static inline FName Leg_2_R = TEXT("Leg_2_R");
+    static inline FName Leg_1_L = TEXT("Leg_1_L");
+    static inline FName Leg_2_L = TEXT("Leg_2_L");
+    static inline FName Toe_R = TEXT("Toe_R");
+    static inline FName Toe_L = TEXT("Toe_L");
+    static inline FName EyeBall = TEXT("EyeBall");
 }
+
+enum class EAdditionalCollider : uint8
+{
+    Chin = 0,
+    Center_1,
+    Center_2,
+    Leg_1_R,
+    Leg_2_R,
+    Leg_1_L,
+    Leg_2_L,
+    Toe_R,
+    Toe_L,
+    Eye_Ball,
+    End
+};
+
+namespace ThrownObject
+{
+    static inline FName HinoxRock = TEXT("HinoxRock");
+    static inline FName SmallRock = TEXT("SmallRock");
+}
+
 
 
 
@@ -82,6 +118,7 @@ enum class EMonsterState : uint8
     Rodeo,
     Stun,
     ReadyToAttack,
+    Damage_Eye,
     Temp,
     End,
 };
@@ -148,11 +185,30 @@ enum class EMonsterMontage : uint8
     GEAR_3_FORWARD,
     GEAR_3_LEFT,
     GEAR_3_RIGHT,
+    DEAD,
+    FOOT,
+	HANDCLAP,
+	HIPDROP,
+    LEFTHAND,
+	DAMAGE_EYE_START,
+	DAMAGE_EYE_END,
+    DAMAGE_FOOT_L,
+	DAMAGE_FOOT_R,
+    RUN,
+    RUN_CURVE_R,
+	RUN_CURVE_L,
+	SLEEP_START,
+	SLEEP_END,
+	THROW_STONE_START,
+	THROW_STONE_END,
+
+
+
     END,
 };
 
 UENUM()
-enum class ECombatIndex : uint8
+enum class ELynelCombatIndex : uint8
 {
     AimingBow = 0, 
     HornAttack, 
@@ -163,6 +219,18 @@ enum class ECombatIndex : uint8
     AimingBowUpper, 
     End
 };
+
+UENUM()
+enum class EHinoxCombatIndex : uint8
+{
+    Foot = 0,
+    HandClap,
+    LeftHand,
+    Hipdrop,
+    ThrowStone,
+    End
+};
+
 
 UENUM()
 enum class EReadyToAttackStep : uint8

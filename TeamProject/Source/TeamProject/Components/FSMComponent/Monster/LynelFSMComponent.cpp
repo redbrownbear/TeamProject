@@ -192,26 +192,26 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		// To show Combat Pattern in order
 		switch (eCombatIndex)
 		{
-		case ECombatIndex::AimingBow: 
-			eCombatIndex = ECombatIndex::DashAttack;
+		case ELynelCombatIndex::AimingBow: 
+			eCombatIndex = ELynelCombatIndex::DashAttack;
 			break;
-		case ECombatIndex::DashAttack:
-			eCombatIndex = ECombatIndex::ExplosionAttack;
+		case ELynelCombatIndex::DashAttack:
+			eCombatIndex = ELynelCombatIndex::ExplosionAttack;
 			break;
-		case ECombatIndex::ExplosionAttack:
-			eCombatIndex = ECombatIndex::FireAttack;
+		case ELynelCombatIndex::ExplosionAttack:
+			eCombatIndex = ELynelCombatIndex::FireAttack;
 			break;
-		case ECombatIndex::FireAttack:
-			eCombatIndex = ECombatIndex::AimingBowUpper;
+		case ELynelCombatIndex::FireAttack:
+			eCombatIndex = ELynelCombatIndex::AimingBowUpper;
 			break;
-		case ECombatIndex::AimingBowUpper:
-			eCombatIndex = ECombatIndex::HornAttack;
+		case ELynelCombatIndex::AimingBowUpper:
+			eCombatIndex = ELynelCombatIndex::HornAttack;
 			break;
-		case ECombatIndex::HornAttack:
-			eCombatIndex = ECombatIndex::RunningAttack;
+		case ELynelCombatIndex::HornAttack:
+			eCombatIndex = ELynelCombatIndex::RunningAttack;
 			break;
-		case ECombatIndex::RunningAttack:
-			eCombatIndex = ECombatIndex::AimingBow;
+		case ELynelCombatIndex::RunningAttack:
+			eCombatIndex = ELynelCombatIndex::AimingBow;
 			break;
 		}
 		break;
@@ -652,28 +652,28 @@ void ULynelFSMComponent::UpdateCombat(float DeltaTime)
 
 	switch (eCombatIndex)
 	{
-	case ECombatIndex::AimingBow:
+	case ELynelCombatIndex::AimingBow:
 		ChangeState(EMonsterState::AimingBow);
 		return;
-	case ECombatIndex::DashAttack:
+	case ELynelCombatIndex::DashAttack:
 		ChangeState(EMonsterState::DashAttack);
 		return;
-	case ECombatIndex::ExplosionAttack:
+	case ELynelCombatIndex::ExplosionAttack:
 		ChangeState(EMonsterState::ExplosionAttack);
 		return;
-	case ECombatIndex::FireAttack:
+	case ELynelCombatIndex::FireAttack:
 		ChangeState(EMonsterState::FireAttack);
 		return;
-	case ECombatIndex::AimingBowUpper:
+	case ELynelCombatIndex::AimingBowUpper:
 		ChangeState(EMonsterState::AimingBowUpper);
 		return;
-	case ECombatIndex::HornAttack:
+	case ELynelCombatIndex::HornAttack:
 		ChangeState(EMonsterState::HornAttack);
 		return;
-	case ECombatIndex::RunningAttack:
+	case ELynelCombatIndex::RunningAttack:
 		ChangeState(EMonsterState::RunningAttack);
 		return;
-	case ECombatIndex::End:
+	case ELynelCombatIndex::End:
 		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::UpdateCombat // Unexpected CombatIndex"));
 		check(false);
 	default:
@@ -748,7 +748,7 @@ void ULynelFSMComponent::UpdateDashAttack(float DeltaTime)
 	}
 
 
-	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, PlayerLocation, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, PlayerLocation, MONSTER_DEFAULT_NEAR_DISTANCE);
 
 	if (bIsNear)
 	{
@@ -843,7 +843,7 @@ void ULynelFSMComponent::UpdateHornAttack(float DeltaTime)
 		//}
 	}
 
-	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, PlayerLocation, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, PlayerLocation, MONSTER_DEFAULT_NEAR_DISTANCE);
 
 	if (bIsNear)
 	{
@@ -880,7 +880,7 @@ void ULynelFSMComponent::UpdateRunningAttack(float DeltaTime)
 
 	MoveToLocation(TargetLocation);
 
-	const bool bIsNear = FVector::PointsAreNear(PlayerLocation, MonsterLocation, 150.f);
+	const bool bIsNear = FVector::PointsAreNear(PlayerLocation, MonsterLocation, MONSTER_DEFAULT_NEAR_DISTANCE);
 
 	if (bIsNear)
 	{
