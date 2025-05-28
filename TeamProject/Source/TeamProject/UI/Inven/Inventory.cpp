@@ -31,7 +31,7 @@ void UInventory::ShowUI()
         InputMode.SetHideCursorDuringCapture(false);
 
         PC_InGame->SetInputMode(InputMode);
-        PC_InGame->BindInventoryInput(this);
+        PC_InGame->BindInventoryInput();
     }
 
     BindDelegates();

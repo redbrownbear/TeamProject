@@ -13,7 +13,7 @@
 
 #include "ShopScroll.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHighlightChanged, int32, HighlightedIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShopHighlightChanged, int32, HighlightedIndex);
 
 /**
  * 
@@ -40,7 +40,7 @@ public:
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnHighlightChanged OnHighlightChanged;
+	FOnShopHighlightChanged OnShopHighlightChanged;
 
 private:
 	int32 CurrentIndex = 0;
