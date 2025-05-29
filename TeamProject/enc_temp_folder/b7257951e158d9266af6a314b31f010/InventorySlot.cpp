@@ -19,25 +19,18 @@ void UInventorySlot::SetItemData(const FItemData& Item)
         Icon->SetBrushFromTexture(LoadedTexture);
     }
 
-    Value->SetVisibility(ESlateVisibility::Visible);
-    Amount->SetVisibility(ESlateVisibility::Visible);
-
-    switch (Item.eItemCategory)
+    switch (ItemData.eItemCategory)
     {
     case EItemCategory::IT_Weapon:
         Value->SetText(FText::FromString(FString::FromInt(Item.Damage)));
         Amount->SetVisibility(ESlateVisibility::Hidden);
         break;
-    case EItemCategory::IT_Arrow:  
-        if (Item.bIsArrow)
+    case EItemCategory::IT_Arrow:
+        Value->SetText(FText::FromString(FString::FromInt(Item.Damage)));
+        Amount->SetVisibility(ESlateVisibility::Hidden);
+        if (ItemData.bIsArrow)
         {
-            Value->SetVisibility(ESlateVisibility::Hidden);
-            Amount->SetText(FText::FromString(FString::Printf(TEXT("X %d"), Item.ItemCount)));
-        }
-        else
-        {
-            Amount->SetVisibility(ESlateVisibility::Hidden);
-            Value->SetText(FText::FromString(FString::FromInt(Item.Damage)));
+            Amount->SetText(FText::FromString(FString::FromInt(1)));
         }
         break;
     case EItemCategory::IT_Shield:
@@ -50,7 +43,7 @@ void UInventorySlot::SetItemData(const FItemData& Item)
         break;
     case EItemCategory::IT_Material:
         Value->SetVisibility(ESlateVisibility::Hidden);
-        Amount->SetText(FText::FromString(FString::Printf(TEXT("X %d"), Item.ItemCount)));
+        Amount->SetText(FText::FromString(FString::FromInt(1)));
         break;
     case EItemCategory::IT_Food:
         Value->SetVisibility(ESlateVisibility::Hidden);

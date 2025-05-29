@@ -128,30 +128,8 @@ void UInventoryScroll::SetSort(EItemCategory Type)
     UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
     check(InvenManager);
     
-    TArray<FItemData> TempItems = InvenManager->GetAllItemData();
-
-    TArray<FItemData> Items;
-    for (FItemData Item : TempItems)
-    {
-        if ((Item.eItemCategory == EItemCategory::IT_Arrow && Item.bIsArrow) || Item.eItemCategory == EItemCategory::IT_Material)
-        {
-            // 이미 동일한 ItemCode가 있는지 확인
-            FItemData* Found = Items.FindByPredicate([&](const FItemData& Other) {
-                return Other.ItemID == Item.ItemID;
-                });
-
-            if (Found)
-                Found->ItemCount += Item.ItemCount;
-            
-            else
-                Items.Add(Item);
-            
-        }
-
-        else
-            Items.Add(Item);
-    }
-
+    TArray<FItemData> Items = InvenManager->GetAllItemData();
+    
     if (Items.IsEmpty())
         return;
 
