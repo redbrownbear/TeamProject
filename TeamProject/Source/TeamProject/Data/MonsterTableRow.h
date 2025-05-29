@@ -78,6 +78,8 @@ public: // Animation
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* SignalEndMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* SearchMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* APPEAR = nullptr;
     UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* BOW_UPPER_START = nullptr;

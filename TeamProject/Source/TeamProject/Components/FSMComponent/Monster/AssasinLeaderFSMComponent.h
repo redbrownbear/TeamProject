@@ -4,35 +4,36 @@
 
 #include "CoreMinimal.h"
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
-#include "Misc/Utils.h"
-#include "HinoxFSMComponent.generated.h"
+#include "AssasinLeaderFSMComponent.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TEAMPROJECT_API UHinoxFSMComponent : public UMonsterFSMComponent
+class TEAMPROJECT_API UAssasinLeaderFSMComponent : public UMonsterFSMComponent
 {
 	GENERATED_BODY()
 public:
-	UHinoxFSMComponent();
+	UAssasinLeaderFSMComponent();
 
 protected:
 	virtual void HandleState(float DeltaTime) override;
+
 public:
 	virtual void ChangeState(EMonsterState NewState) override;
 
 protected:
-	EHinoxCombatIndex eCombatIndex = EHinoxCombatIndex::Foot;
-	float DamageEyeElapsedTime = 0.f;
+	virtual void UpdateIdle(float DeltaTime) override;
+	virtual void UpdatePatrol(float DeltaTime) override;
+	virtual void UpdateAlert(float DeltaTime) override;
+	virtual void UpdateSignal(float DeltaTime) override;
+
+	virtual void UpdateCombat(float DeltaTime) override;
+	virtual void UpdateSuspicious(float DeltaTime) override;
+
+	virtual void UpdateHappy(float DeltaTime);
 
 protected:
-	virtual void UpdateIdle(float DeltaTime) override;
-	virtual void UpdateAlert(float DeltaTime) override;
-	virtual void UpdateCombat(float DeltaTime) override;
-	virtual void UpdateDamageEye(float DeltaTime);
-	virtual void UpdateTemp(float DeltaTime);
-
-public:
-	void UpdateCombatIndex();
+	float AttackCoolTime = 0.f;
+	float AttackBigCoolTime = 0.f;
 };

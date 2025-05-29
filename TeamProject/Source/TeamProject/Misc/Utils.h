@@ -36,12 +36,16 @@ namespace ProjectileName
     static inline FName Monster_HinoxStone = TEXT("Monster_HinoxStone");
     static inline FName Monster_HinoxLink = TEXT("Monster_HinoxLink");
     static inline FName Monster_HinoxHipDrop = TEXT("Monster_HinoxHipDrop");
+    static inline FName Monster_AL_Attack = TEXT("Monster_AL_Attack");
+    static inline FName Monster_AL_AttackBig = TEXT("Monster_AL_AttackBig");
 }
 
 namespace Monster_SocketName
 {
-    static inline FName Weapon_R = TEXT("Weapon_R");
-    static inline FName Weapon_L = TEXT("Weapon_L");
+    //static inline FName Weapon_R = TEXT("Weapon_R");
+    //static inline FName Weapon_L = TEXT("Weapon_L");
+    static inline FName Weapon_Right = TEXT("Weapon_Right");
+    static inline FName Weapon_Left = TEXT("Weapon_Left");
     static inline FName Pod_A = TEXT("Pod_A");
     static inline FName Pod_B = TEXT("Pod_B");
     static inline FName Pod_C = TEXT("Pod_C");
@@ -120,6 +124,7 @@ enum class EMonsterState : uint8
     Stun,
     ReadyToAttack,
     Damage_Eye,
+    Happy,
     Temp,
     End,
 };

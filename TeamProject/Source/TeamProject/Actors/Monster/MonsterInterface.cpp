@@ -258,6 +258,10 @@ void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 	case EMonsterMontage::THROW_STONE_END:
 		TempAnimMontage = MonsterData->Throw_Stone_End;
 		break;
+	case EMonsterMontage::SEARCH:
+		TempAnimMontage = MonsterData->SearchMontage;
+		break;
+
 	case EMonsterMontage::END:
 	default:
 		check(false);

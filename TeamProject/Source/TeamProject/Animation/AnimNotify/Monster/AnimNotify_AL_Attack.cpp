@@ -1,18 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Animation/AnimNotify/Monster/AnimNotify_HinoxGrab.h"
-#include "Actors/Monster/CharacterMonster.h"
+#include "Animation/AnimNotify/Monster/AnimNotify_AL_Attack.h"
 #include "Actors/Projectile/Projectile.h"
+#include "Actors/Monster/CharacterMonster.h"
+#include "Misc/Utils.h"
 
-void UAnimNotify_HinoxGrab::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+void UAnimNotify_AL_Attack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
-
-	if (MeshComp == nullptr)
-	{
-		return;
-	}
 
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(MeshComp->GetOwner()))
 	{
@@ -22,10 +18,11 @@ void UAnimNotify_HinoxGrab::Notify(USkeletalMeshComponent* MeshComp, UAnimSequen
 			FTransform::Identity, nullptr, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 		FTransform NewTransform;
-		Projectile->SetData(ProjectileName::Monster_HinoxGrab, CollisionProfileName::ToPlayer);
+		Projectile->SetData(ProjectileName::Monster_AL_Attack, CollisionProfileName::ToPlayer);
 
-		const USkeletalMeshComponent* Mesh = Monster->GetMonsterMesh();
-		const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Weapon_Right);
+		//const USkeletalMeshComponent* Mesh = Monster->GetMonsterMesh();
+		//const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Toe_L);
+		const FVector Location = Monster->GetActorLocation();
 		NewTransform.SetLocation(Location);
 
 		Projectile->FinishSpawning(NewTransform);

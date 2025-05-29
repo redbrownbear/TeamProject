@@ -51,6 +51,10 @@
 #define HINOX_DAMAGE_EYE_MAX_TIME													5.f
 #define HINOX_NEAR_INSTANCE															300.f
 
+#define ASSASIN_LEADER_ATTACK_COOLTIME_MAX											3.f
+#define ASSASIN_LEADER_ATTACK_BIG_COOLTIME_MAX										6.f
+#define ASSASIN_LEADER_DISTANCE_MAX													600.f
+
 #define NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS											1000.f
 #define NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS										1500.f
 #define NPC_SIGHT_ANGLE																90.f
