@@ -13,7 +13,18 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 
 	BrakingDecelerationFlying = 10000.f;
 	AirControl = 0.f;
+	MaxFlySpeed = PLAYER_CLIMB_SPEED;
 	
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset{ 
+			TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Move/Climb_Up_Land.Climb_Up_Land'") 
+		};
+
+		if (Asset.Object)
+		{
+			LandUpMontage = Asset.Object;
+		}
+	}
 }
 
 bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
@@ -83,6 +94,66 @@ bool UPlayerMovementComponent::TrySetMoveClimb()
 	return false;
 }
 
+bool UPlayerMovementComponent::CanClimbUpLand()
+{
+
+	AActor* OwnerActor = GetOwner();
+
+	FHitResult HitResult;
+
+	FVector Start = OwnerActor->GetActorLocation();
+
+	FVector CharacterUpVector = OwnerActor->GetActorUpVector();
+
+	FVector UpEnd = Start + CharacterUpVector * PLAYER_CAPSULE_HALF_HEIGHT * 3;
+
+	FVector CharacterForwardVector = OwnerActor->GetActorForwardVector();
+	FVector ForwardEnd = UpEnd + CharacterForwardVector * PLAYER_CAPSULE_RADIUS * 3;
+	FVector DownEnd = ForwardEnd - CharacterUpVector * PLAYER_CAPSULE_HALF_HEIGHT * 2;
+
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(OwnerActor);
+
+	
+	
+	bool CanStand = !GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		UpEnd,
+		ForwardEnd,
+		ECollisionChannel::ECC_Visibility,
+		TraceParams
+	);
+
+	if (CanStand)
+	{
+
+
+		CanStand = GetWorld()->LineTraceSingleByChannel(
+			HitResult,
+			ForwardEnd,
+			DownEnd,
+			ECollisionChannel::ECC_Visibility,
+			TraceParams
+		);
+
+		if (CanStand)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CanStand"));
+
+			
+			Cast<APlayerCharacter>(OwnerActor)->GetMesh()->GetAnimInstance()->Montage_Play(LandUpMontage);
+			
+			SetClimbMode(false);
+
+
+			return true;
+
+
+		}
+	}
+	return false;
+}
+
 void UPlayerMovementComponent::SetClimbMode(bool _bool)
 {
 	
@@ -98,7 +169,7 @@ void UPlayerMovementComponent::SetClimbMode(bool _bool)
 
 	bIsClimbing = _bool;
 
-	MaxFlySpeed = _bool ? 100 : PLAYER_MOVE_NML;
+	AnimInst->bIsClimingLand = false;
 
 	USpringArmComponent* SpringArm = Player_C->GetSpringArm();
 

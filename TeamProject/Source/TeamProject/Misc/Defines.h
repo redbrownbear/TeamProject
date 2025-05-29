@@ -36,8 +36,7 @@
 #define NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS										1000.f
 #define NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS									1500.f
 #define NPC_SIGHT_ANGLE															90.f
-#define PLAYER_MOVE_NML																600.f
-#define	PLAYER_MOVE_BOW_ZOOM														300.f
+
 
 
 #define Arrow_Speed																	800.f
@@ -54,3 +53,12 @@
 #define NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS											1000.f
 #define NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS										1500.f
 #define NPC_SIGHT_ANGLE																90.f
+
+#define PLAYER_MOVE_NML																600.f
+#define	PLAYER_MOVE_BOW_ZOOM														300.f
+#define PLAYER_CLIMB_SPEED															100.f
+#define PLAYER_CAPSULE_HALF_HEIGHT													41.f
+#define PLAYER_CAPSULE_RADIUS														20.f
+
+
+

@@ -65,8 +65,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	}
 	{
 		UCapsuleComponent* CC = GetCapsuleComponent();
-		CC->SetCapsuleRadius(20.f);
-		CC->SetCapsuleHalfHeight(41.f);
+		CC->SetCapsuleRadius(PLAYER_CAPSULE_RADIUS);
+		CC->SetCapsuleHalfHeight(PLAYER_CAPSULE_HALF_HEIGHT);
 
 	}
 

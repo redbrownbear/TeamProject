@@ -250,6 +250,8 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(UpVector, ActionValue.X);
 		ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
 
+		if (Movement->CanClimbUpLand())
+		{ }
 	}
 	
 	// 노말 상태일 때의 캐릭터 무브

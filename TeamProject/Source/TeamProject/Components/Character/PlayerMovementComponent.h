@@ -28,6 +28,8 @@ public:
 	bool TrySetMoveClimb();
 
 
+	bool CanClimbUpLand();
+
 	void SetClimbMode(bool _bool);
 
 
@@ -36,6 +38,9 @@ public:
 private:
 	bool bIsClimbing = false;
 	
+	UPROPERTY()
+
+	UAnimMontage* LandUpMontage;
 
 
 };
