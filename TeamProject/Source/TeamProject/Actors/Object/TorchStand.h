@@ -16,9 +16,11 @@ public:
 	ATorchStand();
 
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> NukiStaticMeshComponent;
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UNiagaraComponent> NiagaraComponent;
 
 protected:

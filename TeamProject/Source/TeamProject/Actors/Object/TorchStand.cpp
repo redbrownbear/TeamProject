@@ -14,23 +14,39 @@ ATorchStand::ATorchStand()
     StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
     RootComponent = StaticMeshComponent;
 
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset
-    { TEXT("/Script/Engine.StaticMesh'/Game/Resources/Map/ETC/FireWood.FireWood'") };
-    if (Asset.Object)
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset0
+    { TEXT("/Script/Engine.StaticMesh'/Game/Resources/Map/AssasinHideout/FldObj_TorchStand_A_01_Root__Mt_TorchStand_A.FldObj_TorchStand_A_01_Root__Mt_TorchStand_A'") };
+    if (Asset0.Object)
     {
-        StaticMeshComponent->SetStaticMesh(Asset.Object);
+        StaticMeshComponent->SetStaticMesh(Asset0.Object);
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("ACampFire::ACampFire // No FireWood StaticMeshAsset"));
+        UE_LOG(LogTemp, Error, TEXT("ATorchStand::ATorchStand // No TorchStand StaticMeshAsset"));
     }
-    StaticMeshComponent->SetRelativeScale3D(FVector(DEFAULT_MESH_SCALE));
 
+
+
+
+    NukiStaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("NukiStaticMeshComponent"));
+
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset1
+    { TEXT("/Script/Engine.StaticMesh'/Game/Resources/Map/AssasinHideout/FldObj_TorchStand_A_01_Root__Mt_TorchStand_A_Nuki.FldObj_TorchStand_A_01_Root__Mt_TorchStand_A_Nuki'") };
+    if (Asset1.Object)
+    {
+        NukiStaticMeshComponent->SetStaticMesh(Asset1.Object);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("ATorchStand::ATorchStand // No TorchStandNuki StaticMeshAsset"));
+    }
+    NukiStaticMeshComponent->SetupAttachment(StaticMeshComponent);
+    NukiStaticMeshComponent->SetRelativeLocation(FVector(0.f, 0.f, -1.f));
 
     NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
 
     static ConstructorHelpers::FObjectFinder<UNiagaraSystem> FireAsset
-    { TEXT("/Script/Niagara.NiagaraSystem'/Game/Vefects/Free_Fire/Shared/Particles/NS_Fire_Floor_01_Simple.NS_Fire_Floor_01_Simple'") };
+    { TEXT("/Script/Niagara.NiagaraSystem'/Game/Vefects/Free_Fire/Shared/Particles/NS_Fire_Small.NS_Fire_Small'") };
 
     if (FireAsset.Object)
     {
@@ -42,6 +58,7 @@ ATorchStand::ATorchStand()
     }
 
     NiagaraComponent->SetupAttachment(RootComponent);
+    NiagaraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 
 }
 
