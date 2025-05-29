@@ -72,13 +72,6 @@ TArray<FShopDataRow> UShopManager::GetShopData(EQuestCharacter QuestChar) const
     return ConstRows;
 }
 
-void UShopManager::ShowUI(EQuestCharacter QuestChar)
-{
-    TArray<FShopDataRow> ShopList = GetShopData(QuestChar);
-
-    UpdateItem(ShopList);
-}
-
 void UShopManager::UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow)
 {
     if (TArray<FShopDataRow>* ShopList = ShopRowMap.Find(QuestChar))
@@ -92,7 +85,6 @@ void UShopManager::UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow 
             }
         }
 
-        //юс╫ц
         UpdateItem(*ShopList);
     }
     else

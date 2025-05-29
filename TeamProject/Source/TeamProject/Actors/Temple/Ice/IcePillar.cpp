@@ -41,6 +41,7 @@ void AIcePillar::BeginPlay()
 	SetActorLocation(StartLocation - FVector(0, 0, MaxHeight));
 	CurrentRise = 0.f;
 	bIsRising = true;
+
 }
 
 // Called every frame
@@ -50,21 +51,16 @@ void AIcePillar::Tick(float DeltaTime)
 
 	if (!bIsRising) return;
 
-	const FVector CurrentLocation = GetActorLocation();
+	float DeltaZ = MaxSpeed * DeltaTime;
+	CurrentRise += DeltaZ;
 
-	// Stop
-
-	const float fDistance = FVector::Dist(CurrentLocation, PivotLocation);
-
-	if (fDistance < MaxHeight)
+	if (CurrentRise >= MaxHeight)
 	{
-		FVector NextLocation = CurrentLocation + RiseDirection * MaxSpeed * DeltaTime;
-		SetActorLocation(NextLocation);
-	}
-	else
-	{
+		DeltaZ -= (CurrentRise - MaxHeight); // 초과 제거
 		bIsRising = false;
 	}
+
+	AddActorWorldOffset(FVector(0, 0, DeltaZ));
 }
 
 void AIcePillar::DestroyPillar()
@@ -77,18 +73,5 @@ void AIcePillar::DestroyPillar()
 	}*/
 
 	Destroy();
-}
-
-void AIcePillar::SetRiseDirection(FVector InDirection)
-{
-	RiseDirection = InDirection;
-}
-
-void AIcePillar::SetPivotLocation(FVector InPosition)
-{
-	PivotLocation = InPosition;
-	const FVector ReverseDirection = RiseDirection * -1;
-	PivotLocation += ReverseDirection * MaxHeight;
-	SetActorLocation(PivotLocation);
 }
 

@@ -24,6 +24,15 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 
 	//LockCharacters(Npc, Player);
 
+	APC_InGame* PC = Cast<APC_InGame>(CurrentPlayer->GetController());
+	check(PC);
+
+	AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD());
+	check(HUD)
+
+		if (PC && HUD)
+			HUD->ShowInteractWidget(false);
+
 	UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 

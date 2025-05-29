@@ -12,8 +12,6 @@ AIcePreview::AIcePreview()
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMesh(TEXT("/Game/Resources/Map/Dungeon/DgnObj_Ice.DgnObj_Ice"));
 	StaticMeshComponent->SetStaticMesh(StaticMesh.Object);
-
-	UE_LOG(LogTemp, Warning, TEXT("IcePreview Construct"));
 }
 
 // Called when the game starts or when spawned
@@ -26,10 +24,6 @@ void AIcePreview::BeginPlay()
 	StaticMeshComponent->SetMaterial(0, DynamicMaterialInstance);
 	DynamicMaterialInstance->SetScalarParameterValue("Alpha", 0.1f);
 
-	StartLocation = GetActorLocation();
-	SetActorLocation(StartLocation - FVector(0, 0, MaxHeight));
-	CurrentRise = 0.f;
-	bIsRising = true;
 }
 
 // Called every frame
@@ -37,60 +31,38 @@ void AIcePreview::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!bIsRising) return;
+	FVector Location = GetActorLocation();
+	UE_LOG(LogTemp, Warning, TEXT("IcePreview Z: %f"), Location.Z);
 
-	//float DeltaZ = MaxSpeed * DeltaTime;
-	//CurrentRise += DeltaZ;
-
-	//if (CurrentRise >= MaxHeight)
-	//{
-	//	AddActorWorldOffset(FVector(0, 0, -MaxHeight));
-	//	CurrentRise = 0;
-	//}
-
-	//AddActorWorldOffset(FVector(0, 0, DeltaZ));
-
-	if (bCanSpawn)
+	if (bIsRising)
 	{
-		const FVector CurrentLocation = GetActorLocation();
-		const FVector ReverseDirection = -1 * RiseDirection;
-		const FVector FirstLocation = PivotLocation + ReverseDirection * MaxHeight;
+		float DeltaZ = RiseSpeed * DeltaTime;
+		CurrentRise += DeltaZ;
 
-		FVector NextLocation = CurrentLocation + RiseDirection * MaxSpeed * DeltaTime;
-		const float fDistance = FVector::Dist(CurrentLocation, FirstLocation);
+		if (CurrentRise >= RiseDistance)
+		{
+			DeltaZ -= (CurrentRise - RiseDistance); // 초과분 제거
+			bIsRising = false;
+		}
 
-		if (fDistance > MaxHeight)
-		{
-			SetActorLocation(FirstLocation);
-		}
-		else
-		{
-			SetActorLocation(NextLocation);
-		}
-	}
-	else
-	{
-		SetActorLocation(PivotLocation);
+		FVector NewLocation = GetActorLocation() + FVector(0.f, 0.f, DeltaZ);
+		SetActorLocation(NewLocation);
 	}
 }
 
-void AIcePreview::SetRiseDirection(FVector InDirection)
+void AIcePreview::StartPreview()
 {
-	RiseDirection = InDirection;
+	if (bIsRising) return; 
 
-	/*const bool bFlag = FMath::IsNearlyZero(InDirection.X);
-	const bool bFlag1 = FMath::IsNearlyZero(InDirection.Y);
-	const bool bFlag2 = FMath::IsNearlyZero(InDirection.Z);*/
-
-	/*if (bFlag && bFlag1 && bFlag2)
-	{
-		int a = 0;
-	}*/
+	StartLocation = GetActorLocation() - FVector(0.f, 0.f, RiseDistance);
+	SetActorLocation(StartLocation);
+	CurrentRise = 0.f;
+	bIsRising = true;
 }
 
-void AIcePreview::SetPivotLocation(FVector InPosition)
+void AIcePreview::StopPreview()
 {
-	PivotLocation = InPosition;
+	bIsRising = false;
 }
 
 
