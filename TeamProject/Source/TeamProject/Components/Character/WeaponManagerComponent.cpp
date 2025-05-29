@@ -397,6 +397,7 @@ void UWeaponManagerComponent::RightClickAction()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Shield is not Valid"));
 			return;
+			check(ShieldActor);
 		}
 
 		ShieldActor->RightClickAction();

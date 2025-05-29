@@ -35,7 +35,7 @@ void UNPCDialogue::ShowUI()
         InputMode.SetHideCursorDuringCapture(false);
 
         PC_InGame->SetInputMode(InputMode);
-        PC_InGame->BindDialogueInput(this);
+        PC_InGame->BindDialogueInput();
     }
 
     BindDelegates();
@@ -127,9 +127,6 @@ void UNPCDialogue::OnConfirm()
 
     if (PC_InGame->Npc->GetData()->DialogType == EDialogType::Shop)
     {	
-        //임시
-		FShopDataRow datarow;
-
         UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
         check(UIManager);
 
@@ -141,9 +138,8 @@ void UNPCDialogue::OnConfirm()
 
         if (UIManager && ShopManager && QuestManager)
         {
-
             UIManager->ShowUI(UShop::StaticClass());
-            ShopManager->UpdateShopData(PC_InGame->Npc->GetData()->QuestCharacter, datarow);
+            ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter);
             QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
 
             bool IsShopping = PC_InGame->Npc->GetShopping();
