@@ -19,8 +19,11 @@ class TEAMPROJECT_API UInventoryManager : public UGameInstanceSubsystem
 	GENERATED_BODY()
 	
 public:
+	//테스트코드
 	void AddItem(FItemData Itemdata);
 
+public:
+	const TArray<FItemData>& GetAllItemData() const { return Items; }
 
 public:
 	UPROPERTY(BlueprintAssignable)

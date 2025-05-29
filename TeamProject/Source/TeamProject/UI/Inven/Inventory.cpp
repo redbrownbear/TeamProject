@@ -63,6 +63,8 @@ void UInventory::BindDelegates()
     {
         InvenManager->OnInventoryUpdated.AddDynamic(this, &UInventory::RefreshInventory);
     }
+
+    BP_InvenScroll->OnInventoryDescriptionUpdated.AddDynamic(this, &UInventory::RefreshEquip);
 }
 
 void UInventory::RemoveDelegate()
@@ -73,6 +75,8 @@ void UInventory::RemoveDelegate()
     {
         InvenManager->OnInventoryUpdated.RemoveDynamic(this, &UInventory::RefreshInventory);
     }
+
+    BP_InvenScroll->OnInventoryDescriptionUpdated.RemoveDynamic(this, &UInventory::RefreshEquip);
 }
 
 void UInventory::OnNavigate(const FInputActionValue& InputActionValue)
@@ -165,7 +169,6 @@ void UInventory::RefreshInventory(const FItemData& ItemData)
 {
     BP_InvenScroll->AddItemSlot(ItemData);
 
-    RefreshEquip(ItemData);
 }
 
 void UInventory::RefreshEquip(const FItemData& ItemData)
