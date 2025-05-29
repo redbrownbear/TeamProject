@@ -94,8 +94,6 @@ protected:
 	UCurveFloat* ZoomCurve;
 
 
-
-
 public:
 	virtual uint8 GetGenericTeamId() { return FGenericTeamId(PLAYER_GENERIC_TEAM_ID); }
 };

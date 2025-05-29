@@ -50,6 +50,15 @@ void APC_InGame::BeginPlay()
 		UIManager->PostWorldInitialize();
 
 	ChangeInputContext(EInputContext::IC_InGame);
+
+	if (!IcePreviewActor && IcePreviewClass)
+	{
+		IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
+		if (IcePreviewActor)
+		{
+			IcePreviewActor->SetActorEnableCollision(false);
+		}
+	}
 }
 
 void APC_InGame::SetupInputComponent()
@@ -119,15 +128,6 @@ void APC_InGame::Tick(float DeltaSeconds)
 
 	if (bQPressed)
 	{
-		if (!IcePreviewActor && IcePreviewClass)
-		{
-			IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
-			if (IcePreviewActor)
-			{
-				IcePreviewActor->SetActorEnableCollision(false);
-			}
-		}
-
 		if (IcePreviewActor)
 		{
 			UpdateIcePreview();
@@ -326,6 +326,11 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 {
+	if (bIsCameraLocked)
+	{
+		return; 
+	}
+
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
 	AddYawInput(ActionValue.X);
@@ -547,13 +552,22 @@ void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 {	
 	bQPressed = !bQPressed;
 
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+
 	if (bQPressed)
 	{
+		Player_C->ZoomIn();
+		bIsCameraLocked = true;
+
 		// show icepreview
 		IcePreviewActor->SetActorHiddenInGame(false);
+		
 	}
 	else
 	{
+		Player_C->ZoomOut();
+		bIsCameraLocked = false;
+
 		// hide icepreview
 		IcePreviewActor->SetActorHiddenInGame(true);
 	}
@@ -789,6 +803,7 @@ void APC_InGame::CheckSurface()
 		}
 
 		bCanSpawn = true;
+		IcePreviewActor->SetCanSpawn(bCanSpawn);
 	}
 }
 

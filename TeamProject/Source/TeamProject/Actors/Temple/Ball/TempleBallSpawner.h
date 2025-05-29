@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "TempleBallSpawner.generated.h"
 
+//class UTempleBallSpawnerComponent;
 class ATempleBall;
 
 UCLASS()
@@ -21,16 +22,21 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
 	UFUNCTION()
 	void SpawnBall();
 
+protected:
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	TSubclassOf<ATempleBall> BallClass;
 
+	/*UPROPERTY(EditAnywhere, Category = "Spawning")
+	float SpawnInterval = 0.0f;*/
+
 	UPROPERTY(EditAnywhere, Category = "Spawning")
-	float SpawnInterval = 2.0f;
+	FVector SpawnAreaExtent;
 
 private:
-    FTimerHandle SpawnTimer;
+	FTimerHandle SpawnTimer;
 
 };

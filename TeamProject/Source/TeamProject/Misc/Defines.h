@@ -54,3 +54,6 @@
 #define NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS											1000.f
 #define NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS										1500.f
 #define NPC_SIGHT_ANGLE																90.f
+
+#define DUNGEON_BALL_SPAWNINTERVAL													1.f
+#define DUNGEON_BALL_SPAWNAREAEXTENT												FVector(100.f, 2500.f, 0.f);

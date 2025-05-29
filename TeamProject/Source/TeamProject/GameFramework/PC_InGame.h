@@ -244,7 +244,6 @@ protected:
 	UFUNCTION()
 	void CheckSurface();
 
-
 protected:
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
 	TSubclassOf<AIcePillar> IcePillarClass;
@@ -262,6 +261,9 @@ private:
 	bool bQPressed = false;
 	bool bCanSpawn = false;
 	bool bHitResult = false;
+
+	bool bIsCameraLocked = false;
+
 
 	FHitResult Hit;
 };
