@@ -4,6 +4,8 @@
 #include "Actors/Object/TorchStand.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+#include "Components/SphereComponent.h"
+#include "Actors/TriggerBox/TorchTriggerBox.h"
 #include "Misc/Utils.h"
 
 
@@ -60,13 +62,25 @@ ATorchStand::ATorchStand()
     NiagaraComponent->SetupAttachment(RootComponent);
     NiagaraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 
+
+
+    TriggerColliderComponent = CreateDefaultSubobject<USphereComponent>(TEXT("TriggerColliderComponent"));
+    TriggerColliderComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+    TriggerColliderComponent->SetSphereRadius(32.f);
+    TriggerColliderComponent->SetupAttachment(RootComponent);
+    TriggerColliderComponent->SetRelativeLocation(FVector(0.f, 0.f, 70.f));
+    TriggerColliderComponent->OnComponentBeginOverlap.AddDynamic(this, &ATorchStand::OnBeginOverlap);
 }
 
 // Called when the game starts or when spawned
 void ATorchStand::BeginPlay()
 {
-	Super::BeginPlay();
-	
+    Super::BeginPlay();
+}
+
+void ATorchStand::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
 }
 
 // Called every frame
