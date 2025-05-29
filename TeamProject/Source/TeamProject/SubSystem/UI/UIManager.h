@@ -11,7 +11,6 @@
 #include "UI/Inven/Inventory.h"
 #include "UI/NpcDialogue/NPCDialogue.h"
 #include "UI/Shop/Shop.h"
-#include "UI/Quest/Quest.h"
 
 #include "UIManager.generated.h"
 
@@ -41,9 +40,9 @@ public:
     template <typename T>
     T* FindUI()
     {
-        for (auto& Pair : CachedUIs)
+        for (UBaseUI* UI : CachedUIs)
         {
-            if (T* FoundUI = Cast<T>(Pair.Value))
+            if (T* FoundUI = Cast<T>(UI))
             {
                 return FoundUI;
             }
@@ -93,8 +92,6 @@ public:
     UNPCDialogue* CachedDialogueClass;
     UPROPERTY()
     UShop* CachedShopClass;
-    UPROPERTY()
-    UQuest* CachedQuestClass;
 
 
 public:

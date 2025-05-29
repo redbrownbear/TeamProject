@@ -28,8 +28,6 @@ public:
 	TArray<FShopDataRow> GetShopData(EQuestCharacter QuestChar) const;
 
 public:
-	void ShowUI(EQuestCharacter QuestChar);
-
 	//ตฅภฬลอ
 	void UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow);
 

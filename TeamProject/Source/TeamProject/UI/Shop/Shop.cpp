@@ -32,7 +32,7 @@ void UShop::ShowUI()
         InputMode.SetHideCursorDuringCapture(false);
 
         PC_InGame->SetInputMode(InputMode);
-        PC_InGame->BindShopInput();
+        PC_InGame->BindShopInput(this);
 
         AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
         if (HUD)
@@ -89,7 +89,7 @@ void UShop::BindDelegates()
         ShopManager->OnShopUpdated.AddDynamic(this, &UShop::RefreshShopList);
     }
 
-    BP_ShopScroll->OnShopHighlightChanged.AddDynamic(this, &UShop::RefreshDescription);
+    BP_ShopScroll->OnHighlightChanged.AddDynamic(this, &UShop::RefreshDescription);
 }
 
 void UShop::RemoveDelegates()
@@ -107,7 +107,7 @@ void UShop::RemoveDelegates()
         ShopManager->OnShopUpdated.RemoveDynamic(this, &UShop::RefreshShopList);
     }
 
-    BP_ShopScroll->OnShopHighlightChanged.RemoveDynamic(this, &UShop::RefreshDescription);
+    BP_ShopScroll->OnHighlightChanged.RemoveDynamic(this, &UShop::RefreshDescription);
 }
 
 void UShop::SetShopOpen()
