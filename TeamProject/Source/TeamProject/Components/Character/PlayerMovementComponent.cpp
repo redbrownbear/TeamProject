@@ -8,7 +8,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "Actors/Character/PlayerCharacter.h"
-
+#include "GameFramework/PlayerController.h"
 UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& ObjectInitializer)
 {
 
@@ -86,7 +86,7 @@ bool UPlayerMovementComponent::TrySetMoveClimb()
 		FVector NewLocation = SurfacePoint + SurfaceNormal * 20;
 
 		Player_C->SetActorRotation(FRotator(Player_Rot));
-
+		Player_C->GetController()->SetControlRotation(FRotator(Player_Rot));
 		Player_C->SetActorLocation(NewLocation);
 
 		return true;
@@ -181,10 +181,6 @@ void UPlayerMovementComponent::SetClimbMode(bool _bool)
 	SpringArm->bUsePawnControlRotation = !_bool;
 
 	SpringArm->bEnableCameraRotationLag = _bool;
-
-	SpringArm->CameraLagSpeed = 5.f;
-
-	SpringArm->CameraLagMaxDistance = 100.f;
 
 	Climb_State = EClimb_State::Climb;
 

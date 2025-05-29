@@ -333,10 +333,17 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 {
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 
+	if (Player_C->GetCharacterMovement()->MovementMode == MOVE_Flying)
+	{
+		return;
+	}
+	
+	
 	AddYawInput(ActionValue.X);
 	AddPitchInput(-ActionValue.Y);
-	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	
 	if (!Player_C)
 	{
 		return;

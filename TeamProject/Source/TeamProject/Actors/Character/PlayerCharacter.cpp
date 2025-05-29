@@ -42,6 +42,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 			SpringArm->ProbeSize = 5.0;
 			SpringArm->bUsePawnControlRotation = true;
 			SpringArm->bInheritRoll = false;
+
+			SpringArm->CameraLagSpeed = 5.f;
+			SpringArm->CameraLagMaxDistance = 100.f;
 		}
 		Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 		Camera->SetupAttachment(SpringArm);
