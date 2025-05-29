@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/CapsuleComponent.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "Actors/Character/PlayerCharacter.h"
 
@@ -25,6 +26,9 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 			LandUpMontage = Asset.Object;
 		}
 	}
+
+
+
 }
 
 bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
@@ -139,12 +143,13 @@ bool UPlayerMovementComponent::CanClimbUpLand()
 		if (CanStand)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("CanStand"));
+			APlayerCharacter* Player_C = Cast<APlayerCharacter>(OwnerActor);
 
-			
-			Cast<APlayerCharacter>(OwnerActor)->GetMesh()->GetAnimInstance()->Montage_Play(LandUpMontage);
-			
-			SetClimbMode(false);
 
+			Climb_State = EClimb_State::Land;
+
+			Player_C->GetMesh()->GetAnimInstance()->Montage_Play(LandUpMontage);
+			
 
 			return true;
 
@@ -180,6 +185,8 @@ void UPlayerMovementComponent::SetClimbMode(bool _bool)
 	SpringArm->CameraLagSpeed = 5.f;
 
 	SpringArm->CameraLagMaxDistance = 100.f;
+
+	Climb_State = EClimb_State::Climb;
 
 }
 

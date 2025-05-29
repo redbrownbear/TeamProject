@@ -244,6 +244,10 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	// 클라이밍 상태일 때의 캐릭터 무브
 	if (Movement->IsClimbing())
 	{
+		if (Movement->GetClimbMode() == EClimb_State::Land)
+		{
+			return;
+		}
 	
 		FHitResult HitResult;
 		
@@ -414,7 +418,7 @@ void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
-	
+
 	
 	if (Movement->IsClimbing())
 	{

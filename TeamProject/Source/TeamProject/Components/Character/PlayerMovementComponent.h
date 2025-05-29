@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Misc/Utils.h"
 #include "PlayerMovementComponent.generated.h"
 
 /**
@@ -12,13 +13,14 @@
 UCLASS()
 class TEAMPROJECT_API UPlayerMovementComponent : public UCharacterMovementComponent
 {
-
+	GENERATED_BODY()
 public:
 	UPlayerMovementComponent(const FObjectInitializer& ObjectInitializer);
 
 
-	GENERATED_BODY()
 	
+	EClimb_State GetClimbMode() { return Climb_State; }
+
 	bool ClimbingLineTrace(FHitResult& HitResult);
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
 
@@ -33,7 +35,7 @@ public:
 	void SetClimbMode(bool _bool);
 
 
-
+	UAnimMontage* GTEST() { return LandUpMontage; }
 
 private:
 	bool bIsClimbing = false;
@@ -41,6 +43,7 @@ private:
 	UPROPERTY()
 
 	UAnimMontage* LandUpMontage;
-
+	UPROPERTY()
+	EClimb_State Climb_State = EClimb_State::Climb;
 
 };
