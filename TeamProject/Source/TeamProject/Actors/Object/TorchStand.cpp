@@ -1,20 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Actors/Object/CampFire.h"
+#include "Actors/Object/TorchStand.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Misc/Utils.h"
 
 
-// Sets default values
-ACampFire::ACampFire()
+ATorchStand::ATorchStand()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
-	RootComponent = StaticMeshComponent;
+    StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+    RootComponent = StaticMeshComponent;
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset
     { TEXT("/Script/Engine.StaticMesh'/Game/Resources/Map/ETC/FireWood.FireWood'") };
@@ -45,21 +43,17 @@ ACampFire::ACampFire()
 
     NiagaraComponent->SetupAttachment(RootComponent);
 
-    // 
-    //NiagaraComponent->SetAsset();
-
-
 }
 
 // Called when the game starts or when spawned
-void ACampFire::BeginPlay()
+void ATorchStand::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void ACampFire::Tick(float DeltaTime)
+void ATorchStand::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
