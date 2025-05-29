@@ -47,8 +47,6 @@ void UShopScroll::UpdateSlots(const TArray<FShopDataRow>& ShopList)
         NewSlot->SetItemData(Item);
         ItemVerticalBox->AddChildToVerticalBox(NewSlot);
         ActiveSlots.Add(NewSlot);
-
-        CurrentIndex = ActiveSlots.Num() - 1;
     }
 
     SelectInit();
@@ -58,18 +56,15 @@ void UShopScroll::MoveSelection(FIntPoint Direction)
 {
     if (ActiveSlots.Num() == 0) return;
 
-    const int32 NumPerRow = 5; // WrapBox 기준 가정
     const int32 MaxIndex = ActiveSlots.Num() - 1;
 
     int32 NextIndex = CurrentIndex;
 
-    if (Direction.X != 0) // 좌우
+    //좌우 제거
+
+    if (Direction.Y != 0) // 상하
     {
-        NextIndex += Direction.X;
-    }
-    else if (Direction.Y != 0) // 상하
-    {
-        NextIndex += Direction.Y * NumPerRow;
+        NextIndex += Direction.Y;
     }
 
     NextIndex = FMath::Clamp(NextIndex, 0, MaxIndex);
@@ -82,7 +77,7 @@ void UShopScroll::MoveSelection(FIntPoint Direction)
         CurrentIndex = NextIndex;
     }
 
-    OnHighlightChanged.Broadcast(CurrentIndex);
+    OnShopHighlightChanged.Broadcast(CurrentIndex);
 }
 
 void UShopScroll::SelectInit()
@@ -95,9 +90,10 @@ void UShopScroll::SelectInit()
         slot->SetSelected(false);
     }
 
-    ActiveSlots[CurrentIndex]->SetSelected(true);
+    CurrentIndex = 0;
 
-    OnHighlightChanged.Broadcast(CurrentIndex);
+    ActiveSlots[CurrentIndex]->SetSelected(true);
+    OnShopHighlightChanged.Broadcast(CurrentIndex);
 }
 
 FItemData UShopScroll::GetItemDataAtIndex(int32 Index) const

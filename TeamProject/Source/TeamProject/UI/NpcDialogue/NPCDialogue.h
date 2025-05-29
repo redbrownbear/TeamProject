@@ -30,7 +30,7 @@ private:
 	void BindDelegates();
 	void RemoveDelegates();
 
-public: //바인딩을 위해 퍼블릭선언
+public: //바인?�을 ?�해 ?�블�?��??
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	UFUNCTION()
