@@ -18,6 +18,7 @@ namespace CollisionProfileName
     static inline FName ToItem = TEXT("ToItem");
     static inline FName NPC = TEXT("NPC");
     static inline FName ToNPC = TEXT("ToNPC");
+    static inline FName Trigger = TEXT("Trigger");
 }
 
 namespace ProjectileName
