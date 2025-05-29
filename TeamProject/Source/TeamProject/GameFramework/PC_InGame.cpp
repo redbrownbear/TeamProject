@@ -50,16 +50,6 @@ void APC_InGame::BeginPlay()
 		UIManager->PostWorldInitialize();
 
 	ChangeInputContext(EInputContext::IC_InGame);
-
-	if (!IcePreviewActor && IcePreviewClass)
-	{
-		IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
-		if (IcePreviewActor)
-		{
-			IcePreviewActor->SetActorEnableCollision(false);
-		}
-	}
-
 }
 
 void APC_InGame::SetupInputComponent()
@@ -120,7 +110,7 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Build,
-		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);	
+		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);		
 }
 
 void APC_InGame::Tick(float DeltaSeconds)
@@ -129,6 +119,15 @@ void APC_InGame::Tick(float DeltaSeconds)
 
 	if (bQPressed)
 	{
+		if (!IcePreviewActor && IcePreviewClass)
+		{
+			IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
+			if (IcePreviewActor)
+			{
+				IcePreviewActor->SetActorEnableCollision(false);
+			}
+		}
+
 		if (IcePreviewActor)
 		{
 			UpdateIcePreview();
@@ -560,7 +559,6 @@ void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 	}
 }
 
-
 void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)
 {
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
@@ -778,7 +776,6 @@ void APC_InGame::CheckSurface()
 		if (!ActorName.StartsWith(TEXT("Surface")))
 		{
 			bCanSpawn = false;
-			IcePreviewActor->SetCanSpawn(bCanSpawn);
 			if (IcePreviewActor)
 			{
 				IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", 1.0f);
@@ -792,7 +789,6 @@ void APC_InGame::CheckSurface()
 		}
 
 		bCanSpawn = true;
-		IcePreviewActor->SetCanSpawn(bCanSpawn);
 	}
 }
 

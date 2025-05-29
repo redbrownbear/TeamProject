@@ -21,7 +21,6 @@ ATempleBall::ATempleBall()
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BallMesh(TEXT("/Game/Temple/Ball/DgnObj_AncientBallL_01.DgnObj_AncientBallL_01"));
 	StaticMeshComponent->SetStaticMesh(BallMesh.Object);
-
 }
 
 // Called when the game starts or when spawned

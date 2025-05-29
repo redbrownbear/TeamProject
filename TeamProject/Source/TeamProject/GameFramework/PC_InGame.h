@@ -217,7 +217,6 @@ protected:
 	//UI
 
 	void SpawnIcePillar(const FInputActionValue& InputActionValue);
-	void DestroyIcePillar(const FInputActionValue& InputActionValue);
 	
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }

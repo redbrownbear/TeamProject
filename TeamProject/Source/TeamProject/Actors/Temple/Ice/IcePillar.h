@@ -15,8 +15,8 @@ UCLASS()
 class TEAMPROJECT_API AIcePillar : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AIcePillar();
 
@@ -24,14 +24,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 public:
 	// ÆÄ±« Ã³¸®
 	UFUNCTION()
-	void DestroyPillar(); 
+	void DestroyPillar();
 
 	void SetRiseDirection(FVector InDirection);
 	void SetPivotLocation(FVector InPosition);

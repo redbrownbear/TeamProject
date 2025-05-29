@@ -9,8 +9,8 @@ class UTimelineComponent;
 UCLASS()
 class TEAMPROJECT_API AIcePreview : public AActor
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
     AIcePreview();
 
