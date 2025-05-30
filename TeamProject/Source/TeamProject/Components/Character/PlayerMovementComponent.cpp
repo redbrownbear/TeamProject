@@ -57,14 +57,21 @@ bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
 		TraceParams
 	);
 
-	DrawDebugLine(GetWorld(), Start, End,FColor::Red,false, 2.f);
-
 	return Returnbool;
 }
 
-bool UPlayerMovementComponent::TrySetMoveClimb()
+bool UPlayerMovementComponent::TrySetMoveClimb(FVector2D ActionValue)
 {
 	FHitResult HitResult;
+
+	if (ActionValue.X == 1)
+	{
+		CanClimbUpLand();
+	}
+	else if (ActionValue.X == -1)
+	{
+		CanClimbDownLand();
+	}
 
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 
@@ -109,7 +116,7 @@ bool UPlayerMovementComponent::CanClimbUpLand()
 
 	FVector CharacterUpVector = OwnerActor->GetActorUpVector();
 
-	FVector UpEnd = Start + CharacterUpVector * PLAYER_CAPSULE_HALF_HEIGHT * 3;
+	FVector UpEnd = Start + CharacterUpVector * PLAYER_CAPSULE_HALF_HEIGHT * 2;
 
 	FVector CharacterForwardVector = OwnerActor->GetActorForwardVector();
 	FVector ForwardEnd = UpEnd + CharacterForwardVector * PLAYER_CAPSULE_RADIUS * 3;
@@ -156,6 +163,38 @@ bool UPlayerMovementComponent::CanClimbUpLand()
 
 		}
 	}
+	return false;
+}
+
+bool UPlayerMovementComponent::CanClimbDownLand()
+{
+	AActor* OwnerActor = GetOwner();
+
+	FHitResult HitResult;
+
+	FVector Start = OwnerActor->GetActorLocation();
+
+	FVector CharacterUpVector = OwnerActor->GetActorUpVector();
+
+	FVector End = Start - CharacterUpVector * (PLAYER_CAPSULE_HALF_HEIGHT + 1);
+
+
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(OwnerActor);
+
+	bool CanStand = GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		Start,
+		End,
+		ECollisionChannel::ECC_Visibility,
+		TraceParams
+	);
+	if (CanStand)
+	{
+		SetClimbMode(false);
+	}
+	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
+
 	return false;
 }
 

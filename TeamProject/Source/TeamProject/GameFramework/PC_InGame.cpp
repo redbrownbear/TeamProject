@@ -251,9 +251,6 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	
 		FHitResult HitResult;
 		
-		Movement->TrySetMoveClimb();
-
-
 		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
 		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
@@ -275,8 +272,9 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(UpVector, ActionValue.X);
 		ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
 
-		if (Movement->CanClimbUpLand())
-		{ }
+		Movement->TrySetMoveClimb(ActionValue);
+
+		
 	}
 	
 	// 노말 상태일 때의 캐릭터 무브
@@ -433,10 +431,12 @@ void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 	}
 
 	else
-	{
-		Movement->TrySetMoveClimb();
-		
-		Movement->SetClimbMode(true);
+	{	
+		FHitResult HitResult;
+		if (Movement->ClimbingLineTrace(HitResult))
+		{
+			Movement->SetClimbMode(true);
+		}
 	}
 }
 

@@ -27,10 +27,11 @@ public:
 	void SetMovementClimb() { MovementMode=MOVE_Flying; bIsClimbing = true; }
 	bool IsClimbing() { return bIsClimbing; }
 
-	bool TrySetMoveClimb();
+	bool TrySetMoveClimb(FVector2D ActionValue);
 
 
 	bool CanClimbUpLand();
+	bool CanClimbDownLand();
 
 	void SetClimbMode(bool _bool);
 
