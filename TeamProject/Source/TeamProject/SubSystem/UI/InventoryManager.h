@@ -9,7 +9,6 @@
 
 #include "InventoryManager.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, const FItemData&, ItemData);
 /**
  * 
  */
@@ -18,16 +17,20 @@ class TEAMPROJECT_API UInventoryManager : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 	
+	UInventoryManager();
+
 public:
-	//테스트코드
-	void AddItem(FItemData Itemdata);
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	void LoadItemData(UDataTable* DataTable);
+
 
 public:
 	const TArray<FItemData>& GetAllItemData() const { return Items; }
 
-public:
-	UPROPERTY(BlueprintAssignable)
-	FOnInventoryUpdated OnInventoryUpdated;
+
+	private:
+	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	UDataTable* ItemDataTable;
 
 private:
 	TArray<FItemData> Items;

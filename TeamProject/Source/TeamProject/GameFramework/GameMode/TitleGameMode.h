@@ -4,19 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "GM_InGame.generated.h"
+#include "UI/Title/TitleWidget.h"
+
+#include "TitleGameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TEAMPROJECT_API AGM_InGame : public AGameModeBase
+class TEAMPROJECT_API ATitleGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-
-public:
-	AGM_InGame();
-
-	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 };

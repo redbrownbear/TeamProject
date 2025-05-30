@@ -6,6 +6,7 @@
 
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "SubSystem/UI/ShopManager.h"
+#include "SubSystem/PlayerManager.h"
 
 #include "GameFramework/PC_InGame.h"
 #include "UI/HUD/MainHUD.h"
@@ -13,8 +14,10 @@
 
 void UShop::OnCreated()
 {
+    InitUI();
+    SetRupeeUI();
+
     SetShopOpen();
-    SetCoinText(0);
 }
 
 void UShop::ShowUI()
@@ -32,7 +35,6 @@ void UShop::ShowUI()
         InputMode.SetHideCursorDuringCapture(false);
 
         PC_InGame->SetInputMode(InputMode);
-        PC_InGame->BindShopInput();
 
         AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
         if (HUD)
@@ -67,12 +69,22 @@ void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 }
 
-void UShop::SetCoinText(int32 CoinCount)
+void UShop::InitUI()
 {
-	if (CoinText)
-	{
-		CoinText->SetText(FText::FromString(FString::FromInt(CoinCount)));
-	}
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    if (PC_InGame)
+    {
+        PC_InGame->BindShopInput();
+    }
+}
+
+void UShop::SetRupeeUI()
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        CoinText->SetText(FText::FromString(FString::FromInt(PlayerManager->GetRupee())));
+    }
 }
 
 void UShop::BindDelegates()

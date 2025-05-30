@@ -16,6 +16,8 @@ void AMainHUD::BeginPlay()
             MainWidgetInstance->AddToViewport();
         }
     }
+
+    UpdateHp();
 }
 
 void AMainHUD::SetMainHUDVisible(bool bIsShow)
@@ -32,5 +34,10 @@ void AMainHUD::ShowInteractName(bool bIsShow, FString Name)
 {
     MainWidgetInstance->ShowInteractName(bIsShow, Name);
 
+}
+
+void AMainHUD::UpdateHp()
+{
+    MainWidgetInstance->UpdateHP();
 }
 

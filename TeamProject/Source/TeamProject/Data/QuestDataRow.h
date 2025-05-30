@@ -20,6 +20,9 @@ public:
 	EQuestCharacter QuestCharacter = EQuestCharacter::None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	int32 QuestNum;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	FString QuestNPC;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
@@ -33,4 +36,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	FVector NPCWorldLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	bool bIsComplete;
 };

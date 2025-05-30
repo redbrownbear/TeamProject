@@ -30,13 +30,14 @@ public:
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
 private:
+	void InitUI();
 	void InitializePool(int32 PreloadCount);
 
 	void BindDelegates();
 	void RemoveDelegates();
 
 public:
-	void SetCoin(int32 CoinCount);
+	void SetRupeeUI();
 
 public:
 	UFUNCTION()

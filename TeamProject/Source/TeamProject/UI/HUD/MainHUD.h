@@ -25,6 +25,8 @@ public:
     void ShowInteractWidget(bool bIsShow);
     void ShowInteractName(bool bIsShow, FString Name);
 
+    void UpdateHp();
+
 protected:
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<UMainHUDWidget> MainWidgetClass;
