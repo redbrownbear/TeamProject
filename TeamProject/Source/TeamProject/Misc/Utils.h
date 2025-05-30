@@ -27,17 +27,23 @@ namespace ProjectileName
     static inline FName Monster_PlayerAlert = TEXT("Monster_PlayerAlert");
     static inline FName Monster_CatchItem = TEXT("Monster_CatchItem");
     static inline FName Monster_Arrow = TEXT("Monster_Arrow");
+
     static inline FName Monster_LynelAttack = TEXT("Monster_LynelAttack");
     static inline FName Monster_LynelExplosion = TEXT("Monster_LynelExplosion");
     static inline FName Monster_LynelFire = TEXT("Monster_LynelFire");
     static inline FName Monster_LynelArrow = TEXT("Monster_LynelArrow");
+
     static inline FName Monster_HinoxAttack = TEXT("Monster_HinoxAttack");
     static inline FName Monster_HinoxGrab = TEXT("Monster_HinoxGrab");
     static inline FName Monster_HinoxStone = TEXT("Monster_HinoxStone");
     static inline FName Monster_HinoxLink = TEXT("Monster_HinoxLink");
     static inline FName Monster_HinoxHipDrop = TEXT("Monster_HinoxHipDrop");
+
     static inline FName Monster_AL_Attack = TEXT("Monster_AL_Attack");
     static inline FName Monster_AL_AttackBig = TEXT("Monster_AL_AttackBig");
+
+    static inline FName Monster_AB_KogaStone = TEXT("Monster_AB_KogaStone");
+    static inline FName Monster_AB_KogaStoneBig = TEXT("Monster_AB_KogaStoneBig");
 }
 
 namespace Monster_SocketName
@@ -296,6 +302,14 @@ enum class EWeaponKind : uint8
     END,
 };
 
+UENUM()
+enum class EKogaStoneKind : uint8
+{
+    FIRST = 0,
+    SECOND,
+    THIRD,
+    END
+};
 
 
 inline void InstantRotateActorToDirection(AActor* TargetActor, const FVector& TargetLocation)

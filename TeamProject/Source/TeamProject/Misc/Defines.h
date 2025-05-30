@@ -33,9 +33,9 @@
 
 
 
-#define NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS										1000.f
-#define NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS									1500.f
-#define NPC_SIGHT_ANGLE															90.f
+#define NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS											1000.f
+#define NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS										1500.f
+#define NPC_SIGHT_ANGLE																90.f
 #define PLAYER_MOVE_NML																600.f
 #define	PLAYER_MOVE_BOW_ZOOM														300.f
 
@@ -59,7 +59,11 @@
 #define ASSASIN_BOSS_STONE_FIRST_MAX_TIME											3.f
 #define ASSASIN_BOSS_STONE_SECOND_MAX_TIME											5.f
 #define ASSASIN_BOSS_STUN_MAX_TIME													5.f
-#define ASSASIN_BOSS_TONEXT_MAX_TIME													5.f
+#define ASSASIN_BOSS_TONEXT_MAX_TIME												5.f
+#define ASSASIN_BOSS_BARRIER_MAX_TIME												3.f
+#define KOGASTONE_WAIT_TIME_MAX														3.f
+
+
 
 #define NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS											1000.f
 #define NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS										1500.f

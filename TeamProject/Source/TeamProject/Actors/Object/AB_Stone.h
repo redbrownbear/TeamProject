@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "KogaStoneBig.generated.h"
+#include "AB_Stone.generated.h"
 
 UCLASS()
-class TEAMPROJECT_API AKogaStoneBig : public AActor
+class TEAMPROJECT_API AAB_Stone : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AKogaStoneBig();
+	AAB_Stone();
 
 protected:
 	// Called when the game starts or when spawned
