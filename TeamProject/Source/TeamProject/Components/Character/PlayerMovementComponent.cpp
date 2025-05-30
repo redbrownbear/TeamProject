@@ -176,7 +176,7 @@ bool UPlayerMovementComponent::CanClimbDownLand()
 
 	FVector CharacterUpVector = OwnerActor->GetActorUpVector();
 
-	FVector End = Start - CharacterUpVector * (PLAYER_CAPSULE_HALF_HEIGHT + 1);
+	FVector End = Start - CharacterUpVector * (PLAYER_CAPSULE_HALF_HEIGHT* 1.5);
 
 
 	FCollisionQueryParams TraceParams;
