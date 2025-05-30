@@ -7,7 +7,6 @@
 #include "TreasureBox.generated.h"
 
 class UBoxComponent;
-struct FParticleEffectTableRow;
 
 UCLASS()
 class TEAMPROJECT_API ATreasureBox : public AActor
@@ -30,11 +29,11 @@ protected:
 	UFUNCTION()
 	void GetTreasure();
 
+	void GetParticleEffect();
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Effect", meta = (RowType = "ParticleEffectTableRow"))
 	FDataTableRowHandle ParticleEffectTableRowHandle;
-
-	TObjectPtr<FParticleEffectTableRow> ParticleEffectData;
 
 protected:
 	UPROPERTY(VisibleAnywhere)

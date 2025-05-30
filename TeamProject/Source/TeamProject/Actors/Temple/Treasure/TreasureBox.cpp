@@ -1,6 +1,5 @@
 #include "Actors/Temple/Treasure/TreasureBox.h"
 #include "Components/BoxComponent.h"
-#include "Data/ParticleEffectTableRow.h"
 #include "Actors/Effect/ParticleEffect.h"
 
 // Sets default values
@@ -32,33 +31,18 @@ void ATreasureBox::BeginPlay()
 	CollisionComponent->SetGenerateOverlapEvents(true);
 
 	bCanTakeItem = true;
+
+	GetParticleEffect();
 }
 
 void ATreasureBox::OpenTBox()
 {
+	if (!bCanTakeItem) return;
+
 	USkeletalMeshComponent* MeshComp = FindComponentByClass<USkeletalMeshComponent>();
 	if (MeshComp)
-	{
-		if (!ParticleEffectTableRowHandle.IsNull())
-		{
-			UWorld* World = GetWorld();
-			if (!World) return;
-
-			FTransform SpawnTransform;
-			SpawnTransform.SetLocation(GetActorLocation());
-			SpawnTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
-
-			AParticleEffect* Effect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
-				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-
-			if (Effect)
-			{
-				Effect->SetData(ParticleEffectTableRowHandle);
-				Effect->FinishSpawning(SpawnTransform);
-			}
-
-			GetTreasure();
-		}
+	{		
+		GetTreasure(); // Change Particle?
 	}			
 }
 
@@ -74,3 +58,24 @@ void ATreasureBox::GetTreasure()
 }
 
 
+void ATreasureBox::GetParticleEffect()
+{
+	if (!ParticleEffectTableRowHandle.IsNull())
+	{
+		UWorld* World = GetWorld();
+		if (!World) return;
+
+		FTransform SpawnTransform;
+		SpawnTransform.SetLocation(GetActorLocation());
+		SpawnTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
+
+		AParticleEffect* Effect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+			FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+		if (Effect)
+		{
+			Effect->SetData(ParticleEffectTableRowHandle);
+			Effect->FinishSpawning(SpawnTransform);
+		}
+	}
+}

@@ -30,9 +30,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	TSubclassOf<ATempleBall> BallClass;
 
-	/*UPROPERTY(EditAnywhere, Category = "Spawning")
-	float SpawnInterval = 0.0f;*/
-
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	FVector SpawnAreaExtent;
 
