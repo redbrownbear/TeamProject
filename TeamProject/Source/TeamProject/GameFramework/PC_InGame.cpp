@@ -22,6 +22,8 @@
 #include "Actors/Temple/Ice/IcePillar.h"
 #include "Actors/Temple/Ice/IcePreview.h"
 
+#include "Actors/Temple/Treasure/TreasureBox.h"
+
 APC_InGame::APC_InGame()
 {
 	{
@@ -381,6 +383,24 @@ void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
 
 	WeaponManagerComponent->LeftClickAction();
 
+	// TreasureBox 열 때
+	{
+		FVector Start;
+		FRotator ViewRot;
+		PlayerCharacter->GetController()->GetPlayerViewPoint(Start, ViewRot);
+		FVector End = Start + ViewRot.Vector() * 500.f;
+
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(PlayerCharacter);
+
+		if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+		{
+			if (ATreasureBox* HitBox = Cast<ATreasureBox>(Hit.GetActor()))
+			{
+				HitBox->OpenTBox();
+			}
+		}
+	}	
 }
 
 void APC_InGame::RightClick(const FInputActionValue& InputActionValue)
@@ -566,18 +586,40 @@ void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 	bQPressed = !bQPressed;
 
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
 
 	if (bQPressed)
 	{
+		// 캐릭터 이동 및 회전
+		C_Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
+
+		Player_C->bUseControllerRotationYaw = true; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+
+		// 이동 방향으로 자동 회전 비활성화
+		C_Movement->bOrientRotationToMovement = false;
+
+		USpringArmComponent* C_SpringArm = Player_C->GetSpringArm();
+
 		Player_C->ZoomIn();
+
 		bIsCameraLocked = true;
 
 		// show icepreview
-		IcePreviewActor->SetActorHiddenInGame(false);
-		
+		IcePreviewActor->SetActorHiddenInGame(false);	
+
+		//// 애니메이션
+		//UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+		//AnimInst->Montage_Play(ChargingMTG);
 	}
 	else
 	{
+		Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+
+		// 이동 방향으로 자동 회전 비활성화
+		Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+		Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+
 		Player_C->ZoomOut();
 		bIsCameraLocked = false;
 

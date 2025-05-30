@@ -44,9 +44,6 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USceneComponent> DefaultSceneRoot;
-
-	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere)
