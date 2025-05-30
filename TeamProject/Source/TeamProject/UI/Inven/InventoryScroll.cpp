@@ -27,28 +27,7 @@ void UInventoryScroll::InitializePool(int32 PreloadCount)
 
 void UInventoryScroll::AddItemSlot(const FItemData& NewItem)
 {
-    if (!SlotWidgetClass) 
-        return;
-
-    UInventorySlot* NewSlot = nullptr;
-
-    if (PooledSlots.Num() > 0)
-    {
-        NewSlot = PooledSlots.Pop();
-    }
-    else
-    {
-        NewSlot = CreateWidget<UInventorySlot>(this, SlotWidgetClass);
-    }
-
-    if (!NewSlot) 
-        return;
-
-    NewSlot->SetItemData(NewItem);
-    ItemWrapBox->AddChildToWrapBox(NewSlot);
-    ActiveSlots.Add(NewSlot);
-
-    SelectInit();
+    SelectCategory(NewItem.eItemCategory, true);
 }
 
 void UInventoryScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
@@ -58,10 +37,14 @@ void UInventoryScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
         ActiveSlot->RemoveFromParent();
         PooledSlots.Add(ActiveSlot);
     }
+
     ActiveSlots.Empty();
 
     for (const FItemData& Item : NewItemList)
     {
+        if (Item.eItemCategory != CurrentCategory)
+            return;
+
         UInventorySlot* NewSlot = nullptr;
 
         if (PooledSlots.Num() > 0)
@@ -75,12 +58,10 @@ void UInventoryScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
 
         NewSlot->SetItemData(Item);
         ItemWrapBox->AddChildToWrapBox(NewSlot);
-        ActiveSlots.Add(NewSlot);
-
-        CurrentIndex = ActiveSlots.Num() - 1;
+        ActiveSlots.Add(NewSlot);      
     }
 
-    SelectInit();
+    InitSelectItem();
 }
 
 void UInventoryScroll::MoveSelection(FIntPoint Direction)
@@ -110,9 +91,12 @@ void UInventoryScroll::MoveSelection(FIntPoint Direction)
         ActiveSlots[NextIndex]->SetSelected(true);
         CurrentIndex = NextIndex;
     }
+
+    FItemData Itemdata = ActiveSlots[CurrentIndex]->GetItemData();
+    OnInventoryDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
 }
 
-void UInventoryScroll::SelectInit()
+void UInventoryScroll::InitSelectItem()
 {
     if (ActiveSlots.IsEmpty())
         return;
@@ -122,28 +106,105 @@ void UInventoryScroll::SelectInit()
         slot->SetSelected(false);
     }
 
+    CurrentIndex = 0;
     ActiveSlots[CurrentIndex]->SetSelected(true);
 
+    FItemData Itemdata = ActiveSlots[CurrentIndex]->GetItemData();
+    OnInventoryDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
+}
+
+void UInventoryScroll::SetSort(EItemCategory Type)
+{
+    if (!SlotWidgetClass)
+        return;
+
+    for (UInventorySlot* ActiveSlot : ActiveSlots)
+    {
+        ActiveSlot->RemoveFromParent();
+        PooledSlots.Add(ActiveSlot);
+    }
+      ActiveSlots.Empty();
+
+    UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
+    check(InvenManager);
+    
+    TArray<FItemData> TempItems = InvenManager->GetAllItemData();
+
+    TArray<FItemData> Items;
+    for (FItemData Item : TempItems)
+    {
+        if ((Item.eItemCategory == EItemCategory::IT_Arrow && Item.bIsArrow) || Item.eItemCategory == EItemCategory::IT_Material)
+        {
+            // 이미 동일한 ItemCode가 있는지 확인
+            FItemData* Found = Items.FindByPredicate([&](const FItemData& Other) {
+                return Other.ItemID == Item.ItemID;
+                });
+
+            if (Found)
+                Found->ItemCount += Item.ItemCount;
+            
+            else
+                Items.Add(Item);
+            
+        }
+
+        else
+            Items.Add(Item);
+    }
+
+    if (Items.IsEmpty())
+        return;
+
+    Items.Sort([](const FItemData& A, const FItemData& B)
+        {
+            if (A.eItemCategory == B.eItemCategory)
+            {
+                if (A.eArmorKind == B.eArmorKind)
+                    return A.Damage > B.Damage;
+
+                return A.eArmorKind < B.eArmorKind;
+            }
+            return A.eItemCategory < B.eItemCategory;
+        });
+
+    for (FItemData Item : Items)
+    {
+        if (Item.eItemCategory != CurrentCategory)
+            continue;
+
+        UInventorySlot* NewSlot = nullptr;
+        if (PooledSlots.Num() > 0)
+        {
+            NewSlot = PooledSlots.Pop();
+        }
+        else
+        {
+            NewSlot = CreateWidget<UInventorySlot>(GetWorld(), SlotWidgetClass);
+        }
+
+        NewSlot->SetItemData(Item);
+        ItemWrapBox->AddChildToWrapBox(NewSlot);
+        ActiveSlots.Add(NewSlot);       
+    }
+
+    InitSelectItem();
 }
 
 void UInventoryScroll::InitCategory()
 {
-    // 1. 맵 초기화
-    MapCategory.Add(CategoryType::CT_Weapon, WeaponCheck);
-    MapCategory.Add(CategoryType::CT_Arrow, ArrowCheck);
-    MapCategory.Add(CategoryType::CT_Shield, ShieldCheck);
-    MapCategory.Add(CategoryType::CT_Armor, ArmorCheck);
-    MapCategory.Add(CategoryType::CT_Material, MaterialCheck);
-    MapCategory.Add(CategoryType::CT_Food, FoodCheck);
-    MapCategory.Add(CategoryType::CT_Favorites, FavoritesCheck);
+    MapCategory.Add(EItemCategory::IT_Weapon, WeaponCheck);
+    MapCategory.Add(EItemCategory::IT_Arrow, ArrowCheck);
+    MapCategory.Add(EItemCategory::IT_Shield, ShieldCheck);
+    MapCategory.Add(EItemCategory::IT_Armor, ArmorCheck);
+    MapCategory.Add(EItemCategory::IT_Material, MaterialCheck);
+    MapCategory.Add(EItemCategory::IT_Food, FoodCheck);
 
-    MapCategoryText.Add(CategoryType::CT_Weapon, WeaponText);
-    MapCategoryText.Add(CategoryType::CT_Arrow, ArrowText);
-    MapCategoryText.Add(CategoryType::CT_Shield, ShieldText);
-    MapCategoryText.Add(CategoryType::CT_Armor, ArmorText);
-    MapCategoryText.Add(CategoryType::CT_Material, MaterialText);
-    MapCategoryText.Add(CategoryType::CT_Food, FoodText);
-    MapCategoryText.Add(CategoryType::CT_Favorites, FavoritesText);
+    MapCategoryText.Add(EItemCategory::IT_Weapon, WeaponText);
+    MapCategoryText.Add(EItemCategory::IT_Arrow, ArrowText);
+    MapCategoryText.Add(EItemCategory::IT_Shield, ShieldText);
+    MapCategoryText.Add(EItemCategory::IT_Armor, ArmorText);
+    MapCategoryText.Add(EItemCategory::IT_Material, MaterialText);
+    MapCategoryText.Add(EItemCategory::IT_Food, FoodText);
 
     WeaponCheck->OnCheckStateChanged.AddDynamic(this, &UInventoryScroll::OnWeaponCheckChanged);
     ArrowCheck->OnCheckStateChanged.AddDynamic(this, &UInventoryScroll::OnArrowCheckChanged);
@@ -151,13 +212,12 @@ void UInventoryScroll::InitCategory()
     ArmorCheck->OnCheckStateChanged.AddDynamic(this, &UInventoryScroll::OnArmorCheckChanged);
     MaterialCheck->OnCheckStateChanged.AddDynamic(this, &UInventoryScroll::OnMaterialCheckChanged);
     FoodCheck->OnCheckStateChanged.AddDynamic(this, &UInventoryScroll::OnFoodCheckChanged);
-    FavoritesCheck->OnCheckStateChanged.AddDynamic(this, &UInventoryScroll::OnFavoritesCheckChanged);
 
-    SelectCategory(CategoryType::CT_Weapon, true);
+    SelectCategory(EItemCategory::IT_Weapon, true);
 }
 
 
-void UInventoryScroll::SelectCategory(CategoryType type, bool bIsChecked)
+void UInventoryScroll::SelectCategory(EItemCategory type, bool bIsChecked)
 {
     if (!bIsChecked)
     {
@@ -165,7 +225,7 @@ void UInventoryScroll::SelectCategory(CategoryType type, bool bIsChecked)
         return;
     }
         
-    for (const TPair<CategoryType, UCheckBox*>& Pair : MapCategory)
+    for (const TPair<EItemCategory, UCheckBox*>& Pair : MapCategory)
     {
         UCheckBox* CheckBox = Pair.Value;
 
@@ -175,7 +235,7 @@ void UInventoryScroll::SelectCategory(CategoryType type, bool bIsChecked)
         CheckBox->SetIsChecked(false);    
     }
 
-    for (const TPair<CategoryType, UTextBlock*>& Pair : MapCategoryText)
+    for (const TPair<EItemCategory, UTextBlock*>& Pair : MapCategoryText)
     {
         UTextBlock* TextBlock = Pair.Value;
 
@@ -189,4 +249,6 @@ void UInventoryScroll::SelectCategory(CategoryType type, bool bIsChecked)
     MapCategoryText[type]->SetVisibility(ESlateVisibility::Visible);
 
     CurrentCategory = type;
+
+    SetSort(CurrentCategory);
 }

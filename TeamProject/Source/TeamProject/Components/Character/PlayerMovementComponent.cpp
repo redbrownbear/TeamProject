@@ -5,15 +5,30 @@
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/CapsuleComponent.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "Actors/Character/PlayerCharacter.h"
-
+#include "GameFramework/PlayerController.h"
 UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& ObjectInitializer)
 {
 
 	BrakingDecelerationFlying = 10000.f;
 	AirControl = 0.f;
+	MaxFlySpeed = PLAYER_CLIMB_SPEED;
 	
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset{ 
+			TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Move/Climb_Up_Land.Climb_Up_Land'") 
+		};
+
+		if (Asset.Object)
+		{
+			LandUpMontage = Asset.Object;
+		}
+	}
+
+
+
 }
 
 bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
@@ -42,14 +57,21 @@ bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
 		TraceParams
 	);
 
-	DrawDebugLine(GetWorld(), Start, End,FColor::Red,false, 2.f);
-
 	return Returnbool;
 }
 
-bool UPlayerMovementComponent::TrySetMoveClimb()
+bool UPlayerMovementComponent::TrySetMoveClimb(FVector2D ActionValue)
 {
 	FHitResult HitResult;
+
+	if (ActionValue.X == 1)
+	{
+		CanClimbUpLand();
+	}
+	else if (ActionValue.X == -1)
+	{
+		CanClimbDownLand();
+	}
 
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 
@@ -71,7 +93,7 @@ bool UPlayerMovementComponent::TrySetMoveClimb()
 		FVector NewLocation = SurfacePoint + SurfaceNormal * 20;
 
 		Player_C->SetActorRotation(FRotator(Player_Rot));
-
+		Player_C->GetController()->SetControlRotation(FRotator(Player_Rot));
 		Player_C->SetActorLocation(NewLocation);
 
 		return true;
@@ -79,6 +101,99 @@ bool UPlayerMovementComponent::TrySetMoveClimb()
 	
 
 	SetClimbMode(false);
+
+	return false;
+}
+
+bool UPlayerMovementComponent::CanClimbUpLand()
+{
+
+	AActor* OwnerActor = GetOwner();
+
+	FHitResult HitResult;
+
+	FVector Start = OwnerActor->GetActorLocation();
+
+	FVector CharacterUpVector = OwnerActor->GetActorUpVector();
+
+	FVector UpEnd = Start + CharacterUpVector * PLAYER_CAPSULE_HALF_HEIGHT * 2;
+
+	FVector CharacterForwardVector = OwnerActor->GetActorForwardVector();
+	FVector ForwardEnd = UpEnd + CharacterForwardVector * PLAYER_CAPSULE_RADIUS * 3;
+	FVector DownEnd = ForwardEnd - CharacterUpVector * PLAYER_CAPSULE_HALF_HEIGHT * 2;
+
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(OwnerActor);
+
+	
+	
+	bool CanStand = !GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		UpEnd,
+		ForwardEnd,
+		ECollisionChannel::ECC_Visibility,
+		TraceParams
+	);
+
+	if (CanStand)
+	{
+
+
+		CanStand = GetWorld()->LineTraceSingleByChannel(
+			HitResult,
+			ForwardEnd,
+			DownEnd,
+			ECollisionChannel::ECC_Visibility,
+			TraceParams
+		);
+
+		if (CanStand)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CanStand"));
+			APlayerCharacter* Player_C = Cast<APlayerCharacter>(OwnerActor);
+
+
+			Climb_State = EClimb_State::Land;
+
+			Player_C->GetMesh()->GetAnimInstance()->Montage_Play(LandUpMontage);
+			
+
+			return true;
+
+
+		}
+	}
+	return false;
+}
+
+bool UPlayerMovementComponent::CanClimbDownLand()
+{
+	AActor* OwnerActor = GetOwner();
+
+	FHitResult HitResult;
+
+	FVector Start = OwnerActor->GetActorLocation();
+
+	FVector CharacterUpVector = OwnerActor->GetActorUpVector();
+
+	FVector End = Start - CharacterUpVector * (PLAYER_CAPSULE_HALF_HEIGHT* 1.5);
+
+
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(OwnerActor);
+
+	bool CanStand = GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		Start,
+		End,
+		ECollisionChannel::ECC_Visibility,
+		TraceParams
+	);
+	if (CanStand)
+	{
+		SetClimbMode(false);
+	}
+	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
 
 	return false;
 }
@@ -98,7 +213,7 @@ void UPlayerMovementComponent::SetClimbMode(bool _bool)
 
 	bIsClimbing = _bool;
 
-	MaxFlySpeed = _bool ? 100 : PLAYER_MOVE_NML;
+	AnimInst->bIsClimingLand = false;
 
 	USpringArmComponent* SpringArm = Player_C->GetSpringArm();
 
@@ -106,9 +221,7 @@ void UPlayerMovementComponent::SetClimbMode(bool _bool)
 
 	SpringArm->bEnableCameraRotationLag = _bool;
 
-	SpringArm->CameraLagSpeed = 5.f;
-
-	SpringArm->CameraLagMaxDistance = 100.f;
+	Climb_State = EClimb_State::Climb;
 
 }
 

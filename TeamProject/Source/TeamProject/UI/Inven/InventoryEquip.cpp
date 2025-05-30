@@ -10,6 +10,9 @@ void UInventoryEquip::NativeConstruct()
 	BoxItemOption->SetVisibility(ESlateVisibility::Hidden);
 	BoxItemOptionCompare->SetVisibility(ESlateVisibility::Hidden);
 	BoxItemHp->SetVisibility(ESlateVisibility::Hidden);
+
+	TextItemName->SetText(FText::FromString(""));
+	TextDescription->SetText(FText::FromString(""));
 }
 
 void UInventoryEquip::RefreshDescription(const FItemData& ItemData)
@@ -22,5 +25,4 @@ void UInventoryEquip::RefreshDescription(const FItemData& ItemData)
 	{
 		ItemSimpleIcon->SetBrushFromTexture(LoadedTexture);
 	}
-
 }

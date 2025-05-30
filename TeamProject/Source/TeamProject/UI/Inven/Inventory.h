@@ -43,8 +43,7 @@ public: //바인딩을 위해 퍼블릭선언
 private:
 	UFUNCTION()
 	void RefreshInventory(const FItemData& ItemData);
-
-private:
+	UFUNCTION()
 	void RefreshEquip(const FItemData& ItemData);
 
 protected:

@@ -73,7 +73,6 @@ void UQuest::BindDelegates()
     {
         QuestManager->OnQuestUpdated.AddDynamic(this, &UQuest::RefreshQuestList);
     }
-
 }
 
 void UQuest::RemoveDelegates()

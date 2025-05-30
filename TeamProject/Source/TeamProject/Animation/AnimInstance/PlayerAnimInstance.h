@@ -50,6 +50,10 @@ public:
 	bool bIsCliming = false;
 	UPROPERTY(BlueprintReadOnly)
 	FRotator Rotator;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsClimingLand = false;
+
+
 
 
 

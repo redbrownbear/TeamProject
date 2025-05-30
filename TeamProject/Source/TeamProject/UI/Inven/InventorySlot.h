@@ -26,11 +26,14 @@ protected:
 	
 public:
 	void SetItemData(const FItemData& Item);
+	const FItemData& GetItemData() const { return ItemData; }
 
 public:
 	void SetSelected(bool bIsSelected);
 
 private:
+	FItemData ItemData;
+
 	UPROPERTY(meta = (BindWidget))
 	UImage* Icon;
 	UPROPERTY(meta = (BindWidget))
@@ -38,4 +41,7 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Amount;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* Value;
 };

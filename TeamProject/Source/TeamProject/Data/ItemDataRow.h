@@ -22,7 +22,13 @@ public:
 	int32 ItemID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	EItemCategoryType ItemCategory;
+	int32 ItemCount = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	EItemCategory eItemCategory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	EArmorKind eArmorKind;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSoftObjectPtr<UTexture2D> ItemIcon;
@@ -36,6 +42,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	int32 price;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	bool bIsArrow;
 
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")

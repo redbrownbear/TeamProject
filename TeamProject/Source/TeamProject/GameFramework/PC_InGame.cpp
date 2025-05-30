@@ -244,12 +244,13 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	// 클라이밍 상태일 때의 캐릭터 무브
 	if (Movement->IsClimbing())
 	{
+		if (Movement->GetClimbMode() == EClimb_State::Land)
+		{
+			return;
+		}
 	
 		FHitResult HitResult;
 		
-		Movement->TrySetMoveClimb();
-
-
 		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
 		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
@@ -271,6 +272,9 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(UpVector, ActionValue.X);
 		ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
 
+		Movement->TrySetMoveClimb(ActionValue);
+
+		
 	}
 	
 	// 노말 상태일 때의 캐릭터 무브
@@ -332,10 +336,17 @@ void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 	}
 
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 
+	if (Player_C->GetCharacterMovement()->MovementMode == MOVE_Flying)
+	{
+		return;
+	}
+	
+	
 	AddYawInput(ActionValue.X);
 	AddPitchInput(-ActionValue.Y);
-	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	
 	if (!Player_C)
 	{
 		return;
@@ -417,7 +428,7 @@ void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
-	
+
 	
 	if (Movement->IsClimbing())
 	{
@@ -425,10 +436,12 @@ void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 	}
 
 	else
-	{
-		Movement->TrySetMoveClimb();
-		
-		Movement->SetClimbMode(true);
+	{	
+		FHitResult HitResult;
+		if (Movement->ClimbingLineTrace(HitResult))
+		{
+			Movement->SetClimbMode(true);
+		}
 	}
 }
 
