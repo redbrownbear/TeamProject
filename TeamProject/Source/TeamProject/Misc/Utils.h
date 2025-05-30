@@ -244,7 +244,7 @@ enum class EReadyToAttackStep : uint8
 
 
 UENUM()
-enum class EItemCategoryType : int8
+enum class EItemCategory : int8
 {
     IT_Weapon,
     IT_Arrow,
@@ -257,10 +257,21 @@ enum class EItemCategoryType : int8
 UENUM()
 enum class EWeaponKind : uint8
 {
-    SWORD = 0,
+    None = 0,
+    SWORD,
     SPEAR,
     LSWORD,
     BOW,
+    END,
+};
+
+UENUM()
+enum class EArmorKind : uint8
+{
+    None = 0,
+    HEAD,
+    ARMOR,
+    LEG,
     END,
 };
 

@@ -16,21 +16,7 @@
 
 #include "InventoryScroll.generated.h"
 
-
-UENUM(BlueprintType)
-enum class CategoryType : uint8
-{
-	CT_Weapon,
-	CT_Arrow,
-	CT_Shield,
-	CT_Armor,
-	CT_Material,
-	CT_Food,
-	CT_Favorites,
-
-	CT_End,
-};
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryDescriptionUpdated, const FItemData&, ItemData);
 /**
  * 
  */
@@ -50,29 +36,35 @@ public:
 
 public:
 	void MoveSelection(FIntPoint Direction);
-	void SelectInit();
+	void InitSelectItem();
+
+	const FItemData& GetCurItem()& { return ActiveSlots[CurrentIndex]->GetItemData(); }
 
 private:
+	void SetSort(EItemCategory Type);
+
 	void InitCategory();
 
 	//눈물을 머금고 각각바인딩...
 	UFUNCTION()
-	void OnWeaponCheckChanged(bool bIsChecked)		{ SelectCategory(CategoryType::CT_Weapon, bIsChecked); }
+	void OnWeaponCheckChanged(bool bIsChecked)		{ SelectCategory(EItemCategory::IT_Weapon, bIsChecked); }
 	UFUNCTION()
-	void OnArrowCheckChanged(bool bIsChecked)		{ SelectCategory(CategoryType::CT_Arrow, bIsChecked); }
+	void OnArrowCheckChanged(bool bIsChecked)		{ SelectCategory(EItemCategory::IT_Arrow, bIsChecked); }
 	UFUNCTION()
-	void OnShieldCheckChanged(bool bIsChecked)		{ SelectCategory(CategoryType::CT_Shield, bIsChecked); }
+	void OnShieldCheckChanged(bool bIsChecked)		{ SelectCategory(EItemCategory::IT_Shield, bIsChecked); }
 	UFUNCTION()
-	void OnArmorCheckChanged(bool bIsChecked)		{ SelectCategory(CategoryType::CT_Armor, bIsChecked); }
+	void OnArmorCheckChanged(bool bIsChecked)		{ SelectCategory(EItemCategory::IT_Armor, bIsChecked); }
 	UFUNCTION()
-	void OnMaterialCheckChanged(bool bIsChecked)	{ SelectCategory(CategoryType::CT_Material, bIsChecked); }
+	void OnMaterialCheckChanged(bool bIsChecked)	{ SelectCategory(EItemCategory::IT_Material, bIsChecked); }
 	UFUNCTION()
-	void OnFoodCheckChanged(bool bIsChecked)		{ SelectCategory(CategoryType::CT_Food, bIsChecked); }
-	UFUNCTION()
-	void OnFavoritesCheckChanged(bool bIsChecked)	{ SelectCategory(CategoryType::CT_Favorites, bIsChecked); }
+	void OnFoodCheckChanged(bool bIsChecked)		{ SelectCategory(EItemCategory::IT_Food, bIsChecked); }
 
-	void SelectCategory(CategoryType type, bool bIsChecked);
+	void SelectCategory(EItemCategory type, bool bIsChecked);
 
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnInventoryDescriptionUpdated OnInventoryDescriptionUpdated;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -106,8 +98,6 @@ public:
 	UCheckBox* MaterialCheck;
 	UPROPERTY(meta = (BindWidget))
 	UCheckBox* FoodCheck;
-	UPROPERTY(meta = (BindWidget))
-	UCheckBox* FavoritesCheck;
 	
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* WeaponText;
@@ -121,15 +111,12 @@ public:
 	UTextBlock* MaterialText;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* FoodText;
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* FavoritesText;
-
 
 private:
 	UPROPERTY()
-	TMap<CategoryType, UCheckBox*> MapCategory;
+	TMap<EItemCategory, UCheckBox*> MapCategory;
 	UPROPERTY()
-	TMap<CategoryType, UTextBlock*> MapCategoryText;
+	TMap<EItemCategory, UTextBlock*> MapCategoryText;
 
-	CategoryType CurrentCategory = CategoryType::CT_Weapon;
+	EItemCategory CurrentCategory = EItemCategory::IT_Weapon;
 };
