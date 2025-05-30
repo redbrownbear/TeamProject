@@ -6,6 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "FloatingActor.generated.h"
 
+#define FLOATINGACTOR_FORCE						800.f
+#define FLOATINGACTOR_MASS_KG			        1000.f
+#define FLOATINGACTOR_LINEAR_DAMPING			1.2f
+
 class UBoxComponent;
 class USplineComponent;
 class AFlowSurface;

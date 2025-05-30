@@ -12,13 +12,6 @@ AFlowSurface::AFlowSurface()
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	RootComponent = DefaultSceneRoot;
 
-	if (!HasAnyFlags(RF_ClassDefaultObject))
-	{
-		static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/Floating/PM_Floating.PM_Floating"));
-		check(PhysMaterial.Object);
-		PhysicalMaterial = PhysMaterial.Object;
-	}
-
 	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("SplineComponent"));
 	SplineComponent->SetClosedLoop(true);
 	SplineComponent->SetupAttachment(RootComponent);
@@ -49,6 +42,7 @@ void AFlowSurface::BeginPlay()
 
 		if (NewBoxComponent)
 		{
+			NewBoxComponent->SetBoxExtent(FLOWSURFACE_DEFAULT_BOX_EXTENT);
 			NewBoxComponent->RegisterComponent();
 
 			CollisionComponent_Array.Add(NewBoxComponent);
@@ -85,7 +79,7 @@ void AFlowSurface::Tick(float DeltaTime)
 
 			CollisionComponent_Array[i]->SetWorldLocation(NewLocation);
 
-			// 이 박스 주변에 있는 부유체 탐색
+			// FloatingActor가 Spline 따라 흘러가도록
 			TArray<AActor*> OverlappingActors;
 			CollisionComponent_Array[i]->GetOverlappingActors(OverlappingActors, AFloatingActor::StaticClass());
 
@@ -99,7 +93,7 @@ void AFlowSurface::Tick(float DeltaTime)
 						fDistanceAlongSpline_Array[i], ESplineCoordinateSpace::World);
 					FlowDirection.Z = 0.f;
 
-					FVector FlowForce = FlowDirection.GetSafeNormal() * 2000.f; // 힘 세기 조절
+					FVector FlowForce = FlowDirection.GetSafeNormal() * FLOATINGACTOR_FORCE; // 힘 세기 조절
 					Floating->GetCollisionComponent()->AddForce(FlowForce, NAME_None, true);
 				}
 			}

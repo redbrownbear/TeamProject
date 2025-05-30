@@ -34,16 +34,16 @@ void ATempleBallSpawner::BeginPlay()
 		);
 	}
 
-	DrawDebugBox(
-		GetWorld(),
-		GetActorLocation(),
-		SpawnAreaExtent,
-		FColor::Green,
-		true, // 지속
-		-1,   // 무제한 시간
-		0,
-		2
-	);
+	//DrawDebugBox(
+	//	GetWorld(),
+	//	GetActorLocation(),
+	//	SpawnAreaExtent,
+	//	FColor::Green,
+	//	true, // 지속
+	//	-1,   // 무제한 시간
+	//	0,
+	//	2
+	//);
 
 }
 
