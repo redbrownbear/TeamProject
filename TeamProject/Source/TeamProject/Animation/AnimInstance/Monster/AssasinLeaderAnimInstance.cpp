@@ -19,7 +19,7 @@ void UAssasinLeaderAnimInstance::NativeInitializeAnimation()
 	APawn* Pawn = TryGetPawnOwner();
 	if (GIsEditor && FApp::IsGame() && !Pawn)
 	{
-		checkf(false, TEXT("To use UHinoxAnimInstance, Owner muse be Pawn."));
+		checkf(false, TEXT("To use UAssasinLeaderAnimInstance, Owner muse be Pawn."));
 		return;
 	}
 	else if (!Pawn) { return; }

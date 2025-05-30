@@ -125,6 +125,8 @@ enum class EMonsterState : uint8
     ReadyToAttack,
     Damage_Eye,
     Happy,
+    Barrier,
+    Stone,
     Temp,
     End,
 };
@@ -208,6 +210,14 @@ enum class EMonsterMontage : uint8
 	THROW_STONE_START,
 	THROW_STONE_END,
 
+    APPEAR_START,
+    APPEAR_END,
+    BARRIER_START,
+    BARRIER_END,
+    ATTACK_BALL_FIRST_START,
+    ATTACK_BALL_FIRST_END,
+    ATTACK_BALL_SECOND_START,
+    ATTACK_BALL_SECOND_END,
 
 
     END,
@@ -237,6 +247,22 @@ enum class EHinoxCombatIndex : uint8
     End
 };
 
+UENUM()
+enum class EAssasinBossPhase : uint8
+{
+    PHASE_1 = 0,
+    PHASE_2,
+    PHASE_3,
+    END,
+};
+
+UENUM()
+enum class EAssasinBossCombat : uint8
+{
+    BARRIER = 0,
+    STONE,
+    END,
+};
 
 UENUM()
 enum class EReadyToAttackStep : uint8

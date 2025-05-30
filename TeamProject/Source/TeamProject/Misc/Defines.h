@@ -55,6 +55,12 @@
 #define ASSASIN_LEADER_ATTACK_BIG_COOLTIME_MAX										6.f
 #define ASSASIN_LEADER_DISTANCE_MAX													600.f
 
+#define ASSASIN_BOSS_BARRIER_MAX_TIME												3.f
+#define ASSASIN_BOSS_STONE_FIRST_MAX_TIME											3.f
+#define ASSASIN_BOSS_STONE_SECOND_MAX_TIME											5.f
+#define ASSASIN_BOSS_STUN_MAX_TIME													5.f
+#define ASSASIN_BOSS_TONEXT_MAX_TIME													5.f
+
 #define NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS											1000.f
 #define NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS										1500.f
 #define NPC_SIGHT_ANGLE																90.f
