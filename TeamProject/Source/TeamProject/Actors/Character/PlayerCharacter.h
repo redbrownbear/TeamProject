@@ -59,6 +59,8 @@ public:
 
 	UFUNCTION()
 	void TimelineProgress(float Value);
+	
+	virtual void Landed(const FHitResult& Hit) override;
 
 
 	void ZoomIn();
@@ -94,6 +96,7 @@ protected:
 	UCurveFloat* ZoomCurve;
 
 
+	
 
 
 public:

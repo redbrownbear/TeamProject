@@ -27,8 +27,29 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 		}
 	}
 
+	{
+		Glider = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Glider"));
+		ConstructorHelpers::FObjectFinder<USkeletalMeshComponent> Asset{
+			TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Armor/Animation/Glide/Item_Parastole2_Vagrant.Item_Parastole2_Vagrant'")
+		};
 
+		if (Asset.Object)
+		{
+			Glider = Asset.Object;
+		}
+		
+	}
+	
 
+}
+
+void UPlayerMovementComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	//APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+	//Glider->SetupAttachment(Player_C->GetMesh(), TEXT("GliderSocket"));
+	//Glider->SetVisibility(true);
 }
 
 bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
@@ -222,6 +243,81 @@ void UPlayerMovementComponent::SetClimbMode(bool _bool)
 	SpringArm->bEnableCameraRotationLag = _bool;
 
 	Climb_State = EClimb_State::Climb;
+
+}
+
+void UPlayerMovementComponent::SetGlideMode(bool _bool)
+{
+	bIsGliding = _bool;
+
+	GravityScale = _bool ? 0.07: 1.f;
+
+	AirControl = _bool ? 0.f : 0.f;
+
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+
+	AnimInst->bIsGliding = _bool;
+
+	if (Velocity.Size2D() < PLAYER_GLIDE_MIN_SPEED)
+	{
+		float Origin_Z = Velocity.Z;
+		
+
+		FRotator Player_Rot = GetOwner()->GetActorRotation();
+
+		FVector DirectionXY = Player_Rot.Vector();
+
+		Velocity = DirectionXY * PLAYER_GLIDE_MIN_SPEED;
+		
+		Velocity.Z = 0 < Origin_Z ? 0 : Origin_Z;
+	}
+
+
+}
+
+void UPlayerMovementComponent::GlidingMove(FVector2D ActionValue)
+{
+	ActionValue.X;
+	ActionValue.Y;
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+	Player_C->GetVelocity();
+	float DeltaTime = GetWorld()->GetDeltaSeconds();
+
+	if(ActionValue.Y != 0)
+	{
+		FRotator NewRotation = Player_C->GetActorRotation();
+		NewRotation.Yaw += ActionValue.Y * PLAYER_GLIDE_ROTATE_SPEED * DeltaTime;
+		Player_C->SetActorRotation(NewRotation);
+
+		float ZSpeed = Velocity.Z;
+		Velocity.Z = 0.f;
+		FVector NewDirection = Player_C->GetActorForwardVector();
+		float Speed = Velocity.Size();
+		Velocity = NewDirection * Speed;
+		Velocity.Z = ZSpeed;
+	}
+
+	if (ActionValue.X != 0)
+	{
+		float Speed = Velocity.Size2D();
+		float NewSpeed = FMath::Clamp(Speed + DeltaTime* ActionValue.X * PLAYER_GLIDE_MODIFY_SPEED, PLAYER_GLIDE_MIN_SPEED,PLAYER_GLIDE_MAX_SPEED);
+
+		if (Speed != NewSpeed)
+		{
+			float Origin_Z = Velocity.Z;
+
+			FVector DirectionXY = FVector(Velocity.X, Velocity.Y, 0.f).GetSafeNormal();
+
+			Velocity = DirectionXY * NewSpeed;
+			Velocity.Z = Origin_Z;
+		}
+		
+	}
+
+	
 
 }
 

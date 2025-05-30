@@ -144,6 +144,15 @@ void APlayerCharacter::TimelineProgress(float Value)
 	SpringArm->TargetArmLength = Length;
 }
 
+void APlayerCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	Cast<UPlayerMovementComponent>(GetCharacterMovement())->SetGlideMode(false);
+
+
+}
+
 
 
 

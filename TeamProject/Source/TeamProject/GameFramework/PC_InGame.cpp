@@ -71,7 +71,8 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LookMouse,
 		ETriggerEvent::Triggered, this, &ThisClass::OnLook);
 
-
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Jump,
+		ETriggerEvent::Started, this, &ThisClass::JumpGlide);
 
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LeftClick,
@@ -241,6 +242,10 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	{
 		return;
 	}
+	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+
+	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+
 	// 클라이밍 상태일 때의 캐릭터 무브
 	if (Movement->IsClimbing())
 	{
@@ -251,9 +256,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	
 		FHitResult HitResult;
 		
-		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
-		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
 		FVector Normal_Vec = HitResult.Normal;
 
@@ -276,14 +279,18 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 		
 	}
+	else if (Movement->bIsGliding)
+	{
+		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+
+		P_Anim->ActionValue = ActionValue;
+		
+		Movement->GlidingMove(ActionValue);
+	}
 	
 	// 노말 상태일 때의 캐릭터 무브
 	else
 	{
-		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
-
-
-		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
 		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
@@ -329,6 +336,20 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 
 	UE_LOG(LogTemp, Warning, TEXT("ActionValue %f, %f"), ActionValue.X, ActionValue.Y);
 	P_Anim->ActionValue = ActionValue;
+}
+
+void APC_InGame::JumpGlide(const FInputActionValue& InputActionValue)
+{
+	ACharacter* Player_C = Cast<ACharacter>(GetPawn());
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+	if (Movement->IsFalling())
+	{
+		Movement->SetGlideMode(true);
+	}
+	else
+	{
+		Player_C->Jump();
+	}
 }
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)

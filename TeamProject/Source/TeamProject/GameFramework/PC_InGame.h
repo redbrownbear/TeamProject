@@ -66,6 +66,11 @@ public:
 	UInputAction* IA_LookMouse = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_Climb = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
+	UInputAction* IA_Jump = nullptr;
+
+
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_LeftClick = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
@@ -186,6 +191,8 @@ public:
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
 	void OnMoveCancel(const FInputActionValue& InputActionValue);
+
+	void JumpGlide(const FInputActionValue& InputActionValue);
 
 
 	void OnLook(const FInputActionValue& InputActionValue);
