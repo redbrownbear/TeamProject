@@ -361,6 +361,13 @@ enum class EEquip_State
     Bow,
 
 };
+UENUM()
+enum class EClimb_State
+{
+    Climb,
+    Land,
+};
+
 
 // NPC 추가
 UENUM()
