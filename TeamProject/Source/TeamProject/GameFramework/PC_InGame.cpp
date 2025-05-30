@@ -287,13 +287,15 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
+		P_Anim->ActionValue = ActionValue;
+
 		const FRotator Rotation = K2_GetActorRotation();
 		const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
 		const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
 		const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
 
 
-		P_Anim->ActionValue = ActionValue;
+		
 
 		APawn* ControlledPawn = GetPawn();
 		ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
@@ -323,8 +325,9 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
-	const FVector2D ActionValue = FVector2D();
+	const FVector2D ActionValue = FVector2D::Zero();
 
+	UE_LOG(LogTemp, Warning, TEXT("ActionValue %f, %f"), ActionValue.X, ActionValue.Y);
 	P_Anim->ActionValue = ActionValue;
 }
 
