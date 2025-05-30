@@ -1,4 +1,5 @@
 #include "Actors/Temple/Surface/FloatingActor.h"
+#include "FlowSurface.h"
 #include "Components/BoxComponent.h"
 #include "Components/SplineComponent.h"
 #include "Data/FloatingActorTableRow.h"
@@ -9,9 +10,6 @@ AFloatingActor::AFloatingActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
-	RootComponent = DefaultSceneRoot;
 
 	if (!HasAnyFlags(RF_ClassDefaultObject))
 	{
@@ -29,9 +27,7 @@ AFloatingActor::AFloatingActor()
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
-	StaticMeshComponent->SetVisibility(true); 
-
-	
+	StaticMeshComponent->SetVisibility(true); 	
 }
 
 // Called when the game starts or when spawned
@@ -41,6 +37,34 @@ void AFloatingActor::BeginPlay()
 
 	SetData(DataTableRowHandle);
 
+	CollisionComponent->SetSimulatePhysics(true);
+	CollisionComponent->SetGenerateOverlapEvents(true);
+
+	FloatingSpeed = FLOWSURFACE_MOVING_SPEED;
+
+	/*if (FlowSurface && GetOwner() == nullptr)
+	{
+		const int32 NumClones = 5;
+		const float SplineLength = FlowSurface->GetSplineComponent()->GetSplineLength();
+
+		for (int32 i = 1; i < NumClones; ++i) 
+		{
+			const float StartDistance = (SplineLength / NumClones) * i;
+			const FVector SpawnLocation = FlowSurface->GetSplineComponent()->GetLocationAtDistanceAlongSpline(StartDistance, ESplineCoordinateSpace::World);
+			const FRotator SpawnRotation = GetActorRotation();
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+
+			AFloatingActor* Clone = GetWorld()->SpawnActor<AFloatingActor>(GetClass(), SpawnLocation, SpawnRotation, SpawnParams);
+			if (Clone)
+			{
+				Clone->FlowSurface = FlowSurface;
+				Clone->DistanceAlongSpline = StartDistance;
+				Clone->FloatingSpeed = FloatingSpeed;
+				Clone->SetData(DataTableRowHandle);
+			}
+		}
+	}*/
 }
 
 void AFloatingActor::OnConstruction(const FTransform& Transform)
@@ -61,6 +85,20 @@ void AFloatingActor::OnConstruction(const FTransform& Transform)
 void AFloatingActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	//if (FlowSurface && FlowSurface->GetSplineComponent())
+	//{
+	//	DistanceAlongSpline += DeltaTime * FloatingSpeed;
+
+	//	float SplineLength = FlowSurface->GetSplineComponent()->GetSplineLength();
+	//	if (DistanceAlongSpline > SplineLength)
+	//	{
+	//		DistanceAlongSpline = 0.f; // 루프되도록
+	//	}
+
+	//	FVector NewLocation = FlowSurface->GetSplineComponent()->GetLocationAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World);
+	//	SetActorLocation(NewLocation);
+	//}
 
 }
 

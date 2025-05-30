@@ -8,6 +8,7 @@
 
 class UBoxComponent;
 class USplineComponent;
+class AFlowSurface;
 struct FFloatingActorTableRow;
 
 UCLASS()
@@ -29,6 +30,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
 
+	UBoxComponent* GetCollisionComponent() { return CollisionComponent; }
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Table")
 	FDataTableRowHandle DataTableRowHandle;
@@ -38,18 +41,22 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> CollisionComponent;
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UPhysicalMaterial> PhysicalMaterial; 
-	//UPROPERTY(VisibleAnywhere)
-	//TArray<TObjectPtr<UBoxComponent>> CollisionComponent_Array;
-	//UPROPERTY(EditAnywhere)
-	//TObjectPtr<USplineComponent> SplineComponent;
-	//TArray<float> fDistanceAlongSpline_Array;
+
+	UPROPERTY(EditInstanceOnly, Category = "Flow")
+	TObjectPtr<AFlowSurface> FlowSurface = nullptr;
 
 protected:
-	bool bMove = false;
+	float DistanceAlongSpline = 0.f;
+
+	UPROPERTY(EditAnywhere, Category = "Flow")
+	float FloatingSpeed = 0.f;
 };

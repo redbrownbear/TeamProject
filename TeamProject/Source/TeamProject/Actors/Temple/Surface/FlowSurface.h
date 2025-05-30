@@ -6,6 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "FlowSurface.generated.h"
 
+#define FLOWSURFACE_FLOOR_NUM				20
+#define FLOWSURFACE_DEFAULT_BOX_EXTENT		FVector(128.0, 48.0, 1.0)
+#define FLOWSURFACE_MOVING_SPEED			100.f
+
 class UBoxComponent;
 class USplineComponent;
 
@@ -24,13 +28,18 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
+    USplineComponent* GetSplineComponent() { return SplineComponent; }
+
 protected:
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<USceneComponent> DefaultSceneRoot;
+
     UPROPERTY(VisibleAnywhere)
     TArray<TObjectPtr<UBoxComponent>> CollisionComponent_Array;
+
     UPROPERTY(EditAnywhere)
     TObjectPtr<USplineComponent> SplineComponent;
+
     TArray<float> fDistanceAlongSpline_Array;
 
 protected:

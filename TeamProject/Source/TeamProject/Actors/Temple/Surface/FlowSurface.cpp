@@ -1,48 +1,32 @@
 #include "Actors/Temple/Surface/FlowSurface.h"
+#include "FloatingActor.h"
 #include "Components/BoxComponent.h"
 #include "Components/SplineComponent.h"
 
 #include "Misc/Utils.h"
 
-#define FLOWSURFACE_FLOOR_NUM				10
-#define FLOWSURFACE_DEFAULT_BOX_EXTENT		FVector(128.0, 48.0, 1.0)
-#define FLOWSURFACE_MOVING_SPEED			60.f
-
 AFlowSurface::AFlowSurface()
 {
  	PrimaryActorTick.bCanEverTick = true;
-
+	
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	RootComponent = DefaultSceneRoot;
 
 	if (!HasAnyFlags(RF_ClassDefaultObject))
 	{
-		//static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Script/PhysicsCore.PhysicalMaterial'/Game/Blueprint/NPC/ConveyorBelt/PM_ConveyorBelt.PM_ConveyorBelt'"));
-		//check(PhysMaterial.Object);
-		//PhysicalMaterial = PhysMaterial.Object;
-	}
-	
-	FlowSpeed = FLOWSURFACE_MOVING_SPEED;
-	CollisionComponent_Array.Reserve(FLOWSURFACE_FLOOR_NUM);
-	fDistanceAlongSpline_Array.Reserve(FLOWSURFACE_FLOOR_NUM);
-
-	for (int32 i = 0; i < FLOWSURFACE_FLOOR_NUM; ++i)
-	{
-		FString ComponentName = FString::Printf(TEXT("CollisionComponent_%d"), i);
-		CollisionComponent_Array.Push(CreateDefaultSubobject<UBoxComponent>(*ComponentName));
-		CollisionComponent_Array[i]->SetBoxExtent(FLOWSURFACE_DEFAULT_BOX_EXTENT);
-		CollisionComponent_Array[i]->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-		//if (!HasAnyFlags(RF_ClassDefaultObject))
-		//{
-		//	CollisionComponent_Array[i]->SetPhysMaterialOverride(PhysicalMaterial);
-		//}
-		CollisionComponent_Array[i]->SetCollisionProfileName(CollisionProfileName::MapMesh);
-		fDistanceAlongSpline_Array.Push(0.f);
+		static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/Floating/PM_Floating.PM_Floating"));
+		check(PhysMaterial.Object);
+		PhysicalMaterial = PhysMaterial.Object;
 	}
 
 	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("SplineComponent"));
 	SplineComponent->SetClosedLoop(true);
-	SplineComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	SplineComponent->SetupAttachment(RootComponent);
+
+	CollisionComponent_Array.Reserve(FLOWSURFACE_FLOOR_NUM); // Reserve는 여기서 해도 무방합니다.
+	fDistanceAlongSpline_Array.Reserve(FLOWSURFACE_FLOOR_NUM); // Reserve는 여기서 해도 무방합니다.
+
+	FlowSpeed = FLOWSURFACE_MOVING_SPEED;
 }
 
 // Called when the game starts or when spawned
@@ -50,16 +34,35 @@ void AFlowSurface::BeginPlay()
 {
 	Super::BeginPlay();
 
-	float SplineLength = SplineComponent->GetSplineLength();
-
-	for (int32 i = 0; i < FLOWSURFACE_FLOOR_NUM; ++i)
-	{
-		fDistanceAlongSpline_Array[i] = SplineLength / FLOWSURFACE_FLOOR_NUM * i;
-		//CollisionComponent_Array[i]->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
-	}
 	bMove = true;
 
 	FlowSpeed = FLOWSURFACE_MOVING_SPEED;
+
+	const float SplineLength = SplineComponent->GetSplineLength();
+	for (int32 i = 0; i < FLOWSURFACE_FLOOR_NUM; ++i)
+	{
+		const float DevidedLength = SplineLength / FLOWSURFACE_FLOOR_NUM * i;
+		fDistanceAlongSpline_Array.Push(DevidedLength);
+
+		FString ComponentName = FString::Printf(TEXT("CollisionComponent%d"), i);
+		UBoxComponent* NewBoxComponent = NewObject<UBoxComponent>(this, UBoxComponent::StaticClass(), FName(*ComponentName));
+
+		if (NewBoxComponent)
+		{
+			NewBoxComponent->RegisterComponent();
+
+			CollisionComponent_Array.Add(NewBoxComponent);
+
+			NewBoxComponent->SetCanEverAffectNavigation(false);
+			NewBoxComponent->SetCollisionProfileName(CollisionProfileName::Water); 
+
+			FAttachmentTransformRules AttachRules = FAttachmentTransformRules::KeepRelativeTransform;
+
+			// 실제 부착 수행
+			NewBoxComponent->AttachToComponent(RootComponent, AttachRules);
+			NewBoxComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+		}
+	}
 }
 
 // Called every frame
@@ -81,7 +84,27 @@ void AFlowSurface::Tick(float DeltaTime)
 			FVector NewLocation = SplineComponent->GetLocationAtDistanceAlongSpline(fDistanceAlongSpline_Array[i], ESplineCoordinateSpace::World);
 
 			CollisionComponent_Array[i]->SetWorldLocation(NewLocation);
+
+			// 이 박스 주변에 있는 부유체 탐색
+			TArray<AActor*> OverlappingActors;
+			CollisionComponent_Array[i]->GetOverlappingActors(OverlappingActors, AFloatingActor::StaticClass());
+
+			for (AActor* Actor : OverlappingActors)
+			{
+				AFloatingActor* Floating = Cast<AFloatingActor>(Actor);
+				if (Floating && Floating->GetCollisionComponent())
+				{
+					// 흐름 방향 계산
+					FVector FlowDirection = SplineComponent->GetDirectionAtDistanceAlongSpline(
+						fDistanceAlongSpline_Array[i], ESplineCoordinateSpace::World);
+					FlowDirection.Z = 0.f;
+
+					FVector FlowForce = FlowDirection.GetSafeNormal() * 2000.f; // 힘 세기 조절
+					Floating->GetCollisionComponent()->AddForce(FlowForce, NAME_None, true);
+				}
+			}
 		}
+
 	}
 }
 
