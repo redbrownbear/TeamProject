@@ -22,6 +22,8 @@
 #include "Actors/Temple/Ice/IcePillar.h"
 #include "Actors/Temple/Ice/IcePreview.h"
 
+#include "Actors/Temple/Treasure/TreasureBox.h"
+
 APC_InGame::APC_InGame()
 {
 	{
@@ -50,6 +52,15 @@ void APC_InGame::BeginPlay()
 		UIManager->PostWorldInitialize();
 
 	ChangeInputContext(EInputContext::IC_InGame);
+
+	if (!IcePreviewActor && IcePreviewClass)
+	{
+		IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
+		if (IcePreviewActor)
+		{
+			IcePreviewActor->SetActorEnableCollision(false);
+		}
+	}
 }
 
 void APC_InGame::SetupInputComponent()
@@ -119,15 +130,6 @@ void APC_InGame::Tick(float DeltaSeconds)
 
 	if (bQPressed)
 	{
-		if (!IcePreviewActor && IcePreviewClass)
-		{
-			IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
-			if (IcePreviewActor)
-			{
-				IcePreviewActor->SetActorEnableCollision(false);
-			}
-		}
-
 		if (IcePreviewActor)
 		{
 			UpdateIcePreview();
@@ -330,6 +332,11 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 {
+	if (bIsCameraLocked)
+	{
+		return; 
+	}
+
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 
@@ -376,6 +383,24 @@ void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
 
 	WeaponManagerComponent->LeftClickAction();
 
+	// TreasureBox 열 때
+	{
+		FVector Start;
+		FRotator ViewRot;
+		PlayerCharacter->GetController()->GetPlayerViewPoint(Start, ViewRot);
+		FVector End = Start + ViewRot.Vector() * 500.f;
+
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(PlayerCharacter);
+
+		if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+		{
+			if (ATreasureBox* HitBox = Cast<ATreasureBox>(Hit.GetActor()))
+			{
+				HitBox->OpenTBox();
+			}
+		}
+	}	
 }
 
 void APC_InGame::RightClick(const FInputActionValue& InputActionValue)
@@ -538,44 +563,68 @@ void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
 
 	if (!bCanSpawn) return;
 
-	EndIcePreview();
-
 	FVector SpawnLoc = Hit.Location;
 	FVector Normal = Hit.Normal;
 
-	// 표면 기울기 따라서 얼음 생성되게
-	FRotator SpawnRot = FRotationMatrix::MakeFromZ(Normal).Rotator();
+	AIcePillar* IcePillarActor = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass);
 
-	AIcePillar* NewPillar = GetWorld()->SpawnActor<AIcePillar>(
-		IcePillarClass,
-		SpawnLoc,
-		SpawnRot
-	);	
+	// 호출 순서 중요
+	IcePillarActor->SetRiseDirection(Hit.Normal);
+	IcePillarActor->SetPivotLocation(Hit.Location);
+
+	// 노멀 방향 회전 적용
+	FRotator SpawnRot = FRotationMatrix::MakeFromZ(Hit.Normal).Rotator();
+	IcePillarActor->SetActorRotation(SpawnRot);
+	IcePillarActor->SetActorHiddenInGame(false); // 보이도록	
+	IcePreviewActor->SetActorHiddenInGame(true);
 
 	bCanSpawn = false;
-
 }
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
-{
-	if (!IcePreviewActor)
+{	
+	bQPressed = !bQPressed;
+
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
+
+	if (bQPressed)
 	{
-		bQPressed = true;
+		// 캐릭터 이동 및 회전
+		C_Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
+
+		Player_C->bUseControllerRotationYaw = true; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+
+		// 이동 방향으로 자동 회전 비활성화
+		C_Movement->bOrientRotationToMovement = false;
+
+		USpringArmComponent* C_SpringArm = Player_C->GetSpringArm();
+
+		Player_C->ZoomIn();
+
+		bIsCameraLocked = true;
+
+		// show icepreview
+		IcePreviewActor->SetActorHiddenInGame(false);	
+
+		//// 애니메이션
+		//UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+		//AnimInst->Montage_Play(ChargingMTG);
 	}
 	else
 	{
-		EndIcePreview();
-		bQPressed = false;
-	}
-}
+		Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
 
-void APC_InGame::EndIcePreview()
-{
-	if (IcePreviewClass && IcePreviewActor)
-	{
-		IcePreviewActor->StopPreview();
-		IcePreviewActor->Destroy();
-		IcePreviewActor = nullptr;
+		// 이동 방향으로 자동 회전 비활성화
+		Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+		Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+
+		Player_C->ZoomOut();
+		bIsCameraLocked = false;
+
+		// hide icepreview
+		IcePreviewActor->SetActorHiddenInGame(true);
 	}
 }
 
@@ -749,15 +798,14 @@ void APC_InGame::UpdateIcePreview()
 
 	if (bHitResult)
 	{
-		IcePreviewActor->SetActorLocation(Hit.Location);
+		IcePreviewActor->SetPivotLocation(Hit.Location);
 
 		// 노멀 방향 회전 적용
 		FRotator PreviewRot = FRotationMatrix::MakeFromZ(Hit.Normal).Rotator();
 		IcePreviewActor->SetActorRotation(PreviewRot);
+		IcePreviewActor->SetActorHiddenInGame(false); // 보이도록	
 
-		IcePreviewActor->SetActorHiddenInGame(false); // 보이도록
-
-		IcePreviewActor->StartPreview();
+		IcePreviewActor->SetRiseDirection(Hit.Normal);
 	}
 	else
 	{
@@ -810,6 +858,7 @@ void APC_InGame::CheckSurface()
 		}
 
 		bCanSpawn = true;
+		IcePreviewActor->SetCanSpawn(bCanSpawn);
 	}
 }
 

@@ -15,8 +15,8 @@ UCLASS()
 class TEAMPROJECT_API AIcePillar : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AIcePillar();
 
@@ -24,21 +24,25 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-protected:
+public:
 	// 파괴 처리
 	UFUNCTION()
-	void DestroyPillar(); 
+	void DestroyPillar();
+
+	void SetRiseDirection(FVector InDirection);
+	void SetPivotLocation(FVector InPosition);
+	void SetCanSpawn(bool bFlag) { bCanSpawn = bFlag; }
 
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	float MaxSpeed = 100.f;
+	float MaxSpeed = 300.f;
 
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
 	float MaxHeight = 300.0f; // 매크로로 바꿀까
@@ -54,5 +58,8 @@ private:
 	FVector StartLocation;
 	float CurrentRise = 0.f;
 	bool bIsRising = true;
+	bool bCanSpawn = false;
 
+	FVector RiseDirection;
+	FVector PivotLocation;
 };

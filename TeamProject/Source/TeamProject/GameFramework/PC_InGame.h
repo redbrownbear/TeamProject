@@ -54,10 +54,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
 	UInputMappingContext* IMC_Quest = nullptr;
 
-	//Supernatural
-	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
-	UInputMappingContext* IMC_Supernatural = nullptr;
-
 	//Player
 public:
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
@@ -236,10 +232,6 @@ public:
 
 	// --------- Supernatural ----------
 protected:
-	// 프리뷰 종료
-	UFUNCTION()
-	void EndIcePreview();
-
 	// 매 프레임 업데이트
 	UFUNCTION()
 	void UpdateIcePreview();
@@ -251,7 +243,6 @@ protected:
 	// 수면 체크
 	UFUNCTION()
 	void CheckSurface();
-
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
@@ -270,6 +261,9 @@ private:
 	bool bQPressed = false;
 	bool bCanSpawn = false;
 	bool bHitResult = false;
+
+	bool bIsCameraLocked = false;
+
 
 	FHitResult Hit;
 };

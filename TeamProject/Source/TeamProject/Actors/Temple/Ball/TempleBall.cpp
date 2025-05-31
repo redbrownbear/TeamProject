@@ -11,13 +11,18 @@ ATempleBall::ATempleBall()
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	RootComponent = CollisionComponent;
-	CollisionComponent->SetCollisionProfileName(TEXT("PhysicsActor"));		
+	CollisionComponent->SetCollisionProfileName(TEXT("PhysicsActor"));
+	//CollisionComponent->InitSphereRadius(5000.0f);
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
-	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Script/Engine.StaticMesh'/Game/Temple/Ball/DgnObj_AncientBallL_01.DgnObj_AncientBallL_01'"));
+	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/Ball/PM_TempleBall.PM_TempleBall"));
 	PhysicalMaterial = PhysMaterial.Object;
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> BallMesh(TEXT("/Game/Temple/Ball/DgnObj_AncientBallL_01.DgnObj_AncientBallL_01"));
+	StaticMeshComponent->SetStaticMesh(BallMesh.Object);
+	StaticMeshComponent->SetWorldScale3D(FVector(100.f, 100.f, 100.f));
 
 }
 
@@ -29,7 +34,13 @@ void ATempleBall::BeginPlay()
 	CollisionComponent->SetCanEverAffectNavigation(false);
 	CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
 
+	/*StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);*/
+
 	StaticMeshComponent->BodyInstance.bUseCCD = true;
 	StaticMeshComponent->SetSimulatePhysics(true);
 	StaticMeshComponent->SetEnableGravity(true);
+
+	StaticMeshComponent->SetVisibility(true);
+	StaticMeshComponent->SetHiddenInGame(false);
 }
