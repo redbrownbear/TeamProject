@@ -384,23 +384,16 @@ void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
 	WeaponManagerComponent->LeftClickAction();
 
 	// TreasureBox 열 때
-	{
-		FVector Start;
-		FRotator ViewRot;
-		PlayerCharacter->GetController()->GetPlayerViewPoint(Start, ViewRot);
-		FVector End = Start + ViewRot.Vector() * 500.f;
-
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(PlayerCharacter);
-
-		if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
+	{		
+		if (TreasureBoxActor != nullptr)
 		{
-			if (ATreasureBox* HitBox = Cast<ATreasureBox>(Hit.GetActor()))
+			bool bCanOpen = TreasureBoxActor->GetOpenBox();
+			if (bCanOpen)
 			{
-				HitBox->OpenTBox();
+				TreasureBoxActor->OpenTBox();
 			}
-		}
-	}	
+		}	
+	}
 }
 
 void APC_InGame::RightClick(const FInputActionValue& InputActionValue)

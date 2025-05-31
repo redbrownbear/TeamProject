@@ -16,10 +16,6 @@ ATreasureBox::ATreasureBox()
 	SkeletalMeshComponent->SetupAttachment(RootComponent);
 	SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
-	CollisionComponent->SetRelativeScale3D(FVector(30.f, 30.f, 30.f));
-	//SkeletalMeshComponent->SetRelativeLocation(FVector(0.f, 0.f, -34.f));
-	//SkeletalMeshComponent->SetRelativeScale3D(FVector(10.f, 10.f, 10.f));
-
 }
 
 // Called when the game starts or when spawned
@@ -28,12 +24,16 @@ void ATreasureBox::BeginPlay()
 	Super::BeginPlay();
 	
 	CollisionComponent->SetCollisionObjectType(ECC_WorldDynamic);
-	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Block);
+	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	CollisionComponent->SetGenerateOverlapEvents(true);
 
 	SkeletalMeshComponent->SetCollisionObjectType(ECC_WorldStatic);
 	SkeletalMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
+
+	MaterialInterface = SkeletalMeshComponent->GetMaterial(0);
+	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+	SkeletalMeshComponent->SetMaterial(0, DynamicMaterialInstance);
 
 	if (CollisionComponent)
 	{
@@ -42,28 +42,22 @@ void ATreasureBox::BeginPlay()
 	}
 
 	bCanTakeItem = true;
-
-	GetParticleEffect();
 }
 
 void ATreasureBox::OpenTBox()
 {
 	if (!bCanTakeItem) return;
 
-	USkeletalMeshComponent* MeshComp = FindComponentByClass<USkeletalMeshComponent>();
-	if (MeshComp)
-	{		
-		if (bCanOpenBox)
-		{
-			GetParticleEffect();
-			GetTreasure(); // Change Particle?
-		}		
-	}			
+	GetTreasure();
 }
 
 void ATreasureBox::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	bCanOpenBox = true;
+	if (bCanTakeItem)
+	{
+		bCanOpenBox = true;
+		GetParticleEffect();
+	}
 }
 
 void ATreasureBox::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -78,7 +72,8 @@ void ATreasureBox::GetTreasure()
 		// open Item UI
 		// Add Item to Inventory
 
-		//bCanTakeItem = false;
+		DynamicMaterialInstance->SetScalarParameterValue("Color", 1.f);
+		bCanTakeItem = false;
 	}	
 }
 

@@ -1,22 +1,20 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TempleBallSpawner.generated.h"
+#include "TempleActorSpawner.generated.h"
 
 //class UTempleBallSpawnerComponent;
-class ATempleBall;
+class ATempleActor;
 
 UCLASS()
-class TEAMPROJECT_API ATempleBallSpawner : public AActor
+class TEAMPROJECT_API ATempleActorSpawner : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ATempleBallSpawner();
+	ATempleActorSpawner();
 
 protected:
 	// Called when the game starts or when spawned
@@ -24,11 +22,11 @@ protected:
 
 public:
 	UFUNCTION()
-	void SpawnBall();
+	void SpawnActor();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Spawning")
-	TSubclassOf<ATempleBall> BallClass;
+	TSubclassOf<ATempleActor> TempleActorClass;
 
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	FVector SpawnAreaExtent;

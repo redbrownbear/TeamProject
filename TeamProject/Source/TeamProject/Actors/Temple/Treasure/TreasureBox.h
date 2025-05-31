@@ -25,6 +25,8 @@ public:
 	UFUNCTION()
 	void OpenTBox();
 
+	bool GetOpenBox() { return bCanOpenBox; }
+
 protected:
 	UFUNCTION()
 	void OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -52,6 +54,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
+
+protected:
+	UMaterialInterface* MaterialInterface;
+	UMaterialInstanceDynamic* DynamicMaterialInstance;
 
 private:
 	bool bCanTakeItem = false;

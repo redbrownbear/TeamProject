@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Engine/TriggerVolume.h"
-#include "BallTriggerVolume.generated.h"
+#include "ActorDeleteVolume.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TEAMPROJECT_API ABallTriggerVolume : public ATriggerVolume
+class TEAMPROJECT_API ActorDeleteVolume : public ATriggerVolume
 {
 	GENERATED_BODY()
 	

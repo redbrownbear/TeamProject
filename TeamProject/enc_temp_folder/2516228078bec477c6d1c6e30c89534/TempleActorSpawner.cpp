@@ -1,20 +1,20 @@
-#include "Actors/Temple/Ball/TempleBallSpawner.h"
-#include "TempleBall.h"
+#include "TempleActorSpawner.h"
+#include "TempleActor.h"
 #include "Misc/Defines.h"
 
 // Sets default values
-ATempleBallSpawner::ATempleBallSpawner()
+ATempleActorSpawner::ATempleActorSpawner()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
-	BallClass = ATempleBall::StaticClass();
+	TempleActorClass = ATempleActor::StaticClass();
 }
 
 // Called when the game starts or when spawned
-void ATempleBallSpawner::BeginPlay()
+void ATempleActorSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -23,43 +23,31 @@ void ATempleBallSpawner::BeginPlay()
 	SpawnInterval = DUNGEON_BALL_SPAWNINTERVAL;
 	SpawnAreaExtent = DUNGEON_BALL_SPAWNAREAEXTENT;
 	
-	if (BallClass)
+	if (TempleActorClass)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
 			SpawnTimer,
 			this,
-			&ATempleBallSpawner::SpawnBall,
+			&ATempleActorSpawner::SpawnActor,
 			SpawnInterval,
 			true
 		);
 	}
 
-	//DrawDebugBox(
-	//	GetWorld(),
-	//	GetActorLocation(),
-	//	SpawnAreaExtent,
-	//	FColor::Green,
-	//	true, // 지속
-	//	-1,   // 무제한 시간
-	//	0,
-	//	2
-	//);
-
 }
 
-void ATempleBallSpawner::SpawnBall()
+void ATempleActorSpawner::SpawnActor()
 {
-	if (!BallClass) return;
+	if (!TempleActorClass) return;
 
-	// 랜덤 위치 계산 (스폰 범위 안에서)
 	FVector Origin = GetActorLocation();
 	FVector RandomOffset = FVector(
 		FMath::RandRange(-SpawnAreaExtent.X, SpawnAreaExtent.X),
 		FMath::RandRange(-SpawnAreaExtent.Y, SpawnAreaExtent.Y),
-		FMath::RandRange(-SpawnAreaExtent.Z, SpawnAreaExtent.Z) // Z도 확장하려면 0.f 이상으로
+		FMath::RandRange(-SpawnAreaExtent.Z, SpawnAreaExtent.Z) 
 	);
 	FVector SpawnLocation = Origin + RandomOffset;
 
 	FRotator SpawnRotation = FRotator::ZeroRotator;
-	GetWorld()->SpawnActor<ATempleBall>(BallClass, SpawnLocation, SpawnRotation);
+	GetWorld()->SpawnActor<ATempleActor>(TempleActorClass, SpawnLocation, SpawnRotation);
 }

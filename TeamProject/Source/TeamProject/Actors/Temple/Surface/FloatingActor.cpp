@@ -2,7 +2,7 @@
 #include "FlowSurface.h"
 #include "Components/BoxComponent.h"
 #include "Components/SplineComponent.h"
-#include "Data/FloatingActorTableRow.h"
+#include "Data/TempleActorTableRow.h"
 #include "Misc/Utils.h"
 
 // Sets default values
