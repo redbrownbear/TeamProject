@@ -36,6 +36,7 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 				const FVector TargetLocation = Location + FVector(0.0, 0.0, 1.0) * KOGASTONE_ORBIT_RADIUS;
 
 				NewTransform.SetLocation(TargetLocation);
+				KogaStone->SetKogaStoneKind(EKogaStoneKind::FIRST);
 
 				KogaStone->FinishSpawning(NewTransform);
 			}
@@ -43,12 +44,12 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 				break;
 			case EAssasinBossPhase::PHASE_2:
 			{
-				AKogaStone* Projectile = World->SpawnActorDeferred<AKogaStone>(AKogaStone::StaticClass(),
+				AKogaStone* KogaStone = World->SpawnActorDeferred<AKogaStone>(AKogaStone::StaticClass(),
 					FTransform::Identity, nullptr, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 
 				FTransform NewTransform;
-				Projectile->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayer);
+				KogaStone->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayer);
 
 				const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 				FVector Location = MonsterLocation + CharacterMonster->GetActorRightVector() * KOGASTONE_ORBIT_RADIUS;
@@ -56,18 +57,22 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 
 
 				NewTransform.SetLocation(Location);
+				KogaStone->SetKogaStoneKind(EKogaStoneKind::SECOND);
+				KogaStone->SetInitialAngleOffset(0.f);
 
-				Projectile->FinishSpawning(NewTransform);
+				KogaStone->FinishSpawning(NewTransform);
 				//////////////////////////////////////////
-				Projectile = World->SpawnActorDeferred<AKogaStone>(AKogaStone::StaticClass(),
+				KogaStone = World->SpawnActorDeferred<AKogaStone>(AKogaStone::StaticClass(),
 					FTransform::Identity, nullptr, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 
-				Projectile->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayer);
+				KogaStone->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayer);
 				Location = MonsterLocation - CharacterMonster->GetActorRightVector() * KOGASTONE_ORBIT_RADIUS;
 				NewTransform.SetLocation(Location);
+				KogaStone->SetKogaStoneKind(EKogaStoneKind::SECOND);
+				KogaStone->SetInitialAngleOffset(180.f);
 
-				Projectile->FinishSpawning(NewTransform);
+				KogaStone->FinishSpawning(NewTransform);
 			}
 				break;
 			case EAssasinBossPhase::PHASE_3:
@@ -83,6 +88,7 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 				const FVector TargetLocation = Location + FVector(0.0, 0.0, 1.0) * KOGASTONE_ORBIT_RADIUS;
 
 				NewTransform.SetLocation(TargetLocation);
+				KogaStone->SetKogaStoneKind(EKogaStoneKind::THIRD);
 
 				KogaStone->FinishSpawning(NewTransform);
 			}

@@ -34,9 +34,15 @@ protected:
 	EAssasinBossPhase ePhase = EAssasinBossPhase::PHASE_1;
 	EAssasinBossCombat eCombat = EAssasinBossCombat::BARRIER;
 
+protected:
+	void EnableFlyingMode(bool bFlag);
+	void Hovering(float DeltaTime);
+
 public:
 	EAssasinBossPhase GetPhase() const { return ePhase; }
 	void SetPhase(EAssasinBossPhase InPhase) { ePhase = InPhase; }
+
+
 
 protected:
 	float ToNextElapsedTime = 0.f;

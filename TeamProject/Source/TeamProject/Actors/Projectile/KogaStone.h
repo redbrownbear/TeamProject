@@ -31,10 +31,12 @@ private:
 	float OrbitRadius = 300.0f;
 	//float OrbitSpeed = 300.0f; 
 	//float OrbitPlaneRotationRate = 0.5f; 
+	float InitialAngleOffset = 0.f;
 
 public:
 	void SetFallTrue();
 	void SetKogaStoneKind(EKogaStoneKind InKind) { eKind = InKind; }
+	void SetInitialAngleOffset(float InAngle) { InitialAngleOffset = InAngle; }
 
 private:
 	float WaitTime = 0.f;

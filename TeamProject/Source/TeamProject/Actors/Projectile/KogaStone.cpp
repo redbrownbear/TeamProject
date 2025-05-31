@@ -42,22 +42,22 @@ void AKogaStone::Tick(float DeltaTime)
 			if (eKind == EKogaStoneKind::SECOND)
 			{
 
-				if (AActor* CenterActor = GetOwner())
+				if (AActor* CenterActor = GetInstigator())
 				{
-					// X축 공전: Pitch 축 기준으로 회전 = 언리얼 좌표계 기준으로 YZ 평면에서 회전
 					OrbitAngle += 360.f * DeltaTime;
+					float TotalAngle = OrbitAngle + InitialAngleOffset;
+					float Radians = FMath::DegreesToRadians(TotalAngle);
 
-					// 도 → 라디안
-					float Radians = FMath::DegreesToRadians(OrbitAngle);
+					// 회전 평면을 Instigator 기준으로 맞춤
+					FVector Forward = CenterActor->GetActorForwardVector(); // X
+					FVector Right = CenterActor->GetActorRightVector();     // Y
+					FVector Up = CenterActor->GetActorUpVector();           // Z
 
-					// 기준 위치
+					// 원형 궤도: Right(=Y) & Up(=Z) 기준으로 회전
+					FVector Offset = FMath::Cos(Radians) * Right * OrbitRadius + FMath::Sin(Radians) * Up * OrbitRadius;
+
 					FVector Center = CenterActor->GetActorLocation();
-
-					// X축을 기준으로 회전하면, YZ 평면 상에서 원을 그림
-					float Y = FMath::Cos(Radians) * OrbitRadius;
-					float Z = FMath::Sin(Radians) * OrbitRadius;
-
-					FVector NewLocation = Center + FVector(0.f, Y, Z);
+					FVector NewLocation = Center + Offset;
 					SetActorLocation(NewLocation);
 				}
 			}
