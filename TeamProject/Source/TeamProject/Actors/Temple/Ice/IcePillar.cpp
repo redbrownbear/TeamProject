@@ -43,7 +43,7 @@ void AIcePillar::BeginPlay()
 		RiseTimeline->PlayFromStart();
 	}
 
-	// ÀÏÁ¤ ½Ã°£ ÈÄ ÀÚµ¿ ÆÄ±«
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ ï¿½Úµï¿½ ï¿½Ä±ï¿½
 	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 		{
 			FTimerHandle Handle;

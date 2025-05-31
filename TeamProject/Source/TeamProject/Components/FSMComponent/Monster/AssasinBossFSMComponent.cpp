@@ -85,6 +85,8 @@ void UAssasinBossFSMComponent::ChangeState(EMonsterState NewState)
 		default:
 			break;
 		}
+
+		UE_LOG(LogTemp, Warning, TEXT("ChangeState // PrevState Stone"))
 		eCombat = EAssasinBossCombat::BARRIER;
 		break;
 	case EMonsterState::Stun:
@@ -106,9 +108,11 @@ void UAssasinBossFSMComponent::ChangeState(EMonsterState NewState)
 		{
 		case EAssasinBossPhase::PHASE_1:
 		case EAssasinBossPhase::PHASE_3:
+			UE_LOG(LogTemp, Warning, TEXT("EAssasinBossPhase::PHASE_1, 3"));
 			CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_BALL_FIRST_END);
 			break;
 		case EAssasinBossPhase::PHASE_2:
+			UE_LOG(LogTemp, Warning, TEXT("EAssasinBossPhase::PHASE_2"));
 			CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_BALL_SECOND_END);
 			break;
 		case EAssasinBossPhase::END:
@@ -143,7 +147,19 @@ void UAssasinBossFSMComponent::UpdateIdle(float DeltaTime)
 
 void UAssasinBossFSMComponent::UpdateCombat(float DeltaTime)
 {
+	if (!Player)
+	{
+		ToNextElapsedTime = 0.f;
+		ChangeState(EMonsterState::Idle);
+	}
+
+
 	ToNextElapsedTime += DeltaTime;
+
+
+	const FVector PlayerLocation = Player->GetActorLocation();
+	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
+
 	if (ToNextElapsedTime > ASSASIN_BOSS_TONEXT_MAX_TIME)
 	{
 		ToNextElapsedTime = 0.f;
@@ -191,28 +207,38 @@ void UAssasinBossFSMComponent::UpdateStone(float DeltaTime)
 {
 	StopMove();
 
-	BarrierElapsedTime += DeltaTime;
+	if (!Player)
+	{
+		StoneElapsedTime = 0.f;
+		ChangeState(EMonsterState::Idle);
+	}
+
+	const FVector PlayerLocation = Player->GetActorLocation();
+
+	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
+
+	StoneElapsedTime += DeltaTime;
 
 	switch (ePhase)
 	{
 	case EAssasinBossPhase::PHASE_1:
-		if (BarrierElapsedTime > ASSASIN_BOSS_STONE_FIRST_MAX_TIME)
+		if (StoneElapsedTime > ASSASIN_BOSS_STONE_FIRST_MAX_TIME)
 		{
-			BarrierElapsedTime = 0.f;
+			StoneElapsedTime = 0.f;
 			ChangeState(EMonsterState::Combat);
 		}
 		break;
 	case EAssasinBossPhase::PHASE_2:
-		if (BarrierElapsedTime > ASSASIN_BOSS_STONE_SECOND_MAX_TIME)
+		if (StoneElapsedTime > ASSASIN_BOSS_STONE_SECOND_MAX_TIME)
 		{
-			BarrierElapsedTime = 0.f;
+			StoneElapsedTime = 0.f;
 			ChangeState(EMonsterState::Combat);
 		}
 		break;
 	case EAssasinBossPhase::PHASE_3:
-		if (BarrierElapsedTime > ASSASIN_BOSS_STONE_FIRST_MAX_TIME)
+		if (StoneElapsedTime > ASSASIN_BOSS_STONE_FIRST_MAX_TIME)
 		{
-			BarrierElapsedTime = 0.f;
+			StoneElapsedTime = 0.f;
 			ChangeState(EMonsterState::Combat);
 		}
 		break;

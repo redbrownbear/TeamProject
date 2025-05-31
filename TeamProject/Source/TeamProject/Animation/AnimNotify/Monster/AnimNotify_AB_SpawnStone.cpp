@@ -10,6 +10,8 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
+	UE_LOG(LogTemp, Warning, TEXT("UAnimNotify_AB_SpawnStone::Notify"));
+
 	if (ACharacterMonster* CharacterMonster = Cast<ACharacterMonster>(MeshComp->GetOwner()))
 	{
 		UWorld* World = MeshComp->GetWorld();
@@ -31,7 +33,9 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 				KogaStone->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayer);
 
 				const FVector Location = CharacterMonster->GetActorLocation();
-				NewTransform.SetLocation(Location);
+				const FVector TargetLocation = Location + FVector(0.0, 0.0, 1.0) * KOGASTONE_ORBIT_RADIUS;
+
+				NewTransform.SetLocation(TargetLocation);
 
 				KogaStone->FinishSpawning(NewTransform);
 			}
@@ -46,7 +50,11 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 				FTransform NewTransform;
 				Projectile->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayer);
 
-				const FVector Location = CharacterMonster->GetActorLocation();
+				const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+				FVector Location = MonsterLocation + CharacterMonster->GetActorRightVector() * KOGASTONE_ORBIT_RADIUS;
+
+
+
 				NewTransform.SetLocation(Location);
 
 				Projectile->FinishSpawning(NewTransform);
@@ -56,7 +64,7 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 
 
 				Projectile->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayer);
-
+				Location = MonsterLocation - CharacterMonster->GetActorRightVector() * KOGASTONE_ORBIT_RADIUS;
 				NewTransform.SetLocation(Location);
 
 				Projectile->FinishSpawning(NewTransform);
@@ -72,7 +80,9 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 				KogaStone->SetData(ProjectileName::Monster_AB_KogaStoneBig, CollisionProfileName::ToPlayer);
 
 				const FVector Location = CharacterMonster->GetActorLocation();
-				NewTransform.SetLocation(Location);
+				const FVector TargetLocation = Location + FVector(0.0, 0.0, 1.0) * KOGASTONE_ORBIT_RADIUS;
+
+				NewTransform.SetLocation(TargetLocation);
 
 				KogaStone->FinishSpawning(NewTransform);
 			}

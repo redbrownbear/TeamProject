@@ -17,7 +17,7 @@ AKogaStone::AKogaStone()
 void AKogaStone::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	ProjectileMovementComponent->Velocity = FVector::Zero();
 }
 
 // Called every frame
@@ -26,7 +26,6 @@ void AKogaStone::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	WaitTime += DeltaTime;
-	ProjectileMovementComponent->Velocity = FVector::Zero();
 
 	if (!bFall)
 	{
@@ -70,6 +69,7 @@ void AKogaStone::SetFallTrue()
 {
 	bFall = true;
 	ProjectileMovementComponent->ProjectileGravityScale = 1.f;
+	ProjectileMovementComponent->Velocity = FVector::Zero();
 }
 
 void AKogaStone::SetVelocity()
@@ -78,7 +78,7 @@ void AKogaStone::SetVelocity()
 	{
 		if (APlayerController* PC = World->GetFirstPlayerController())
 		{
-			if (AActor* Player = PC->GetOwner())
+			if (AActor* Player = PC->GetPawn())
 			{
 				const FVector PlayerLocation = Player->GetActorLocation();
 				const FVector ProjectileLocation = GetActorLocation();
@@ -86,7 +86,7 @@ void AKogaStone::SetVelocity()
 				FVector Direction = PlayerLocation - ProjectileLocation;
 				Direction.Normalize();
 
-				ProjectileMovementComponent->Velocity = Direction;
+				ProjectileMovementComponent->Velocity = Direction * ProjectileTableRow->MaxSpeed;
 			}
 		}
 	}
