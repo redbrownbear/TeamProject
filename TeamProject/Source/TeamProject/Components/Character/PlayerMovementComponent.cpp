@@ -236,6 +236,13 @@ void UPlayerMovementComponent::SetClimbMode(bool _bool)
 
 void UPlayerMovementComponent::SetGlideMode(bool _bool)
 {
+	if (_bool)
+	{
+		if (!CanGlide())
+		{
+			return;
+		}
+	}
 	bIsGliding = _bool;
 
 	GravityScale = _bool ? 0.07: 1.f;
@@ -261,7 +268,16 @@ void UPlayerMovementComponent::SetGlideMode(bool _bool)
 		
 		Velocity.Z = 0 < Origin_Z ? 0 : Origin_Z;
 	}
-
+	UWeaponManagerComponent* WeaponManagerComponent = Player_C->GetWeaponManagerComponent();
+	if (_bool)
+	{
+		AnimInst->Montage_Play(WeaponManagerComponent->GetGliderEquipMontage());
+	}
+	else
+	{
+		WeaponManagerComponent->GetGlider()->SetVisibility(false);
+		AnimInst->Montage_Play(WeaponManagerComponent->GetGliderUnEquipMontage());
+	}
 
 }
 
@@ -306,6 +322,28 @@ void UPlayerMovementComponent::GlidingMove(FVector2D ActionValue)
 	}
 
 	
+
+}
+
+bool UPlayerMovementComponent::CanGlide()
+{
+	AActor* Owner_C = GetOwner();
+	
+	FVector Start = Owner_C->GetActorLocation();
+	FVector C_Up_Vector = Owner_C->GetActorUpVector();
+	FVector End = Start - C_Up_Vector * PLAYER_CAPSULE_HALF_HEIGHT * 5;
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(Owner_C);
+
+	FHitResult HitResult;
+
+	return !GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		Start,
+		End,
+		ECollisionChannel::ECC_Visibility,
+		TraceParams
+	);
 
 }
 

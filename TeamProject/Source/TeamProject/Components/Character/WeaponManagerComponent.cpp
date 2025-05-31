@@ -70,6 +70,30 @@ UWeaponManagerComponent::UWeaponManagerComponent()
 			UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
 		}
 	}
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Glide/Equip_Float_On_Montage.Equip_Float_On_Montage'"));
+
+		if (Asset.Object)
+		{
+			EquipGlider = Asset.Object;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+		}
+	}
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimSequence'/Game/Resources/Player/Armor/Animation/Glide/Equip_Float_Off.Equip_Float_Off'"));
+
+		if (Asset.Object)
+		{
+			UnEquipGlider = Asset.Object;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+		}
+	}
 
 }
 

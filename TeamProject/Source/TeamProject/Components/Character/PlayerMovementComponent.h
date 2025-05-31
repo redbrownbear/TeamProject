@@ -42,6 +42,9 @@ public:
 	UAnimMontage* GTEST() { return LandUpMontage; }
 
 
+private:
+	bool CanGlide();
+
 
 private:
 	
