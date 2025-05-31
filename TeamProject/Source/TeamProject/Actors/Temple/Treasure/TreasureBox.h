@@ -27,6 +27,17 @@ public:
 
 protected:
 	UFUNCTION()
+	void OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+
+protected:
+	UFUNCTION()
 	void GetTreasure();
 
 	void GetParticleEffect();
@@ -44,5 +55,5 @@ protected:
 
 private:
 	bool bCanTakeItem = false;
-
+	bool bCanOpenBox = false;
 };

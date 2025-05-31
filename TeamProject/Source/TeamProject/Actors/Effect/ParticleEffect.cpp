@@ -8,80 +8,87 @@
 #include "Particles/ParticleSystem.h"
 
 AParticleEffect::AParticleEffect(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+    : Super(ObjectInitializer)
 {
-	PrimaryActorTick.bCanEverTick = true;
-	DefaultSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneComponent"));
-	RootComponent = DefaultSceneComponent;
-	ParticleEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleEffectComponent"));
-	ParticleEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+    PrimaryActorTick.bCanEverTick = true;
+    DefaultSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneComponent"));
+    RootComponent = DefaultSceneComponent;
+    ParticleEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleEffectComponent"));
+    ParticleEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 void AParticleEffect::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 {
-	DataTableRowHandle = InDataTableRowHandle;
-	if (DataTableRowHandle.IsNull()) { return; }
-	FParticleEffectTableRow* Data = DataTableRowHandle.GetRow<FParticleEffectTableRow>(DataTableRowHandle.RowName.ToString());
-	if (!Data) { return; }
-	ParticleEffectData = Data;
-	ParticleEffectComponent->SetTemplate(ParticleEffectData->EffectParticleSystem);
-	fLifeTime = ParticleEffectData->LifeTime;
+    DataTableRowHandle = InDataTableRowHandle;
+    if (DataTableRowHandle.IsNull()) { return; }
+    FParticleEffectTableRow* Data = DataTableRowHandle.GetRow<FParticleEffectTableRow>(DataTableRowHandle.RowName.ToString());
+    if (!Data) { return; }
+    ParticleEffectData = Data;
+    ParticleEffectComponent->SetTemplate(ParticleEffectData->EffectParticleSystem);
+
+    if (ParticleEffectData->bIsLifeTime)
+    {
+        fLifeTime = ParticleEffectData->LifeTime;
+    }
 }
 
 void AParticleEffect::SetParticleSystem(UParticleSystem* ParticleSystem)
 {
-	ParticleEffectComponent->SetTemplate(ParticleSystem);
+    ParticleEffectComponent->SetTemplate(ParticleSystem);
 }
 
 void AParticleEffect::PostDuplicate(EDuplicateMode::Type DuplicateMode)
 {
-	Super::PostDuplicate(DuplicateMode);
+    Super::PostDuplicate(DuplicateMode);
 
-	if (DuplicateMode == EDuplicateMode::Normal)
-	{
-		FTransform Backup = GetActorTransform();
-		SetData(DataTableRowHandle);
-		SetActorTransform(Backup);
-	}
+    if (DuplicateMode == EDuplicateMode::Normal)
+    {
+        FTransform Backup = GetActorTransform();
+        SetData(DataTableRowHandle);
+        SetActorTransform(Backup);
+    }
 }
 
 void AParticleEffect::PostLoad()
 {
-	Super::PostLoad();
+    Super::PostLoad();
 }
 
 void AParticleEffect::PostLoadSubobjects(FObjectInstancingGraph* OuterInstanceGraph)
 {
-	Super::PostLoadSubobjects(OuterInstanceGraph);
+    Super::PostLoadSubobjects(OuterInstanceGraph);
 }
 
 void AParticleEffect::PostInitializeComponents()
 {
-	Super::PostInitializeComponents();
+    Super::PostInitializeComponents();
 }
 
 void AParticleEffect::OnConstruction(const FTransform& Transform)
 {
-	Super::OnConstruction(Transform);
-	SetData(DataTableRowHandle);
-	SetActorTransform(Transform);
+    Super::OnConstruction(Transform);
+    SetData(DataTableRowHandle);
+    SetActorTransform(Transform);
 }
 
 // Called when the game starts or when spawned
 void AParticleEffect::BeginPlay()
 {
-	Super::BeginPlay();
-	SetData(DataTableRowHandle);
+    Super::BeginPlay();
+    SetData(DataTableRowHandle);
 }
 
 // Called every frame
 void AParticleEffect::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-	fCurrentLifeTime += DeltaTime;
-	if (fCurrentLifeTime > fLifeTime)
-	{
-		Destroy();
-	}
-}
+    Super::Tick(DeltaTime);
 
+    if (ParticleEffectData->bIsLifeTime)
+    {
+        fCurrentLifeTime += DeltaTime;
+        if (fCurrentLifeTime > fLifeTime)
+        {
+            Destroy();
+        }
+    }
+}
