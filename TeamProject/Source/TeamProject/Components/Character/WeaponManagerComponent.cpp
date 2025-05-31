@@ -38,13 +38,24 @@ UWeaponManagerComponent::UWeaponManagerComponent()
 	Arrow = CreateDefaultSubobject<UWeaponChildActorComponent>(TEXT("ArrowNormal"));
 	
 	Arrow->SetChildActorClass(AWeaponArrow::StaticClass());
+	{
+		Glider = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Glider"));
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset{
+			TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Armor/Animation/Glide/Item_Parastole2_Vagrant.Item_Parastole2_Vagrant'")
+		};
 
+		if (Asset.Object)
+		{
+			Glider->SetSkeletalMesh(Asset.Object);
+		}
+	}
 	if (Mesh)
 	{
 		Shield->SetupAttachment(Player_C->GetMesh(), TEXT("Shield_Socket"));
 		Sword->SetupAttachment(Player_C->GetMesh(), TEXT("Sword_Socket"));
 		Bow->SetupAttachment(Player_C->GetMesh(), TEXT("Bow_Socket"));
 		Arrow->SetupAttachment(Player_C->GetMesh(), TEXT("Arrow_Normal"));
+		Glider->SetupAttachment(Player_C->GetMesh(), TEXT("GliderSocket"));
 	}
 
 	{
@@ -70,7 +81,7 @@ void UWeaponManagerComponent::BeginPlay()
 	Sword->GetChildActor()->SetOwner(GetOwner());
 	Shield->GetChildActor()->SetOwner(GetOwner());
 	Bow->GetChildActor()->SetOwner(GetOwner());
-
+	Glider->SetVisibility(false);
 	// ...
 	
 }

@@ -1,4 +1,4 @@
-
+﻿
 #define	COLLISION_HIDDEN_IN_GAME													false
 
 #define MONSTER_AISENSECONFIG_SIGHT_SIGHTRADIUS										1000.f
@@ -64,5 +64,5 @@
 
 #define PLAYER_GLIDE_MAX_SPEED														700.f
 #define PLAYER_GLIDE_MIN_SPEED														100.f
-#define PLAYER_GLIDE_MODIFY_SPEED													200.f
+#define PLAYER_GLIDE_MODIFY_SPEED													600.f
 #define PLAYER_GLIDE_ROTATE_SPEED													100.f

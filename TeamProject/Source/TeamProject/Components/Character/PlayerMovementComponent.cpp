@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Components/Character/PlayerMovementComponent.h"
@@ -27,18 +27,7 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 		}
 	}
 
-	{
-		Glider = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Glider"));
-		ConstructorHelpers::FObjectFinder<USkeletalMeshComponent> Asset{
-			TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Armor/Animation/Glide/Item_Parastole2_Vagrant.Item_Parastole2_Vagrant'")
-		};
 
-		if (Asset.Object)
-		{
-			Glider = Asset.Object;
-		}
-		
-	}
 	
 
 }
@@ -46,10 +35,9 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 void UPlayerMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	//APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+	
+	
 
-	//Glider->SetupAttachment(Player_C->GetMesh(), TEXT("GliderSocket"));
-	//Glider->SetVisibility(true);
 }
 
 bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)

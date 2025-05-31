@@ -32,6 +32,7 @@ public:
 	UWeaponChildActorComponent* GetSword() { return Sword; }
 	UWeaponChildActorComponent* GetShield() { return Shield; }
 	UWeaponChildActorComponent* GetBow() { return Bow; }
+	USkeletalMeshComponent* GetGlider() { return Glider; }
 
 
 	EWeapon_Type GetNextWeaponType() { return NextWeapon; }
@@ -90,6 +91,9 @@ protected:
 
 	UPROPERTY()
 	UAnimMontage* UnEquip_Sword_Shield;
+	UPROPERTY()
+	TObjectPtr<USkeletalMeshComponent> Glider;
+
 
 
 	bool bRightClick;
