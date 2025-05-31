@@ -18,11 +18,6 @@ void ATempleActorSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
-	float SpawnInterval;
-
-	SpawnInterval = DUNGEON_BALL_SPAWNINTERVAL;
-	SpawnAreaExtent = DUNGEON_BALL_SPAWNAREAEXTENT;
-	
 	if (TempleActorClass)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
@@ -34,6 +29,16 @@ void ATempleActorSpawner::BeginPlay()
 		);
 	}
 
+	DrawDebugBox(
+		GetWorld(),
+		GetActorLocation(),
+		SpawnAreaExtent,
+		FColor::Green,
+		false,
+		0.f,
+		0,
+		5.f
+	);
 }
 
 void ATempleActorSpawner::SpawnActor()

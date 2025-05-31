@@ -6,6 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "TempleActor.generated.h"
 
+#define FLOATINGACTOR_FORCE						800.f
+#define FLOATINGACTOR_MASS_KG			        1000.f
+#define FLOATINGACTOR_LINEAR_DAMPING			1.2f
+
 class USphereComponent;
 class UPhysicalMaterial;
 struct FTempleActorTableRow;
@@ -26,11 +30,15 @@ protected:
 public:
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
 
+	USphereComponent* GetCollisionComponent() { return CollisionComponent; }
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> CollisionComponent;
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UPhysicalMaterial> PhysicalMaterial;
 

@@ -1,17 +1,17 @@
 #include "ActorDeleteVolume.h"
 #include "TempleActor.h"
 
-void ActorDeleteVolume::BeginPlay()
+void AActorDeleteVolume::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OnActorBeginOverlap.AddDynamic(this, &ActorDeleteVolume::OnOverlapBegin);
+	OnActorBeginOverlap.AddDynamic(this, &AActorDeleteVolume::OnOverlapBegin);
 }
 
-void ActorDeleteVolume::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
+void AActorDeleteVolume::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if (ATempleActor* Ball = Cast<ATempleActor>(OtherActor))
+	if (ATempleActor* Actor = Cast<ATempleActor>(OtherActor))
 	{
-		Ball->Destroy(); 
+		Actor->Destroy();
 	}
 }

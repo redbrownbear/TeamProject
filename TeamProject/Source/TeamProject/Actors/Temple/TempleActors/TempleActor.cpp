@@ -30,9 +30,10 @@ void ATempleActor::BeginPlay()
 
 	CollisionComponent->SetCanEverAffectNavigation(false);
 	CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
+	CollisionComponent->SetSimulatePhysics(true);
+	CollisionComponent->SetGenerateOverlapEvents(true);
 
 	StaticMeshComponent->BodyInstance.bUseCCD = true;
-	StaticMeshComponent->SetSimulatePhysics(true);
 	StaticMeshComponent->SetEnableGravity(true);
 
 	StaticMeshComponent->SetVisibility(true);
@@ -47,12 +48,13 @@ void ATempleActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	FTempleActorTableRow* Data = DataTableRowHandle.GetRow<FTempleActorTableRow>(DataTableRowHandle.RowName.ToString());
 	if (!Data) { return; }
 	TempleActorData = Data;
-	if (CollisionComponent)
+	if (CollisionComponent && TempleActorData)
 	{
-		//CollisionComponent->SetCollisionProfileName(CollisionProfileName::Floating);
-		CollisionComponent->RegisterComponent();
+		CollisionComponent->SetCollisionProfileName(TempleActorData->CollisionProfileName);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->SetSimulatePhysics(true);
+		CollisionComponent->SetMassOverrideInKg(NAME_None, TempleActorData->MassInKg, true);
+		CollisionComponent->SetLinearDamping(TempleActorData->LinearDamping);
 	}
 
 	if (StaticMeshComponent)
@@ -63,8 +65,6 @@ void ATempleActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		}
 
 
-		//StaticMeshComponent->SetRelativeTransform(FloatingActorData->MeshTransform);
-		StaticMeshComponent->SetRelativeScale3D(TempleActorData->MeshTransform.GetScale3D());
-		//CollisionComponent->SetSimulatePhysics(false);
+		StaticMeshComponent->SetRelativeScale3D(TempleActorData->MeshTransform.GetScale3D());		
 	}
 }

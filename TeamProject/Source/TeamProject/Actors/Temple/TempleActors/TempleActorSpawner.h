@@ -31,6 +31,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	FVector SpawnAreaExtent;
 
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	float SpawnInterval;
+
 	//UPROPERTY(EditAnywhere, Category = "Spawning")
 	//UDataTable* TempleActorDataTable;
 

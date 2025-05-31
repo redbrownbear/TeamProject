@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class TEAMPROJECT_API ActorDeleteVolume : public ATriggerVolume
+class TEAMPROJECT_API AActorDeleteVolume : public ATriggerVolume
 {
 	GENERATED_BODY()
 	

@@ -21,6 +21,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform MeshTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName CollisionProfileName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MassInKg;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float LinearDamping;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Friction;
 };
 
 USTRUCT()
