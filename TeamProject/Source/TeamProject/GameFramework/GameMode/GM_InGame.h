@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+
+#include "UI/Loading/LoadingWithPlayerInfo.h"
+
 #include "GM_InGame.generated.h"
 
 /**
@@ -18,5 +21,9 @@ public:
 	AGM_InGame();
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Loading")
+	TSubclassOf<ULoadingWithPlayerInfo> LoadingWidgetClass;
 
 };

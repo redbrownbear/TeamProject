@@ -10,6 +10,8 @@
 
 #include "InputActionValue.h"
 
+#include "UI/Loading/LoadingWithPlayerInfo.h"
+
 #include "TitleWidget.generated.h"
 
 class ATitlePlayerController;
@@ -24,9 +26,6 @@ class TEAMPROJECT_API UTitleWidget : public UUserWidget
 private:
 	virtual void NativeConstruct() override;
 
-	void OnHovored();
-	void OffHovored();
-
 	UFUNCTION()
 	void OnStartClicked();
 public:
@@ -34,6 +33,9 @@ public:
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	UFUNCTION()
 	void OnConfirm();
+
+private:
+	void PlayFadeOutAndStart();
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -49,4 +51,12 @@ private:
 	UImage* ImgNewGame;
 	UPROPERTY(meta = (BindWidget))
 	UImage* ImgExit;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loading")
+	TSubclassOf<UUserWidget> LoadingWidgetClass;
+
+private:
+	int CurrentStep = 0;
+	FTimerHandle FadeHandle;
 };

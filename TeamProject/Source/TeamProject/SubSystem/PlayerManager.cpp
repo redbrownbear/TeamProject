@@ -71,6 +71,8 @@ void UPlayerManager::InitStatus()
     status.PreviousLoction;             //알아서 쓰쇼
     status.StaminaRegenSpeed = 4.0f;    //알아서
 
+    status.Rupee = 0;
+
     PlayerStatus = status;
 }
 

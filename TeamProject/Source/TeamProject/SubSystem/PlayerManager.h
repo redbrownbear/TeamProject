@@ -74,12 +74,16 @@ public:
 	void SetPlayerStatus(sPlayerStatus status) { PlayerStatus = status; }
 	void SetPlayerHp(int32 Hp) { PlayerStatus.Hp = Hp; }
 	void SetRupee(int32 Rupee) { PlayerStatus.Rupee = Rupee; }
+	void SetTargetLevel(const TSoftObjectPtr<UWorld>& NewLevel) { TargetLevel = NewLevel; }
 
+	const sPlayerStatus& GetPlayerStatus() { return PlayerStatus; }
 	const int32& GetHp() { return PlayerStatus.Hp; }
 	const int32& GetMaxHp() { return PlayerStatus.MaxHp; }
 	const float& GetStamina() { return PlayerStatus.Stamina; }
 	const float& GetMaxStamina() { return PlayerStatus.MaxStamina; }
 	const int32& GetRupee() { return PlayerStatus.Rupee; }
+	const TSoftObjectPtr<UWorld> GetTargetLevel() { return TargetLevel; }
+
 
 public:
 	void SetPlayerStamina(float InStamina);
@@ -103,4 +107,8 @@ private:
 
 	TArray<FQuestDataRow> QuestList;
 	TArray<FItemData> ItemList;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loading")
+	TSoftObjectPtr<UWorld> TargetLevel;
 };
