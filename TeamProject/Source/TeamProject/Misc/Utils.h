@@ -18,6 +18,8 @@ namespace CollisionProfileName
     static inline FName ToItem = TEXT("ToItem");
     static inline FName NPC = TEXT("NPC");
     static inline FName ToNPC = TEXT("ToNPC");
+    static inline FName Floating = TEXT("Floating");
+    static inline FName Water = TEXT("Water");
 }
 
 namespace ProjectileName
@@ -361,6 +363,13 @@ enum class EEquip_State
     Bow,
 
 };
+UENUM()
+enum class EClimb_State
+{
+    Climb,
+    Land,
+};
+
 
 // NPC 추가
 UENUM()

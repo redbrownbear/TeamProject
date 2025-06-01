@@ -45,6 +45,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 			SpringArm->ProbeSize = 5.0;
 			SpringArm->bUsePawnControlRotation = true;
 			SpringArm->bInheritRoll = false;
+
+			SpringArm->CameraLagSpeed = 5.f;
+			SpringArm->CameraLagMaxDistance = 100.f;
 		}
 		Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 		Camera->SetupAttachment(SpringArm);
@@ -68,8 +71,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	}
 	{
 		UCapsuleComponent* CC = GetCapsuleComponent();
-		CC->SetCapsuleRadius(20.f);
-		CC->SetCapsuleHalfHeight(41.f);
+		CC->SetCapsuleRadius(PLAYER_CAPSULE_RADIUS);
+		CC->SetCapsuleHalfHeight(PLAYER_CAPSULE_HALF_HEIGHT);
 
 	}
 
