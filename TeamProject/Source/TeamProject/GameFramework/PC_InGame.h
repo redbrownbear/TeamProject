@@ -10,6 +10,7 @@
 #include "UI/Inven/Inventory.h"
 #include "UI/NpcDialogue/NPCDialogue.h"
 #include "UI/Shop/Shop.h"
+#include "UI/Quest/Quest.h"
 
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
@@ -21,6 +22,7 @@ enum class EInputContext
 	IC_Inventory,
 	IC_Dialogue,
 	IC_Shop,
+	IC_Quest,
 	//필요하면 추가해서 사용합니다.
 
 	IC_End,
@@ -44,13 +46,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
 	UInputMappingContext* IMC_Dialogue = nullptr;
 
-	//Dialogue
+	//Shop
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
-	UInputMappingContext* IMC_Shop = nullptr;\
+	UInputMappingContext* IMC_Shop = nullptr;
 
-	//Supernatural
+	//Quest
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
-	UInputMappingContext* IMC_Supernatural = nullptr;
+	UInputMappingContext* IMC_Quest = nullptr;
 
 	//Player
 public:
@@ -88,6 +90,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_Inventory = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_Quest = nullptr;
 
 	//Inven
 public:
@@ -133,6 +138,7 @@ public:
 		check(IA_EquipBow);
 		check(IA_Interact);
 		check(IA_Inventory);
+		check(IA_Quest);
 		check(IA_InvenNavigate);
 		check(IA_InvenConfirm);
 		check(IA_InvenCancel);
@@ -149,6 +155,7 @@ public:
 
 class AIcePillar;
 class AIcePreview;
+class ATreasureBox;
 /**
  *
  */
@@ -164,11 +171,14 @@ protected:
 	virtual void SetupInputComponent() override;
 
 public:
+	virtual void Tick(float DeltaSeconds) override;
+
+public:
 	void ChangeInputContext(EInputContext NewContext);
-	void BindInventoryInput(UInventory* Inventory);
-	void BindDialogueInput(UNPCDialogue* NpcDialogue);
-	void BindShopInput(UShop* Shop);
-	void ShowDialogueUI();
+	void BindInventoryInput();
+	void BindDialogueInput();
+	void BindShopInput();
+	void BindQuestInput();
 
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
@@ -191,13 +201,24 @@ protected:
 
 	void OnInteract(const FInputActionValue& InputActionValue);
 	void OpenInventory(const FInputActionValue& InputActionValue);
+	void OpenQuest(const FInputActionValue& InputActionValue);
 
 	// --------- Ice Maker ------------------------------
 
 	void BeginIcePreview(const FInputActionValue& InputActionValue);
 	void EndIcePreview(const FInputActionValue& InputActionValue);
 
+	//UI
+	void OnNavigate(const FInputActionValue& InputActionValue);
+	void OnConfirm(const FInputActionValue& InputActionValue);
+	void OnCancel(const FInputActionValue& InputActionValue);
+	void OnNextDialogue(const FInputActionValue& InputActionValue);
 
+	void OnCreateItemTest(const FInputActionValue& InputActionValue);
+	//UI
+
+	void SpawnIcePillar(const FInputActionValue& InputActionValue);
+	
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
 
@@ -212,14 +233,17 @@ public:
 
 	// --------- Supernatural ----------
 protected:
-	UFUNCTION()
-	void SpawnIcePillar();
-
-	UFUNCTION()
-	void ClearOldestPillar();
-
 	// 매 프레임 업데이트
+	UFUNCTION()
 	void UpdateIcePreview();
+
+	// 충돌 체크
+	UFUNCTION()
+	void CheckCollision();
+
+	// 수면 체크
+	UFUNCTION()
+	void CheckSurface();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
@@ -234,10 +258,17 @@ protected:
 	UPROPERTY()
 	TObjectPtr<AIcePreview> IcePreviewActor = nullptr;
 
+protected:
+	UPROPERTY()
+	TObjectPtr<ATreasureBox> TreasureBoxActor = nullptr;
 
 private:
-	TArray<TWeakObjectPtr<AIcePillar>> IceList;
-	uint64 MaxIceCount = 3; // 한 번에 만들 수 있는 얼음 기둥 개수
-
 	bool bQPressed = false;
+	bool bCanSpawn = false;
+	bool bHitResult = false;
+
+	bool bIsCameraLocked = false;
+
+
+	FHitResult Hit;
 };

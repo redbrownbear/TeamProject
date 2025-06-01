@@ -19,6 +19,8 @@ namespace CollisionProfileName
     static inline FName NPC = TEXT("NPC");
     static inline FName ToNPC = TEXT("ToNPC");
     static inline FName Trigger = TEXT("Trigger");
+    static inline FName Floating = TEXT("Floating");
+    static inline FName Water = TEXT("Water");
 }
 
 namespace ProjectileName
@@ -282,7 +284,7 @@ enum class EReadyToAttackStep : uint8
 
 
 UENUM()
-enum class EItemCategoryType : int8
+enum class EItemCategory : int8
 {
     IT_Weapon,
     IT_Arrow,
@@ -295,7 +297,8 @@ enum class EItemCategoryType : int8
 UENUM()
 enum class EWeaponKind : uint8
 {
-    SWORD = 0,
+    None = 0,
+    SWORD,
     SPEAR,
     LSWORD,
     BOW,
@@ -311,6 +314,15 @@ enum class EKogaStoneKind : uint8
     END
 };
 
+UENUM()
+enum class EArmorKind : uint8
+{
+    None = 0,
+    HEAD,
+    ARMOR,
+    LEG,
+    END,
+};
 
 inline void InstantRotateActorToDirection(AActor* TargetActor, const FVector& TargetLocation)
 {
@@ -396,6 +408,13 @@ enum class EEquip_State
     Bow,
 
 };
+UENUM()
+enum class EClimb_State
+{
+    Climb,
+    Land,
+};
+
 
 // NPC 추가
 UENUM()

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Misc/Utils.h"
 #include "PlayerMovementComponent.generated.h"
 
 /**
@@ -12,28 +13,38 @@
 UCLASS()
 class TEAMPROJECT_API UPlayerMovementComponent : public UCharacterMovementComponent
 {
-
+	GENERATED_BODY()
 public:
 	UPlayerMovementComponent(const FObjectInitializer& ObjectInitializer);
 
 
-	GENERATED_BODY()
 	
-	TArray<FHitResult> DoCapsuleTraceMultiByObject(const FVector& Start, const FVector& End, bool bShowDebugSphere);
+	EClimb_State GetClimbMode() { return Climb_State; }
 
-	void TraceFromEyeHeight(float TraceDistance, float TraceStartOffset);
+	bool ClimbingLineTrace(FHitResult& HitResult);
+	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
 
-	void DoLineTraceSingleByObject(FVector Start, FVector End, bool bShowDebugLine);
+	void SetMovementClimb() { MovementMode=MOVE_Flying; bIsClimbing = true; }
+	bool IsClimbing() { return bIsClimbing; }
+
+	bool TrySetMoveClimb(FVector2D ActionValue);
 
 
-public:
+	bool CanClimbUpLand();
+	bool CanClimbDownLand();
 
-	UPROPERTY(EditAnywhere, category = "Climb")
-	float ClimbCapsuleTraceRadius;
-	UPROPERTY(EditAnywhere, category = "Climb")
-	float ClimbCapsuleTraceHalfHeight;
-	UPROPERTY(EditAnywhere, category = "Climb")
-	TArray<TEnumAsByte<EObjectTypeQuery>> ClimbableSurfaceTraceTypes;
+	void SetClimbMode(bool _bool);
 
+
+	UAnimMontage* GTEST() { return LandUpMontage; }
+
+private:
+	bool bIsClimbing = false;
+	
+	UPROPERTY()
+
+	UAnimMontage* LandUpMontage;
+	UPROPERTY()
+	EClimb_State Climb_State = EClimb_State::Climb;
 
 };

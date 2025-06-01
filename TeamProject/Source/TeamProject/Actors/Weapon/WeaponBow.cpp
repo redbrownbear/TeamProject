@@ -109,6 +109,8 @@ void AWeaponBow::LeftClickAction()
 
     // 이동 방향으로 자동 회전 비활성화
     Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+    Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
   
     FireArrow();
 

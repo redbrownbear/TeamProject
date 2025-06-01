@@ -42,6 +42,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 			SpringArm->ProbeSize = 5.0;
 			SpringArm->bUsePawnControlRotation = true;
 			SpringArm->bInheritRoll = false;
+
+			SpringArm->CameraLagSpeed = 5.f;
+			SpringArm->CameraLagMaxDistance = 100.f;
 		}
 		Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 		Camera->SetupAttachment(SpringArm);
@@ -65,8 +68,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	}
 	{
 		UCapsuleComponent* CC = GetCapsuleComponent();
-		CC->SetCapsuleRadius(20.f);
-		CC->SetCapsuleHalfHeight(41.f);
+		CC->SetCapsuleRadius(PLAYER_CAPSULE_RADIUS);
+		CC->SetCapsuleHalfHeight(PLAYER_CAPSULE_HALF_HEIGHT);
 
 	}
 
@@ -134,9 +137,8 @@ void APlayerCharacter::TimelineProgress(float Value)
 	float Length = FMath::Lerp(300.f, 150.f, Value);
 
 	FVector SpringArmLocation = FVector::Zero();
-	float Y = FMath::Lerp(0.f, 30.f, Value);
 	float Z = FMath::Lerp(30.f, 40.f, Value);
-	SpringArmLocation.Y = Y;
+	
 	SpringArmLocation.Z = Z;
 	SpringArm->SetRelativeLocation(SpringArmLocation);
 	SpringArm->TargetArmLength = Length;
