@@ -15,6 +15,8 @@
 #include "Components/FSMComponent/Monster/HinoxFSMComponent.h"
 #include "Components/CapsuleComponent.h"
 
+#include "Shakes/DefaultCameraShakeBase.h"
+
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
@@ -148,13 +150,19 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 			AWorldWeapon* MeleeWeapon = World->SpawnActorDeferred<AWorldWeapon>(AWorldWeapon::StaticClass(),
 				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 			MeleeWeapon->SetDataWithHandle(MonsterData->MeleeWeaponTableRowHandle);
-			const FVector Scale = MeleeWeapon->GetActorScale3D() * 2.f;
-			MeleeWeapon->SetActorScale3D(Scale);
-			MeleeWeapon->AttachToMonster(this, Monster_SocketName::Pod_Melee);
-			MeleeWeapon->FinishSpawning(FTransform::Identity);
-
 			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 			{
+				FVector Scale = MeleeWeapon->GetActorScale3D();
+
+				if (ULynelFSMComponent* LynelFSMComponent = Cast<ULynelFSMComponent>(FSMComponent))
+				{
+					Scale *= 2.f;
+				}
+
+				MeleeWeapon->SetActorScale3D(Scale);
+				MeleeWeapon->AttachToMonster(this, Monster_SocketName::Pod_Melee);
+				MeleeWeapon->FinishSpawning(FTransform::Identity);
+
 				FSMComponent->SetMeleeWeapon(MeleeWeapon);
 				FSMComponent->SheathMeleeWeapon();
 			}
@@ -306,6 +314,11 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 
 			}
 		}
+	}
+
+	if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+	{
+		DefaultCameraShakeBase = NewObject<UDefaultCameraShakeBase>(this, UDefaultCameraShakeBase::StaticClass(), TEXT("DefaultCameraShakeBase"));
 	}
 }
 void ACharacterMonster::PostDuplicate(EDuplicateMode::Type DuplicateMode)

@@ -155,6 +155,7 @@ public:
 
 class AIcePillar;
 class AIcePreview;
+class ATreasureBox;
 /**
  *
  */
@@ -256,6 +257,10 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<AIcePreview> IcePreviewActor = nullptr;
+
+protected:
+	UPROPERTY()
+	TObjectPtr<ATreasureBox> TreasureBoxActor = nullptr;
 
 private:
 	bool bQPressed = false;

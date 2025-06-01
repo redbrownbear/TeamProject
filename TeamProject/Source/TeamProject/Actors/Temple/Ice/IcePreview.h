@@ -27,10 +27,10 @@ protected:
 
 protected:
     UPROPERTY(EditAnywhere, Category = "Cryonis")
-    float MaxSpeed = 300.f;            // 1ÃÊ¿¡ ¿Ã¶ó°¥ ¼Óµµ (cm/sec)
+    float MaxSpeed = 300.f;            // 1ï¿½Ê¿ï¿½ ï¿½Ã¶ï¿½ ï¿½Óµï¿½ (cm/sec)
 
     UPROPERTY(EditAnywhere, Category = "Cryonis")
-    float MaxHeight = 300.0f;         // ÃÑ ¿Ã¶ó°¥ °Å¸®
+    float MaxHeight = 300.0f;         // ï¿½ï¿½ ï¿½Ã¶ï¿½ ï¿½Å¸ï¿½
 
 protected:
     UMaterialInterface* MaterialInterface;

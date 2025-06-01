@@ -30,7 +30,7 @@ void UAnimNotify_HinoxGrabStone::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 		DataTableRowHandle.RowName = ThrownObject::HinoxRock;
 
 		ThrownObject->SetDataWithHandle(DataTableRowHandle);
-		ThrownObject->AttachToMonster(Monster, Monster_SocketName::Weapon_R);
+		ThrownObject->AttachToMonster(Monster, Monster_SocketName::Weapon_Right);
 		ThrownObject->FinishSpawning(FTransform::Identity);
 		Monster->SetThrownObject(ThrownObject);
 	}

@@ -14,9 +14,7 @@ ATreasureBox::ATreasureBox()
 
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
 	SkeletalMeshComponent->SetupAttachment(RootComponent);
-
-	SkeletalMeshComponent->SetRelativeLocation(FVector(0.f, 0.f, -30.f));
-	SkeletalMeshComponent->SetRelativeScale3D(FVector(30.f, 30.f, 30.f));
+	SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 }
 
@@ -26,24 +24,45 @@ void ATreasureBox::BeginPlay()
 	Super::BeginPlay();
 	
 	CollisionComponent->SetCollisionObjectType(ECC_WorldDynamic);
-	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Block);
-	CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block); // 플레이어와 충돌
+	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	CollisionComponent->SetGenerateOverlapEvents(true);
 
-	bCanTakeItem = true;
+	SkeletalMeshComponent->SetCollisionObjectType(ECC_WorldStatic);
+	SkeletalMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
 
-	GetParticleEffect();
+	MaterialInterface = SkeletalMeshComponent->GetMaterial(0);
+	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+	SkeletalMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+
+	if (CollisionComponent)
+	{
+		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ATreasureBox::OnBeginOverlapWithPlayer);
+		CollisionComponent->OnComponentEndOverlap.AddDynamic(this, &ATreasureBox::OnEndOverlapWithPlayer);
+	}
+
+	bCanTakeItem = true;
 }
 
 void ATreasureBox::OpenTBox()
 {
 	if (!bCanTakeItem) return;
 
-	USkeletalMeshComponent* MeshComp = FindComponentByClass<USkeletalMeshComponent>();
-	if (MeshComp)
-	{		
-		GetTreasure(); // Change Particle?
-	}			
+	GetTreasure();
+}
+
+void ATreasureBox::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (bCanTakeItem)
+	{
+		bCanOpenBox = true;
+		GetParticleEffect();
+	}
+}
+
+void ATreasureBox::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	bCanOpenBox = false;
 }
 
 void ATreasureBox::GetTreasure()
@@ -52,9 +71,10 @@ void ATreasureBox::GetTreasure()
 	{
 		// open Item UI
 		// Add Item to Inventory
-	}
-	
-	bCanTakeItem = false;
+
+		DynamicMaterialInstance->SetScalarParameterValue("Color", 1.f);
+		bCanTakeItem = false;
+	}	
 }
 
 
