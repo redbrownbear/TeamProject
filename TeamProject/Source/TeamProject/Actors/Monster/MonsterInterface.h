@@ -41,7 +41,7 @@ protected:
 public:
 	void PlayMontage(EMonsterMontage _InEnum, bool bIsLoop = false);
 	bool IsMontage(EMonsterMontage _InEnum);
-	bool IsPlayingMontage(EMonsterMontage _InEnum);
+	bool IsPlayingMontage(EMonsterMontage _InEnum = EMonsterMontage::END);
 
 
 public:

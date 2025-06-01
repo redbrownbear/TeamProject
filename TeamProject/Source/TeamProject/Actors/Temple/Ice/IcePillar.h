@@ -29,7 +29,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	// ÆÄ±« Ã³¸®
+	// ï¿½Ä±ï¿½ Ã³ï¿½ï¿½
 	UFUNCTION()
 	void DestroyPillar();
 
@@ -45,7 +45,7 @@ protected:
 	float MaxSpeed = 300.f;
 
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	float MaxHeight = 300.0f; // ¸ÅÅ©·Î·Î ¹Ù²Ü±î
+	float MaxHeight = 300.0f; // ï¿½ï¿½Å©ï¿½Î·ï¿½ ï¿½Ù²Ü±ï¿½
 
 	/*UPROPERTY(EditDefaultsOnly, Category = "Cryonis")
 	TObjectPtr<UNiagaraSystem> BreakEffect;*/

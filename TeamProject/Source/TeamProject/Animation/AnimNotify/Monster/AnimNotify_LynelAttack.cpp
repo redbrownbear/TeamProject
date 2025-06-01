@@ -22,7 +22,7 @@ void UAnimNotify_LynelAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 		Projectile->SetData(ProjectileName::Monster_LynelAttack, CollisionProfileName::ToPlayer);
 
 		const USkeletalMeshComponent* Mesh = Monster->GetMonsterMesh();
-		const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Weapon_R);
+		const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Weapon_Right);
 		NewTransform.SetLocation(Location);
 
 		Projectile->FinishSpawning(NewTransform);

@@ -101,11 +101,11 @@ void UMonsterFSMComponent::DrawMeleeWeapon()
 	CurrentWeapon = MeleeWeapon;
 	if (CharacterMonster)
 	{
-		MeleeWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Weapon_R);
+		MeleeWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Weapon_Right);
 	}
 	else if (PawnMonster)
 	{
-		MeleeWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Weapon_R);
+		MeleeWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Weapon_Right);
 	}
 	else
 	{
@@ -120,11 +120,11 @@ void UMonsterFSMComponent::DrawBowWeapon()
 
 	if (CharacterMonster)
 	{
-		BowWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Weapon_R);
+		BowWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Weapon_Right);
 	}
 	else if (PawnMonster)
 	{
-		BowWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Weapon_R);
+		BowWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Weapon_Right);
 	}
 	else
 	{
@@ -539,8 +539,6 @@ void UMonsterFSMComponent::UpdateSuspicious(float DeltaTime)
 		}
 		else
 		{
-
-
 			SuspicionGauge += DeltaTime;
 		}
 

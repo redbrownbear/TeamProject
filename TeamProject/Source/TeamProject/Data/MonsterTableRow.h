@@ -78,6 +78,8 @@ public: // Animation
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* SignalEndMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* SearchMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* APPEAR = nullptr;
     UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* BOW_UPPER_START = nullptr;
@@ -189,6 +191,23 @@ public: // Animation
 	UAnimMontage* Throw_Stone_Start = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* Throw_Stone_End = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* APPEAR_START = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* APPEAR_END = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* BARRIER_START = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* BARRIER_END = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_BALL_FIRST_START = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_BALL_FIRST_END = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_BALL_SECOND_START = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
+	UAnimMontage* ATTACK_BALL_SECOND_END = nullptr;
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Monster|AI")
