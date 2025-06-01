@@ -32,20 +32,20 @@ void UAssasinBossFSMComponent::HandleState(float DeltaTime)
 		const float HPRate = CurrentHP / MaxHP;
 
 
-		ePhase = EAssasinBossPhase::PHASE_3;
+		//ePhase = EAssasinBossPhase::PHASE_3;
 
-		//if (HPRate > 0.66f)
-		//{
-		//	ePhase = EAssasinBossPhase::PHASE_1;
-		//}
-		//else if (HPRate > 0.33f)
-		//{
-		//	ePhase = EAssasinBossPhase::PHASE_2;
-		//}
-		//else
-		//{
-		//	ePhase = EAssasinBossPhase::PHASE_3;
-		//}
+		if (HPRate > 0.66f)
+		{
+			ePhase = EAssasinBossPhase::PHASE_1;
+		}
+		else if (HPRate > 0.33f)
+		{
+			ePhase = EAssasinBossPhase::PHASE_2;
+		}
+		else
+		{
+			ePhase = EAssasinBossPhase::PHASE_3;
+		}
 
 
 	}
