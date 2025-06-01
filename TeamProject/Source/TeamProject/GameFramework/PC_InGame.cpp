@@ -277,6 +277,8 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 		Movement->TrySetMoveClimb(ActionValue);
 
+		UE_LOG(LogTemp, Warning, TEXT("Climbing"));
+
 		
 	}
 	else if (Movement->bIsGliding)
@@ -286,6 +288,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		P_Anim->ActionValue = ActionValue;
 		
 		Movement->GlidingMove(ActionValue);
+		UE_LOG(LogTemp, Warning, TEXT("Gliding"));
 	}
 	
 	// 노말 상태일 때의 캐릭터 무브
@@ -307,7 +310,15 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		APawn* ControlledPawn = GetPawn();
 		ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
 		ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
+
 	}
+	UE_LOG(LogTemp, Warning, TEXT("CanJump: %s, IsMovingOnGround: %s, IsFalling: %s, JumpProvidingForce: %s, JumpCurrentCount: %d"),
+		Player_C->CanJump() ? TEXT("True") : TEXT("False"),
+		Player_C->GetCharacterMovement()->IsMovingOnGround() ? TEXT("True") : TEXT("False"),
+		Player_C->GetCharacterMovement()->IsFalling() ? TEXT("True") : TEXT("False"),
+		Player_C->IsJumpProvidingForce() ? TEXT("True") : TEXT("False"),
+		Player_C->JumpCurrentCount
+	);
 }
 
 void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
@@ -456,6 +467,10 @@ void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 
 	else
 	{	
+		if (Movement->bIsGliding)
+		{
+			return;
+		}
 		FHitResult HitResult;
 		if (Movement->ClimbingLineTrace(HitResult))
 		{

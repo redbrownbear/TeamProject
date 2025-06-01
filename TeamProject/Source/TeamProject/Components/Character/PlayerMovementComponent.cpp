@@ -27,9 +27,6 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 		}
 	}
 
-
-	
-
 }
 
 void UPlayerMovementComponent::BeginPlay()
@@ -125,7 +122,7 @@ bool UPlayerMovementComponent::CanClimbUpLand()
 
 	FVector CharacterUpVector = OwnerActor->GetActorUpVector();
 
-	FVector UpEnd = Start + CharacterUpVector * PLAYER_CAPSULE_HALF_HEIGHT * 2;
+	FVector UpEnd = Start + CharacterUpVector * PLAYER_CAPSULE_HALF_HEIGHT * 0.5;
 
 	FVector CharacterForwardVector = OwnerActor->GetActorForwardVector();
 	FVector ForwardEnd = UpEnd + CharacterForwardVector * PLAYER_CAPSULE_RADIUS * 3;
@@ -134,6 +131,7 @@ bool UPlayerMovementComponent::CanClimbUpLand()
 	FCollisionQueryParams TraceParams;
 	TraceParams.AddIgnoredActor(OwnerActor);
 
+	DrawDebugLine(GetWorld(), ForwardEnd, DownEnd, FColor::Red, false, 2.f);
 	
 	
 	bool CanStand = !GetWorld()->LineTraceSingleByChannel(
@@ -143,7 +141,7 @@ bool UPlayerMovementComponent::CanClimbUpLand()
 		ECollisionChannel::ECC_Visibility,
 		TraceParams
 	);
-
+	//캐릭터 머리가 벽보다 높을 때,
 	if (CanStand)
 	{
 
@@ -158,6 +156,7 @@ bool UPlayerMovementComponent::CanClimbUpLand()
 
 		if (CanStand)
 		{
+
 			UE_LOG(LogTemp, Warning, TEXT("CanStand"));
 			APlayerCharacter* Player_C = Cast<APlayerCharacter>(OwnerActor);
 
@@ -210,9 +209,22 @@ bool UPlayerMovementComponent::CanClimbDownLand()
 void UPlayerMovementComponent::SetClimbMode(bool _bool)
 {
 	
-	MovementMode = _bool ? MOVE_Flying : MOVE_Walking;
 
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+	if (!_bool)
+	{
+		Player_C->JumpCurrentCount = 0;
+	}
+	if (bIsGliding)
+	{
+		SetGlideMode(false);
+
+		UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+
+	}
+	MovementMode = _bool ? MOVE_Flying : MOVE_Walking;
+
+	
 
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
@@ -242,7 +254,11 @@ void UPlayerMovementComponent::SetGlideMode(bool _bool)
 		{
 			return;
 		}
+
 	}
+	
+
+
 	bIsGliding = _bool;
 
 	GravityScale = _bool ? 0.07: 1.f;
@@ -250,6 +266,10 @@ void UPlayerMovementComponent::SetGlideMode(bool _bool)
 	AirControl = _bool ? 0.f : 0.f;
 
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+	FHitResult HitResult;
+
+	Player_C->OnLanded(HitResult);
 
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
@@ -283,8 +303,7 @@ void UPlayerMovementComponent::SetGlideMode(bool _bool)
 
 void UPlayerMovementComponent::GlidingMove(FVector2D ActionValue)
 {
-	ActionValue.X;
-	ActionValue.Y;
+
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 
 	Player_C->GetVelocity();
@@ -318,10 +337,10 @@ void UPlayerMovementComponent::GlidingMove(FVector2D ActionValue)
 			Velocity = DirectionXY * NewSpeed;
 			Velocity.Z = Origin_Z;
 		}
-		
+
+
 	}
 
-	
 
 }
 

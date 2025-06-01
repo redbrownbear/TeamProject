@@ -59,13 +59,10 @@ public:
 
 	UFUNCTION()
 	void TimelineProgress(float Value);
-	
-	virtual void Landed(const FHitResult& Hit) override;
 
 
 	void ZoomIn();
 	void ZoomOut();
-
 protected:
 
 	/*UPROPERTY(EditAnywhere, Category="Weapon")

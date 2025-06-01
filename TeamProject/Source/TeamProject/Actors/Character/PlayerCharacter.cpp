@@ -70,7 +70,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 		UCapsuleComponent* CC = GetCapsuleComponent();
 		CC->SetCapsuleRadius(PLAYER_CAPSULE_RADIUS);
 		CC->SetCapsuleHalfHeight(PLAYER_CAPSULE_HALF_HEIGHT);
-
+		
 	}
 
 	{
@@ -144,14 +144,8 @@ void APlayerCharacter::TimelineProgress(float Value)
 	SpringArm->TargetArmLength = Length;
 }
 
-void APlayerCharacter::Landed(const FHitResult& Hit)
-{
-	Super::Landed(Hit);
-
-	Cast<UPlayerMovementComponent>(GetCharacterMovement())->SetGlideMode(false);
 
 
-}
 
 
 
