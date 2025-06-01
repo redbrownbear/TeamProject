@@ -1,31 +1,30 @@
-#include "TempleActor.h"
+#include "Actors/Object/MetalActor.h"
 #include "Components/SphereComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
-#include "ActorDeleteVolume.h"
 
-#include "Data/TempleActorTableRow.h"
+#include "Data/MetalActorTableRow.h"
 
 // Sets default values
-ATempleActor::ATempleActor()
+AMetalActor::AMetalActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));	
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	RootComponent = CollisionComponent;
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
-	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/TempleActors/PM_TempleActor.PM_TempleActor"));
+	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/MetalActors/PM_MetalActor.PM_MetalActor"));
 	PhysicalMaterial = PhysMaterial.Object;
 }
 
 // Called when the game starts or when spawned
-void ATempleActor::BeginPlay()
+void AMetalActor::BeginPlay()
 {
-	Super::BeginPlay();	
-
+	Super::BeginPlay();
+	
 	CollisionComponent->SetCanEverAffectNavigation(false);
 	CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
 	CollisionComponent->SetSimulatePhysics(true);
@@ -40,38 +39,39 @@ void ATempleActor::BeginPlay()
 	SetData(DataTableRowHandle);
 }
 
-void ATempleActor::OnConstruction(const FTransform& Transform)
+void AMetalActor::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
 	SetData(DataTableRowHandle);
 }
 
-void ATempleActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
+void AMetalActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 {
 	DataTableRowHandle = InDataTableRowHandle;
 	if (DataTableRowHandle.IsNull()) { return; }
 
-	FTempleActorTableRow* Data = DataTableRowHandle.GetRow<FTempleActorTableRow>(DataTableRowHandle.RowName.ToString());
+	FMetalActorTableRow* Data = DataTableRowHandle.GetRow<FMetalActorTableRow>(DataTableRowHandle.RowName.ToString());
 	if (!Data) { return; }
-	TempleActorData = Data;
-	if (CollisionComponent && TempleActorData)
+	MetalActorData = Data;
+	if (CollisionComponent && MetalActorData)
 	{
-		CollisionComponent->SetCollisionProfileName(TempleActorData->CollisionProfileName);
+		CollisionComponent->SetCollisionProfileName(MetalActorData->CollisionProfileName);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->SetSimulatePhysics(true);
-		CollisionComponent->SetMassOverrideInKg(NAME_None, TempleActorData->MassInKg, true);
-		CollisionComponent->SetLinearDamping(TempleActorData->LinearDamping);
+		CollisionComponent->SetMassOverrideInKg(NAME_None, MetalActorData->MassInKg, true);
+		CollisionComponent->SetLinearDamping(MetalActorData->LinearDamping);
 	}
 
 	if (StaticMeshComponent)
 	{
-		if (TempleActorData->StaticMesh)
+		if (MetalActorData->StaticMesh)
 		{
-			StaticMeshComponent->SetStaticMesh(TempleActorData->StaticMesh);
+			StaticMeshComponent->SetStaticMesh(MetalActorData->StaticMesh);
 		}
 
 
-		StaticMeshComponent->SetRelativeScale3D(TempleActorData->MeshTransform.GetScale3D());		
+		StaticMeshComponent->SetRelativeScale3D(MetalActorData->MeshTransform.GetScale3D());
 	}
 }
+

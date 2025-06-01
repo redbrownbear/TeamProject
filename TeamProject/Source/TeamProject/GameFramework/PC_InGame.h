@@ -124,6 +124,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_Build = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_Magnesis = nullptr;
+
 	void CheckValid() const
 	{
 		check(IMC_InGame);
@@ -149,13 +152,11 @@ public:
 		check(IA_DialogueNext);
 		check(IA_IceMaker);		
 		check(IA_Build);
+		check(IA_Magnesis);
 	}
 };
 
 
-class AIcePillar;
-class AIcePreview;
-class ATreasureBox;
 /**
  *
  */
@@ -203,10 +204,26 @@ protected:
 	void OpenInventory(const FInputActionValue& InputActionValue);
 	void OpenQuest(const FInputActionValue& InputActionValue);
 
-	// --------- Ice Maker ------------------------------
+	// --------- Supernatural ------------------------------
 
+	// Ice Maker
 	void BeginIcePreview(const FInputActionValue& InputActionValue);
-	void EndIcePreview(const FInputActionValue& InputActionValue);
+
+	// Magnesis
+	void Magnesis(const FInputActionValue& InputActionValue);
+
+	// Magnesis 입력 함수
+	void StartMagnetGrab();
+	void StopMagnetGrab();
+
+	//  Magnesis 내부 기능 함수
+	bool TraceForMetal(FHitResult& OutHit);
+	void MoveGrabbedObject();
+
+	// 상태 체크
+	bool IsHoldingObject() const;
+
+	void DrawDebugTraceLine();
 
 	//UI
 	void OnNavigate(const FInputActionValue& InputActionValue);
@@ -249,17 +266,37 @@ protected:
 	void CheckSurface();
 
 protected:
+	// ------------ Ice Maker ---------------
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	TSubclassOf<AIcePillar> IcePillarClass;
+	TSubclassOf<class AIcePillar> IcePillarClass;
 
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	TSubclassOf<AIcePreview> IcePreviewClass;
-
-	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	float TraceDistance = 300.0f;
+	TSubclassOf<class AIcePreview> IcePreviewClass;
 
 	UPROPERTY()
 	TObjectPtr<AIcePreview> IcePreviewActor = nullptr;
+
+	// ------------ Magnesis ---------------
+
+	UPROPERTY(EditAnywhere, Category = "Magnet | Trace")
+	float TraceDistance = 1000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Magnet | Grab")
+	float HoldDistance = 300.f;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AMetalActor> MetalActorClass;
+
+	UPROPERTY(VisibleAnywhere)
+	class UPhysicsHandleComponent* PhysicsHandle;
+
+	UPROPERTY()
+	UPrimitiveComponent* GrabbedComponent;
+
+	FTimerHandle MoveTimerHandle;
+
+	FTimerHandle DebugTraceTimerHandle;
+
 
 private:
 	bool bQPressed = false;
@@ -268,6 +305,7 @@ private:
 
 	bool bIsCameraLocked = false;
 
+	bool bXPressed = false;
 
 	FHitResult Hit;
 };

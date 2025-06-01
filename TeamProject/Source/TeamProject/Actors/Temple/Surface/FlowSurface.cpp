@@ -1,5 +1,4 @@
 #include "Actors/Temple/Surface/FlowSurface.h"
-//#include "FloatingActor.h"
 #include "Actors/Temple/TempleActors/TempleActor.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
@@ -54,7 +53,6 @@ void AFlowSurface::BeginPlay()
 
 			FAttachmentTransformRules AttachRules = FAttachmentTransformRules::KeepRelativeTransform;
 
-			// ���� ���� ����
 			NewBoxComponent->AttachToComponent(RootComponent, AttachRules);
 			NewBoxComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
 		}
@@ -90,12 +88,11 @@ void AFlowSurface::Tick(float DeltaTime)
 				ATempleActor* Floating = Cast<ATempleActor>(Actor);
 				if (Floating && Floating->GetCollisionComponent())
 				{
-					// �帧 ���� ���
 					FVector FlowDirection = SplineComponent->GetDirectionAtDistanceAlongSpline(
 						fDistanceAlongSpline_Array[i], ESplineCoordinateSpace::World);
 					FlowDirection.Z = 0.f;
 
-					FVector FlowForce = FlowDirection.GetSafeNormal() * FLOATINGACTOR_FORCE; // �� ���� ����
+					FVector FlowForce = FlowDirection.GetSafeNormal() * FLOATINGACTOR_FORCE; 
 					Floating->GetCollisionComponent()->AddForce(FlowForce, NAME_None, true);
 				}
 			}

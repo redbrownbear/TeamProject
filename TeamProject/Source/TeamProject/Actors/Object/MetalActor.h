@@ -4,20 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TempleActor.generated.h"
+#include "MetalActor.generated.h"
+
 
 class USphereComponent;
 class UPhysicalMaterial;
-struct FTempleActorTableRow;
+struct FMetalActorTableRow;
 
 UCLASS()
-class TEAMPROJECT_API ATempleActor : public AActor
+class TEAMPROJECT_API AMetalActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ATempleActor();
+	AMetalActor();
 
 protected:
 	// Called when the game starts or when spawned
@@ -25,10 +26,9 @@ protected:
 
 public:
 	virtual void OnConstruction(const FTransform& Transform);
-
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
 
-	USphereComponent* GetCollisionComponent() { return CollisionComponent; }
+	//USphereComponent* GetCollisionComponent() { return CollisionComponent; }
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -44,5 +44,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Table")
 	FDataTableRowHandle DataTableRowHandle;
 
-	FTempleActorTableRow* TempleActorData;
+	FMetalActorTableRow* MetalActorData;
 };
