@@ -24,8 +24,13 @@ public:
 	UFUNCTION()
 	void SpawnActor();
 
+	void ReturnActorToPool(ATempleActor* Actor);
+
 protected:
-	UPROPERTY(EditAnywhere, Category = "Spawning")
+	TObjectPtr<ATempleActor> GetPooledActor();
+
+protected:
+	UPROPERTY()
 	TSubclassOf<ATempleActor> TempleActorClass;
 
 	UPROPERTY(EditAnywhere, Category = "Spawning")
@@ -34,16 +39,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	float SpawnInterval;
 
-	//UPROPERTY(EditAnywhere, Category = "Spawning")
-	//UDataTable* TempleActorDataTable;
-
-	//UPROPERTY(EditAnywhere, Category = "Spawning")
-	//FName RowToSpawn;
-
 	UPROPERTY(EditAnywhere, Category = "Spawning", meta = (RowType = "TempleActorTableRow"))
 	FDataTableRowHandle SpawnRowHandle;
 
+
 private:
 	FTimerHandle SpawnTimer;
+
+	UPROPERTY()
+	TArray<TObjectPtr<ATempleActor>> ActorPool;
 
 };

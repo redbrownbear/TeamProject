@@ -28,7 +28,13 @@ public:
 
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
 
+	void Initialize(class ATempleActorSpawner* InOwner) { SpawnerOwner = InOwner; }
+	void DeactivateActor() { bIsActive = false; }
+	void ActivateActor() { bIsActive = true; }
+	bool IsActive() const { return bIsActive; }
+
 	USphereComponent* GetCollisionComponent() { return CollisionComponent; }
+	ATempleActorSpawner* GetTempleActorSpawner() { return SpawnerOwner; }
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -45,4 +51,12 @@ protected:
 	FDataTableRowHandle DataTableRowHandle;
 
 	FTempleActorTableRow* TempleActorData;
+
+	UPROPERTY()
+	TObjectPtr<ATempleActorSpawner> SpawnerOwner;
+
+private:
+	UPROPERTY()
+	bool bIsActive = false;
+
 };

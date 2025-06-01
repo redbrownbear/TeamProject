@@ -1,6 +1,5 @@
 #include "TempleActorSpawner.h"
 #include "TempleActor.h"
-#include "Misc/Defines.h"
 
 // Sets default values
 ATempleActorSpawner::ATempleActorSpawner()
@@ -28,17 +27,6 @@ void ATempleActorSpawner::BeginPlay()
 			true
 		);
 	}
-
-	DrawDebugBox(
-		GetWorld(),
-		GetActorLocation(),
-		SpawnAreaExtent,
-		FColor::Green,
-		false,
-		0.f,
-		0,
-		5.f
-	);
 }
 
 void ATempleActorSpawner::SpawnActor()
@@ -55,9 +43,7 @@ void ATempleActorSpawner::SpawnActor()
 
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
-	//GetWorld()->SpawnActor<ATempleActor>(TempleActorClass, SpawnLocation, SpawnRotation);
-
-	ATempleActor* SpawnedActor = GetWorld()->SpawnActor<ATempleActor>(
+	/*ATempleActor* SpawnedActor = GetWorld()->SpawnActor<ATempleActor>(
 		TempleActorClass,
 		SpawnLocation,
 		SpawnRotation
@@ -66,5 +52,46 @@ void ATempleActorSpawner::SpawnActor()
 	if (SpawnedActor)
 	{
 		SpawnedActor->SetData(SpawnRowHandle);
+	}*/
+
+	ATempleActor* Actor = GetPooledActor();
+	if (Actor)
+	{
+		Actor->SetActorLocationAndRotation(SpawnLocation, SpawnRotation);
+		Actor->SetActorHiddenInGame(false);
+		Actor->SetActorEnableCollision(true);
+		Actor->SetActorTickEnabled(true);
+		Actor->ActivateActor();
 	}
+}
+
+void ATempleActorSpawner::ReturnActorToPool(ATempleActor* Actor)
+{
+	if (!Actor) return;
+
+	Actor->SetActorHiddenInGame(true);
+	Actor->SetActorEnableCollision(false);
+	Actor->SetActorTickEnabled(false);
+	Actor->DeactivateActor();
+}
+
+TObjectPtr<ATempleActor> ATempleActorSpawner::GetPooledActor()
+{
+	for (ATempleActor* Actor : ActorPool)
+	{
+		if (!Actor->IsActive())
+		{
+			return Actor;
+		}
+	}
+
+	FActorSpawnParameters SpawnParams;
+	ATempleActor* NewActor = GetWorld()->SpawnActor<ATempleActor>(TempleActorClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	if (NewActor)
+	{
+		NewActor->SetData(SpawnRowHandle);
+		NewActor->Initialize(this);
+		ActorPool.Add(NewActor);
+	}
+	return NewActor;
 }
