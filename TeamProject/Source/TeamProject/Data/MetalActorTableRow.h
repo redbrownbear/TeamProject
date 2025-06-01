@@ -17,6 +17,9 @@ public:
 	UStaticMesh* StaticMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterialInterface* Material;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform MeshTransform;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

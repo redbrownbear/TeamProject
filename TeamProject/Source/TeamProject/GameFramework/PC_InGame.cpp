@@ -60,12 +60,21 @@ void APC_InGame::BeginPlay()
 
 	ChangeInputContext(EInputContext::IC_InGame);
 
-	if (!IcePreviewActor && IcePreviewClass)
+	if (IcePreviewClass && !IcePreviewActor)
 	{
 		IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
 		if (IcePreviewActor)
 		{
 			IcePreviewActor->SetActorEnableCollision(false);
+		}
+	}
+
+	if (MetalActorClass && !MetalActor)
+	{
+		MetalActor = GetWorld()->SpawnActor<AMetalActor>(MetalActorClass);
+		if (MetalActor)
+		{
+			MetalActor->SetActorEnableCollision(false);
 		}
 	}
 
@@ -134,14 +143,14 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::OpenQuest);
 
 	// ------------ Supernatural -----------------
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_TrySuperPower,
+		ETriggerEvent::Started, this, &ThisClass::TrySupernatural);
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
 		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
 
-	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Build,
-		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);	
-
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Magnesis,
-		ETriggerEvent::Started, this, &ThisClass::Magnesis);
+		ETriggerEvent::Started, this, &ThisClass::ShowMetalActorPreview);
 
 }
 
@@ -404,17 +413,6 @@ void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
 
 	WeaponManagerComponent->LeftClickAction();
 
-	// TreasureBox 열 때
-	{		
-		/*if (TreasureBoxActor != nullptr)
-		{
-			bool bCanOpen = TreasureBoxActor->GetOpenBox();
-			if (bCanOpen)
-			{
-				TreasureBoxActor->OpenTBox();
-			}
-		}*/	
-	}
 }
 
 void APC_InGame::RightClick(const FInputActionValue& InputActionValue)
@@ -571,17 +569,41 @@ void APC_InGame::OpenQuest(const FInputActionValue& InputActionValue)
 	}
 }
 
-void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
+void APC_InGame::TrySupernatural(const FInputActionValue& InputActionValue)
 {
-	if (!IcePillarClass) return;
+	if (bQPressed)
+	{
+		if (!IcePillarClass) return;
 
-	if (!bQPressed) return;
+		// 수면 체크: 지형 위라면 충돌, 월드 정적에 한정
+		CheckSurface();
 
-	// 수면 체크: 지형 위라면 충돌, 월드 정적에 한정
-	CheckSurface();
+		if (bCanSpawn)
+		{
+			SpawnIcePillar();
+		}
+	}
 
-	if (!bCanSpawn) return;
+	if (bXPressed)
+	{
+		if (IsHoldingObject()) return;
 
+		if (!MetalActorClass) return;
+
+		bShowMouseCursor = false;
+
+		CheckMetalActor();
+
+		if (bCanControlMetal)
+		{
+			Magnesis();
+		}
+	}
+}
+
+void APC_InGame::SpawnIcePillar()
+{
+	
 	FVector SpawnLoc = Hit.Location;
 	FVector Normal = Hit.Normal;
 
@@ -602,6 +624,7 @@ void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 {	
+	if (bXPressed) { return; }
 	bQPressed = !bQPressed;
 
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
@@ -647,47 +670,91 @@ void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 	}
 }
 
-void APC_InGame::Magnesis(const FInputActionValue& InputActionValue)
+void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue)
 {
+	if (bQPressed) { return; }
+
 	bXPressed = !bXPressed;
 
-	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
-	UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();		
+	// Check if is MetalicActor	 
+	 if (!MetalActor) return;
+
+	 APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	 UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
+
+	 if (bXPressed)
+	 { 
+		 C_Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
+
+		 Player_C->bUseControllerRotationYaw = true; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+
+		 // 이동 방향으로 자동 회전 비활성화
+		 C_Movement->bOrientRotationToMovement = false;
+
+		 USpringArmComponent* C_SpringArm = Player_C->GetSpringArm();
+
+		 Player_C->ZoomIn(); 
+
+		 bShowMouseCursor = true; // 임시
+	 } 
+	 else
+	 {
+		 Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+
+		 // 이동 방향으로 자동 회전 비활성화
+		 Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+		 Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+
+		 Player_C->ZoomOut();
+
+		 if (IsHoldingObject())
+		 {
+			 StopMagnetGrab();
+		 }
+
+		 bShowMouseCursor = false; // 임시
+	 }
+
+	 MetalActor->ThisIsMetal();
+}
+
+void APC_InGame::Magnesis()
+{
+	// 액터 색 끄기
+	MetalActor->ChangeNomalColor();
+
+	if (!bXPressed) return;
 	
-	if (bXPressed) 
-	{			
-		C_Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
-
-		Player_C->bUseControllerRotationYaw = true; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
-
-		// 이동 방향으로 자동 회전 비활성화
-		C_Movement->bOrientRotationToMovement = false;
-
-		USpringArmComponent* C_SpringArm = Player_C->GetSpringArm();
-
-		Player_C->ZoomIn();
-
-		if (!IsHoldingObject())
-		{
-			StartMagnetGrab();
-		}
-	}		
-	else
+	if (!IsHoldingObject())
 	{
-		Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
+		StartMagnetGrab();
+	}
+}
 
-		// 이동 방향으로 자동 회전 비활성화
-		Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+void APC_InGame::CheckMetalActor()
+{
+	CheckCollision();
 
-		Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+	if (bHitResult)
+	{
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor) return;
 
-		Player_C->ZoomOut();
+#if WITH_EDITOR
+		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
+#else
+		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
+#endif
 
-		if (IsHoldingObject())
+		if (!ActorName.StartsWith(TEXT("Metal")))
 		{
-			StopMagnetGrab();
+			bCanControlMetal = false;
+			return;
 		}
-	}		
+
+		bCanControlMetal = true;
+	}
 }
 
 void APC_InGame::StartMagnetGrab()
@@ -704,14 +771,8 @@ void APC_InGame::StartMagnetGrab()
 				PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, Hit.ImpactPoint);
 				GrabbedComponent = HitComp;
 
-				// 물체 이동용 타이머
-				GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &APC_InGame::MoveGrabbedObject, 0.01f, true);
-
-				// 디버그 라인 표시용 타이머
-				GetWorld()->GetTimerManager().SetTimer(DebugTraceTimerHandle, this, &APC_InGame::DrawDebugTraceLine, 0.01f, true);
-
 				// 주기적으로 위치 갱신
-				//GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &APC_InGame::MoveGrabbedObject, 0.01f, true);
+				GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &APC_InGame::MoveGrabbedObject, 0.01f, true);
 			}
 		}
 	}
@@ -725,7 +786,7 @@ void APC_InGame::StopMagnetGrab()
 	GrabbedComponent = nullptr;
 
 	GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
-	GetWorld()->GetTimerManager().ClearTimer(DebugTraceTimerHandle);  // 디버그 라인도 해제
+	//GetWorld()->GetTimerManager().ClearTimer(DebugTraceTimerHandle);  // 디버그 라인도 해제
 }
 
 bool APC_InGame::TraceForMetal(FHitResult& OutHit)
@@ -743,7 +804,7 @@ bool APC_InGame::TraceForMetal(FHitResult& OutHit)
 
 	if (bHit && OutHit.GetActor()->IsA(MetalActorClass))
 	{
-		DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1.0f, 0, 2.0f);
+		//DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1.0f, 0, 2.0f);
 		return true;
 	}
 
@@ -765,17 +826,6 @@ void APC_InGame::MoveGrabbedObject()
 bool APC_InGame::IsHoldingObject() const
 {
 	return PhysicsHandle->GrabbedComponent != nullptr;
-}
-
-void APC_InGame::DrawDebugTraceLine()
-{
-	FVector Start;
-	FRotator Rot;
-	GetPlayerViewPoint(Start, Rot);
-
-	FVector End = Start + Rot.Vector() * TraceDistance;
-
-	DrawDebugLine(GetWorld(), Start, End, FColor::Cyan, false, 0.02f, 0, 2.0f);
 }
 
 void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)

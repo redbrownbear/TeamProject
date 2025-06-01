@@ -19,7 +19,6 @@ AIcePillar::AIcePillar()
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	RootComponent = StaticMeshComponent;
-	//StaticMeshComponent->SetupAttachment(RootComponent);
 	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> PillarMesh(TEXT("/Game/Resources/Map/Dungeon/DgnObj_Ice.DgnObj_Ice"));

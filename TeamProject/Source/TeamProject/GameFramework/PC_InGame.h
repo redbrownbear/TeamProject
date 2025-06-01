@@ -122,7 +122,7 @@ public:
 	UInputAction* IA_IceMaker = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_Build = nullptr;
+	UInputAction* IA_TrySuperPower = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_Magnesis = nullptr;
@@ -151,7 +151,7 @@ public:
 		check(IA_DialogueCancel);
 		check(IA_DialogueNext);
 		check(IA_IceMaker);		
-		check(IA_Build);
+		check(IA_TrySuperPower);
 		check(IA_Magnesis);
 	}
 };
@@ -206,24 +206,13 @@ protected:
 
 	// --------- Supernatural ------------------------------
 
+	void TrySupernatural(const FInputActionValue& InputActionValue);
+
 	// Ice Maker
-	void BeginIcePreview(const FInputActionValue& InputActionValue);
-
+	void BeginIcePreview(const FInputActionValue& InputActionValue);	
+	
 	// Magnesis
-	void Magnesis(const FInputActionValue& InputActionValue);
-
-	// Magnesis 입력 함수
-	void StartMagnetGrab();
-	void StopMagnetGrab();
-
-	//  Magnesis 내부 기능 함수
-	bool TraceForMetal(FHitResult& OutHit);
-	void MoveGrabbedObject();
-
-	// 상태 체크
-	bool IsHoldingObject() const;
-
-	void DrawDebugTraceLine();
+	void ShowMetalActorPreview(const FInputActionValue& InputActionValue);
 
 	//UI
 	void OnNavigate(const FInputActionValue& InputActionValue);
@@ -233,8 +222,7 @@ protected:
 
 	void OnCreateItemTest(const FInputActionValue& InputActionValue);
 	//UI
-
-	void SpawnIcePillar(const FInputActionValue& InputActionValue);
+	
 	
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
@@ -257,6 +245,10 @@ protected:
 	UFUNCTION()
 	void UpdateIcePreview();
 
+	// Create IcePillar
+	UFUNCTION()
+	void SpawnIcePillar();
+
 	// 충돌 체크
 	UFUNCTION()
 	void CheckCollision();
@@ -264,6 +256,30 @@ protected:
 	// 수면 체크
 	UFUNCTION()
 	void CheckSurface();
+
+	// Magnesis
+	UFUNCTION()
+	void Magnesis();
+
+	// Check Metal
+	UFUNCTION()
+	void CheckMetalActor();
+
+	// Magnesis 입력 함수
+	UFUNCTION()
+	void StartMagnetGrab();
+	UFUNCTION()
+	void StopMagnetGrab();
+
+	//  Magnesis 내부 기능 함수
+	UFUNCTION()
+	bool TraceForMetal(FHitResult& OutHit);
+	UFUNCTION()
+	void MoveGrabbedObject();
+
+	// 상태 체크
+	UFUNCTION()
+	bool IsHoldingObject() const;
 
 protected:
 	// ------------ Ice Maker ---------------
@@ -278,14 +294,17 @@ protected:
 
 	// ------------ Magnesis ---------------
 
+	UPROPERTY(EditAnywhere, Category = "Magnesis")
+	TSubclassOf<class AMetalActor> MetalActorClass;
+
+	UPROPERTY()
+	TObjectPtr<class AMetalActor> MetalActor = nullptr;
+
 	UPROPERTY(EditAnywhere, Category = "Magnet | Trace")
 	float TraceDistance = 1000.f;
 
 	UPROPERTY(EditAnywhere, Category = "Magnet | Grab")
 	float HoldDistance = 300.f;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AMetalActor> MetalActorClass;
 
 	UPROPERTY(VisibleAnywhere)
 	class UPhysicsHandleComponent* PhysicsHandle;
@@ -306,6 +325,7 @@ private:
 	bool bIsCameraLocked = false;
 
 	bool bXPressed = false;
+	bool bCanControlMetal = false;
 
 	FHitResult Hit;
 };

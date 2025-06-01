@@ -30,12 +30,22 @@ public:
 
 	//USphereComponent* GetCollisionComponent() { return CollisionComponent; }
 
+public:
+	void ThisIsMetal();
+	void ChangeNomalColor();
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInterface> MaterialInterface;
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> DynamicMaterialInstance;	
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UPhysicalMaterial> PhysicalMaterial;
@@ -45,4 +55,5 @@ protected:
 	FDataTableRowHandle DataTableRowHandle;
 
 	FMetalActorTableRow* MetalActorData;
+	
 };

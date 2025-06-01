@@ -16,6 +16,8 @@ AMetalActor::AMetalActor()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
+
+
 	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/MetalActors/PM_MetalActor.PM_MetalActor"));
 	PhysicalMaterial = PhysMaterial.Object;
 }
@@ -36,7 +38,10 @@ void AMetalActor::BeginPlay()
 	StaticMeshComponent->SetVisibility(true);
 	StaticMeshComponent->SetHiddenInGame(false);
 
-	SetData(DataTableRowHandle);
+	if (!DataTableRowHandle.IsNull())
+	{
+		SetData(DataTableRowHandle);
+	}
 }
 
 void AMetalActor::OnConstruction(const FTransform& Transform)
@@ -70,8 +75,35 @@ void AMetalActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 			StaticMeshComponent->SetStaticMesh(MetalActorData->StaticMesh);
 		}
 
+		if (MetalActorData->Material)
+		{
+			DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MetalActorData->Material, this);
+			StaticMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MetalActorData->Material is null!"));
+		}
 
 		StaticMeshComponent->SetRelativeScale3D(MetalActorData->MeshTransform.GetScale3D());
+	}
+}
+
+void AMetalActor::ThisIsMetal()
+{
+	// Change Material Color	
+	if (DynamicMaterialInstance)
+	{
+		DynamicMaterialInstance->SetScalarParameterValue("Color", 1.f);
+	}
+}
+
+void AMetalActor::ChangeNomalColor()
+{
+	// Change Material Color	
+	if (DynamicMaterialInstance)
+	{
+		DynamicMaterialInstance->SetScalarParameterValue("Color", 0.f);
 	}
 }
 

@@ -79,3 +79,5 @@
 
 
 
+#define ICEPILLAR_MAXSPEED														    300.f
+#define ICEPILLAR_MAXHEIGT															300.F
