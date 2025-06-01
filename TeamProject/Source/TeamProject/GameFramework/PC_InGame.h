@@ -229,6 +229,9 @@ public:
 	UPROPERTY()
 	TObjectPtr<class ANpc> Npc = nullptr;
 
+	UPROPERTY()
+	TObjectPtr<class ATreasureBox> TreasureBox = nullptr;
+
 	EInputContext CurrentInputContext = EInputContext::IC_Start;
 
 	// --------- Supernatural ----------
@@ -257,10 +260,6 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<AIcePreview> IcePreviewActor = nullptr;
-
-protected:
-	UPROPERTY()
-	TObjectPtr<ATreasureBox> TreasureBoxActor = nullptr;
 
 private:
 	bool bQPressed = false;

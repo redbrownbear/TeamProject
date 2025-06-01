@@ -62,4 +62,8 @@ protected:
 private:
 	bool bCanTakeItem = false;
 	bool bCanOpenBox = false;
+
+	// 상호작용 가능 변수
+	UPROPERTY()
+	bool bPlayerInRange = false;
 };

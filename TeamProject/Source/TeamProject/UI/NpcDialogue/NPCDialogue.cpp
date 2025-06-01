@@ -140,7 +140,8 @@ void UNPCDialogue::OnConfirm()
         {
             UIManager->ShowUI(UShop::StaticClass());
             ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter);
-            QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
+            //QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
+            QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_STORE);
 
             bool IsShopping = PC_InGame->Npc->GetShopping();
             bool IsBuying = PC_InGame->Npc->GetBuy();

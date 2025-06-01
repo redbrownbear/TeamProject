@@ -11,10 +11,8 @@ ATempleActor::ATempleActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));	
 	RootComponent = CollisionComponent;
-	CollisionComponent->SetCollisionProfileName(TEXT("PhysicsActor"));
-	//CollisionComponent->InitSphereRadius(5000.0f);
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);

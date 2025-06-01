@@ -385,14 +385,14 @@ void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
 
 	// TreasureBox 열 때
 	{		
-		if (TreasureBoxActor != nullptr)
+		/*if (TreasureBoxActor != nullptr)
 		{
 			bool bCanOpen = TreasureBoxActor->GetOpenBox();
 			if (bCanOpen)
 			{
 				TreasureBoxActor->OpenTBox();
 			}
-		}	
+		}*/	
 	}
 }
 
@@ -514,6 +514,11 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 				FSM->ChangeState(ENpcState::Talk);
 			}			
 		}
+	}
+
+	if (TreasureBox && TreasureBox->GetOpenBox())
+	{
+		TreasureBox->OpenTBox();
 	}
 }
 

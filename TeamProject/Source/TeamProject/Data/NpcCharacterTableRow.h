@@ -7,6 +7,10 @@
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 #include "NpcCharacterTableRow.generated.h"
 
+#define QUESTCHARDIALOGUE_FURIKO				0
+#define QUESTCHARDIALOGUE_FURIKO_FIND			100
+#define QUESTCHARDIALOGUE_STORE					200
+
 UENUM()
 enum class EDialogType
 {
@@ -23,19 +27,19 @@ enum class EQuestCharacter
 
 	Furiko,
 	Korok,
-	//¿©±â´Â Ä³¸¯ÅÍ¸¸
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ Ä³ï¿½ï¿½ï¿½Í¸ï¿½
 	//Store,
 
 	End,
 };
 
-UENUM(BlueprintType)
-enum class EQuestCharDialogue : uint8
-{
-	Furiko = 0,
-	Furiko_Found = 100,
-	Store = 200,
-};
+//UENUM(BlueprintType)
+//enum class EQuestCharDialogue : uint8
+//{
+//	Furiko = 0,
+//	Furiko_Found = 100,
+//	Store = 200,
+//};
 
 USTRUCT()
 struct TEAMPROJECT_API FNpcCharacterTableRow : public FTableRowBase

@@ -105,11 +105,10 @@ void ANpc::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AA
 
 			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
 			{
-				HUD->ShowInteractWidget(bPlayerInRange);
+				HUD->ShowInteractWidget(bPlayerInRange); // Create Interact UI
 				HUD->ShowInteractName(bPlayerInRange, NpcData->NPCName);
 			}
-		}
-		// Create Interact UI
+		}		
 	}
 }
 

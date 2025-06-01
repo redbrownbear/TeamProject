@@ -2,6 +2,11 @@
 #include "Components/BoxComponent.h"
 #include "Actors/Effect/ParticleEffect.h"
 
+#include "Actors/Character/PlayerCharacter.h"
+#include "GameFramework/PC_InGame.h"
+
+#include "UI/HUD/MainHUD.h"
+
 // Sets default values
 ATreasureBox::ATreasureBox()
 {
@@ -53,6 +58,20 @@ void ATreasureBox::OpenTBox()
 
 void ATreasureBox::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
+	{
+		if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
+		{
+			PC->TreasureBox = this;
+			bPlayerInRange = true;
+
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			{
+				HUD->ShowInteractWidget(bPlayerInRange);
+			}
+		}
+	}
+
 	if (bCanTakeItem)
 	{
 		bCanOpenBox = true;
@@ -63,6 +82,20 @@ void ATreasureBox::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedCompo
 void ATreasureBox::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	bCanOpenBox = false;
+
+	if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
+	{
+		if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
+		{
+			PC->TreasureBox = this;
+			bPlayerInRange = false;
+
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			{
+				HUD->ShowInteractWidget(bPlayerInRange);
+			}
+		}
+	}
 }
 
 void ATreasureBox::GetTreasure()

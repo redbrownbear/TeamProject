@@ -43,18 +43,21 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 		bool IsQuest = Npc->GetDoQuest();
 		if (!DialogueDataRow.bIsEndConversation && IsQuest)
 		{
-			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko_Found));
+			//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko_Found));
+			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_FURIKO_FIND);
 		}
 		else
 		{
 			if (DialogType == EDialogType::Shop)
 			{
-				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
+				//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
+				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_STORE);
+
 			}
 			else
 			{
-
-				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko));
+				//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko));
+				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_FURIKO);
 			}
 		}
 	}
