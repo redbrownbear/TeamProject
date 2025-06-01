@@ -25,7 +25,7 @@ void UAnimNotify_HinoxGrab::Notify(USkeletalMeshComponent* MeshComp, UAnimSequen
 		Projectile->SetData(ProjectileName::Monster_HinoxGrab, CollisionProfileName::ToPlayer);
 
 		const USkeletalMeshComponent* Mesh = Monster->GetMonsterMesh();
-		const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Weapon_R);
+		const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Weapon_Right);
 		NewTransform.SetLocation(Location);
 
 		Projectile->FinishSpawning(NewTransform);

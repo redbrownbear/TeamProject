@@ -44,4 +44,3 @@ float UStatusComponent::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 
 	return NewDamage;
 }
-

@@ -25,6 +25,19 @@ public:
 	UFUNCTION()
 	void OpenTBox();
 
+	bool GetOpenBox() { return bCanOpenBox; }
+
+protected:
+	UFUNCTION()
+	void OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+
 protected:
 	UFUNCTION()
 	void GetTreasure();
@@ -42,7 +55,11 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
+protected:
+	UMaterialInterface* MaterialInterface;
+	UMaterialInstanceDynamic* DynamicMaterialInstance;
+
 private:
 	bool bCanTakeItem = false;
-
+	bool bCanOpenBox = false;
 };

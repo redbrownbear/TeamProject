@@ -1,6 +1,8 @@
 #include "Actors/Temple/Surface/FlowSurface.h"
-#include "FloatingActor.h"
+//#include "FloatingActor.h"
+#include "Actors/Temple/TempleActors/TempleActor.h"
 #include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "Components/SplineComponent.h"
 
 #include "Misc/Utils.h"
@@ -16,8 +18,8 @@ AFlowSurface::AFlowSurface()
 	SplineComponent->SetClosedLoop(true);
 	SplineComponent->SetupAttachment(RootComponent);
 
-	CollisionComponent_Array.Reserve(FLOWSURFACE_FLOOR_NUM); // Reserve´Â ¿©±â¼­ ÇØµµ ¹«¹æÇÕ´Ï´Ù.
-	fDistanceAlongSpline_Array.Reserve(FLOWSURFACE_FLOOR_NUM); // Reserve´Â ¿©±â¼­ ÇØµµ ¹«¹æÇÕ´Ï´Ù.
+	CollisionComponent_Array.Reserve(FLOWSURFACE_FLOOR_NUM); // Reserveï¿½ï¿½ ï¿½ï¿½ï¿½â¼­ ï¿½Øµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+	fDistanceAlongSpline_Array.Reserve(FLOWSURFACE_FLOOR_NUM); // Reserveï¿½ï¿½ ï¿½ï¿½ï¿½â¼­ ï¿½Øµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
 
 	FlowSpeed = FLOWSURFACE_MOVING_SPEED;
 }
@@ -52,7 +54,7 @@ void AFlowSurface::BeginPlay()
 
 			FAttachmentTransformRules AttachRules = FAttachmentTransformRules::KeepRelativeTransform;
 
-			// ½ÇÁ¦ ºÎÂø ¼öÇà
+			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			NewBoxComponent->AttachToComponent(RootComponent, AttachRules);
 			NewBoxComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
 		}
@@ -70,30 +72,30 @@ void AFlowSurface::Tick(float DeltaTime)
 		{
 			fDistanceAlongSpline_Array[i] += DeltaTime * FlowSpeed;
 
-			// ½ºÇÃ¶óÀÎÀÇ ±æÀÌ¸¦ ÃÊ°úÇÏÁö ¾Êµµ·Ï Ã³¸®
+			// ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½Ê°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Êµï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
 			if (fDistanceAlongSpline_Array[i] > SplineComponent->GetSplineLength())
 			{
-				fDistanceAlongSpline_Array[i] = 0.f; // ´Ù½Ã Ã³À½À¸·Î
+				fDistanceAlongSpline_Array[i] = 0.f; // ï¿½Ù½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			}
 			FVector NewLocation = SplineComponent->GetLocationAtDistanceAlongSpline(fDistanceAlongSpline_Array[i], ESplineCoordinateSpace::World);
 
 			CollisionComponent_Array[i]->SetWorldLocation(NewLocation);
 
-			// FloatingActor°¡ Spline µû¶ó Èê·¯°¡µµ·Ï
+			// Floating Actors
 			TArray<AActor*> OverlappingActors;
-			CollisionComponent_Array[i]->GetOverlappingActors(OverlappingActors, AFloatingActor::StaticClass());
+			CollisionComponent_Array[i]->GetOverlappingActors(OverlappingActors, ATempleActor::StaticClass());
 
 			for (AActor* Actor : OverlappingActors)
 			{
-				AFloatingActor* Floating = Cast<AFloatingActor>(Actor);
+				ATempleActor* Floating = Cast<ATempleActor>(Actor);
 				if (Floating && Floating->GetCollisionComponent())
 				{
-					// Èå¸§ ¹æÇâ °è»ê
+					// ï¿½å¸§ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 					FVector FlowDirection = SplineComponent->GetDirectionAtDistanceAlongSpline(
 						fDistanceAlongSpline_Array[i], ESplineCoordinateSpace::World);
 					FlowDirection.Z = 0.f;
 
-					FVector FlowForce = FlowDirection.GetSafeNormal() * FLOATINGACTOR_FORCE; // Èû ¼¼±â Á¶Àý
+					FVector FlowForce = FlowDirection.GetSafeNormal() * FLOATINGACTOR_FORCE; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 					Floating->GetCollisionComponent()->AddForce(FlowForce, NAME_None, true);
 				}
 			}

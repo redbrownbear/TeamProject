@@ -31,7 +31,6 @@ protected:
 	virtual void UpdateAlert(float DeltaTime) override;
 	virtual void UpdateCombat(float DeltaTime) override;
 	virtual void UpdateDamageEye(float DeltaTime);
-	virtual void UpdateDead(float DeltaTime);
 	virtual void UpdateTemp(float DeltaTime);
 
 public:

@@ -14,7 +14,7 @@ void UHinoxFSMComponent::HandleState(float DeltaTime)
 {
 	if (!CharacterMonster)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // No CharacterMonster"));
+		UE_LOG(LogTemp, Error, TEXT("UHinoxFSMComponent::HandleState // No CharacterMonster"));
 		check(false);
 		return;
 	}
@@ -31,7 +31,7 @@ void UHinoxFSMComponent::HandleState(float DeltaTime)
 		UpdateCombat(DeltaTime);
 		break;
 	case EMonsterState::Dead:
-		UpdateDead(DeltaTime);
+		UpdateDying(DeltaTime);
 		break;
 	case EMonsterState::Damage_Eye:
 		UpdateDamageEye(DeltaTime);
@@ -41,7 +41,7 @@ void UHinoxFSMComponent::HandleState(float DeltaTime)
 		break;
 	case EMonsterState::End:
 	default:
-		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::HandleState // Unexpected MonsterState"));
+		UE_LOG(LogTemp, Error, TEXT("UHinoxFSMComponent::HandleState // Unexpected MonsterState"));
 		check(false);
 		break;
 	}
@@ -52,7 +52,7 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 	if (eCurrentState == NewState) { return; }
 	if (!CharacterMonster)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::ChangeState // No CharacterMonster"));
+		UE_LOG(LogTemp, Error, TEXT("UHinoxFSMComponent::ChangeState // No CharacterMonster"));
 		return;
 	}
 
@@ -119,7 +119,7 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Dead:
 		break;
 	default:
-		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::ChangeState // Unexpected MonsterState, ChangeState Failed"));
+		UE_LOG(LogTemp, Error, TEXT("UHinoxFSMComponent::ChangeState // Unexpected MonsterState, ChangeState Failed"));
 		return;
 		break;
 	}
@@ -323,10 +323,7 @@ void UHinoxFSMComponent::UpdateDamageEye(float DeltaTime)
 	this->StopMove();
 }
 
-void UHinoxFSMComponent::UpdateDead(float DeltaTime)
-{
-	this->StopMove();
-}
+
 
 void UHinoxFSMComponent::UpdateTemp(float DeltaTime)
 {

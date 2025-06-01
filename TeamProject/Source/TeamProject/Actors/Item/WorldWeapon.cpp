@@ -230,7 +230,7 @@ void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 					bool bSucceeded = this->AttachToComponent(
 						Monster->GetMonsterMesh(),
 						FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-						Monster_SocketName::Weapon_R);
+						Monster_SocketName::Weapon_Right);
 
 
 					Proj->Destroy();

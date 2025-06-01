@@ -21,7 +21,7 @@ void UAnimNotify_HinoxLeftHandAttack::Notify(USkeletalMeshComponent* MeshComp, U
 		Projectile->SetData(ProjectileName::Monster_HinoxAttack, CollisionProfileName::ToPlayer);
 
 		const USkeletalMeshComponent* Mesh = Monster->GetMonsterMesh();
-		const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Weapon_L);
+		const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Weapon_Left);
 		NewTransform.SetLocation(Location);
 
 		Projectile->FinishSpawning(NewTransform);

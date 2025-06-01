@@ -194,11 +194,6 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	{
 		CollisionComponent->SetSphereRadius(NpcData->CollisionSphereRadius);
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::NPC);
-		//CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		//CollisionComponent->SetCollisionObjectType(ECC_WorldDynamic);
-		//CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
-		//CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		//CollisionComponent->SetGenerateOverlapEvents(true);
 		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
 		CollisionComponent->RegisterComponent();
 		CollisionComponent->SetCanEverAffectNavigation(false);
