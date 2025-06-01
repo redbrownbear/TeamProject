@@ -61,7 +61,8 @@
 #define ASSASIN_BOSS_STONE_SECOND_MAX_TIME											5.f
 #define ASSASIN_BOSS_STUN_MAX_TIME													5.f
 #define ASSASIN_BOSS_TONEXT_MAX_TIME												5.f
-#define ASSASIN_BOSS_BARRIER_MAX_TIME												3.f
+#define ASSASIN_BOSS_DAMAGE_MAX_TIME												3.f
+
 #define KOGASTONE_WAIT_TIME_MAX														3.f
 #define KOGASTONE_ORBIT_RADIUS														250.f
 

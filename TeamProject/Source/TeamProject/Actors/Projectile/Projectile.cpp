@@ -112,3 +112,15 @@ FName AProjectile::GetProjectileName()
 	return DataTableRowHandle.RowName;
 }
 
+float AProjectile::GetDamage()
+{
+	if (ProjectileTableRow)
+	{
+		return ProjectileTableRow->Damage;
+	}
+	else
+	{
+		return 1.f;
+	}
+}
+

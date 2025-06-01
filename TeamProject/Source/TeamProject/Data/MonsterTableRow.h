@@ -209,6 +209,7 @@ public: // Animation
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* ATTACK_BALL_SECOND_END = nullptr;
 
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Monster|AI")
 	TSubclassOf<AMonsterAIController> AIControllerClass;
