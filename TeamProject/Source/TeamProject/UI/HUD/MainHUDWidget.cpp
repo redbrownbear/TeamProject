@@ -90,6 +90,21 @@ void UMainHUDWidget::ShowAbilityAimUI(bool bIsShow)
 		AimingAbilityOverlay->SetVisibility(bIsShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
+void UMainHUDWidget::ShowBossHP(bool bIsShow, float Hp, float MaxHp, FString Name)
+{
+	if(BossHpOverlay)
+		BossHpOverlay->SetVisibility(bIsShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+
+	if(TextBossName)
+		TextBossName->SetText(FText::FromString(Name));
+
+	if (BossHpProgressBar && MaxHp > 0.0f)
+	{
+		float HpPercent = Hp / MaxHp;
+		BossHpProgressBar->SetPercent(HpPercent);
+	}
+}
+
 void UMainHUDWidget::UpdateHP()
 {
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();

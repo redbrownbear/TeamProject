@@ -10,6 +10,7 @@
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Components/WrapBox.h"
+#include "Components/Progressbar.h"
 
 #include "MainHUDWidget.generated.h"
 
@@ -36,6 +37,8 @@ public:
 	void ShowBowAimgUI(bool bIsShow, int32 Count);
 	void ShowAbilityAimUI(bool bIsShow);
 
+	void ShowBossHP(bool bIsShow, float Hp, float MaxHp, FString Name);
+
 public:
 	void UpdateHP();
 	void UpdateStamina(float InDeltaTime);
@@ -52,13 +55,21 @@ public:
 	UOverlay* AimingBowOverlay;
 	UPROPERTY(meta = (BindWidget))
 	UOverlay* AimingAbilityOverlay;
+	UPROPERTY(meta = (BindWidget))
+	UOverlay* BossHpOverlay;
 
 	UPROPERTY(meta = (BindWIdget))
 	UTextBlock* NameText;
 	UPROPERTY(meta = (BindWIdget))
 	UImage* StaminaImg;
 	UPROPERTY(meta = (BindWIdget))
-	UTextBlock* TextArrowCount;	
+	UTextBlock* TextArrowCount;
+	UPROPERTY(meta = (BindWIdget))
+	UTextBlock* TextBossName;
+
+
+	UPROPERTY(meta = (BindWIdget))
+	UProgressBar* BossHpProgressBar;
 
 	UPROPERTY(meta = (BindWIdget))
 	UWrapBox* HpWrapBox;
