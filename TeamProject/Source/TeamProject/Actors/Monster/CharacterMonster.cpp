@@ -55,14 +55,23 @@ void ACharacterMonster::BeginPlay()
 
 	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 	{
-		if (ULynelFSMComponent* LynelFSMComponent = Cast<ULynelFSMComponent>(FSMComponent))
-		{
-			LynelFSMComponent->SetCharacterMonster(this);
-		}
-		else if (UHinoxFSMComponent* HinoxFSMComponent = Cast<UHinoxFSMComponent>(FSMComponent))
-		{
-			HinoxFSMComponent->SetCharacterMonster(this);
-		}
+		FSMComponent->SetCharacterMonster(this);
+		FSMComponent->BindHitEvent();
+		//if (ULynelFSMComponent* LynelFSMComponent = Cast<ULynelFSMComponent>(FSMComponent))
+		//{
+		//	LynelFSMComponent->SetCharacterMonster(this);
+		//	LynelFSMComponent->BindHitEvent();
+		//}
+		//else if (UHinoxFSMComponent* HinoxFSMComponent = Cast<UHinoxFSMComponent>(FSMComponent))
+		//{
+		//	HinoxFSMComponent->SetCharacterMonster(this);
+		//	HinoxFSMComponent->BindHitEvent();
+		//}
+		//else if (UHinoxFSMComponent* HinoxFSMComponent = Cast<UHinoxFSMComponent>(FSMComponent))
+		//{
+		//	HinoxFSMComponent->SetCharacterMonster(this);
+		//	HinoxFSMComponent->BindHitEvent();
+		//}
 	}
 	SetData(DataTableRowHandle);
 
@@ -239,7 +248,15 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 
 				NewSphereCollider->SetCanEverAffectNavigation(false);
 				NewSphereCollider->SetCollisionProfileName(CollisionProfileName::Monster); // 몬스터 피격 판정에 적합한 프로파일
-				NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+
+				if (static_cast<EAdditionalCollider>(i) == EAdditionalCollider::Eye_Ball)
+				{
+					NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnEyeBeginOverlap);
+				}
+				else
+				{
+					NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+				}
 
 				FAttachmentTransformRules AttachRules = FAttachmentTransformRules::SnapToTargetNotIncludingScale;
 
@@ -288,7 +305,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 						break;
 					case EAdditionalCollider::Eye_Ball:
 						AttachSocketName = Monster_SocketName::EyeBall;
-						NewSphereCollider->SetSphereRadius(50.f);
+						NewSphereCollider->SetSphereRadius(70.f);
 						break;
 					default:
 						UE_LOG(LogTemp, Error, TEXT("ACharacterMonster::SetData // Hinox: Unexpected AdditionalCollider index: %d"), i);
@@ -414,6 +431,28 @@ void ACharacterMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 					if (AActor* Player = Controller->GetPawn())
 					{
 						IMonsterInterface::TakeDamage(Projectile->GetDamage(), DamageEvent, GetController(), this);
+					}
+				}
+			}
+		}
+	}
+}
+void ACharacterMonster::OnEyeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (AProjectile* Projectile = Cast<AProjectile>(OtherActor))
+	{
+		if (ProjectileName::Player_Arrow == Projectile->GetProjectileName())
+		{
+			// float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser
+			FDamageEvent DamageEvent;
+
+			if (UWorld* World = GetWorld())
+			{
+				if (AController* PlayerController = World->GetFirstPlayerController())
+				{
+					if (AActor* Player = PlayerController->GetPawn())
+					{
+						IMonsterInterface::TakeDamage(Projectile->GetDamage(), DamageEvent, PlayerController, Player, 1);
 					}
 				}
 			}

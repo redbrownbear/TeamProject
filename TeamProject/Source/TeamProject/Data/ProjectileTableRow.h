@@ -44,6 +44,11 @@ public:
 	float Damage = 0.f;
 
 public:
+	UPROPERTY(EditAnywhere, Category = "Damage")
+	float LifeSpan = 3.f;
+
+
+public:
 	UPROPERTY(EditAnywhere, Category = "NiagaraEffect", meta = (RowType = "NiagaraEffectTableRow"))
 	FDataTableRowHandle NiagaraEffectTableRowHandle;
 };

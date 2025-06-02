@@ -76,7 +76,6 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Alert:
 		break;
 	case EMonsterState::Combat:
-		CharacterMonster->PlayMontage(EMonsterMontage::SLEEP_END);
 
 		//switch (eCombatIndex)
 		//{
@@ -105,6 +104,8 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::Dead:
 		break;
+	case EMonsterState::Damage:
+		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::ChangeState // Unexpected MonsterState"));
 		check(false);
@@ -126,6 +127,8 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 		CharacterMonster->PlayMontage(EMonsterMontage::DAMAGE_EYE_START);
 		break;
 	case EMonsterState::Dead:
+		break;
+	case EMonsterState::Damage:
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("UHinoxFSMComponent::ChangeState // Unexpected MonsterState, ChangeState Failed"));
@@ -151,6 +154,7 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 				}
 			}
 		}
+		CharacterMonster->PlayMontage(EMonsterMontage::DEAD);
 		break;
 	case EMonsterState::Combat:
 	case EMonsterState::Damage_Eye:
@@ -204,6 +208,18 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 	const FVector PlayerLocation = Player->GetActorLocation();
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+
+
+
+
 	if (CharacterMonster->IsPlayingMontage(EMonsterMontage::END))
 	{
 		if (CharacterMonster->IsPlayingMontage(EMonsterMontage::THROW_STONE_END))
@@ -243,12 +259,14 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 				{
 					//SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 10.f);
 					CharacterMonster->PlayMontage(EMonsterMontage::TURN_180_R); // 오른쪽
+					SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 					return;
 				}
 				else if (RightDot < -0.3f)
 				{
 					//SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 10.f);
 					CharacterMonster->PlayMontage(EMonsterMontage::TURN_180_L); // 왼쪽
+					SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 					return;
 				}
 
@@ -337,6 +355,10 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 		float ForwardDot = FVector::DotProduct(Forward, ToPlayer);
 		float RightDot = FVector::DotProduct(Right, ToPlayer);
 
+
+		SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 1.f);
+
+
 		// 정면 조건: ForwardDot이 높고, 좌우 편차가 작을 때
 		if (ForwardDot > 0.7f && FMath::Abs(RightDot) < 0.3f
 			&& !CharacterMonster->IsPlayingMontage(EMonsterMontage::RUN)) // 현재 몬스터가 RUN 몽타주를 재생 중이 아닐 때)
@@ -352,6 +374,11 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 			CharacterMonster->PlayMontage(EMonsterMontage::RUN_CURVE_L); // 왼쪽
 		}
 	}
+}
+
+void UHinoxFSMComponent::UpdateDying(float DeltaTime)
+{
+	Super::UpdateDying(DeltaTime);
 }
 
 void UHinoxFSMComponent::UpdateDamageEye(float DeltaTime)

@@ -11,6 +11,8 @@ void UAnimNotify_HinoxRightFootAttack::Notify(USkeletalMeshComponent* MeshComp, 
 
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(MeshComp->GetOwner()))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UAnimNotify_HinoxRightFootAttack::Notify"));
+
 		UWorld* World = MeshComp->GetWorld();
 
 		AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),

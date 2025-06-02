@@ -10,6 +10,7 @@
 
 
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
+#include "Components/FSMComponent/Monster/HinoxFSMComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
 #include "Data/MonsterTableRow.h"
@@ -857,7 +858,7 @@ bool IMonsterInterface::IsPlayingMontage(EMonsterMontage _InEnum)
 	return bFlag;
 }
 
-void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, int32 iOption)
 {
 	UMonsterStatusComponent * UMonsterStatusComponent = GetStatusComponent();
 	const float fDamage = UMonsterStatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
@@ -871,7 +872,18 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 			}
 			else
 			{
-				FSMComponent->ChangeState(EMonsterState::Damage);
+				if (iOption)
+				{
+					if (UHinoxFSMComponent* HinoxFSMComponent = Cast<UHinoxFSMComponent>(FSMComponent))
+					{
+						FSMComponent->ChangeState(EMonsterState::Damage_Eye);
+					}
+				}
+				else
+				{
+					FSMComponent->ChangeState(EMonsterState::Damage);
+				}
+
 			}
 		}
 		else
@@ -885,7 +897,6 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 void IMonsterInterface::OnDie()
 {
 	GetFSMComponent()->ChangeState(EMonsterState::Dead);
-	PlayMontage(EMonsterMontage::DAMAGE);
 }
 
 void IMonsterInterface::OnDeadEnd()

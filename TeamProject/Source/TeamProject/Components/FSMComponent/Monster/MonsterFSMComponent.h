@@ -34,6 +34,9 @@ public:
 	void SetCharacterMonster(ACharacterMonster* InOwner) { CharacterMonster = InOwner; }
 	void SetPlayer(APlayerCharacter* InPlayer) { Player = InPlayer; }
 	void OnHitReceived(bool bIsDead = false);
+	UFUNCTION()
+	void BindHitEvent();
+
 
 public:
 	void SetToCatchWeapon(AWorldWeapon* InWW) { ToCatchWeapon = InWW; }
@@ -120,5 +123,8 @@ protected:
 	void MoveToLocation(const FVector& InLocation);
 	void StopMove();
 	void SpawnProjectile(FName ProjectileName, FName CollisionProfileName);
+	UFUNCTION()
+	void UpdateUIHPBar(float CurrentHP, float MaxHP);
+
 
 };

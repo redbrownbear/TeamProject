@@ -18,6 +18,12 @@
 
 #include "Navigation/PathFollowingComponent.h"
 
+#include "GameFramework/PC_InGame.h"
+
+#include "UI/HUD/MainHUD.h"
+
+#include "Data/MonsterTableRow.h"
+
 
 UMonsterFSMComponent::UMonsterFSMComponent()
 {
@@ -49,6 +55,8 @@ void UMonsterFSMComponent::BeginPlay()
 	default:
 		break;
 	}
+
+
 }
 
 
@@ -69,6 +77,18 @@ void UMonsterFSMComponent::OnHitReceived(bool bIsDead)
 	else
 	{
 		ChangeState(EMonsterState::Damage);
+	}
+}
+
+void UMonsterFSMComponent::BindHitEvent()
+{
+	if (CharacterMonster)
+	{
+		CharacterMonster->GetStatusComponent()->OnHPChanged.AddDynamic(this, &ThisClass::UpdateUIHPBar);
+	}
+	else if (PawnMonster)
+	{
+		PawnMonster->GetStatusComponent()->OnHPChanged.AddDynamic(this, &ThisClass::UpdateUIHPBar);
 	}
 }
 
@@ -947,4 +967,34 @@ void UMonsterFSMComponent::SpawnProjectile(FName ProjectileName, FName Collision
 	NewTransform.SetLocation(Location);
 	NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
 	Projectile->FinishSpawning(NewTransform);
+}
+
+void UMonsterFSMComponent::UpdateUIHPBar(float CurrentHP, float MaxHP)
+{
+	if (CharacterMonster)
+	{ 
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					HUD->ShowBossHpUI(true, CurrentHP, MaxHP, CharacterMonster->GetMonsterData()->Name.ToString());
+				}
+			}
+		}
+	}
+	else if (PawnMonster)
+	{
+		if (UWorld* World = PawnMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					HUD->ShowBossHpUI(false, CurrentHP, MaxHP, PawnMonster->GetMonsterData()->Name.ToString());
+				}
+			}
+		}
+	}
 }

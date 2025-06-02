@@ -26,7 +26,7 @@ AProjectile::AProjectile()
 	ProjectileMovementComponent->InitialSpeed = 0.f;
 	ProjectileMovementComponent->MaxSpeed = 0.f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
-	InitialLifeSpan = 15.f;
+	InitialLifeSpan = 3.f;
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->SetCanEverAffectNavigation(false);
@@ -71,7 +71,7 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		SphereCom->SetSphereRadius(ProjectileTableRow->CollisionSphereRadius);
 	}
 
-	// @TODO : Set Size of other kinds of ShapeComponent
+	SetLifeSpan(ProjectileTableRow->LifeSpan);
 }
 
 // Called when the game starts or when spawned
@@ -91,14 +91,16 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	Destroy();
+	if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone)
+	{
+		Destroy();
+	}
 }
 
 // Called every frame
 void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 FVector AProjectile::GetVelocity()
