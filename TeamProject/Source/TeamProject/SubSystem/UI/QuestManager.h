@@ -9,7 +9,6 @@
 
 #include "QuestManager.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestUpdated, const TArray<FQuestDataRow>&, QuestList);
 /**
  * 
  */
@@ -24,24 +23,12 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	void LoadQuestData(UDataTable* DataTable);
 
-	TArray<FQuestDataRow> GetQuestData(EQuestCharacter QuestChar) const;
+	TArray<FQuestDataRow> GetQuestData() const;
 
-public:
-	void ShowUI();
-
-	//µ•¿Ã≈Õ
-	void UpdateQuestData(EQuestCharacter QuestChar, const FQuestDataRow UpdateShopRow);
-
-	//UI
-	void UpdateQuest(const TArray<FQuestDataRow>& ShopList);
-
-public:
-	UPROPERTY(BlueprintAssignable)
-	FOnQuestUpdated OnQuestUpdated;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* QuestDataTable;
 
-	TMap<EQuestCharacter, TArray<FQuestDataRow>> QuestRowMap;
+	TArray<FQuestDataRow> QuestArr;
 };

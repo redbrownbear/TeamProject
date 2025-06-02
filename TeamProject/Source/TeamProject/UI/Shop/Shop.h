@@ -26,8 +26,9 @@ public:
 	virtual void ShowUI() override;
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
-public:
-	void SetCoinText(int32 CoinCount);
+private:
+	void InitUI();
+	void SetRupeeUI();
 
 private:
 	void BindDelegates();

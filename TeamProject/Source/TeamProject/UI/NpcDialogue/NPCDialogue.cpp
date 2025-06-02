@@ -35,7 +35,6 @@ void UNPCDialogue::ShowUI()
         InputMode.SetHideCursorDuringCapture(false);
 
         PC_InGame->SetInputMode(InputMode);
-        PC_InGame->BindDialogueInput();
     }
 
     BindDelegates();
@@ -78,6 +77,12 @@ void UNPCDialogue::InitUI()
 {
     ConfirmButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnConfirm);
     CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancel);
+
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    if (PC_InGame)
+    {
+        PC_InGame->BindDialogueInput();
+    }
 }
 
 void UNPCDialogue::BindDelegates()

@@ -5,6 +5,7 @@
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/InventoryManager.h"
+#include "SubSystem/PlayerManager.h"
 
 #include "GameFramework/PC_InGame.h"
 
@@ -31,7 +32,6 @@ void UInventory::ShowUI()
         InputMode.SetHideCursorDuringCapture(false);
 
         PC_InGame->SetInputMode(InputMode);
-        PC_InGame->BindInventoryInput();
     }
 
     BindDelegates();
@@ -51,17 +51,25 @@ void UInventory::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 void UInventory::InitUI()
 {
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    if (PC_InGame)
+    {
+        PC_InGame->BindInventoryInput();
+    }
+
+    SetRupeeUI();
+
     check(BP_InvenScroll);
     check(BP_InvenEquip);
 }
 
 void UInventory::BindDelegates()
 {
-    UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
-    check(InvenManager);
-    if (InvenManager)
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
     {
-        InvenManager->OnInventoryUpdated.AddDynamic(this, &UInventory::RefreshInventory);
+        PlayerManager->OnInventoryUpdated.AddDynamic(this, &UInventory::RefreshInventory);
+        PlayerManager->OnInventoryAllUpdated.AddDynamic(this, &UInventory::RefreshAllInventory);
     }
 
     BP_InvenScroll->OnInventoryDescriptionUpdated.AddDynamic(this, &UInventory::RefreshEquip);
@@ -69,14 +77,23 @@ void UInventory::BindDelegates()
 
 void UInventory::RemoveDelegate()
 {
-    UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
-    check(InvenManager);
-    if (InvenManager)
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
     {
-        InvenManager->OnInventoryUpdated.RemoveDynamic(this, &UInventory::RefreshInventory);
+        PlayerManager->OnInventoryUpdated.RemoveDynamic(this, &UInventory::RefreshInventory);
+        PlayerManager->OnInventoryAllUpdated.RemoveDynamic(this, &UInventory::RefreshAllInventory);
     }
 
     BP_InvenScroll->OnInventoryDescriptionUpdated.RemoveDynamic(this, &UInventory::RefreshEquip);
+}
+
+void UInventory::SetRupeeUI()
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        CoinText->SetText(FText::FromString(FString::FromInt(PlayerManager->GetRupee())));
+    }
 }
 
 void UInventory::OnNavigate(const FInputActionValue& InputActionValue)
@@ -118,44 +135,22 @@ void UInventory::OnCancel(const FInputActionValue& InputActionValue)
 
 void UInventory::OnCreateItemTest(const FInputActionValue& InputActionValue)
 {
-    // 구조 바꿔야 함
-    UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
-    check(InvenManager);
+    UInventoryManager* InventoryManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 
-    if (InvenManager)
+    if (PlayerManager && InventoryManager)
     {
-        TArray<TSharedPtr<const FItemData>> FoundRows;
-        FItemData Item;
-
-
-        TArray<FName> RowNames = ItemDataTable->GetRowNames();
-        for (const FName& RowName : RowNames)
-        {
-            FItemData* Row = ItemDataTable->FindRow<FItemData>(RowName, "Item");
-            if (Row)
-            {
-                // 원본 Row 복사본 생성
-                FItemData* NewRow = new FItemData(*Row);
-                TSharedPtr<const FItemData> SharedRow = MakeShareable(NewRow);
-         
-                FoundRows.Add(SharedRow);
-            }
-            else
-            {
-                UE_LOG(LogTemp, Warning, TEXT("Failed to find row for name: %s"), *RowName.ToString());
-            }
-        }
-
+        TArray<FItemData> FoundRows  = InventoryManager->GetAllItemData();
         if (!FoundRows.IsEmpty())
         {
             if (FoundRows.Num() > 0)
             {
                 int32 RandomIndex = FMath::RandRange(0, FoundRows.Num() - 1);
-                TSharedPtr<const FItemData> RandomItem = (FoundRows)[RandomIndex];
-                InvenManager->AddItem(*RandomItem);
+                const FItemData RandomItem = (FoundRows)[RandomIndex];
+                PlayerManager->SetInvenData(RandomItem);
 
                 // 사용 예
-                UE_LOG(LogTemp, Log, TEXT("랜덤 Name: %s"), *RandomItem->Name);
+                UE_LOG(LogTemp, Log, TEXT("랜덤 Name: %s"), *RandomItem.Name);
             }
             else
             {
@@ -169,6 +164,11 @@ void UInventory::RefreshInventory(const FItemData& ItemData)
 {
     BP_InvenScroll->AddItemSlot(ItemData);
 
+}
+
+void UInventory::RefreshAllInventory(const TArray<FItemData>& ItemDataList)
+{
+    BP_InvenScroll->UpdateSlots(ItemDataList);
 }
 
 void UInventory::RefreshEquip(const FItemData& ItemData)

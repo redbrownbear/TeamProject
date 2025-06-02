@@ -3,7 +3,7 @@
 
 #include "UI/Inven/InventoryScroll.h"
 
-#include "SubSystem/UI/InventoryManager.h"
+#include "SubSystem/PlayerManager.h"
 
 void UInventoryScroll::NativeConstruct()
 {
@@ -43,7 +43,7 @@ void UInventoryScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
     for (const FItemData& Item : NewItemList)
     {
         if (Item.eItemCategory != CurrentCategory)
-            return;
+            continue;
 
         UInventorySlot* NewSlot = nullptr;
 
@@ -125,10 +125,10 @@ void UInventoryScroll::SetSort(EItemCategory Type)
     }
       ActiveSlots.Empty();
 
-    UInventoryManager* InvenManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
-    check(InvenManager);
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    check(PlayerManager);
     
-    TArray<FItemData> TempItems = InvenManager->GetAllItemData();
+    TArray<FItemData> TempItems = PlayerManager->GetAllItemData();
 
     TArray<FItemData> Items;
     for (FItemData Item : TempItems)

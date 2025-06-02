@@ -10,7 +10,7 @@
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "SubSystem/UI/ShopManager.h"
-#include "SubSystem/UI/QuestManager.h"
+#include "SubSystem/PlayerManager.h"
 
 #include "Actors/Npc/Npc.h" 
 #include "Components/Character/PlayerMovementComponent.h"
@@ -46,10 +46,6 @@ APC_InGame::APC_InGame()
 void APC_InGame::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-	if (UIManager)
-		UIManager->PostWorldInitialize();
 
 	ChangeInputContext(EInputContext::IC_InGame);
 
@@ -520,28 +516,30 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
 {
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-	check(UIManager);
-
 	if (UIManager)
 	{
 		UIManager->ShowUI(UInventory::StaticClass());
+	}
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
+	{
+		PlayerManager->ShowInvenUI();
 	}
 }
 
 void APC_InGame::OpenQuest(const FInputActionValue& InputActionValue)
 {
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-	check(UIManager);
-
 	if (UIManager)
 	{
 		UIManager->ShowUI(UQuest::StaticClass());
 	}
 
-	UQuestManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestManager>();
-	if (QuestManager)
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
 	{
-		QuestManager->ShowUI();
+		PlayerManager->ShowQuestUI();
 	}
 }
 
