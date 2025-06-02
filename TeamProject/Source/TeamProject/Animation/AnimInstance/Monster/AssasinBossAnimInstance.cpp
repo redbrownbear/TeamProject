@@ -46,10 +46,10 @@ void UAssasinBossAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsIdle = false;
 	bIsFlyIdle = false;
 	bIsStun = false;
-	bIsFlyStun = false;
 	bIsStoneFirst = false;
 	bIsStoneSecond = false;
 	bIsBarrier = false;
+	bIsDamage = false;
 
 	switch (eMonsterState)
 	{
@@ -88,19 +88,10 @@ void UAssasinBossAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 		break;
 	case EMonsterState::Stun:
-	{
-		const EAssasinBossPhase Phase = FSMComponent->GetPhase();
-		switch (Phase)
-		{
-		case EAssasinBossPhase::PHASE_1:
-			bIsStun = true;
-			break;
-		case EAssasinBossPhase::PHASE_2:
-		case EAssasinBossPhase::PHASE_3:
-			bIsFlyStun = true;
-			break;
-		}
-	}
+		bIsStun = true;
+		break;
+	case EMonsterState::Damage:
+		bIsDamage = true;
 		break;
 	default:
 		break;

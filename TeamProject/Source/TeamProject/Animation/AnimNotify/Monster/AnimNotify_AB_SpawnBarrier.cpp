@@ -11,18 +11,25 @@ void UAnimNotify_AB_SpawnBarrier::Notify(USkeletalMeshComponent* MeshComp, UAnim
 
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(MeshComp->GetOwner()))
 	{
-		UWorld* World = MeshComp->GetWorld();
+		if (UWorld* World = MeshComp->GetWorld())
+		{
+			ABarrier* Barrier = World->SpawnActorDeferred<ABarrier>(ABarrier::StaticClass(),
+				FTransform::Identity, nullptr, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-		ABarrier* Barrier = World->SpawnActorDeferred<ABarrier>(ABarrier::StaticClass(),
-			FTransform::Identity, nullptr, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+			FTransform NewTransform;
+			const FVector Location = Monster->GetActorLocation();
 
-		FTransform NewTransform;
-		const FVector Location = Monster->GetActorLocation();
-		const FVector FowardVector = Monster->GetActorForwardVector();
-		const FVector SpawnLocation = Location + FowardVector * 100.f;
-		const FRotator SpawnRotator = Monster->GetActorRotation();
-		NewTransform.SetLocation(SpawnLocation);
-		NewTransform.SetRotation(SpawnRotator.Quaternion());
-		Barrier->FinishSpawning(NewTransform);
+			const FVector PlayerLocation = World->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+			
+
+			FVector DirectionVector = PlayerLocation - Location;
+			DirectionVector.Normalize();
+			const FVector SpawnLocation = Location + DirectionVector * 100.f;
+			const FRotator SpawnRotator = DirectionVector.Rotation();
+			NewTransform.SetLocation(SpawnLocation);
+			NewTransform.SetRotation(SpawnRotator.Quaternion());
+			Barrier->FinishSpawning(NewTransform);
+		}
+
 	}
 }

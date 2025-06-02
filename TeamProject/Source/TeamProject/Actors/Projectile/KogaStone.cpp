@@ -5,6 +5,10 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Data/ProjectileTableRow.h"
 
+#include "Actors/Monster/CharacterMonster.h"
+
+#include "Components/FSMComponent/Monster/AssasinBossFSMComponent.h"
+
 // Sets default values
 AKogaStone::AKogaStone()
 {
@@ -27,8 +31,26 @@ void AKogaStone::Tick(float DeltaTime)
 
 	WaitTime += DeltaTime;
 
+
+
+
 	if (!bFall)
 	{
+
+		if (ACharacterMonster* CharacterMonster = Cast<ACharacterMonster>(Owner))
+		{
+			if (UAssasinBossFSMComponent* FSMComponent = Cast<UAssasinBossFSMComponent>(CharacterMonster->GetFSMComponent()))
+			{
+				if (EMonsterState::Damage == FSMComponent->GetMonsterState())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("KogaStone // SetFallTrue"));
+					SetFallTrue();
+					return;
+				}
+			}
+		}
+
+
 		if (WaitTime > KOGASTONE_WAIT_TIME_MAX)
 		{
 			if (!bVelocitySet)
@@ -44,7 +66,7 @@ void AKogaStone::Tick(float DeltaTime)
 
 				if (AActor* CenterActor = GetInstigator())
 				{
-					OrbitAngle += 360.f * DeltaTime;
+					OrbitAngle += KOGASTONE_ROTATE_SPEED * DeltaTime;
 					float TotalAngle = OrbitAngle + InitialAngleOffset;
 					float Radians = FMath::DegreesToRadians(TotalAngle);
 

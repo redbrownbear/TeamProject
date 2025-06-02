@@ -33,6 +33,7 @@ public:
 	void SetPawnMonster(APawnMonster* InOwner) { PawnMonster = InOwner; }
 	void SetCharacterMonster(ACharacterMonster* InOwner) { CharacterMonster = InOwner; }
 	void SetPlayer(APlayerCharacter* InPlayer) { Player = InPlayer; }
+	void OnHitReceived(bool bIsDead = false);
 
 public:
 	void SetToCatchWeapon(AWorldWeapon* InWW) { ToCatchWeapon = InWW; }
@@ -113,6 +114,7 @@ protected:
 	virtual void UpdateSignal(float DeltaTime);
 	virtual void UpdateAimingBow(float DeltaTime);
 	virtual void UpdateDying(float DeltaTime);
+	virtual void UpdateDamage(float DeltaTime);
 
 protected:
 	void MoveToLocation(const FVector& InLocation);

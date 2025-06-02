@@ -3,8 +3,12 @@
 
 #include "Actors/TriggerBox/TriggerBox_ToAssasinHideout.h"
 #include "Components/ShapeComponent.h"
+
 #include "SubSystem/AsyncLoadingScreen/GIS_ASyncLoadingScreen.h"
+#include "SubSystem/PlayerManager.h"
+
 #include "Actors/Character/PlayerCharacter.h"
+
 #include "Misc/Utils.h"
 
 ATriggerBox_ToAssasinHideout::ATriggerBox_ToAssasinHideout()
@@ -20,9 +24,17 @@ void ATriggerBox_ToAssasinHideout::OnTrigger(UPrimitiveComponent* OverlappedComp
 	if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
 	{
 		UGIS_ASyncLoadingScreen* LoadingScreenSubsystem = GetGameInstance()->GetSubsystem<UGIS_ASyncLoadingScreen>();
-		//UClass* WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/UI_Loading.UI_Loading_C'"));
-		//LoadingScreenSubsystem->ShowLoadingScreen(WidgetClass);
+		if (LoadingScreenSubsystem)
+		{
+			if (UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>())
+			{
+				sPlayerStatus Status = PlayerManager->GetPlayerStatus();
+				Status.PreviousLoction = Player->GetActorLocation() - Player->GetActorForwardVector() * 200.f;
+				PlayerManager->SetPlayerStatus(Status);
 
-		UGameplayStatics::OpenLevel(GetWorld(), TEXT("AssasinHideout"));
+				TSoftObjectPtr<UWorld> GameMap = TSoftObjectPtr<UWorld>(FSoftObjectPath(TEXT("/Game/Level/AssasinHideout.AssasinHideout")));
+				LoadingScreenSubsystem->OpenLevelWithLoadingScreen(GameMap);
+			}
+		}
 	}
 }

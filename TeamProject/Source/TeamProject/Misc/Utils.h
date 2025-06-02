@@ -13,6 +13,7 @@ namespace CollisionProfileName
     static inline FName ToPlayer = TEXT("ToPlayer");
 	static inline FName Monster = TEXT("Monster");
     static inline FName ToMonster = TEXT("ToMonster");
+    static inline FName ToPlayerMonster = TEXT("ToPlayerMonster");
     static inline FName MapMesh = TEXT("MapMesh");
     static inline FName Item = TEXT("Item");
     static inline FName ToItem = TEXT("ToItem");
@@ -46,6 +47,8 @@ namespace ProjectileName
 
     static inline FName Monster_AB_KogaStone = TEXT("Monster_AB_KogaStone");
     static inline FName Monster_AB_KogaStoneBig = TEXT("Monster_AB_KogaStoneBig");
+
+    static inline FName Player_Arrow = TEXT("Player_Arrow");
 }
 
 namespace Monster_SocketName
@@ -135,6 +138,7 @@ enum class EMonsterState : uint8
     Happy,
     Barrier,
     Stone,
+    Damage,
     Temp,
     End,
 };

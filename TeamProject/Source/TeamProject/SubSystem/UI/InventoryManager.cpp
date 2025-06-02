@@ -3,9 +3,41 @@
 
 #include "SubSystem/UI/InventoryManager.h"
 
-void UInventoryManager::AddItem(FItemData Itemdata)
+UInventoryManager::UInventoryManager()
 {
-	Items.Add(Itemdata);
+    static ConstructorHelpers::FObjectFinder<UDataTable> ShopTableObj(TEXT("/Game/Data/ItemData/DT_Item.DT_Item"));
 
-	OnInventoryUpdated.Broadcast(Itemdata); // UI에게 알림
+    if (ShopTableObj.Succeeded())
+    {
+        ItemDataTable = ShopTableObj.Object;
+    }
+    check(ItemDataTable);
+}
+
+void UInventoryManager::Initialize(FSubsystemCollectionBase& Collection)
+{
+    LoadItemData(ItemDataTable);
+}
+
+void UInventoryManager::LoadItemData(UDataTable* DataTable)
+{
+    if (!DataTable)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("DataTable is null!"));
+        return;
+    }
+
+    TArray<FName> RowNames = DataTable->GetRowNames();
+    for (const FName& RowName : RowNames)
+    {
+        FItemData* Row = DataTable->FindRow<FItemData>(RowName, "Populate ItemRow");
+        if (Row)
+        {
+            Items.Add(*Row);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Failed to find row for name: %s"), *RowName.ToString());
+        }
+    }
 }

@@ -4,13 +4,16 @@
 #include "UI/Quest/Quest.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "SubSystem/UI/QuestManager.h"
+#include "SubSystem/PlayerManager.h"
 
 #include "GameFramework/PC_InGame.h"
 #include "UI/HUD/MainHUD.h"
 
 void UQuest::OnCreated()
 {
+    InitUI();
+    SetRupeeUI();
+
     InitializePool(100);
 }
 
@@ -29,11 +32,6 @@ void UQuest::ShowUI()
         InputMode.SetHideCursorDuringCapture(false);
 
         PC_InGame->SetInputMode(InputMode);
-        PC_InGame->BindQuestInput();
-
-        AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
-        if (HUD)
-            HUD->SetMainHUDVisible(false);
     }
 
     BindDelegates();
@@ -45,15 +43,19 @@ void UQuest::HideUI(TSubclassOf<UBaseUI> UIClass)
     if (PC_InGame)
     {
         PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
-
-        AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
-        if (HUD)
-            HUD->SetMainHUDVisible(true);
-
     }
 
     RemoveDelegates();
     Super::HideUI(UQuest::StaticClass());
+}
+
+void UQuest::InitUI()
+{
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    if (PC_InGame)
+    {
+        PC_InGame->BindQuestInput();
+    }
 }
 
 void UQuest::InitializePool(int32 PreloadCount)
@@ -68,30 +70,30 @@ void UQuest::InitializePool(int32 PreloadCount)
 
 void UQuest::BindDelegates()
 {
-    UQuestManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestManager>();
-    if (QuestManager)
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
     {
-        QuestManager->OnQuestUpdated.AddDynamic(this, &UQuest::RefreshQuestList);
+        PlayerManager->OnQuestUpdated.AddDynamic(this, &UQuest::RefreshQuestList);
     }
 }
 
 void UQuest::RemoveDelegates()
 {
-    UQuestManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestManager>();
-    if (QuestManager)
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
     {
-        QuestManager->OnQuestUpdated.RemoveDynamic(this, &UQuest::RefreshQuestList);
+        PlayerManager->OnQuestUpdated.RemoveDynamic(this, &UQuest::RefreshQuestList);
     }
 }
 
-void UQuest::SetCoin(int32 CoinCount)
+void UQuest::SetRupeeUI()
 {
-	check(TextCoin);
-
-	TextCoin->SetText(FText::FromString(FString::FromInt(CoinCount)));
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        TextCoin->SetText(FText::FromString(FString::FromInt(PlayerManager->GetRupee())));
+    }
 }
-
-
 void UQuest::RefreshQuestList(const TArray<FQuestDataRow>& QuestList)
 {
     for (UQuestSlot* ActiveSlot : ActiveSlots)

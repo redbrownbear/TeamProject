@@ -149,14 +149,27 @@ void UAssasinLeaderFSMComponent::UpdatePatrol(float DeltaTime)
 	{
 		CharacterMonster->PlayMontage(EMonsterMontage::SEARCH);
 
-		++CurrentPatrolIndex;
+		if (bUp)
+		{
+			++CurrentPatrolIndex;
+		}
+		else
+		{
+			--CurrentPatrolIndex;
+		}
 
 
 		if (PatrolPath)
 		{
 			if (CurrentPatrolIndex >= PatrolPath->GetSplineMaxIndex())
 			{
-				CurrentPatrolIndex = 0;
+				bUp = false;
+				CurrentPatrolIndex = PatrolPath->GetSplineMaxIndex() - 2;
+			}
+			else if (CurrentPatrolIndex < 0)
+			{
+				bUp = true;
+				CurrentPatrolIndex = 1;
 			}
 		}
 	}
