@@ -66,7 +66,7 @@ void AKogaStone::Tick(float DeltaTime)
 
 				if (AActor* CenterActor = GetInstigator())
 				{
-					OrbitAngle += 360.f * DeltaTime;
+					OrbitAngle += KOGASTONE_ROTATE_SPEED * DeltaTime;
 					float TotalAngle = OrbitAngle + InitialAngleOffset;
 					float Radians = FMath::DegreesToRadians(TotalAngle);
 

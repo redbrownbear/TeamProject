@@ -25,7 +25,7 @@ void UAnimNotify_AB_SpawnBarrier::Notify(USkeletalMeshComponent* MeshComp, UAnim
 			FVector DirectionVector = PlayerLocation - Location;
 			DirectionVector.Normalize();
 			const FVector SpawnLocation = Location + DirectionVector * 100.f;
-			const FRotator SpawnRotator = Monster->GetActorRotation();
+			const FRotator SpawnRotator = DirectionVector.Rotation();
 			NewTransform.SetLocation(SpawnLocation);
 			NewTransform.SetRotation(SpawnRotator.Quaternion());
 			Barrier->FinishSpawning(NewTransform);
