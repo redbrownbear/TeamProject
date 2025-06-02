@@ -111,6 +111,22 @@ void APlayerCharacter::BeginPlay()
 
 	GetMesh()->SetCollisionProfileName(TEXT("Player"));
 
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		// Get the current level name
+		FString LevelName = World->GetName();
+		if (LevelName.Equals(TEXT("GameMap")))
+		{
+			UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+
+			FVector LinkLocation = PlayerManager->GetPlayerStatus().PreviousLoction;
+			if (LinkLocation != FVector::Zero())
+			{
+				SetActorLocation(LinkLocation);
+			}
+		}
+	}
 }
 
 // Called every frame
