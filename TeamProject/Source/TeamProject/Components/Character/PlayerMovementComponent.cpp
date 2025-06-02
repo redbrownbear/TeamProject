@@ -43,7 +43,6 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 
 void UPlayerMovementComponent::BeginPlay()
 {
-
 	Super::BeginPlay();
 	
 	GetNavAgentPropertiesRef().bCanCrouch = true;
@@ -257,7 +256,6 @@ void UPlayerMovementComponent::SetClimbMode(bool _bool)
 
 	Climb_State = EClimb_State::Climb;
 
-
 }
 
 void UPlayerMovementComponent::SetGlideMode(bool _bool)
@@ -282,7 +280,7 @@ void UPlayerMovementComponent::SetGlideMode(bool _bool)
 	FHitResult HitResult;
 
 	Player_C->OnLanded(HitResult);
-	
+	 
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
 	AnimInst->bIsGliding = _bool;

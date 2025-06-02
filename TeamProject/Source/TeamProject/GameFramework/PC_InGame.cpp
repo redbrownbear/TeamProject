@@ -290,8 +290,6 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 		
 	}
-
-	// Gliding Move
 	else if (Movement->bIsGliding)
 	{
 		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
