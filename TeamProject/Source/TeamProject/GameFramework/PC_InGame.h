@@ -304,7 +304,7 @@ protected:
 	float TraceDistance = 1000.f;
 
 	UPROPERTY(EditAnywhere, Category = "Magnet | Grab")
-	float HoldDistance = 300.f;
+	float HoldDistance = 1000.f;
 
 	UPROPERTY(VisibleAnywhere)
 	class UPhysicsHandleComponent* PhysicsHandle;
@@ -319,6 +319,7 @@ protected:
 
 private:
 	bool bQPressed = false;
+	bool bIceMaker = false;
 	bool bCanSpawn = false;
 	bool bHitResult = false;
 

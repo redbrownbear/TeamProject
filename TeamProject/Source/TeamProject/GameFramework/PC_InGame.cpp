@@ -10,6 +10,7 @@
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "SubSystem/UI/ShopManager.h"
+#include "UI/HUD/MainHUD.h"
 #include "SubSystem/PlayerManager.h"
 
 #include "Actors/Npc/Npc.h" 
@@ -588,8 +589,6 @@ void APC_InGame::TrySupernatural(const FInputActionValue& InputActionValue)
 
 		if (!MetalActorClass) return;
 
-		bShowMouseCursor = false;
-
 		CheckMetalActor();
 
 		if (bCanControlMetal)
@@ -624,6 +623,12 @@ void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 {	
 	if (bXPressed) { return; }
 	bQPressed = !bQPressed;
+
+	/*AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
+	if (MainHUD)
+	{
+		MainHUD->ShowAbilityAimUI(bQPressed);
+	}*/
 
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 	UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
@@ -674,6 +679,12 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 
 	bXPressed = !bXPressed;
 
+	AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
+	if (MainHUD)
+	{
+		MainHUD->ShowAbilityAimUI(bXPressed);
+	}
+
 	// Check if is MetalicActor	 
 	 if (!MetalActor) return;
 
@@ -693,7 +704,6 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 
 		 Player_C->ZoomIn(); 
 
-		 bShowMouseCursor = true; // 임시
 	 } 
 	 else
 	 {
@@ -766,7 +776,7 @@ void APC_InGame::StartMagnetGrab()
 		{
 			if (HitComp->IsSimulatingPhysics())
 			{
-				PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, Hit.ImpactPoint);
+				PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, HitResult.ImpactPoint);
 				GrabbedComponent = HitComp;
 
 				// 주기적으로 위치 갱신
@@ -818,7 +828,16 @@ void APC_InGame::MoveGrabbedObject()
 	GetPlayerViewPoint(CameraLocation, CameraRotation);
 
 	FVector TargetLocation = CameraLocation + CameraRotation.Vector() * HoldDistance;
-	PhysicsHandle->SetTargetLocation(TargetLocation);
+
+	// 현재 위치
+	//FVector CurrentLocation = GrabbedComponent->GetComponentLocation();
+	FVector CurrentLocation = GrabbedComponent->GetOwner()->GetActorLocation();
+
+	// 부드럽게 따라가게 보간 처리
+	FVector SmoothedLocation = FMath::VInterpTo(CurrentLocation, TargetLocation, GetWorld()->GetDeltaSeconds(), 0.01f);
+
+	PhysicsHandle->SetTargetLocation(TargetLocation);	
+
 }
 
 bool APC_InGame::IsHoldingObject() const
@@ -992,6 +1011,8 @@ void APC_InGame::UpdateIcePreview()
 {
 	if (!IcePreviewActor) return;
 
+	bIceMaker = true;
+
 	CheckSurface();
 
 	if (bHitResult)
@@ -1013,15 +1034,34 @@ void APC_InGame::UpdateIcePreview()
 
 void APC_InGame::CheckCollision()
 {
-	FHitResult HitResult;
-	bHitResult = this->GetHitResultUnderCursorByChannel(
-		UEngineTypes::ConvertToTraceType(ECC_Visibility),
-		false,
-		HitResult);
-
-	if (bHitResult)
+	// Cursor Hit
+	if (bIceMaker)
 	{
-		Hit = HitResult;
+		FHitResult HitResult;
+		bHitResult = this->GetHitResultUnderCursorByChannel(
+			UEngineTypes::ConvertToTraceType(ECC_Visibility),
+			false,
+			HitResult);
+
+		if (bHitResult)
+		{
+			Hit = HitResult;
+		}
+		
+		bIceMaker = false;
+	}	
+	else
+	{
+		FVector Start;
+		FRotator ViewRot;
+		GetPlayerViewPoint(Start, ViewRot); // 카메라 위치 & 방향
+
+		FVector End = Start + ViewRot.Vector() * TraceDistance;
+
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(GetPawn()); // 자기 자신 제외
+
+		bHitResult = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
 	}
 }
 
