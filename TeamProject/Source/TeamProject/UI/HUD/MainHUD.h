@@ -28,6 +28,8 @@ public:
     void ShowBowAimgUI(bool bIsShow, int32 Count);
     void ShowAbilityAimUI(bool bIsShow);
 
+    void ShowBossHpUI(bool bIsShow, float Hp, float MaxHp, FString Name);
+
     void UpdateHp();
 
 protected:
