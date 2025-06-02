@@ -43,11 +43,8 @@ void UNPCDialogue::ShowUI()
 void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
 {
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
-    }
-
+    check(PC_InGame);
+   
     if (PC_InGame->Npc)
     {
         ANpcController* Controller = Cast<ANpcController>(PC_InGame->Npc->GetController());
@@ -77,6 +74,7 @@ void UNPCDialogue::InitUI()
 {
     ConfirmButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnConfirm);
     CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancel);
+    ExtraButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnExit);
 
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
@@ -144,7 +142,7 @@ void UNPCDialogue::OnConfirm()
         if (UIManager && ShopManager && QuestManager)
         {
             UIManager->ShowUI(UShop::StaticClass());
-            ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter);
+            ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter, true);
             QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
 
             bool IsShopping = PC_InGame->Npc->GetShopping();
@@ -178,10 +176,49 @@ void UNPCDialogue::OnConfirm()
 
 void UNPCDialogue::OnCancel()
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    PC_InGame->Npc->SetIsConfirmed(false);
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));   
+    check(PC_InGame);
 
-    HideUI(UNPCDialogue::StaticClass());
+    UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
+    check(UIManager);
+
+    UShopManager* ShopManager = GetWorld()->GetGameInstance()->GetSubsystem<UShopManager>();
+    check(ShopManager);
+
+    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+
+    if (PC_InGame->Npc->GetData()->DialogType == EDialogType::Shop)
+    {
+        PC_InGame->Npc->SetIsConfirmed(true);
+        HideUI(UNPCDialogue::StaticClass());
+
+        if (UIManager && ShopManager && QuestManager)
+        {
+            UIManager->ShowUI(UShop::StaticClass());
+            ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter, false);
+            QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
+        }
+    }
+    else
+    {
+        PC_InGame->Npc->SetIsConfirmed(false);
+
+        HideUI(UNPCDialogue::StaticClass());
+    }
+}
+
+void UNPCDialogue::OnExit()
+{
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    check(PC_InGame);
+
+    if (PC_InGame->Npc->GetData()->DialogType == EDialogType::Shop)
+    {
+        PC_InGame->Npc->SetIsConfirmed(false);
+
+        HideUI(UNPCDialogue::StaticClass());
+    }
 }
 
 void UNPCDialogue::OnNextDialogue(const FInputActionValue& InputActionValue)
@@ -221,15 +258,29 @@ void UNPCDialogue::UpdateTyping()
 
 void UNPCDialogue::OnNextButtonClicked()
 {
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    check(PC_InGame);
+
+
     if (bIsTyping)
     {
-        // Ÿ���� ���̸� ��� ��ü �ؽ�Ʈ ���
         GetWorld()->GetTimerManager().ClearTimer(TypingTimerHandle);
         TextBox->SetText(FText::FromString(FullText));
         bIsTyping = false;
     }
     else
     {
+        if (PC_InGame->Npc->GetData()->DialogType == EDialogType::Shop)
+        {
+            ConfirmButton->SetVisibility(ESlateVisibility::Visible);
+            CancelButton->SetVisibility(ESlateVisibility::Visible);
+            ExtraButton->SetVisibility(ESlateVisibility::Visible);
+
+            ConfrimText->SetText(FText::FromString(TEXT("구매")));
+            CancelText->SetText(FText::FromString(TEXT("판매")));
+            ExtraText->SetText(FText::FromString(TEXT("나가기")));
+        }
+
         if (DialogueDataRow.bIsEndConversation == true)
         {
             ConfirmButton->SetVisibility(ESlateVisibility::Visible);

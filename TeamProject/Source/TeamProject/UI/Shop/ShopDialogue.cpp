@@ -30,6 +30,17 @@ void UShopDialogue::SetBuy()
     //인풋 바인드!
 }
 
+void UShopDialogue::SetSell()
+{
+    ConfirmButton->SetVisibility(ESlateVisibility::Visible);
+    CancelButton->SetVisibility(ESlateVisibility::Visible);
+
+    ActionLay->SetVisibility(ESlateVisibility::Hidden);
+
+    ConfrimText->SetText(FText::FromString(TEXT("판매")));
+    CancelText->SetText(FText::FromString(TEXT("취소")));
+}
+
 void UShopDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 {
 

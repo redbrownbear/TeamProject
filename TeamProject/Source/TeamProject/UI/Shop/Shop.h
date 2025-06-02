@@ -10,6 +10,7 @@
 #include "UI/Shop/ShopDescription.h"
 #include "UI/Shop/ShopDialogue.h"
 #include "UI/Shop/ShopScroll.h"
+#include "UI/Shop/ShopSellScroll.h"
 
 #include "Shop.generated.h"
 
@@ -41,6 +42,9 @@ private:
 	//상품 고르고 구매?
 	void SetItemBuy();
 
+	UFUNCTION()
+	void RefreshAllInventory(const TArray<FItemData>& ItemDataList);
+
 
 public: //바인딩을 위해 퍼블릭선언
 	UFUNCTION()
@@ -57,6 +61,8 @@ private:
 	void RefreshDialogue(const FNPCDialogueTableRow& QuestData);
 	UFUNCTION()
 	void RefreshDescription(int32 CurrentIdx);
+	UFUNCTION()
+	void RefreshDescriptionSellItem(const FItemData& ItemData);
 
 	UFUNCTION()
 	void RefreshShopList(const TArray<FShopDataRow>& ShopList);
@@ -70,6 +76,9 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	UShopScroll* BP_ShopScroll;
+
+	UPROPERTY(meta = (BindWidget))
+	UShopSellScroll* BP_ShopSellScroll;
 
 private:
 	UPROPERTY(meta = (BindWidget))

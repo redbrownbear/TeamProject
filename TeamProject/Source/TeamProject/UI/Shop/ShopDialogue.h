@@ -27,6 +27,7 @@ protected:
 public:
 	void InitUI();
 	void SetBuy();
+	void SetSell();
 
 public: //바인딩을 위해 퍼블릭선언
 	UFUNCTION()

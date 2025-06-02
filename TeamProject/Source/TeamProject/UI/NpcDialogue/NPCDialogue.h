@@ -38,6 +38,8 @@ public: //Î∞îÏù∏?©ÏùÑ ?ÑÌï¥ ?ºÎ∏îÎ¶?Ñ†??
 	UFUNCTION()
 	void OnCancel();
 	UFUNCTION()
+	void OnExit();
+	UFUNCTION()
 	void OnNextDialogue(const FInputActionValue& InputActionValue);
 
 private:

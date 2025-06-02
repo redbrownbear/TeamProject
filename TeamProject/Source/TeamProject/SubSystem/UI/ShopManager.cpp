@@ -2,6 +2,7 @@
 
 
 #include "SubSystem/UI/ShopManager.h"
+#include "SubSystem/PlayerManager.h"
 
 UShopManager::UShopManager()
 {
@@ -72,11 +73,23 @@ TArray<FShopDataRow> UShopManager::GetShopData(EQuestCharacter QuestChar) const
     return ConstRows;
 }
 
-void UShopManager::ShowUI(EQuestCharacter QuestChar)
+void UShopManager::ShowUI(EQuestCharacter QuestChar, bool IsBuy)
 {
-    TArray<FShopDataRow> ShopList = GetShopData(QuestChar);
+    SetIsBuy(IsBuy);
 
-    UpdateItem(ShopList);
+    if (IsBuy)
+    {
+        TArray<FShopDataRow> ShopList = GetShopData(QuestChar);
+        UpdateItem(ShopList);
+    }
+    else
+    {
+        UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+        if (PlayerManager)
+        {
+            PlayerManager->ShowInvenUI();
+        }
+    }
 }
 
 void UShopManager::UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow)

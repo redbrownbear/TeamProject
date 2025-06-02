@@ -39,12 +39,6 @@ void UInventory::ShowUI()
 
 void UInventory::HideUI(TSubclassOf<UBaseUI> UIClass)
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
-    }
-
     RemoveDelegate();
     Super::HideUI(UInventory::StaticClass());
 }
