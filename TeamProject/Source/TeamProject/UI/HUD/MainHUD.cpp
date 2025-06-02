@@ -46,6 +46,11 @@ void AMainHUD::ShowAbilityAimUI(bool bIsShow)
     MainWidgetInstance->ShowAbilityAimUI(bIsShow);
 }
 
+void AMainHUD::ShowBossHpUI(bool bIsShow, float Hp, float MaxHp, FString Name)
+{
+    MainWidgetInstance->ShowBossHP(bIsShow, Hp, MaxHp, Name);
+}
+
 void AMainHUD::UpdateHp()
 {
     MainWidgetInstance->UpdateHP();

@@ -21,6 +21,9 @@ void UMainHUDWidget::NativeConstruct()
 	if (AimingAbilityOverlay)
 		AimingAbilityOverlay->SetVisibility(ESlateVisibility::Hidden);
 
+	if (BossHpOverlay)
+		BossHpOverlay->SetVisibility(ESlateVisibility::Hidden);
+
 	InitValue();
 	InitResource();
 }
