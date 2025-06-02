@@ -45,6 +45,7 @@ private:
 
     FVector RiseDirection;
     FVector PivotLocation;
+
 public:
     void SetRiseDirection(FVector InDirection);
     void SetPivotLocation(FVector InPosition);

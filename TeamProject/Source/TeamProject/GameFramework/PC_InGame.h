@@ -122,10 +122,14 @@ public:
 	UInputAction* IA_IceMaker = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_Magnesis = nullptr;
+	
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_TrySuperPower = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_Magnesis = nullptr;
+	UInputAction* IA_ControlDistance = nullptr;
+
 
 	void CheckValid() const
 	{
@@ -151,8 +155,9 @@ public:
 		check(IA_DialogueCancel);
 		check(IA_DialogueNext);
 		check(IA_IceMaker);		
-		check(IA_TrySuperPower);
 		check(IA_Magnesis);
+		check(IA_TrySuperPower);
+		check(IA_ControlDistance);
 	}
 };
 
@@ -204,9 +209,9 @@ protected:
 	void OpenInventory(const FInputActionValue& InputActionValue);
 	void OpenQuest(const FInputActionValue& InputActionValue);
 
-	// --------- Supernatural ------------------------------
-
-	void TrySupernatural(const FInputActionValue& InputActionValue);
+	// --------- SuperPower ------------------------------
+	void TrySuperPower(const FInputActionValue& InputActionValue);
+	void OnControlDistance(const FInputActionValue& InputActionValue);
 
 	// Ice Maker
 	void BeginIcePreview(const FInputActionValue& InputActionValue);	
@@ -239,7 +244,7 @@ public:
 
 	EInputContext CurrentInputContext = EInputContext::IC_Start;
 
-	// --------- Supernatural ----------
+	// --------- SuperPower ----------
 protected:
 	// 매 프레임 업데이트
 	UFUNCTION()
@@ -249,13 +254,11 @@ protected:
 	UFUNCTION()
 	void SpawnIcePillar();
 
-	// 충돌 체크
 	UFUNCTION()
-	void CheckCollision();
+	bool IsSurfaceActor(AActor* Actor) const;
 
-	// 수면 체크
 	UFUNCTION()
-	void CheckSurface();
+	AActor* FindVisibleActorOnScreen(FHitResult& OutHit);
 
 	// Magnesis
 	UFUNCTION()
@@ -274,12 +277,16 @@ protected:
 	//  Magnesis 내부 기능 함수
 	UFUNCTION()
 	bool TraceForMetal(FHitResult& OutHit);
+
 	UFUNCTION()
 	void MoveGrabbedObject();
 
 	// 상태 체크
 	UFUNCTION()
 	bool IsHoldingObject() const;
+
+	UFUNCTION()
+	void ScanMetalActorInView();
 
 protected:
 	// ------------ Ice Maker ---------------
@@ -301,10 +308,10 @@ protected:
 	TObjectPtr<class AMetalActor> MetalActor = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Magnet | Trace")
-	float TraceDistance = 1000.f;
+	float TraceDistance = 5000.f;
 
 	UPROPERTY(EditAnywhere, Category = "Magnet | Grab")
-	float HoldDistance = 1000.f;
+	float HoldDistance = 0.f;
 
 	UPROPERTY(VisibleAnywhere)
 	class UPhysicsHandleComponent* PhysicsHandle;
@@ -314,19 +321,17 @@ protected:
 
 	FTimerHandle MoveTimerHandle;
 
-	FTimerHandle DebugTraceTimerHandle;
-
-
 private:
-	bool bQPressed = false;
-	bool bIceMaker = false;
-	bool bCanSpawn = false;
-	bool bHitResult = false;
-
 	bool bIsCameraLocked = false;
 
-	bool bXPressed = false;
+	bool bIceKeyPressed = false;
+	bool bIceMaker = false;
+	bool bCanSpawn = false;
+	bool bIcePreviewPlaced = false;
+
+	bool bMagnesisKeyPressed = false;
 	bool bCanControlMetal = false;
 
-	FHitResult Hit;
+	FHitResult LastHit;
+	bool bHitResult = false;
 };
