@@ -35,10 +35,6 @@ void UShop::ShowUI()
         InputMode.SetHideCursorDuringCapture(false);
 
         PC_InGame->SetInputMode(InputMode);
-
-        AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
-        if (HUD)
-            HUD->SetMainHUDVisible(false);
     }
 
     BindDelegates();
@@ -50,11 +46,6 @@ void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
     if (PC_InGame)
     {
         PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
-
-        AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
-        if (HUD)
-            HUD->SetMainHUDVisible(true);
-
     }
 
     UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();

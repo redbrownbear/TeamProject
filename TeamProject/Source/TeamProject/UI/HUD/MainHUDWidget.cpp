@@ -15,6 +15,12 @@ void UMainHUDWidget::NativeConstruct()
 	if (NameOvelay)
 		NameOvelay->SetVisibility(ESlateVisibility::Hidden);
 
+	if (AimingBowOverlay)
+		AimingBowOverlay->SetVisibility(ESlateVisibility::Hidden);
+
+	if (AimingAbilityOverlay)
+		AimingAbilityOverlay->SetVisibility(ESlateVisibility::Hidden);
+
 	InitValue();
 	InitResource();
 }
@@ -64,6 +70,24 @@ void UMainHUDWidget::ShowInteractName(bool bIsShow, FString Name)
 		FText NametoText = FText::FromString(Name);
 		NameText->SetText(NametoText);
 	}
+}
+
+void UMainHUDWidget::ShowBowAimgUI(bool bIsShow, int32 Count)
+{
+	if (AimingBowOverlay)
+		AimingBowOverlay->SetVisibility(bIsShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+
+	if (TextArrowCount)
+	{
+		TextArrowCount->SetText(FText::FromString(FString::FromInt(Count)));
+	}
+
+}
+
+void UMainHUDWidget::ShowAbilityAimUI(bool bIsShow)
+{
+	if (AimingAbilityOverlay)
+		AimingAbilityOverlay->SetVisibility(bIsShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 void UMainHUDWidget::UpdateHP()

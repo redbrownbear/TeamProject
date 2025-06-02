@@ -33,6 +33,9 @@ public:
 	void ShowInteractUI(bool bIsShow);
 	void ShowInteractName(bool bIsShow, FString Name);
 
+	void ShowBowAimgUI(bool bIsShow, int32 Count);
+	void ShowAbilityAimUI(bool bIsShow);
+
 public:
 	void UpdateHP();
 	void UpdateStamina(float InDeltaTime);
@@ -45,11 +48,20 @@ public:
 	UOverlay* HIntOverlay;
 	UPROPERTY(meta = (BindWidget))
 	UOverlay* NameOvelay;
-	UPROPERTY(meta = (BindWIdget))
-	UTextBlock* NameText;
+	UPROPERTY(meta = (BindWidget))
+	UOverlay* AimingBowOverlay;
+	UPROPERTY(meta = (BindWidget))
+	UOverlay* AimingAbilityOverlay;
 
 	UPROPERTY(meta = (BindWIdget))
+	UTextBlock* NameText;
+	UPROPERTY(meta = (BindWIdget))
 	UImage* StaminaImg;
+	UPROPERTY(meta = (BindWIdget))
+	UTextBlock* TextArrowCount;	
+
+	UPROPERTY(meta = (BindWIdget))
+	UWrapBox* HpWrapBox;
 
 public:
 	UTexture2D* HpFull;
@@ -57,9 +69,6 @@ public:
 	UTexture2D* HpHalf;
 	UTexture2D* Hp025;
 	UTexture2D* HpEmpty;
-
-	UPROPERTY(meta = (BindWIdget))
-	UWrapBox* HpWrapBox;
 
 	UPROPERTY()
 	TArray<UImage*> HeartImages;
