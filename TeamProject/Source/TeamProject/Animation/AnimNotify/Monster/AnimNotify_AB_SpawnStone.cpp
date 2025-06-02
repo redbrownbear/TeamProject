@@ -26,11 +26,11 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 			case EAssasinBossPhase::PHASE_1:
 			{
 				AKogaStone* KogaStone = World->SpawnActorDeferred<AKogaStone>(AKogaStone::StaticClass(),
-					FTransform::Identity, nullptr, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+					FTransform::Identity, CharacterMonster, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 
 				FTransform NewTransform;
-				KogaStone->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayer);
+				KogaStone->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayerMonster);
 
 				const FVector Location = CharacterMonster->GetActorLocation();
 				const FVector TargetLocation = Location + FVector(0.0, 0.0, 1.0) * KOGASTONE_ORBIT_RADIUS;
@@ -45,11 +45,11 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 			case EAssasinBossPhase::PHASE_2:
 			{
 				AKogaStone* KogaStone = World->SpawnActorDeferred<AKogaStone>(AKogaStone::StaticClass(),
-					FTransform::Identity, nullptr, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+					FTransform::Identity, CharacterMonster, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 
 				FTransform NewTransform;
-				KogaStone->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayer);
+				KogaStone->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayerMonster);
 
 				const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 				FVector Location = MonsterLocation + CharacterMonster->GetActorRightVector() * KOGASTONE_ORBIT_RADIUS;
@@ -63,10 +63,10 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 				KogaStone->FinishSpawning(NewTransform);
 				//////////////////////////////////////////
 				KogaStone = World->SpawnActorDeferred<AKogaStone>(AKogaStone::StaticClass(),
-					FTransform::Identity, nullptr, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+					FTransform::Identity, CharacterMonster, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 
-				KogaStone->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayer);
+				KogaStone->SetData(ProjectileName::Monster_AB_KogaStone, CollisionProfileName::ToPlayerMonster);
 				Location = MonsterLocation - CharacterMonster->GetActorRightVector() * KOGASTONE_ORBIT_RADIUS;
 				NewTransform.SetLocation(Location);
 				KogaStone->SetKogaStoneKind(EKogaStoneKind::SECOND);
@@ -78,11 +78,11 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 			case EAssasinBossPhase::PHASE_3:
 			{
 				AKogaStone* KogaStone = World->SpawnActorDeferred<AKogaStone>(AKogaStone::StaticClass(),
-					FTransform::Identity, nullptr, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+					FTransform::Identity, CharacterMonster, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 
 				FTransform NewTransform;
-				KogaStone->SetData(ProjectileName::Monster_AB_KogaStoneBig, CollisionProfileName::ToPlayer);
+				KogaStone->SetData(ProjectileName::Monster_AB_KogaStoneBig, CollisionProfileName::ToPlayerMonster);
 
 				const FVector Location = CharacterMonster->GetActorLocation();
 				const FVector TargetLocation = Location + FVector(0.0, 0.0, 1.0) * KOGASTONE_ORBIT_RADIUS;

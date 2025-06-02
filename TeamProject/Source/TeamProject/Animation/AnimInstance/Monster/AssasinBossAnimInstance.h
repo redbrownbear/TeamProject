@@ -31,11 +31,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsStun = false;
 	UPROPERTY(BlueprintReadOnly)
-	bool bIsFlyStun = false;
-	UPROPERTY(BlueprintReadOnly)
 	bool bIsStoneFirst = false;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsStoneSecond = false;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsBarrier = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsDamage = false;
 };

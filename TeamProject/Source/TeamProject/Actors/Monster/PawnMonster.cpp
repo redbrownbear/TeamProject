@@ -126,6 +126,10 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
 	}
 
+
+	StatusComponent->SetMaxHP(MonsterData->MaxHP);
+
+
 	if (!(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
 	{
 		if (UWorld* World = GetWorld())
