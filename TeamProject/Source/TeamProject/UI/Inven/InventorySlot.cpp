@@ -8,6 +8,8 @@
 void UInventorySlot::NativeConstruct()
 {
     Super::NativeConstruct();
+
+    SetIsFocusable(true);
 }
 
 void UInventorySlot::SetItemData(const FItemData& Item)

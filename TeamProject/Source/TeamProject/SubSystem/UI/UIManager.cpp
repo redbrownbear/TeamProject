@@ -7,13 +7,20 @@
 
 void UUIManager::PostWorldInitialize()
 {
+    if (bIsCompleteload == true)
+        return;
+
     BindDelegates();
     LoadUIClass();
+
+    bIsCompleteload = true;
 }
 
 void UUIManager::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
+
+    bIsCompleteload = false;
 }
 
 void UUIManager::BindDelegates()

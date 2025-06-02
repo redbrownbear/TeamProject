@@ -13,6 +13,9 @@
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "SubSystem/PlayerManager.h"
+
+
 // Sets default values
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -115,6 +118,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//스테미너 정보
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
+	{
+		PlayerManager->TickStamina(DeltaTime);
+	}
 }
 
 // Called to bind functionality to input

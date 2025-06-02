@@ -100,4 +100,7 @@ public:
 public:
     UPROPERTY(BlueprintAssignable)
     FOnDialogueNextRequested OnDialogueNextRequested;
+
+private:
+    bool bIsCompleteload;
 };
