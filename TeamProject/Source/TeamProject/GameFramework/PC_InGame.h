@@ -69,6 +69,10 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_Jump = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
+	UInputAction* IA_Dash = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
+	UInputAction* IA_Crouch = nullptr;
 
 
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
@@ -189,18 +193,26 @@ public:
 	void BindQuestInput();
 
 protected:
+	// ---------- Move Mode ------------------------------
 	void OnMove(const FInputActionValue& InputActionValue);
 	void OnMoveCancel(const FInputActionValue& InputActionValue);
 
 	void JumpGlide(const FInputActionValue& InputActionValue);
+	void StartedDash(const FInputActionValue& InputActionValue);
+	void CompletedDash(const FInputActionValue& InputActionValue);
 
 
 	void OnLook(const FInputActionValue& InputActionValue);
+	void Climb(const FInputActionValue& InputActionValue);
+
+	void OnCrouch(const FInputActionValue& InputActionValue);
+	void OnUnCrouch(const FInputActionValue& InputActionValue);
+
+
+	// ------------Attack Sequence ------------------------
 	void LeftClick(const FInputActionValue& InputActionValue);
 	void RightClick(const FInputActionValue& InputActionValue);
 	void RightClickEnd(const FInputActionValue& InputActionValue);
-	void Climb(const FInputActionValue& InputActionValue);
-
 
 	// --------- Weapon Swap ------------------------------
 

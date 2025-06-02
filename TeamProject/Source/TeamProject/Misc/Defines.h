@@ -54,7 +54,10 @@
 #define NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS										1500.f
 #define NPC_SIGHT_ANGLE																90.f
 
-#define PLAYER_MOVE_NML																600.f
+
+#define PLAYER_MOVE_CROUCH															200.f
+#define PLAYER_MOVE_DASH															800.f
+#define PLAYER_MOVE_NML																500.f
 #define	PLAYER_MOVE_BOW_ZOOM														200.f
 #define PLAYER_CLIMB_SPEED															80.f
 #define PLAYER_CAPSULE_HALF_HEIGHT													41.f

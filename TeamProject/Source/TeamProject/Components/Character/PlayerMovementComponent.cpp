@@ -26,6 +26,18 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 			LandUpMontage = Asset.Object;
 		}
 	}
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset{
+			TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Glide/Equip_Float_Off_Montage.Equip_Float_Off_Montage'")
+		};
+
+		if (Asset.Object)
+		{
+			GlideUnEquip = Asset.Object;
+		}
+	}
+	MaxWalkSpeedCrouched = PLAYER_MOVE_CROUCH;
+	MaxWalkSpeed = PLAYER_MOVE_NML;
 
 }
 
@@ -33,7 +45,7 @@ void UPlayerMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
+	GetNavAgentPropertiesRef().bCanCrouch = true;
 
 }
 
@@ -257,9 +269,7 @@ void UPlayerMovementComponent::SetGlideMode(bool _bool)
 
 	}
 	
-
-
-	bIsGliding = _bool;
+  	bIsGliding = _bool;
 
 	GravityScale = _bool ? 0.07: 1.f;
 
@@ -270,35 +280,37 @@ void UPlayerMovementComponent::SetGlideMode(bool _bool)
 	FHitResult HitResult;
 
 	Player_C->OnLanded(HitResult);
-
+	 
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
 	AnimInst->bIsGliding = _bool;
 
-	if (Velocity.Size2D() < PLAYER_GLIDE_MIN_SPEED)
-	{
-		float Origin_Z = Velocity.Z;
-		
-
-		FRotator Player_Rot = GetOwner()->GetActorRotation();
-
-		FVector DirectionXY = Player_Rot.Vector();
-
-		Velocity = DirectionXY * PLAYER_GLIDE_MIN_SPEED;
-		
-		Velocity.Z = 0 < Origin_Z ? 0 : Origin_Z;
-	}
-	UWeaponManagerComponent* WeaponManagerComponent = Player_C->GetWeaponManagerComponent();
 	if (_bool)
 	{
-		AnimInst->Montage_Play(WeaponManagerComponent->GetGliderEquipMontage());
-	}
-	else
-	{
-		WeaponManagerComponent->GetGlider()->SetVisibility(false);
-		AnimInst->Montage_Play(WeaponManagerComponent->GetGliderUnEquipMontage());
-	}
+		if (Velocity.Size2D() < PLAYER_GLIDE_MIN_SPEED)
+		{
+			float Origin_Z = Velocity.Z;
 
+
+			FRotator Player_Rot = GetOwner()->GetActorRotation();
+
+			FVector DirectionXY = Player_Rot.Vector();
+
+			Velocity = DirectionXY * PLAYER_GLIDE_MIN_SPEED;
+
+			Velocity.Z = 0 < Origin_Z ? 0 : Origin_Z;
+		}
+		UWeaponManagerComponent* WeaponManagerComponent = Player_C->GetWeaponManagerComponent();
+		if (_bool)
+		{
+			AnimInst->Montage_Play(WeaponManagerComponent->GetGliderEquipMontage());
+		}
+		else
+		{
+			WeaponManagerComponent->GetGlider()->SetVisibility(false);
+			AnimInst->Montage_Play(WeaponManagerComponent->GetGliderUnEquipMontage());
+		}
+	}
 }
 
 void UPlayerMovementComponent::GlidingMove(FVector2D ActionValue)

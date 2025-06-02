@@ -310,8 +310,13 @@ void UWeaponManagerComponent::EquipWeapon(UAnimMontage* Montage, bool bInterrupt
 
 void UWeaponManagerComponent::LeftClickAction()
 {
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 	if (Equip_State == EEquip_State::Sword)
 	{
+		if (Player_C->JumpCurrentCount == 1)
+			return;
+
+
 		AWeaponSword* SwordActor = Cast<AWeaponSword>(Sword->GetChildActor());
 
 		if (!SwordActor)
@@ -345,6 +350,8 @@ void UWeaponManagerComponent::LeftClickAction()
 
 	else if (Equip_State == EEquip_State::Sword_Shield)
 	{
+		if (Player_C->JumpCurrentCount == 1)
+			return;
 		if (bRightClick)
 		{
 			if (!bCanShot)
@@ -376,6 +383,8 @@ void UWeaponManagerComponent::LeftClickAction()
 	}
 	else if(Equip_State == EEquip_State::Shield)
 	{
+		if (Player_C->JumpCurrentCount == 1)
+			return;
 		if (bRightClick)
 		{
 			if (!bCanShot)

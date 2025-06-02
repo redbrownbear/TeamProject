@@ -20,6 +20,8 @@ public:
 
 	
 	EClimb_State GetClimbMode() { return Climb_State; }
+	UAnimMontage* GetGlideUnEquipMontage() { return GlideUnEquip; }
+
 
 	bool ClimbingLineTrace(FHitResult& HitResult);
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
@@ -47,14 +49,17 @@ private:
 
 
 private:
-	
 
-
+	UPROPERTY()
+	UAnimMontage* GlideUnEquip;
+	UPROPERTY()
 	UAnimMontage* LandUpMontage;
 	UPROPERTY()
 	EClimb_State Climb_State = EClimb_State::Climb;
 
 public:
+
+
 	bool bIsClimbing = false;
 	bool bIsGliding = false;
 };

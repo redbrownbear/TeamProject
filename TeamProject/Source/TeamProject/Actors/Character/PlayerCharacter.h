@@ -56,6 +56,7 @@ public:
 	UWeaponManagerComponent* GetWeaponManagerComponent() { return WeaponManagerComponent; }
 	USpringArmComponent* GetSpringArm() { return SpringArm; }
 
+	virtual void Landed(const FHitResult& Hit) override;
 
 	UFUNCTION()
 	void TimelineProgress(float Value);
