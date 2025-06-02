@@ -13,6 +13,11 @@ USTRUCT()
 struct TEAMPROJECT_API FMonsterTableRow : public FTableRowBase
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Monster|Status")
+	FName Name = FName(TEXT("Monster"));
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Monster")
 	USkeletalMesh* SkeletalMesh = nullptr;

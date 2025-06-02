@@ -929,3 +929,12 @@ void IMonsterInterface::OnDeadEnd()
 		Actor->Destroy();
 	}
 }
+
+FName IMonsterInterface::GetName() const
+{
+	if (FMonsterTableRow* MonsterData = GetMonsterData())
+	{
+		return MonsterData->Name;
+	}
+	return FName(TEXT(""));
+}

@@ -8,6 +8,13 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Item/WorldWeapon.h"
 
+#include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
+
+#include "GameFramework/PC_InGame.h"
+
+#include "UI/HUD/MainHUD.h"
+
+#include "Data/MonsterTableRow.h"
 
 ULynelFSMComponent::ULynelFSMComponent()
 {
@@ -581,6 +588,60 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	}
 
+
+	switch (NewState)
+	{
+	case EMonsterState::Idle:
+	case EMonsterState::Suspicious:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(false, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
+		break;
+	case EMonsterState::Alert:
+	case EMonsterState::Combat:
+	case EMonsterState::Dead:
+	case EMonsterState::Fire:
+	case EMonsterState::Signal:
+	case EMonsterState::AimingBow:
+	case EMonsterState::AimingBowUpper:
+	case EMonsterState::DashAttack:
+	case EMonsterState::ExplosionAttack:
+	case EMonsterState::FireAttack:
+	case EMonsterState::HornAttack:
+	case EMonsterState::RunningAttack:
+	case EMonsterState::Rebound:
+	case EMonsterState::Rodeo:
+	case EMonsterState::Stun:
+	case EMonsterState::ReadyToAttack:
+	case EMonsterState::Temp:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(true, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
+		break;
+	default:
+		break;
+	}
+
 	eCurrentState = NewState;
 }
 
@@ -674,9 +735,9 @@ void ULynelFSMComponent::UpdateCombat(float DeltaTime)
 		ChangeState(EMonsterState::RunningAttack);
 		return;
 	case ELynelCombatIndex::End:
+	default:
 		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::UpdateCombat // Unexpected CombatIndex"));
 		check(false);
-	default:
 		break;
 	}
 }

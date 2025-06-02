@@ -5,6 +5,15 @@
 #include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Character/PlayerCharacter.h"
 
+#include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
+
+#include "GameFramework/PC_InGame.h"
+
+#include "UI/HUD/MainHUD.h"
+
+#include "Data/MonsterTableRow.h"
+
+
 UHinoxFSMComponent::UHinoxFSMComponent()
 {
 	eCurrentState = EMonsterState::Idle;
@@ -124,6 +133,46 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	}
 
+	switch (NewState)
+	{
+	case EMonsterState::Idle:
+	case EMonsterState::Alert:
+	case EMonsterState::Dead:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(false, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
+		break;
+	case EMonsterState::Combat:
+	case EMonsterState::Damage_Eye:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(true, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
+		break;
+	default:
+		UE_LOG(LogTemp, Error, TEXT("UHinoxFSMComponent::ChangeState // Unexpected MonsterState, ChangeState Failed"));
+		return;
+		break;
+	}
 
 	eCurrentState = NewState;
 }
