@@ -73,8 +73,8 @@ void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
 void UNPCDialogue::InitUI()
 {
     ConfirmButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnConfirm);
-    CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancel);
-    ExtraButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnExit);
+    CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnSell);
+    ExtraButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancel);
 
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
@@ -174,7 +174,7 @@ void UNPCDialogue::OnConfirm()
     }
 }
 
-void UNPCDialogue::OnCancel()
+void UNPCDialogue::OnSell()
 {
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));   
     check(PC_InGame);
@@ -208,7 +208,7 @@ void UNPCDialogue::OnCancel()
     }
 }
 
-void UNPCDialogue::OnExit()
+void UNPCDialogue::OnCancel()
 {
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     check(PC_InGame);

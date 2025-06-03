@@ -37,8 +37,10 @@ public: //Î∞îÏù∏?©ÏùÑ ?ÑÌï¥ ?ºÎ∏îÎ¶?Ñ†??
 	void OnConfirm();
 	UFUNCTION()
 	void OnCancel();
+
 	UFUNCTION()
-	void OnExit();
+	void OnSell();
+
 	UFUNCTION()
 	void OnNextDialogue(const FInputActionValue& InputActionValue);
 

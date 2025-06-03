@@ -128,6 +128,9 @@ void UShop::RemoveDelegates()
 void UShop::SetShopOpen()
 {
     BP_ShopDialogue->InitUI();
+
+    FInputModeGameAndUI InputMode;
+    InputMode.SetWidgetToFocus(TakeWidget());
 }
 
 void UShop::SetItemBuy()
@@ -182,8 +185,6 @@ void UShop::OnNavigate(const FInputActionValue& InputActionValue)
 
 void UShop::OnConfirm()
 {
-
-
     SetItemBuy();
 }
 
