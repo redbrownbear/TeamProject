@@ -6,6 +6,20 @@
 #include "Misc/Utils.h"
 #include "ItemDataRow.generated.h"
 
+
+UENUM(BlueprintType)
+enum class eEquipParts : uint8
+{
+	NONE,
+	HEAD,     
+	ARMOR,    
+	UNDER,    
+	RIGHT,    
+	LEFT,     
+	BOWRIGHT,
+	ARROWLEFT,
+};
+
 /**
  *
  */

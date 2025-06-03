@@ -28,7 +28,7 @@ public:
 	TArray<FShopDataRow> GetShopData(EQuestCharacter QuestChar) const;
 
 public:
-	void ShowUI(EQuestCharacter QuestChar);
+	void ShowUI(EQuestCharacter QuestChar, bool IsBuy);
 
 	//ตฅภฬลอ
 	void UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow);
@@ -36,6 +36,11 @@ public:
 	//UI
 	void UpdateItem(const TArray<FShopDataRow>& ShopList);
 
+
+private:
+	void SetIsBuy(bool IsBuy) { bIsBuy = IsBuy; }
+public:
+	bool IsBuy() { return bIsBuy; }
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -46,4 +51,6 @@ private:
 	UDataTable* ShopDataTable;
 
 	TMap<EQuestCharacter, TArray<FShopDataRow>> ShopRowMap;
+
+	bool bIsBuy = false;
 };

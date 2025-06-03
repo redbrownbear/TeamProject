@@ -11,6 +11,7 @@
 #include "UI/NpcDialogue/NPCDialogue.h"
 #include "UI/Shop/Shop.h"
 #include "UI/Quest/Quest.h"
+#include "UI/Popup/PopupGetItem.h"
 
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
@@ -23,6 +24,7 @@ enum class EInputContext
 	IC_Dialogue,
 	IC_Shop,
 	IC_Quest,
+	IC_Popup,
 	//필요하면 추가해서 사용합니다.
 
 	IC_End,

@@ -208,6 +208,11 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;
 		break;
+	case EInputContext::IC_Popup:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 4);
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+		break;
 
 	}
 
@@ -538,9 +543,6 @@ void APC_InGame::OnUnCrouch(const FInputActionValue& InputActionValue)
 	ACharacter* ControlledCharacter = Cast<ACharacter>(GetPawn());
 	ControlledCharacter->UnCrouch();
 }
-
-
-
 
 
 void APC_InGame::EquipSword(const FInputActionValue& InputActionValue)
@@ -1186,6 +1188,7 @@ void APC_InGame::OnCancel(const FInputActionValue& InputActionValue)
 	UShop* ShopUI = nullptr;
 	UNPCDialogue* DialogUI = nullptr;
 	UQuest* QuestUI = nullptr;
+	UPopupGetItem* PopupUI = nullptr;
 
 	switch (CurrentInputContext)
 	{
@@ -1212,6 +1215,13 @@ void APC_InGame::OnCancel(const FInputActionValue& InputActionValue)
 		QuestUI = UIManager->FindUI<UQuest>();
 		if (QuestUI)
 			QuestUI->OnCancel();
+
+		break;
+
+	case EInputContext::IC_Popup:
+		PopupUI = UIManager->FindUI<UPopupGetItem>();
+		if (PopupUI)
+			PopupUI->OnCancel();
 
 		break;
 	}

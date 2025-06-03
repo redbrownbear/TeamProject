@@ -31,6 +31,19 @@ public:
 public:
 	void SetLoadingUI(TSubclassOf<ULoadingWithPlayerInfo> WidgetClass) { LoadingWidgetClass = WidgetClass; }
 
+public:
+	void BeginLoading(TSoftObjectPtr<UWorld> LevelToOpen);
+	const TSoftObjectPtr<UWorld> GetPendingLevelName() { return PendingLevel; }
+
+private:
+	void SetPendingLevel(TSoftObjectPtr<UWorld> Level) { PendingLevel = Level; }
+
 private:
 	TSubclassOf<ULoadingWithPlayerInfo> LoadingWidgetClass;
+
+	UPROPERTY(Transient) 
+	ULoadingWithPlayerInfo* LoadingWidget;
+
+	UPROPERTY()
+	TSoftObjectPtr<UWorld> PendingLevel;
 };
