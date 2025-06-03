@@ -52,7 +52,8 @@ public:
 	FRotator Rotator;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsClimingLand = false;
-
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsGliding = false;
 
 
 

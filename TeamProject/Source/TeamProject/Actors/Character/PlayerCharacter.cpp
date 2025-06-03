@@ -73,7 +73,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 		UCapsuleComponent* CC = GetCapsuleComponent();
 		CC->SetCapsuleRadius(PLAYER_CAPSULE_RADIUS);
 		CC->SetCapsuleHalfHeight(PLAYER_CAPSULE_HALF_HEIGHT);
-
+		
 	}
 
 	{
@@ -156,18 +156,32 @@ void APlayerCharacter::OnConstruction(const FTransform& Transform)
 
 }
 
+void APlayerCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(GetCharacterMovement());
+	Movement->SetGlideMode(false);
+	GetMesh()->GetAnimInstance()->Montage_Play(Movement->GetGlideUnEquipMontage());
+	
+
+}
+
 void APlayerCharacter::TimelineProgress(float Value)
 {
 
 	float Length = FMath::Lerp(300.f, 150.f, Value);
 
 	FVector SpringArmLocation = FVector::Zero();
-	float Z = FMath::Lerp(30.f, 40.f, Value);
+	float Z = FMath::Lerp(30.f, 50.f, Value);
 	
 	SpringArmLocation.Z = Z;
 	SpringArm->SetRelativeLocation(SpringArmLocation);
 	SpringArm->TargetArmLength = Length;
 }
+
+
+
 
 
 

@@ -38,13 +38,24 @@ UWeaponManagerComponent::UWeaponManagerComponent()
 	Arrow = CreateDefaultSubobject<UWeaponChildActorComponent>(TEXT("ArrowNormal"));
 	
 	Arrow->SetChildActorClass(AWeaponArrow::StaticClass());
+	{
+		Glider = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Glider"));
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset{
+			TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Armor/Animation/Glide/Item_Parastole2_Vagrant.Item_Parastole2_Vagrant'")
+		};
 
+		if (Asset.Object)
+		{
+			Glider->SetSkeletalMesh(Asset.Object);
+		}
+	}
 	if (Mesh)
 	{
 		Shield->SetupAttachment(Player_C->GetMesh(), TEXT("Shield_Socket"));
 		Sword->SetupAttachment(Player_C->GetMesh(), TEXT("Sword_Socket"));
 		Bow->SetupAttachment(Player_C->GetMesh(), TEXT("Bow_Socket"));
 		Arrow->SetupAttachment(Player_C->GetMesh(), TEXT("Arrow_Normal"));
+		Glider->SetupAttachment(Player_C->GetMesh(), TEXT("GliderSocket"));
 	}
 
 	{
@@ -53,6 +64,30 @@ UWeaponManagerComponent::UWeaponManagerComponent()
 		if (Asset.Object)
 		{
 			UnEquip_Sword_Shield = Asset.Object;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+		}
+	}
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Glide/Equip_Float_On_Montage.Equip_Float_On_Montage'"));
+
+		if (Asset.Object)
+		{
+			EquipGlider = Asset.Object;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
+		}
+	}
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimSequence'/Game/Resources/Player/Armor/Animation/Glide/Equip_Float_Off.Equip_Float_Off'"));
+
+		if (Asset.Object)
+		{
+			UnEquipGlider = Asset.Object;
 		}
 		else
 		{
@@ -70,7 +105,7 @@ void UWeaponManagerComponent::BeginPlay()
 	Sword->GetChildActor()->SetOwner(GetOwner());
 	Shield->GetChildActor()->SetOwner(GetOwner());
 	Bow->GetChildActor()->SetOwner(GetOwner());
-
+	Glider->SetVisibility(false);
 	// ...
 	
 }
@@ -275,8 +310,13 @@ void UWeaponManagerComponent::EquipWeapon(UAnimMontage* Montage, bool bInterrupt
 
 void UWeaponManagerComponent::LeftClickAction()
 {
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 	if (Equip_State == EEquip_State::Sword)
 	{
+		if (Player_C->JumpCurrentCount == 1)
+			return;
+
+
 		AWeaponSword* SwordActor = Cast<AWeaponSword>(Sword->GetChildActor());
 
 		if (!SwordActor)
@@ -310,6 +350,8 @@ void UWeaponManagerComponent::LeftClickAction()
 
 	else if (Equip_State == EEquip_State::Sword_Shield)
 	{
+		if (Player_C->JumpCurrentCount == 1)
+			return;
 		if (bRightClick)
 		{
 			if (!bCanShot)
@@ -341,6 +383,8 @@ void UWeaponManagerComponent::LeftClickAction()
 	}
 	else if(Equip_State == EEquip_State::Shield)
 	{
+		if (Player_C->JumpCurrentCount == 1)
+			return;
 		if (bRightClick)
 		{
 			if (!bCanShot)
