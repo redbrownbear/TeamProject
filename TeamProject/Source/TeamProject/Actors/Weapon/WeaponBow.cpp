@@ -5,6 +5,7 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Projectile/Arrow/Projectile_Arrow.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 AWeaponBow::AWeaponBow()
 {
@@ -22,6 +23,7 @@ AWeaponBow::AWeaponBow()
         SkeletalMeshComponent->SetupAttachment(RootComponent);
         SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         SkeletalMeshComponent->SetSkeletalMesh(Asset.Object);
+
     }
 
     {
@@ -80,6 +82,48 @@ AWeaponBow::AWeaponBow()
     {
         ArrowClass = AProjectile_Arrow::StaticClass();
     }
+
+    {
+        ChargedArrow = CreateDefaultSubobject<AProjectile_Arrow>(TEXT("ChargedArrow"));
+        
+    }
+    
+}
+
+void AWeaponBow::BeginPlay()
+{
+    Super::BeginPlay();
+
+    APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+    FVector SpawnLocation = SkeletalMeshComponent->GetSocketLocation(SocketName);
+
+    // 조준 방향 계산: 예) 카메라 방향, 또는 컨트롤러 방향
+    FVector AimDirection = Player_C->GetControlRotation().Vector(); // 또는 캐릭터 카메라 방향
+
+    // 조준 방향을 회전으로 변환
+    FRotator SpawnRotation = AimDirection.Rotation();
+
+    // 스폰 파라미터
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    SpawnParams.Owner = this;
+
+    // 화살 액터 스폰
+    ChargedArrow = GetWorld()->SpawnActor<AProjectile_Arrow>(
+        AProjectile_Arrow::StaticClass(),
+        SpawnLocation,
+        SpawnRotation,
+        SpawnParams
+    );
+   
+
+    ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
+    ChargedArrow->GetStaticMeshComp()->SetRelativeLocation(FVector::ZeroVector);
+    ChargedArrow->AttachToComponent(SkeletalMeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+    ChargedArrow->SetLifeSpan(0.f);
+    ChargedArrow->GetProjectileMovement()->Deactivate();
+    ChargedArrow->GetStaticMeshComp()->SetVisibility(false);
 }
 
 void AWeaponBow::LeftClickAction()
@@ -160,7 +204,7 @@ void AWeaponBow::RightClickAction()
 void AWeaponBow::FireArrow()
 {
 
-    FName SocketName = "String_R_2";
+    
 
 
     // 소켓 위치 및 회전 가져오기
@@ -187,10 +231,32 @@ void AWeaponBow::FireArrow()
         SpawnRotation,
         SpawnParams
     );
-
-    // 방향 설정 (ProjectileMovementComponent가 필요)
-    if (Arrow)
+    if (bIsFire)
     {
-
+        Arrow->SetData(TEXT("Player_FireArrow"), TEXT("ToMonster"));
     }
+    else {
+        Arrow->SetData(TEXT("Player_Arrow"), TEXT("ToMonster"));
+    }
+    Arrow->GetStaticMeshComp()->SetRelativeLocation(FVector::ZeroVector);
+    SetArrowFire(false);
+
+    SetArrowVisibility(false);
+
+}
+
+void AWeaponBow::SetArrowFire(bool _bool)
+{
+    bIsFire = _bool;
+    if (_bool)
+    {
+        ChargedArrow->SetData(TEXT("Player_Charged_Arrow_Fire"), TEXT("NoCollision"));
+    }
+    else
+    {
+        ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
+    }
+    
+    ChargedArrow->GetStaticMeshComp()->SetRelativeLocation(FVector::ZeroVector);
+    ChargedArrow->GetStaticMeshComp()->SetRelativeRotation(FRotator::ZeroRotator);
 }
