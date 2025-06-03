@@ -11,6 +11,7 @@
 
 #include "UI/Inven/InventoryScroll.h"
 #include "UI/Inven/InventoryEquip.h"
+#include "UI/Inven/InventorySelectSet.h"
 
 #include "UI/Base/BaseUI.h"
 #include "Inventory.generated.h"
@@ -48,7 +49,10 @@ private:
 	UFUNCTION()
 	void RefreshAllInventory(const TArray<FItemData>& ItemDataList);
 	UFUNCTION()
-	void RefreshEquip(const FItemData& ItemData);
+	void RefreshDescription(const FItemData& ItemData);
+	UFUNCTION()
+	void RefreshEquip(const TArray<FItemData>& ItemDataMap);
+
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -56,6 +60,9 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	UInventoryEquip* BP_InvenEquip;
+
+	UPROPERTY(meta = (BindWidget))
+	UInventorySelectSet* BP_InvenSelectSet;
 
 private:
 	UPROPERTY(meta = (BindWidget))

@@ -11,6 +11,7 @@
 #include "UI/NpcDialogue/NPCDialogue.h"
 #include "UI/Shop/Shop.h"
 #include "UI/Quest/Quest.h"
+#include "UI/Popup/PopupGetItem.h"
 
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
@@ -23,6 +24,7 @@ enum class EInputContext
 	IC_Dialogue,
 	IC_Shop,
 	IC_Quest,
+	IC_Popup,
 	//필요하면 추가해서 사용합니다.
 
 	IC_End,
@@ -183,7 +185,6 @@ public:
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
 	void OnMoveCancel(const FInputActionValue& InputActionValue);
-
 
 	void OnLook(const FInputActionValue& InputActionValue);
 	void LeftClick(const FInputActionValue& InputActionValue);

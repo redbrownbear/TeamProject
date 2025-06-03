@@ -113,6 +113,17 @@ void UInventoryScroll::InitSelectItem()
     OnInventoryDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
 }
 
+FVector2D UInventoryScroll::GetItemListLocation()
+{
+    FGeometry Geometry = ActiveSlots[CurrentIndex]->GetCachedGeometry();
+
+    FVector2D RawPos = Geometry.GetAbsolutePosition();
+    float Scale = Geometry.GetAccumulatedLayoutTransform().GetScale();
+
+    FVector2D AdjustedPos = RawPos / Scale;
+    return  AdjustedPos;
+}
+
 void UInventoryScroll::SetSort(EItemCategory Type)
 {
     if (!SlotWidgetClass)

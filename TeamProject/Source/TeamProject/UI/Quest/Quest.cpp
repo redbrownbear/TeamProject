@@ -45,11 +45,11 @@ void UQuest::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 void UQuest::InitUI()
 {
-    //APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    //if (PC_InGame)
-    //{
-    //    PC_InGame->BindQuestInput();
-    //}
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    if (PC_InGame)
+    {
+        PC_InGame->BindQuestInput();
+    }
 }
 
 void UQuest::InitializePool(int32 PreloadCount)

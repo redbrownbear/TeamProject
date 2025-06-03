@@ -7,9 +7,9 @@
 #include "SubSystem/UI/InventoryManager.h"
 #include "SubSystem/PlayerManager.h"
 
+#include "Components/CanvasPanelSlot.h"
+
 #include "GameFramework/PC_InGame.h"
-
-
 
 void UInventory::OnCreated()
 {
@@ -64,9 +64,11 @@ void UInventory::BindDelegates()
     {
         PlayerManager->OnInventoryUpdated.AddDynamic(this, &UInventory::RefreshInventory);
         PlayerManager->OnInventoryAllUpdated.AddDynamic(this, &UInventory::RefreshAllInventory);
+
+        PlayerManager->OnInvenEquipItemAllUpdated.AddDynamic(this, &UInventory::RefreshEquip);
     }
 
-    BP_InvenScroll->OnInventoryDescriptionUpdated.AddDynamic(this, &UInventory::RefreshEquip);
+    BP_InvenScroll->OnInventoryDescriptionUpdated.AddDynamic(this, &UInventory::RefreshDescription);
 }
 
 void UInventory::RemoveDelegate()
@@ -76,9 +78,11 @@ void UInventory::RemoveDelegate()
     {
         PlayerManager->OnInventoryUpdated.RemoveDynamic(this, &UInventory::RefreshInventory);
         PlayerManager->OnInventoryAllUpdated.RemoveDynamic(this, &UInventory::RefreshAllInventory);
+
+        PlayerManager->OnInvenEquipItemAllUpdated.RemoveDynamic(this, &UInventory::RefreshEquip);
     }
 
-    BP_InvenScroll->OnInventoryDescriptionUpdated.RemoveDynamic(this, &UInventory::RefreshEquip);
+    BP_InvenScroll->OnInventoryDescriptionUpdated.RemoveDynamic(this, &UInventory::RefreshDescription);
 }
 
 void UInventory::SetRupeeUI()
@@ -119,7 +123,18 @@ void UInventory::OnNavigate(const FInputActionValue& InputActionValue)
 
 void UInventory::OnConfirm(const FInputActionValue& InputActionValue)
 {
-    HideUI(UInventory::StaticClass());
+    if (BP_InvenSelectSet->IsVisible())
+        return;
+
+    FVector2D ItemWidgetPosition = BP_InvenScroll->GetItemListLocation();
+    FVector2D Offset(100.f, -100.0f); 
+
+    BP_InvenSelectSet->ShowButton(true, BP_InvenScroll->GetCurItem());
+
+    if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(BP_InvenSelectSet->Slot))
+    {
+        CanvasSlot->SetPosition(ItemWidgetPosition + Offset);
+    }
 }
 
 void UInventory::OnCancel(const FInputActionValue& InputActionValue)
@@ -165,7 +180,12 @@ void UInventory::RefreshAllInventory(const TArray<FItemData>& ItemDataList)
     BP_InvenScroll->UpdateSlots(ItemDataList);
 }
 
-void UInventory::RefreshEquip(const FItemData& ItemData)
+void UInventory::RefreshDescription(const FItemData& ItemData)
 {
     BP_InvenEquip->RefreshDescription(ItemData);
+}
+
+void UInventory::RefreshEquip(const TArray<FItemData>& ItemDataMap)
+{
+    BP_InvenEquip->SetEquipMakeData(ItemDataMap);
 }

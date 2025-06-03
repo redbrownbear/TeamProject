@@ -51,7 +51,6 @@ void UShopDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 
 void UShopDialogue::OnConfirm()
 {
-    int a = 0;
     //구매 완료
 }
 
