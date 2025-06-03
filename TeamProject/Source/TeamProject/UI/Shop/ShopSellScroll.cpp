@@ -1,0 +1,254 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "UI/Shop/ShopSellScroll.h"
+
+#include "SubSystem/PlayerManager.h"
+
+void UShopSellScroll::NativeConstruct()
+{
+    Super::NativeConstruct();
+
+    InitCategory();
+
+    InitializePool(100);//미리 100개의 아이콘을 만들어 놓는다.
+    check(ItemWrapBox);
+}
+
+void UShopSellScroll::InitializePool(int32 PreloadCount)
+{
+    for (int32 i = 0; i < PreloadCount; ++i)
+    {
+        UShopSellSlot* PoolSlot = CreateWidget<UShopSellSlot>(GetWorld(), SlotWidgetClass);
+        PoolSlot->RemoveFromParent();
+        PooledSlots.Add(PoolSlot);
+    }
+}
+
+void UShopSellScroll::AddItemSlot(const FItemData& NewItem)
+{
+    SelectCategory(NewItem.eItemCategory, true);
+}
+
+void UShopSellScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
+{
+    for (UShopSellSlot* ActiveSlot : ActiveSlots)
+    {
+        ActiveSlot->RemoveFromParent();
+        PooledSlots.Add(ActiveSlot);
+    }
+
+    ActiveSlots.Empty();
+
+    for (const FItemData& Item : NewItemList)
+    {
+        if (Item.eItemCategory != CurrentCategory)
+            continue;
+
+        UShopSellSlot* NewSlot = nullptr;
+
+        if (PooledSlots.Num() > 0)
+        {
+            NewSlot = PooledSlots.Pop();
+        }
+        else
+        {
+            NewSlot = CreateWidget<UShopSellSlot>(GetWorld(), SlotWidgetClass);
+        }
+
+        NewSlot->SetItemData(Item);
+        ItemWrapBox->AddChildToWrapBox(NewSlot);
+        ActiveSlots.Add(NewSlot);
+    }
+
+    InitSelectItem();
+}
+
+void UShopSellScroll::MoveSelection(FIntPoint Direction)
+{
+    if (ActiveSlots.Num() == 0) return;
+
+    const int32 NumPerRow = 5; // WrapBox 기준 가정
+    const int32 MaxIndex = ActiveSlots.Num() - 1;
+
+    int32 NextIndex = CurrentIndex;
+
+    if (Direction.X != 0) // 좌우
+    {
+        NextIndex += Direction.X;
+    }
+    else if (Direction.Y != 0) // 상하
+    {
+        NextIndex += Direction.Y * NumPerRow;
+    }
+
+    NextIndex = FMath::Clamp(NextIndex, 0, MaxIndex);
+
+    if (NextIndex != CurrentIndex)
+    {
+        ScrollBox->ScrollWidgetIntoView(ActiveSlots[NextIndex], true, EDescendantScrollDestination::IntoView);
+        ActiveSlots[CurrentIndex]->SetSelected(false);
+        ActiveSlots[NextIndex]->SetSelected(true);
+        CurrentIndex = NextIndex;
+    }
+
+    FItemData Itemdata = ActiveSlots[CurrentIndex]->GetItemData();
+    OnShopDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
+}
+
+void UShopSellScroll::InitSelectItem()
+{
+    if (ActiveSlots.IsEmpty())
+        return;
+
+    for (UShopSellSlot* slot : ActiveSlots)
+    {
+        slot->SetSelected(false);
+    }
+
+    CurrentIndex = 0;
+    ActiveSlots[CurrentIndex]->SetSelected(true);
+
+    FItemData Itemdata = ActiveSlots[CurrentIndex]->GetItemData();
+    OnShopDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
+}
+
+void UShopSellScroll::SetSort(EItemCategory Type)
+{
+    if (!SlotWidgetClass)
+        return;
+
+    for (UShopSellSlot* ActiveSlot : ActiveSlots)
+    {
+        ActiveSlot->RemoveFromParent();
+        PooledSlots.Add(ActiveSlot);
+    }
+    ActiveSlots.Empty();
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    check(PlayerManager);
+
+    TArray<FItemData> TempItems = PlayerManager->GetAllItemData();
+
+    TArray<FItemData> Items;
+    for (FItemData Item : TempItems)
+    {
+        if ((Item.eItemCategory == EItemCategory::IT_Arrow && Item.bIsArrow) || Item.eItemCategory == EItemCategory::IT_Material)
+        {
+            // 이미 동일한 ItemCode가 있는지 확인
+            FItemData* Found = Items.FindByPredicate([&](const FItemData& Other) {
+                return Other.ItemID == Item.ItemID;
+                });
+
+            if (Found)
+                Found->ItemCount += Item.ItemCount;
+
+            else
+                Items.Add(Item);
+
+        }
+
+        else
+            Items.Add(Item);
+    }
+
+    if (Items.IsEmpty())
+        return;
+
+    Items.Sort([](const FItemData& A, const FItemData& B)
+        {
+            if (A.eItemCategory == B.eItemCategory)
+            {
+                if (A.eArmorKind == B.eArmorKind)
+                    return A.Damage > B.Damage;
+
+                return A.eArmorKind < B.eArmorKind;
+            }
+            return A.eItemCategory < B.eItemCategory;
+        });
+
+    for (FItemData Item : Items)
+    {
+        if (Item.eItemCategory != CurrentCategory)
+            continue;
+
+        UShopSellSlot* NewSlot = nullptr;
+        if (PooledSlots.Num() > 0)
+        {
+            NewSlot = PooledSlots.Pop();
+        }
+        else
+        {
+            NewSlot = CreateWidget<UShopSellSlot>(GetWorld(), SlotWidgetClass);
+        }
+
+        NewSlot->SetItemData(Item);
+        ItemWrapBox->AddChildToWrapBox(NewSlot);
+        ActiveSlots.Add(NewSlot);
+    }
+
+    InitSelectItem();
+}
+
+void UShopSellScroll::InitCategory()
+{
+    MapCategory.Add(EItemCategory::IT_Weapon, WeaponCheck);
+    MapCategory.Add(EItemCategory::IT_Arrow, ArrowCheck);
+    MapCategory.Add(EItemCategory::IT_Shield, ShieldCheck);
+    MapCategory.Add(EItemCategory::IT_Armor, ArmorCheck);
+    MapCategory.Add(EItemCategory::IT_Material, MaterialCheck);
+    MapCategory.Add(EItemCategory::IT_Food, FoodCheck);
+
+    MapCategoryText.Add(EItemCategory::IT_Weapon, WeaponText);
+    MapCategoryText.Add(EItemCategory::IT_Arrow, ArrowText);
+    MapCategoryText.Add(EItemCategory::IT_Shield, ShieldText);
+    MapCategoryText.Add(EItemCategory::IT_Armor, ArmorText);
+    MapCategoryText.Add(EItemCategory::IT_Material, MaterialText);
+    MapCategoryText.Add(EItemCategory::IT_Food, FoodText);
+
+    WeaponCheck->OnCheckStateChanged.AddDynamic(this, &UShopSellScroll::OnWeaponCheckChanged);
+    ArrowCheck->OnCheckStateChanged.AddDynamic(this, &UShopSellScroll::OnArrowCheckChanged);
+    ShieldCheck->OnCheckStateChanged.AddDynamic(this, &UShopSellScroll::OnShieldCheckChanged);
+    ArmorCheck->OnCheckStateChanged.AddDynamic(this, &UShopSellScroll::OnArmorCheckChanged);
+    MaterialCheck->OnCheckStateChanged.AddDynamic(this, &UShopSellScroll::OnMaterialCheckChanged);
+    FoodCheck->OnCheckStateChanged.AddDynamic(this, &UShopSellScroll::OnFoodCheckChanged);
+
+    SelectCategory(EItemCategory::IT_Weapon, true);
+}
+
+
+void UShopSellScroll::SelectCategory(EItemCategory type, bool bIsChecked)
+{
+    if (!bIsChecked)
+    {
+        MapCategory[CurrentCategory]->SetIsChecked(true);
+        return;
+    }
+
+    for (const TPair<EItemCategory, UCheckBox*>& Pair : MapCategory)
+    {
+        UCheckBox* CheckBox = Pair.Value;
+
+        if (!CheckBox)
+            continue;
+
+        CheckBox->SetIsChecked(false);
+    }
+
+    for (const TPair<EItemCategory, UTextBlock*>& Pair : MapCategoryText)
+    {
+        UTextBlock* TextBlock = Pair.Value;
+
+        if (!TextBlock)
+            continue;
+
+        TextBlock->SetVisibility(ESlateVisibility::Hidden);
+    }
+
+    MapCategory[type]->SetIsChecked(bIsChecked);
+    MapCategoryText[type]->SetVisibility(ESlateVisibility::Visible);
+
+    CurrentCategory = type;
+
+    SetSort(CurrentCategory);
+}

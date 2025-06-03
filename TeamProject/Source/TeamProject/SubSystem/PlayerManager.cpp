@@ -45,6 +45,17 @@ void UPlayerManager::ShowInvenUI()
     UpDateInvenUI(ItemList);
 }
 
+void UPlayerManager::SetEquipData(const FItemData& ItemRow)
+{
+    EquipItemList.Add(ItemRow);
+    UpDateInvenEquipUI(EquipItemList);
+}
+
+void UPlayerManager::ShowEquipUI()
+{
+    UpDateInvenEquipUI(EquipItemList);
+}
+
 void UPlayerManager::UpDateInvenUI(const FItemData& ItemData)
 {
     OnInventoryUpdated.Broadcast(ItemData);
@@ -53,6 +64,11 @@ void UPlayerManager::UpDateInvenUI(const FItemData& ItemData)
 void UPlayerManager::UpDateInvenUI(const TArray<FItemData>& ItemRows)
 {
     OnInventoryAllUpdated.Broadcast(ItemRows); // UI에게 알림
+}
+
+void UPlayerManager::UpDateInvenEquipUI(const TArray<FItemData>& ItemMap)
+{   
+    OnInvenEquipItemAllUpdated.Broadcast(ItemMap);
 }
 
 void UPlayerManager::InitStatus()

@@ -12,8 +12,11 @@
 #include "PlayerManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestUpdated, const TArray<FQuestDataRow>&, QuestList);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryAllUpdated, const TArray<FItemData>&, ItemData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, const FItemData&, ItemData);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInvenEquipItemAllUpdated, const TArray<FItemData>&, ItemData);
 
 struct sPlayerStatus
 {
@@ -59,11 +62,23 @@ private:
 
 	//Itemï¿½ï¿½ï¿½ï¿½
 public:
-	void SetInvenData(FItemData QuestRow);
+	void SetInvenData(FItemData ItemRow);
 	void ShowInvenUI();
 	const TArray<FItemData>& GetAllItemData() const { return ItemList; }
+
+	UFUNCTION()
+	void SetEquipData(const FItemData& ItemRow);
+	void ShowEquipUI();
+	const TArray<FItemData>& GetAllEquipData() const { return EquipItemList; }
+
 private:
 	void UpDateInvenUI(const FItemData& ItemData);
+	void UpDateInvenUI(const TArray<FItemData>& ItemList);
+
+	void UpDateInvenEquipUI(const TArray<FItemData>& ItemMap);
+
+	//ItemÀü¿ë
+=======
 	void UpDateInvenUI(const TArray<FItemData>& QuestList);
 	//Itemï¿½ï¿½ï¿½ï¿½
 
@@ -101,12 +116,16 @@ public:
 	FOnInventoryUpdated OnInventoryUpdated;
 	UPROPERTY(BlueprintAssignable)
 	FOnInventoryAllUpdated OnInventoryAllUpdated;
+	UPROPERTY(BlueprintAssignable)
+	FOnInvenEquipItemAllUpdated OnInvenEquipItemAllUpdated;
 
 private:
 	sPlayerStatus PlayerStatus;
 
 	TArray<FQuestDataRow> QuestList;
 	TArray<FItemData> ItemList;
+
+	TArray<FItemData> EquipItemList;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loading")
