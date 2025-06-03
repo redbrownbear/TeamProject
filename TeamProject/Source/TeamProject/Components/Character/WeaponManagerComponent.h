@@ -32,7 +32,13 @@ public:
 	UWeaponChildActorComponent* GetSword() { return Sword; }
 	UWeaponChildActorComponent* GetShield() { return Shield; }
 	UWeaponChildActorComponent* GetBow() { return Bow; }
-
+	
+	
+	
+	
+	USkeletalMeshComponent* GetGlider() { return Glider; }
+	UAnimMontage* GetGliderEquipMontage() { return EquipGlider; }
+	UAnimMontage* GetGliderUnEquipMontage() { return UnEquipGlider; }
 
 	EWeapon_Type GetNextWeaponType() { return NextWeapon; }
 	void SetNextWeaponType(EWeapon_Type _Type) { NextWeapon = _Type; }
@@ -90,6 +96,14 @@ protected:
 
 	UPROPERTY()
 	UAnimMontage* UnEquip_Sword_Shield;
+	UPROPERTY()
+	TObjectPtr<USkeletalMeshComponent> Glider;
+
+	UPROPERTY()
+	UAnimMontage* EquipGlider;
+
+	UPROPERTY()
+	UAnimMontage* UnEquipGlider;
 
 
 	bool bRightClick;

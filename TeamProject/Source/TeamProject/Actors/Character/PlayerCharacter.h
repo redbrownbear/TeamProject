@@ -56,6 +56,7 @@ public:
 	UWeaponManagerComponent* GetWeaponManagerComponent() { return WeaponManagerComponent; }
 	USpringArmComponent* GetSpringArm() { return SpringArm; }
 
+	virtual void Landed(const FHitResult& Hit) override;
 
 	UFUNCTION()
 	void TimelineProgress(float Value);
@@ -63,7 +64,6 @@ public:
 
 	void ZoomIn();
 	void ZoomOut();
-
 protected:
 
 	/*UPROPERTY(EditAnywhere, Category="Weapon")
@@ -92,6 +92,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Zoom")
 	UCurveFloat* ZoomCurve;
+
+
+	
 
 
 public:
