@@ -18,7 +18,7 @@
 AProjectile::AProjectile()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 
@@ -85,13 +85,21 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 {
 	if (!IsValid(this)) { return; }
 
-	//Destroy();
+	Destroy();
+
+	//if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
+	//	|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig)
+	//{
+	//	Destroy();
+	//}
+
 
 }
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone)
+	if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
+		|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig)
 	{
 		Destroy();
 	}
@@ -101,6 +109,8 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	ProjectileMovementComponent->Velocity = GetActorForwardVector() * ProjectileMovementComponent->MaxSpeed;
 }
 
 FVector AProjectile::GetVelocity()
