@@ -639,9 +639,6 @@ void APC_InGame::TrySuperPower(const FInputActionValue& InputActionValue)
 	{
 		if (!IcePillarClass) return;
 
-		// 수면 체크: 지형 위라면 충돌, 월드 정적에 한정		
-		//CheckSurface();
-
 		if (bCanSpawn)
 		{
 			SpawnIcePillar();
@@ -775,7 +772,7 @@ void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 			SetIgnoreLookInput(true);
 		}
 
-		//bIcePreviewPlaced = false; // 새 위치 탐색 허용
+		bIcePreviewPlaced = false; // 새 위치 탐색 허용
 
 		// 캐릭터 IcePreviewActor에 정면 고정?
 	}
@@ -939,44 +936,12 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 		MetalActor = nullptr;
 	}
 
-	/*if (!IsHoldingObject())
-	{
-		FHitResult MetalHit;
-		MetalActor = Cast<AMetalActor>(FindVisibleActorOnScreen(MetalHit));
-	}
-
-	if (bMagnesisKeyPressed)
-	{
-		Player_C->ZoomIn();
-
-		if (MetalActor)
-		{
-			MetalActor->ThisIsMetal();
-		}
-	}
-	else
-	{
-		Player_C->ZoomOut();
-
-		if (MetalActor)
-		{
-			MetalActor->ChangeNomalColor();
-		}
-
-		if (IsHoldingObject())
-		{
-			StopMagnetGrab();
-		}
-	}*/
 }
 
 
 void APC_InGame::Magnesis()
 {	
 	if (!bMagnesisKeyPressed) return;
-
-	// 중앙 라인 기반 Metal 체크
-	CheckMetalActor();
 
 	if (!IsHoldingObject() && bCanControlMetal)
 	{
@@ -1031,10 +996,10 @@ void APC_InGame::StartMagnetGrab()
 {
 	if (IsHoldingObject()) return;
 
-	FHitResult HitResult;
-	if (TraceForMetal(HitResult))
+	//FHitResult HitResult;
+	if (TraceForMetal(LastHit))
 	{
-		if (UPrimitiveComponent* HitComp = HitResult.GetComponent())
+		if (UPrimitiveComponent* HitComp = LastHit.GetComponent())
 		{
 			if (HitComp->IsSimulatingPhysics())
 			{
@@ -1047,7 +1012,7 @@ void APC_InGame::StartMagnetGrab()
 					HoldDistance = FVector::Distance(PlayerLocation, TargetLocation);
 				}
 
-				PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, HitResult.ImpactPoint);
+				PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, LastHit.ImpactPoint);
 				GrabbedComponent = HitComp;
 
 				// 주기적으로 위치 갱신
