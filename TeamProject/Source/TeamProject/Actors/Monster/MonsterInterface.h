@@ -68,5 +68,5 @@ protected:
 
 public:
 	FName GetName() const;
-
+	float GetDamageFromWeapon();
 };

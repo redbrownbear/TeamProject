@@ -54,6 +54,9 @@ public:
 	void DrawBowWeapon();
 	const AWorldWeapon* GetCurrentWeapon() const { return CurrentWeapon; }
 
+	const AWorldWeapon* GetMeleeWeapon() { return MeleeWeapon; }
+	const AWorldWeapon* GetBowWeapon() { return BowWeapon; }
+
 protected:
 	void DropWeapons();
 

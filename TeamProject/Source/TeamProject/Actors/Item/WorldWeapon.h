@@ -75,5 +75,7 @@ public:
 protected:
 	bool bIsCatched = false;
 public:
-	bool GetCatched() { return bIsCatched; }
+	bool GetCatched() const { return bIsCatched; }
+	float GetDamage() const;
+
 };

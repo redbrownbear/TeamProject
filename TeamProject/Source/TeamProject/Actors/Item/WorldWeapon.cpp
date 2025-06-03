@@ -294,3 +294,8 @@ void AWorldWeapon::DetachFromMonster()
 
 	this->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
+
+float AWorldWeapon::GetDamage() const
+{
+	return ItemTableRow->Damage;
+}

@@ -248,6 +248,9 @@ void UMonsterFSMComponent::HandleState(float DeltaTime)
 	case EMonsterState::Dead:
 		UpdateDying(DeltaTime);
 		break;
+	case EMonsterState::Damage:
+		UpdateDamage(DeltaTime);
+		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // Unexpected MonsterState"));
 		check(false);
@@ -898,11 +901,11 @@ void UMonsterFSMComponent::UpdateDamage(float DeltaTime)
 {
 	this->StopMove();
 
-	if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
+	if (PawnMonster && !PawnMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
 	{
 		ChangeState(EMonsterState::Combat);
 	}
-	else if (PawnMonster && !PawnMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
+	else if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
 	{
 		ChangeState(EMonsterState::Combat);
 	}

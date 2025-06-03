@@ -187,6 +187,12 @@ void AWeaponSword::Attack()
                 CM->IMonsterInterface::TakeDamage(Damage, DamageEvent, PlayerCharacter->GetController(), PlayerCharacter);
                 DamagedActors.Add(HitActor); // 중복 방지용
             }
+            else if (APawnMonster* PM = Cast<APawnMonster>(HitActor))
+            {
+                FDamageEvent DamageEvent;
+                PM->IMonsterInterface::TakeDamage(Damage, DamageEvent, PlayerCharacter->GetController(), PlayerCharacter);
+                DamagedActors.Add(HitActor); // 중복 방지용
+            }
         }
     }
 }

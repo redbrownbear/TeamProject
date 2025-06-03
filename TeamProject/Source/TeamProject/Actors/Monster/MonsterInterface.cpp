@@ -957,3 +957,14 @@ FName IMonsterInterface::GetName() const
 	}
 	return FName(TEXT(""));
 }
+
+float IMonsterInterface::GetDamageFromWeapon()
+{
+	UMonsterFSMComponent* FSMComponent = GetFSMComponent();
+	if (const AWorldWeapon* WW = FSMComponent->GetCurrentWeapon())
+	{
+		float fDamage = WW->GetDamage();
+		return fDamage;
+	}
+	return 0.0f;
+}

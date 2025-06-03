@@ -10,9 +10,15 @@
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+
+#include "Actors/Monster/CharacterMonster.h"
+#include "Actors/Monster/PawnMonster.h"
+#include "Actors/Item/WorldWeapon.h"
+
 
 // Sets default values
 AProjectile::AProjectile()
@@ -72,6 +78,11 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 	}
 
 	SetLifeSpan(ProjectileTableRow->LifeSpan);
+
+	if (ProjectileName::Monster_Attack == ProjectileName)
+	{
+		bGetDamageFromWeapon = true;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -126,13 +137,51 @@ FName AProjectile::GetProjectileName()
 
 float AProjectile::GetDamage()
 {
-	if (ProjectileTableRow)
+	if (bGetDamageFromWeapon)
 	{
-		return ProjectileTableRow->Damage;
+		if (ACharacterMonster* CM = Cast<ACharacterMonster>(GetOwner()))
+		{
+			if (const AWorldWeapon* WW = CM->GetFSMComponent()->GetCurrentWeapon())
+			{
+				float fDamage = WW->GetDamage();
+				return fDamage;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No WorldWeapon"));
+				return 1.f;
+			}
+		}
+		else if (APawnMonster* PM = Cast<APawnMonster>(GetOwner()))
+		{
+			if (const AWorldWeapon* WW = PM->GetFSMComponent()->GetCurrentWeapon())
+			{
+				float fDamage = WW->GetDamage();
+				return fDamage;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No WorldWeapon"));
+				return 1.f;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // Not Monster"));
+			return 1.f;
+		}
 	}
 	else
 	{
-		return 1.f;
+		if (ProjectileTableRow)
+		{
+			return ProjectileTableRow->Damage;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No ProjectileTableRow"));
+			return 1.f;
+		}
 	}
 }
 

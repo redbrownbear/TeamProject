@@ -49,7 +49,7 @@ protected:
 
 protected:
 	ECollisionChannel CollisionChannel;
-
+	bool bGetDamageFromWeapon = false;
 public:
 	FVector GetVelocity();
 	virtual FName GetProjectileName();
