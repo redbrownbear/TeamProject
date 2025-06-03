@@ -11,6 +11,7 @@
 
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "Components/FSMComponent/Monster/HinoxFSMComponent.h"
+#include "Components/FSMComponent/Monster/LynelFSMComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
 #include "Data/MonsterTableRow.h"
@@ -877,9 +878,13 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 			{
 				if (iOption)
 				{
-					if (UHinoxFSMComponent* HinoxFSMComponent = Cast<UHinoxFSMComponent>(FSMComponent))
+					if (FSMComponent->IsA<UHinoxFSMComponent>())
 					{
 						FSMComponent->ChangeState(EMonsterState::Damage_Eye);
+					}
+					else if (FSMComponent->IsA<ULynelFSMComponent>())
+					{
+						FSMComponent->ChangeState(EMonsterState::Stun);
 					}
 				}
 				else

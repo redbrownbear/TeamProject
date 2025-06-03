@@ -582,6 +582,9 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::ReadyToAttack:
 		break;
+	case EMonsterState::Damage:
+		return;
+		break;
 	case EMonsterState::Temp:
 		break;
 	default:
