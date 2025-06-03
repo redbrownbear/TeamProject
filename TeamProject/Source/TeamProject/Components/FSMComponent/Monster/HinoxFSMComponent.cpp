@@ -127,8 +127,10 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 		CharacterMonster->PlayMontage(EMonsterMontage::DAMAGE_EYE_START);
 		break;
 	case EMonsterState::Dead:
+		CharacterMonster->PlayMontage(EMonsterMontage::DEAD);
 		break;
 	case EMonsterState::Damage:
+		return;
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("UHinoxFSMComponent::ChangeState // Unexpected MonsterState, ChangeState Failed"));
@@ -154,10 +156,10 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 				}
 			}
 		}
-		CharacterMonster->PlayMontage(EMonsterMontage::DEAD);
 		break;
 	case EMonsterState::Combat:
 	case EMonsterState::Damage_Eye:
+	case EMonsterState::Damage:
 		if (UWorld* World = CharacterMonster->GetWorld())
 		{
 			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))

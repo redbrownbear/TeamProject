@@ -2,10 +2,19 @@
 
 
 #include "Actors/Weapon/WeaponSword.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Actors/Character/PlayerCharacter.h"
+#include "Actors/Monster/CharacterMonster.h"
+#include "Actors/Monster/PawnMonster.h"
+
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/StatusComponent/PlayerStatusComponent/PlayerStatusComponent.h"
+
+
+#include "Kismet/KismetSystemLibrary.h"
+
 #include "GameFramework/PawnMovementComponent.h"
+
+#include "Engine/DamageEvents.h"
 
 AWeaponSword::AWeaponSword()
 {
@@ -111,74 +120,74 @@ void AWeaponSword::SetCanMove()
     Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
+void AWeaponSword::EmptyDamagedActors()
+{
+    DamagedActors.Empty(); // 공격 시작 시 클리어
+}
+
 void AWeaponSword::Attack()
 {
+    AActor* OwnerActor = GetOwner();
+    if (!OwnerActor) return;
+
+    FVector ActorLocation = OwnerActor->GetActorLocation();
+    FRotator ActorRotation = OwnerActor->GetActorRotation();
+
+    FRotator LeftRotator = FRotator(0.f, ActorRotation.Yaw - 15.f, 0.f);
+    FVector LeftVector = LeftRotator.RotateVector(FVector::ForwardVector) * 70.f + ActorLocation;
+
+    FRotator RightRotator = FRotator(0.f, ActorRotation.Yaw + 15.f, 0.f);
+    FVector RightVector = RightRotator.RotateVector(FVector::ForwardVector) * 70.f + ActorLocation;
+
+    FVector HalfSize = FVector(10.f, 10.f, 10.f);
+
+    TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+    ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1));
+
+    TArray<AActor*> ActorsToIgnore;
+    ActorsToIgnore.Add(OwnerActor);
+
+    TArray<FHitResult> OutHits;
+
+    bool bHit = UKismetSystemLibrary::BoxTraceMultiForObjects(
+        this->GetWorld(),
+        LeftVector,
+        RightVector,
+        HalfSize,
+        FRotator::ZeroRotator,
+        ObjectTypes,
+        false,
+        ActorsToIgnore,
+        EDrawDebugTrace::ForDuration,
+        OutHits,
+        true,
+        FLinearColor::Red,
+        FLinearColor::Green,
+        0.2f
+    );
+
+    APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OwnerActor);
+    if (!PlayerCharacter) return;
+
+    UPlayerStatusComponent* PlayerStatusComponent = PlayerCharacter->GetPlayerStatusComponent();
+    const int32 Damage = PlayerStatusComponent->GetDamage();
+
+    if (bHit)
     {
-        AActor* OwnerActor = GetOwner();
-
-        FVector ActorLocation = OwnerActor->GetActorLocation();
-        FRotator ActorRotation = OwnerActor->GetActorRotation();
-
-        // 현재 전방 벡터
-        FVector ForwardVector = ActorRotation.Vector();
-
-        // Yaw -15도 회전
-        FRotator LeftRotator = FRotator(0.f, ActorRotation.Yaw - 15.f, 0.f);
-        FVector LeftVector = LeftRotator.RotateVector(FVector::ForwardVector) * 70.f + ActorLocation;
-
-        // Yaw +15도 회전
-        FRotator RightRotator = FRotator(0.f, ActorRotation.Yaw + 15.f, 0.f);
-        FVector RightVector = RightRotator.RotateVector(FVector::ForwardVector) * 70.f + ActorLocation;
-
-        // 변수에 대입
-        FVector Left = LeftVector;
-        FVector Right = RightVector;
-
-        // 박스 설정
-        FVector HalfSize = FVector(10.f, 10.f, 10.f);
-        FRotator Orientation = FRotator::ZeroRotator;
-
-        // 감지할 오브젝트 타입 (Pawn)
-        TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-        ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1));
-
-        // 무시할 액터
-        TArray<AActor*> ActorsToIgnore;
-        ActorsToIgnore.Add(OwnerActor);
-
-        // 결과 저장용
-        TArray<FHitResult> OutHits;
-
-        // 박스 트레이스 실행
-        bool bHit = UKismetSystemLibrary::BoxTraceMultiForObjects(
-            this->GetWorld(),        // WorldContextObject
-            Left,                   // Start
-            Right,                  // End
-            FVector(10.f, 10.f, 10.f), // HalfSize
-            FRotator::ZeroRotator,  // Orientation
-            ObjectTypes,            // ObjectTypes
-            false,                  // bTraceComplex
-            ActorsToIgnore,         // ActorsToIgnore
-            EDrawDebugTrace::ForDuration, // DrawDebugType
-            OutHits,                // OutHits (여기 위치 중요!)
-            true,                   // bIgnoreSelf
-            FLinearColor::Red,      // TraceColor
-            FLinearColor::Green,    // TraceHitColor
-            0.2f                    // DrawTime
-        );
-
-        // 결과 출력 감지된 Actor UE_LOG 에 출력
-        if (bHit)
+        for (const FHitResult& Hit : OutHits)
         {
-            for (const FHitResult& Hit : OutHits)
+            AActor* HitActor = Hit.GetActor();
+            if (!HitActor || DamagedActors.Contains(HitActor)) continue;
+
+            UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
+
+            if (ACharacterMonster* CM = Cast<ACharacterMonster>(HitActor))
             {
-                if (AActor* HitActor = Hit.GetActor())
-                {
-                    UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
-                }
+                FDamageEvent DamageEvent;
+                CM->IMonsterInterface::TakeDamage(Damage, DamageEvent, PlayerCharacter->GetController(), PlayerCharacter);
+                DamagedActors.Add(HitActor); // 중복 방지용
             }
         }
     }
 }
-
 

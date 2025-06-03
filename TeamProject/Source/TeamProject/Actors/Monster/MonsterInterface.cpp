@@ -860,6 +860,9 @@ bool IMonsterInterface::IsPlayingMontage(EMonsterMontage _InEnum)
 
 void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, int32 iOption)
 {
+	if (FMath::IsNearlyZero(Damage)) return;
+
+
 	UMonsterStatusComponent * UMonsterStatusComponent = GetStatusComponent();
 	const float fDamage = UMonsterStatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
@@ -886,7 +889,7 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 
 			}
 		}
-		else
+		else if (FMath::IsNearlyZero(fDamage))
 		{
 			FSMComponent->ChangeState(EMonsterState::Dead);
 		}
