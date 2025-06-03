@@ -462,8 +462,7 @@ void UMonsterFSMComponent::UpdateToDance(float DeltaTime)
 		{
 			const FVector CampFireLocation = CampFireActor->GetActorLocation();
 			MoveToLocation(CampFireLocation);
-			AActor* TempActor = Cast<AActor>(PawnMonster);
-			float fDistance = FVector::Dist(TempActor->GetActorLocation(), CampFireLocation);
+			float fDistance = FVector::Dist(PawnMonster->GetActorLocation(), CampFireLocation);
 			if (fDistance < MONSTER_CAMPFIRE_MIN_LENGTH)
 			{
 				this->StopMove();
@@ -477,8 +476,7 @@ void UMonsterFSMComponent::UpdateToDance(float DeltaTime)
 		{
 			const FVector CampFireLocation = CampFireActor->GetActorLocation();
 			MoveToLocation(CampFireLocation);
-			AActor* TempActor = Cast<AActor>(CharacterMonster);
-			float fDistance = FVector::Dist(TempActor->GetActorLocation(), CampFireLocation);
+			float fDistance = FVector::Dist(CharacterMonster->GetActorLocation(), CampFireLocation);
 			if (fDistance < MONSTER_CAMPFIRE_MIN_LENGTH)
 			{
 				this->StopMove();

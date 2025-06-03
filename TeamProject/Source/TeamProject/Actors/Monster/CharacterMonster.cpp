@@ -126,7 +126,8 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		//CapsuleComp->SetSphereRadius(MonsterData->CollisionSphereRadius); // SetCapsuleHalfHeight와 충돌 가능성 있음
 		CapsuleComp->SetCollisionProfileName(CollisionProfileName::Monster);
 		CapsuleComp->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
-		CapsuleComp->SetCapsuleHalfHeight(MonsterData->CollisionSphereRadius);
+		CapsuleComp->SetCapsuleHalfHeight(MonsterData->CapsuleHalfHeight);
+		CapsuleComp->SetCapsuleRadius(MonsterData->CapsuleRadius);
 	}
 
 	// 스켈레탈 메쉬 컴포넌트 설정 (이미 ACharacter에 의해 생성되고 등록된 상태)
@@ -136,7 +137,9 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		MeshComp->SetSkeletalMesh(MonsterData->SkeletalMesh);
 		MeshComp->SetAnimClass(MonsterData->AnimClass);
 		MeshComp->SetRelativeScale3D(MonsterData->MeshTransform.GetScale3D());
-		MeshComp->SetRelativeLocation(FVector(0.0, 0.0, -MonsterData->CollisionSphereRadius));
+		FVector RelativeLocation = MonsterData->MeshTransform.GetLocation();
+		RelativeLocation += FVector(0.0, 0.0, -MonsterData->CapsuleHalfHeight);
+		MeshComp->SetRelativeLocation(RelativeLocation);
 	}
 
 
@@ -166,7 +169,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 			{
 				FVector Scale = MeleeWeapon->GetActorScale3D();
 
-				if (ULynelFSMComponent* LynelFSMComponent = Cast<ULynelFSMComponent>(FSMComponent))
+				if (FSMComponent->IsA<ULynelFSMComponent>())
 				{
 					Scale *= 2.f;
 				}
@@ -249,15 +252,28 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 				NewSphereCollider->SetCanEverAffectNavigation(false);
 				NewSphereCollider->SetCollisionProfileName(CollisionProfileName::Monster); // 몬스터 피격 판정에 적합한 프로파일
 
-				if (static_cast<EAdditionalCollider>(i) == EAdditionalCollider::Eye_Ball)
+				if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
 				{
-					NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnEyeBeginOverlap);
+					if (static_cast<EAdditionalCollider>(i) == EAdditionalCollider::Eye_Ball)
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnEyeBeginOverlap);
+					}
+					else
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+					}
 				}
-				else
+				else if (DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
 				{
-					NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+					if (static_cast<EAdditionalCollider>(i) == EAdditionalCollider::Chin)
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnEyeBeginOverlap);
+					}
+					else
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+					}
 				}
-
 				FAttachmentTransformRules AttachRules = FAttachmentTransformRules::SnapToTargetNotIncludingScale;
 
 				FName AttachSocketName = NAME_None; // 기본은 메시의 루트

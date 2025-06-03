@@ -31,6 +31,10 @@ public:
 public:
 	UPROPERTY(EditAnywhere, Category = "Monster|Collision")
 	float CollisionSphereRadius = 32.f;
+	UPROPERTY(EditAnywhere, Category = "Monster|Collision")
+	float CapsuleHalfHeight= 32.f;
+	UPROPERTY(EditAnywhere, Category = "Monster|Collision")
+	float CapsuleRadius = 32.f;
 
 public: // Movement
 	UPROPERTY(EditAnywhere, Category = "Monster|Movement")
