@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -16,14 +16,17 @@ class TEAMPROJECT_API UPlayerMovementComponent : public UCharacterMovementCompon
 	GENERATED_BODY()
 public:
 	UPlayerMovementComponent(const FObjectInitializer& ObjectInitializer);
-
+	virtual void BeginPlay() override;
 
 	
 	EClimb_State GetClimbMode() { return Climb_State; }
+	UAnimMontage* GetGlideUnEquipMontage() { return GlideUnEquip; }
+
 
 	bool ClimbingLineTrace(FHitResult& HitResult);
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
 
+	
 	void SetMovementClimb() { MovementMode=MOVE_Flying; bIsClimbing = true; }
 	bool IsClimbing() { return bIsClimbing; }
 
@@ -34,17 +37,29 @@ public:
 	bool CanClimbDownLand();
 
 	void SetClimbMode(bool _bool);
+	void SetGlideMode(bool _bool);
 
+	void GlidingMove(FVector2D ActionValue);
 
 	UAnimMontage* GTEST() { return LandUpMontage; }
 
-private:
-	bool bIsClimbing = false;
-	
-	UPROPERTY()
 
+private:
+	bool CanGlide();
+
+
+private:
+
+	UPROPERTY()
+	UAnimMontage* GlideUnEquip;
+	UPROPERTY()
 	UAnimMontage* LandUpMontage;
 	UPROPERTY()
 	EClimb_State Climb_State = EClimb_State::Climb;
 
+public:
+
+
+	bool bIsClimbing = false;
+	bool bIsGliding = false;
 };

@@ -105,8 +105,17 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LookMouse,
 		ETriggerEvent::Triggered, this, &ThisClass::OnLook);
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Jump,
+		ETriggerEvent::Started, this, &ThisClass::JumpGlide);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
+		ETriggerEvent::Started, this, &ThisClass::StartedDash);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
+		ETriggerEvent::Completed, this, &ThisClass::CompletedDash);
 
-
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Crouch,
+		ETriggerEvent::Triggered, this, &ThisClass::OnCrouch);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Crouch,
+		ETriggerEvent::Completed, this, &ThisClass::OnUnCrouch);
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LeftClick,
 		ETriggerEvent::Started, this, &ThisClass::LeftClick);
@@ -255,6 +264,7 @@ void APC_InGame::BindQuestInput()
 
 void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 {
+
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 	if (!Player_C)
 	{
@@ -265,6 +275,10 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	{
 		return;
 	}
+	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
+
+	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+
 	// 클라이밍 상태일 때의 캐릭터 무브
 	if (Movement->IsClimbing())
 	{
@@ -275,9 +289,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	
 		FHitResult HitResult;
 		
-		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
-		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
 		FVector Normal_Vec = HitResult.Normal;
 
@@ -298,18 +310,27 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 		Movement->TrySetMoveClimb(ActionValue);
 
+		UE_LOG(LogTemp, Warning, TEXT("Climbing"));
+
 		
+	}
+	else if (Movement->bIsGliding)
+	{
+		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+
+		P_Anim->ActionValue = ActionValue;
+		
+		Movement->GlidingMove(ActionValue);
+		UE_LOG(LogTemp, Warning, TEXT("Gliding"));
 	}
 	
 	// 노말 상태일 때의 캐릭터 무브
 	else
 	{
-		UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
-
-
-		UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
 		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+
+		P_Anim->ActionValue = ActionValue;
 
 		const FRotator Rotation = K2_GetActorRotation();
 		const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
@@ -317,12 +338,14 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
 
 
-		P_Anim->ActionValue = ActionValue;
+		
 
 		APawn* ControlledPawn = GetPawn();
 		ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
 		ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
+
 	}
+	
 }
 
 void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
@@ -347,9 +370,37 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
-	const FVector2D ActionValue = FVector2D();
+	const FVector2D ActionValue = FVector2D::Zero();
 
+	UE_LOG(LogTemp, Warning, TEXT("ActionValue %f, %f"), ActionValue.X, ActionValue.Y);
 	P_Anim->ActionValue = ActionValue;
+}
+
+void APC_InGame::JumpGlide(const FInputActionValue& InputActionValue)
+{
+	ACharacter* Player_C = Cast<ACharacter>(GetPawn());
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+	if (Movement->IsFalling())
+	{
+		Movement->SetGlideMode(true);
+	}
+	else
+	{
+		Player_C->Jump();
+	}
+}
+
+void APC_InGame::StartedDash(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_DASH;
+
+}
+
+void APC_InGame::CompletedDash(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
 }
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
@@ -461,12 +512,31 @@ void APC_InGame::Climb(const FInputActionValue& InputActionValue)
 
 	else
 	{	
+		if (Movement->bIsGliding)
+		{
+			return;
+		}
 		FHitResult HitResult;
 		if (Movement->ClimbingLineTrace(HitResult))
 		{
 			Movement->SetClimbMode(true);
 		}
 	}
+}
+
+void APC_InGame::OnCrouch(const FInputActionValue& InputActionValue)
+{
+	
+	ACharacter* ControlledCharacter = Cast<ACharacter>(GetPawn());
+	if (ControlledCharacter->GetMovementComponent()->IsFalling()) { return; }
+	ControlledCharacter->Crouch();
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *ControlledCharacter->GetCharacterMovement()->GetMovementName());
+}
+
+void APC_InGame::OnUnCrouch(const FInputActionValue& InputActionValue)
+{
+	ACharacter* ControlledCharacter = Cast<ACharacter>(GetPawn());
+	ControlledCharacter->UnCrouch();
 }
 
 
