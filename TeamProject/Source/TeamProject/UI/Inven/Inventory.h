@@ -33,6 +33,8 @@ private:
 	void BindDelegates();
 	void RemoveDelegate();
 
+	void SetRupeeUI();
+
 public: //바인딩을 위해 퍼블릭선언
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
@@ -44,11 +46,9 @@ private:
 	UFUNCTION()
 	void RefreshInventory(const FItemData& ItemData);
 	UFUNCTION()
+	void RefreshAllInventory(const TArray<FItemData>& ItemDataList);
+	UFUNCTION()
 	void RefreshEquip(const FItemData& ItemData);
-
-protected:
-	UPROPERTY(EditDefaultsOnly)
-	UDataTable* ItemDataTable;
 
 private:
 	UPROPERTY(meta = (BindWidget))

@@ -20,7 +20,7 @@ void UAnimNotify_HinoxThrowStone::Notify(USkeletalMeshComponent* MeshComp, UAnim
 		Projectile->SetData(ProjectileName::Monster_HinoxStone, CollisionProfileName::ToPlayer);
 
 		const USkeletalMeshComponent* Mesh = Monster->GetMonsterMesh();;
-		const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Weapon_R);
+		const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Weapon_Right);
 
 		const FVector MonsterForwardVector = Monster->GetActorForwardVector();
 		NewTransform.SetLocation(Location);

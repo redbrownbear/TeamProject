@@ -42,4 +42,8 @@ public:
 	FOnHPChanged OnHPChanged;
 	UPROPERTY(BlueprintAssignable)
 	FOnDie OnDie;
+	float GetCurrentHP() const { return HP; }
+	float GetMaxHP() const { return MaxHP; }
+	void SetMaxHP(float inHP);
+
 };

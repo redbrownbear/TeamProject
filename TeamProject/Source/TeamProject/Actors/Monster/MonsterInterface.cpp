@@ -20,8 +20,6 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "Data/MonsterTableRow.h"
-
 void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 {
 	UAnimInstance* AnimInstance = GetAnimInstance();
@@ -258,6 +256,35 @@ void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 	case EMonsterMontage::THROW_STONE_END:
 		TempAnimMontage = MonsterData->Throw_Stone_End;
 		break;
+	case EMonsterMontage::SEARCH:
+		TempAnimMontage = MonsterData->SearchMontage;
+		break;
+	case EMonsterMontage::APPEAR_START:
+		TempAnimMontage = MonsterData->APPEAR_START;
+		break;
+	case EMonsterMontage::APPEAR_END:
+		TempAnimMontage = MonsterData->APPEAR_END;
+		break;
+	case EMonsterMontage::BARRIER_START:
+		TempAnimMontage = MonsterData->BARRIER_START;
+		break;
+	case EMonsterMontage::BARRIER_END:
+		TempAnimMontage = MonsterData->BARRIER_END;
+		break;
+	case EMonsterMontage::ATTACK_BALL_FIRST_START:
+		TempAnimMontage = MonsterData->ATTACK_BALL_FIRST_START;
+		break;
+	case EMonsterMontage::ATTACK_BALL_FIRST_END:
+		TempAnimMontage = MonsterData->ATTACK_BALL_FIRST_END;
+		break;
+	case EMonsterMontage::ATTACK_BALL_SECOND_START:
+		TempAnimMontage = MonsterData->ATTACK_BALL_SECOND_START;
+		break;
+	case EMonsterMontage::ATTACK_BALL_SECOND_END:
+		TempAnimMontage = MonsterData->ATTACK_BALL_SECOND_END;
+		break;
+
+
 	case EMonsterMontage::END:
 	default:
 		check(false);
@@ -515,6 +542,33 @@ bool IMonsterInterface::IsMontage(EMonsterMontage _InEnum)
 	case EMonsterMontage::THROW_STONE_END:
 		TempAnimMontage = MonsterData->Throw_Stone_End;
 		break;
+	case EMonsterMontage::SEARCH:
+		TempAnimMontage = MonsterData->SearchMontage;
+		break;
+	case EMonsterMontage::APPEAR_START:
+		TempAnimMontage = MonsterData->APPEAR_START;
+		break;
+	case EMonsterMontage::APPEAR_END:
+		TempAnimMontage = MonsterData->APPEAR_END;
+		break;
+	case EMonsterMontage::BARRIER_START:
+		TempAnimMontage = MonsterData->BARRIER_START;
+		break;
+	case EMonsterMontage::BARRIER_END:
+		TempAnimMontage = MonsterData->BARRIER_END;
+		break;
+	case EMonsterMontage::ATTACK_BALL_FIRST_START:
+		TempAnimMontage = MonsterData->ATTACK_BALL_FIRST_START;
+		break;
+	case EMonsterMontage::ATTACK_BALL_FIRST_END:
+		TempAnimMontage = MonsterData->ATTACK_BALL_FIRST_END;
+		break;
+	case EMonsterMontage::ATTACK_BALL_SECOND_START:
+		TempAnimMontage = MonsterData->ATTACK_BALL_SECOND_START;
+		break;
+	case EMonsterMontage::ATTACK_BALL_SECOND_END:
+		TempAnimMontage = MonsterData->ATTACK_BALL_SECOND_END;
+		break;
 	case EMonsterMontage::END:
 		TempAnimMontage = nullptr;
 		break;
@@ -762,6 +816,33 @@ bool IMonsterInterface::IsPlayingMontage(EMonsterMontage _InEnum)
 	case EMonsterMontage::THROW_STONE_END:
 		TempAnimMontage = MonsterData->Throw_Stone_End;
 		break;
+	case EMonsterMontage::SEARCH:
+		TempAnimMontage = MonsterData->SearchMontage;
+		break;
+	case EMonsterMontage::APPEAR_START:
+		TempAnimMontage = MonsterData->APPEAR_START;
+		break;
+	case EMonsterMontage::APPEAR_END:
+		TempAnimMontage = MonsterData->APPEAR_END;
+		break;
+	case EMonsterMontage::BARRIER_START:
+		TempAnimMontage = MonsterData->BARRIER_START;
+		break;
+	case EMonsterMontage::BARRIER_END:
+		TempAnimMontage = MonsterData->BARRIER_END;
+		break;
+	case EMonsterMontage::ATTACK_BALL_FIRST_START:
+		TempAnimMontage = MonsterData->ATTACK_BALL_FIRST_START;
+		break;
+	case EMonsterMontage::ATTACK_BALL_FIRST_END:
+		TempAnimMontage = MonsterData->ATTACK_BALL_FIRST_END;
+		break;
+	case EMonsterMontage::ATTACK_BALL_SECOND_START:
+		TempAnimMontage = MonsterData->ATTACK_BALL_SECOND_START;
+		break;
+	case EMonsterMontage::ATTACK_BALL_SECOND_END:
+		TempAnimMontage = MonsterData->ATTACK_BALL_SECOND_END;
+		break;
 
 
 	case EMonsterMontage::END:
@@ -780,9 +861,23 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 {
 	UMonsterStatusComponent * UMonsterStatusComponent = GetStatusComponent();
 	const float fDamage = UMonsterStatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-	if (fDamage > 0.f)
+	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 	{
-		PlayMontage(EMonsterMontage::DAMAGE);
+		if (fDamage > 0.f)
+		{
+			if (Cast<AActor>(this) == DamageCauser)
+			{
+				FSMComponent->ChangeState(EMonsterState::Stun);
+			}
+			else
+			{
+				FSMComponent->ChangeState(EMonsterState::Damage);
+			}
+		}
+		else
+		{
+			FSMComponent->ChangeState(EMonsterState::Dead);
+		}
 	}
 
 }

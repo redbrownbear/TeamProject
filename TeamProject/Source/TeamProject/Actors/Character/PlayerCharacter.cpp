@@ -13,6 +13,9 @@
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "SubSystem/PlayerManager.h"
+
+
 // Sets default values
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -108,6 +111,22 @@ void APlayerCharacter::BeginPlay()
 
 	GetMesh()->SetCollisionProfileName(TEXT("Player"));
 
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		// Get the current level name
+		FString LevelName = World->GetName();
+		if (LevelName.Equals(TEXT("GameMap")))
+		{
+			UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+
+			FVector LinkLocation = PlayerManager->GetPlayerStatus().PreviousLoction;
+			if (LinkLocation != FVector::Zero())
+			{
+				SetActorLocation(LinkLocation);
+			}
+		}
+	}
 }
 
 // Called every frame
@@ -115,6 +134,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//스테미너 정보
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
+	{
+		PlayerManager->TickStamina(DeltaTime);
+	}
 }
 
 // Called to bind functionality to input

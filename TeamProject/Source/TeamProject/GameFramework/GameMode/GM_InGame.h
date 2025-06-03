@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+
+#include "UI/Loading/LoadingWithPlayerInfo.h"
+
 #include "GM_InGame.generated.h"
 
 /**
@@ -16,5 +19,11 @@ class TEAMPROJECT_API AGM_InGame : public AGameModeBase
 
 public:
 	AGM_InGame();
+
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Loading")
+	TSubclassOf<ULoadingWithPlayerInfo> LoadingWidgetClass;
 
 };

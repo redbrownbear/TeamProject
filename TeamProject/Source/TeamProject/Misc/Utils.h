@@ -13,11 +13,15 @@ namespace CollisionProfileName
     static inline FName ToPlayer = TEXT("ToPlayer");
 	static inline FName Monster = TEXT("Monster");
     static inline FName ToMonster = TEXT("ToMonster");
+    static inline FName ToPlayerMonster = TEXT("ToPlayerMonster");
     static inline FName MapMesh = TEXT("MapMesh");
     static inline FName Item = TEXT("Item");
     static inline FName ToItem = TEXT("ToItem");
     static inline FName NPC = TEXT("NPC");
     static inline FName ToNPC = TEXT("ToNPC");
+    static inline FName Trigger = TEXT("Trigger");
+    static inline FName Floating = TEXT("Floating");
+    static inline FName Water = TEXT("Water");
 }
 
 namespace ProjectileName
@@ -26,21 +30,33 @@ namespace ProjectileName
     static inline FName Monster_PlayerAlert = TEXT("Monster_PlayerAlert");
     static inline FName Monster_CatchItem = TEXT("Monster_CatchItem");
     static inline FName Monster_Arrow = TEXT("Monster_Arrow");
+
     static inline FName Monster_LynelAttack = TEXT("Monster_LynelAttack");
     static inline FName Monster_LynelExplosion = TEXT("Monster_LynelExplosion");
     static inline FName Monster_LynelFire = TEXT("Monster_LynelFire");
     static inline FName Monster_LynelArrow = TEXT("Monster_LynelArrow");
+
     static inline FName Monster_HinoxAttack = TEXT("Monster_HinoxAttack");
     static inline FName Monster_HinoxGrab = TEXT("Monster_HinoxGrab");
     static inline FName Monster_HinoxStone = TEXT("Monster_HinoxStone");
     static inline FName Monster_HinoxLink = TEXT("Monster_HinoxLink");
     static inline FName Monster_HinoxHipDrop = TEXT("Monster_HinoxHipDrop");
+
+    static inline FName Monster_AL_Attack = TEXT("Monster_AL_Attack");
+    static inline FName Monster_AL_AttackBig = TEXT("Monster_AL_AttackBig");
+
+    static inline FName Monster_AB_KogaStone = TEXT("Monster_AB_KogaStone");
+    static inline FName Monster_AB_KogaStoneBig = TEXT("Monster_AB_KogaStoneBig");
+
+    static inline FName Player_Arrow = TEXT("Player_Arrow");
 }
 
 namespace Monster_SocketName
 {
-    static inline FName Weapon_R = TEXT("Weapon_R");
-    static inline FName Weapon_L = TEXT("Weapon_L");
+    //static inline FName Weapon_R = TEXT("Weapon_R");
+    //static inline FName Weapon_L = TEXT("Weapon_L");
+    static inline FName Weapon_Right = TEXT("Weapon_Right");
+    static inline FName Weapon_Left = TEXT("Weapon_Left");
     static inline FName Pod_A = TEXT("Pod_A");
     static inline FName Pod_B = TEXT("Pod_B");
     static inline FName Pod_C = TEXT("Pod_C");
@@ -119,6 +135,10 @@ enum class EMonsterState : uint8
     Stun,
     ReadyToAttack,
     Damage_Eye,
+    Happy,
+    Barrier,
+    Stone,
+    Damage,
     Temp,
     End,
 };
@@ -202,6 +222,14 @@ enum class EMonsterMontage : uint8
 	THROW_STONE_START,
 	THROW_STONE_END,
 
+    APPEAR_START,
+    APPEAR_END,
+    BARRIER_START,
+    BARRIER_END,
+    ATTACK_BALL_FIRST_START,
+    ATTACK_BALL_FIRST_END,
+    ATTACK_BALL_SECOND_START,
+    ATTACK_BALL_SECOND_END,
 
 
     END,
@@ -231,6 +259,22 @@ enum class EHinoxCombatIndex : uint8
     End
 };
 
+UENUM()
+enum class EAssasinBossPhase : uint8
+{
+    PHASE_1 = 0,
+    PHASE_2,
+    PHASE_3,
+    END,
+};
+
+UENUM()
+enum class EAssasinBossCombat : uint8
+{
+    BARRIER = 0,
+    STONE,
+    END,
+};
 
 UENUM()
 enum class EReadyToAttackStep : uint8
@@ -266,6 +310,15 @@ enum class EWeaponKind : uint8
 };
 
 UENUM()
+enum class EKogaStoneKind : uint8
+{
+    FIRST = 0,
+    SECOND,
+    THIRD,
+    END
+};
+
+UENUM()
 enum class EArmorKind : uint8
 {
     None = 0,
@@ -274,8 +327,6 @@ enum class EArmorKind : uint8
     LEG,
     END,
 };
-
-
 
 inline void InstantRotateActorToDirection(AActor* TargetActor, const FVector& TargetLocation)
 {

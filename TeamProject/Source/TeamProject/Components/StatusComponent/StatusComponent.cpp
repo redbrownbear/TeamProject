@@ -40,8 +40,14 @@ float UStatusComponent::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 	{
 		bDie = true;
 		OnDie.Broadcast();
+		NewDamage = 0.f;
 	}
 
 	return NewDamage;
 }
 
+void UStatusComponent::SetMaxHP(float inHP)
+{
+	MaxHP = inHP;
+	HP = inHP;
+}

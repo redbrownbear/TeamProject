@@ -48,15 +48,13 @@ void AMonsterAIController::BeginPlay()
 		if (APawnMonster* Monster = Cast<APawnMonster>(TempPawn))
 		{
 			MonsterFSMComponent->SetPawnMonster(Monster);
-			MonsterFSMComponent->SetPatrolPath(Monster->GetPatrolPath());
 			MonsterFSMComponent->SetCampFire(Monster->GetCampFire());
+			MonsterFSMComponent->SetPatrolPath(Monster->GetPatrolPath());
 		}
 		else if (ACharacterMonster* CharacterMonster = Cast<ACharacterMonster>(TempPawn))
 		{
-			if (ULynelFSMComponent* LynelFSMComponent = Cast<ULynelFSMComponent>(CharacterMonster->GetFSMComponent()))
-			{
-				LynelFSMComponent->SetCharacterMonster(CharacterMonster);
-			}
+			MonsterFSMComponent->SetCharacterMonster(CharacterMonster);
+			MonsterFSMComponent->SetPatrolPath(CharacterMonster->GetPatrolPath());
 		}
 
 		MonsterFSMComponent->SetPlayer(nullptr);
@@ -68,30 +66,30 @@ void AMonsterAIController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AMonsterAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
-{
-	APlayerCharacter* Player = nullptr;
-
-	for (AActor* SeenActor : UpdatedActors)
-	{
-		if (APlayerCharacter* DetectedPlayer = Cast<APlayerCharacter>(SeenActor))
-		{
-			Player = DetectedPlayer;
-			break; // 플레이어 감지
-		}
-	}
-
-	if (Player)
-	{
-		MonsterFSMComponent->SetPlayer(Player);
-		UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Valid"));
-	}
-	else
-	{
-		MonsterFSMComponent->SetPlayer(nullptr);
-		UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Null"));
-	}
-}
+//void AMonsterAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
+//{
+//	APlayerCharacter* Player = nullptr;
+//
+//	for (AActor* SeenActor : UpdatedActors)
+//	{
+//		if (APlayerCharacter* DetectedPlayer = Cast<APlayerCharacter>(SeenActor))
+//		{
+//			Player = DetectedPlayer;
+//			break; // 플레이어 감지
+//		}
+//	}
+//
+//	if (Player)
+//	{
+//		MonsterFSMComponent->SetPlayer(Player);
+//		UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Valid"));
+//	}
+//	else
+//	{
+//		MonsterFSMComponent->SetPlayer(nullptr);
+//		UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Null"));
+//	}
+//}
 
 void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
@@ -121,12 +119,7 @@ void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus 
 		}
 
 	}
-	//else
-	//{
-	//	// 감지 해제됨
-	//	MonsterFSMComponent->SetPlayer(nullptr);
-	//	UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Null"));
-	//}
+
 }
 void AMonsterAIController::SetAIEnabled(bool bEnabled)
 {

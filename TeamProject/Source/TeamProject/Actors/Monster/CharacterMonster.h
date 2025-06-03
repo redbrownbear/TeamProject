@@ -17,6 +17,7 @@ class UMonsterFSMComponent;
 class USphereComponent;
 class APatrolPath;
 class ACampFire;
+class UDefaultCameraShakeBase;
 
 struct FMonsterTableRow;
 
@@ -36,8 +37,10 @@ protected:
     TObjectPtr<APatrolPath> PatrolPath;
     UPROPERTY(EditAnywhere)
     TObjectPtr<ACampFire> CampFire;
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(VisibleAnywhere)
     TArray<USphereComponent*> AdditionalColliders;
+    UPROPERTY(VisibleAnywhere)
+    TObjectPtr<UDefaultCameraShakeBase> DefaultCameraShakeBase;
 
 protected:
     UPROPERTY(EditAnywhere, meta = (RowType = "MonsterTableRow"))
@@ -97,4 +100,7 @@ protected:
 public:
     void SetThrownObject(AActor * InThrownObject) { ThrownObject = InThrownObject; }
     void DeleteThrownObject() { if (ThrownObject) ThrownObject->Destroy(); }
+
+public:
+	UDefaultCameraShakeBase* GetDefaultCameraShakeBase() const { return DefaultCameraShakeBase; }
 };

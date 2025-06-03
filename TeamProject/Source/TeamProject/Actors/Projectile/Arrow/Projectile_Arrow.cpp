@@ -6,13 +6,12 @@
 #include "Components/ShapeComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Misc/Utils.h"
-#include "Projectile_Arrow.h"
 
 
 AProjectile_Arrow::AProjectile_Arrow()
 {
 	
-	ProjectileMovementComponent->ProjectileGravityScale = 0.3f;
+	ProjectileMovementComponent->ProjectileGravityScale = 0.1f;
 	ProjectileMovementComponent->InitialSpeed = Arrow_Speed;
 	ProjectileMovementComponent->MaxSpeed = Arrow_Speed;
 	ProjectileMovementComponent->bShouldBounce = false;
@@ -25,8 +24,10 @@ AProjectile_Arrow::AProjectile_Arrow()
 	}
 
 	CollisionComponent->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
-	CollisionComponent->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel5);
-	
+	//CollisionComponent->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel5);
+	CollisionComponent->SetCollisionProfileName(CollisionProfileName::ToMonster);
+
+	GetProjectileName();
 
 }
 
@@ -45,7 +46,7 @@ void AProjectile_Arrow::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 {
 	Super::OnBeginOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
-
+	Destroy();
 }
 
 void AProjectile_Arrow::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -63,6 +64,11 @@ void AProjectile_Arrow::Tick(float DeltaTime)
 		FRotator NewRotation = Velocity.Rotation();
 		StaticMeshComponent->SetWorldRotation(NewRotation);
 	}
+}
+
+FName AProjectile_Arrow::GetProjectileName()
+{
+	return ProjectileName::Player_Arrow;
 }
 
 

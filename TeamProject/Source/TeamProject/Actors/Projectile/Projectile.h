@@ -52,7 +52,7 @@ protected:
 
 public:
 	FVector GetVelocity();
-	FName GetProjectileName();
-
+	virtual FName GetProjectileName();
+	float GetDamage();
 
 };

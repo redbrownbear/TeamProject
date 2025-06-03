@@ -15,6 +15,8 @@
 #include "Components/FSMComponent/Monster/HinoxFSMComponent.h"
 #include "Components/CapsuleComponent.h"
 
+#include "Shakes/DefaultCameraShakeBase.h"
+
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
@@ -23,6 +25,9 @@
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+
+#include "Engine/DamageEvents.h"
+
 
 // Sets default values
 ACharacterMonster::ACharacterMonster()
@@ -113,7 +118,6 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		CapsuleComp->SetCollisionProfileName(CollisionProfileName::Monster);
 		CapsuleComp->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
 		CapsuleComp->SetCapsuleHalfHeight(MonsterData->CollisionSphereRadius);
-		// CapsuleComp->RegisterComponent(); // 이미 등록된 컴포넌트이므로 호출하면 안 됩니다.
 	}
 
 	// 스켈레탈 메쉬 컴포넌트 설정 (이미 ACharacter에 의해 생성되고 등록된 상태)
@@ -140,6 +144,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
 	}
 
+	StatusComponent->SetMaxHP(MonsterData->MaxHP);
 
 	if (!(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
 	{
@@ -148,13 +153,19 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 			AWorldWeapon* MeleeWeapon = World->SpawnActorDeferred<AWorldWeapon>(AWorldWeapon::StaticClass(),
 				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 			MeleeWeapon->SetDataWithHandle(MonsterData->MeleeWeaponTableRowHandle);
-			const FVector Scale = MeleeWeapon->GetActorScale3D() * 2.f;
-			MeleeWeapon->SetActorScale3D(Scale);
-			MeleeWeapon->AttachToMonster(this, Monster_SocketName::Pod_Melee);
-			MeleeWeapon->FinishSpawning(FTransform::Identity);
-
 			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 			{
+				FVector Scale = MeleeWeapon->GetActorScale3D();
+
+				if (ULynelFSMComponent* LynelFSMComponent = Cast<ULynelFSMComponent>(FSMComponent))
+				{
+					Scale *= 2.f;
+				}
+
+				MeleeWeapon->SetActorScale3D(Scale);
+				MeleeWeapon->AttachToMonster(this, Monster_SocketName::Pod_Melee);
+				MeleeWeapon->FinishSpawning(FTransform::Identity);
+
 				FSMComponent->SetMeleeWeapon(MeleeWeapon);
 				FSMComponent->SheathMeleeWeapon();
 			}
@@ -307,6 +318,11 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 			}
 		}
 	}
+
+	if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+	{
+		DefaultCameraShakeBase = NewObject<UDefaultCameraShakeBase>(this, UDefaultCameraShakeBase::StaticClass(), TEXT("DefaultCameraShakeBase"));
+	}
 }
 void ACharacterMonster::PostDuplicate(EDuplicateMode::Type DuplicateMode)
 {
@@ -367,6 +383,38 @@ void ACharacterMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 				else
 				{
 					check(false);
+				}
+			}
+		}
+		else if (ProjectileName::Player_Arrow == Projectile->GetProjectileName())
+		{
+			// float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser
+			FDamageEvent DamageEvent;
+
+			if (UWorld* World = GetWorld())
+			{
+				if (AController* PlayerController = World->GetFirstPlayerController())
+				{
+					if (AActor* Player = PlayerController->GetPawn())
+					{
+						IMonsterInterface::TakeDamage(Projectile->GetDamage(), DamageEvent, PlayerController, Player);
+					}
+				}
+			}
+		}
+		else if (ProjectileName::Monster_AB_KogaStone == Projectile->GetProjectileName()
+			|| ProjectileName::Monster_AB_KogaStoneBig == Projectile->GetProjectileName()
+			)		
+		{
+			FDamageEvent DamageEvent;
+			if (UWorld* World = GetWorld())
+			{
+				if (AController* PlayerController = World->GetFirstPlayerController())
+				{
+					if (AActor* Player = Controller->GetPawn())
+					{
+						IMonsterInterface::TakeDamage(Projectile->GetDamage(), DamageEvent, GetController(), this);
+					}
 				}
 			}
 		}

@@ -9,17 +9,13 @@ class UTimelineComponent;
 UCLASS()
 class TEAMPROJECT_API AIcePreview : public AActor
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
     AIcePreview();
 
-    void StartPreview();
-    void StopPreview();
-
 public:
     UMaterialInstanceDynamic* GetMaterialInstance() { return DynamicMaterialInstance; }
-    void SetMaterialInstance(UMaterialInstanceDynamic* InMaterialInstance) { DynamicMaterialInstance = InMaterialInstance; }
 
 protected:
     virtual void BeginPlay() override;
@@ -29,17 +25,27 @@ protected:
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
-private:
-    float RiseSpeed = 3.f;            // 1ÃÊ¿¡ ¿Ã¶ó°¥ ¼Óµµ (cm/sec)
-    float RiseDistance = 250.f;         // ÃÑ ¿Ã¶ó°¥ °Å¸®
+protected:
+    UPROPERTY(EditAnywhere, Category = "Cryonis")
+    float MaxSpeed = 300.f;            // 1ï¿½Ê¿ï¿½ ï¿½Ã¶ï¿½ ï¿½Óµï¿½ (cm/sec)
 
-    FVector StartLocation;
-    FVector TargetLocation;
-    float CurrentRise = 0.f;
-    bool bIsRising = false;
-    
+    UPROPERTY(EditAnywhere, Category = "Cryonis")
+    float MaxHeight = 300.0f;         // ï¿½ï¿½ ï¿½Ã¶ï¿½ ï¿½Å¸ï¿½
+
 protected:
     UMaterialInterface* MaterialInterface;
     UMaterialInstanceDynamic* DynamicMaterialInstance;
 
+private:
+    FVector StartLocation;
+    float CurrentRise = 0.f;
+    bool bIsRising = false;
+    bool bCanSpawn = false;
+
+    FVector RiseDirection;
+    FVector PivotLocation;
+public:
+    void SetRiseDirection(FVector InDirection);
+    void SetPivotLocation(FVector InPosition);
+    void SetCanSpawn(bool bFlag) { bCanSpawn = bFlag; }
 };

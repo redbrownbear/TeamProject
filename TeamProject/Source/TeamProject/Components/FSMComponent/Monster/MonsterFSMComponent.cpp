@@ -60,6 +60,18 @@ void UMonsterFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	HandleState(DeltaTime);
 }
 
+void UMonsterFSMComponent::OnHitReceived(bool bIsDead)
+{
+	if (bIsDead)
+	{
+		ChangeState(EMonsterState::Dead);
+	}
+	else
+	{
+		ChangeState(EMonsterState::Damage);
+	}
+}
+
 void UMonsterFSMComponent::SheathMeleeWeapon()
 {
 	CurrentWeapon = nullptr;
@@ -101,11 +113,11 @@ void UMonsterFSMComponent::DrawMeleeWeapon()
 	CurrentWeapon = MeleeWeapon;
 	if (CharacterMonster)
 	{
-		MeleeWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Weapon_R);
+		MeleeWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Weapon_Right);
 	}
 	else if (PawnMonster)
 	{
-		MeleeWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Weapon_R);
+		MeleeWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Weapon_Right);
 	}
 	else
 	{
@@ -120,11 +132,11 @@ void UMonsterFSMComponent::DrawBowWeapon()
 
 	if (CharacterMonster)
 	{
-		BowWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Weapon_R);
+		BowWeapon->AttachToMonster(CharacterMonster, Monster_SocketName::Weapon_Right);
 	}
 	else if (PawnMonster)
 	{
-		BowWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Weapon_R);
+		BowWeapon->AttachToMonster(PawnMonster, Monster_SocketName::Weapon_Right);
 	}
 	else
 	{
@@ -260,6 +272,8 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::AimingBow:
 		break;
+	case EMonsterState::Damage:
+		break;
 	case EMonsterState::End:
 		break;
 	default:
@@ -333,8 +347,25 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 	}
 		break;
 	case EMonsterState::Dead:
+		if (PawnMonster)
+		{
+			PawnMonster->PlayMontage(EMonsterMontage::DEAD);
+		}
+		else if (CharacterMonster)
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::DEAD);
+		}
 		break;
-
+	case EMonsterState::Damage:
+		if (PawnMonster)
+		{
+			PawnMonster->PlayMontage(EMonsterMontage::DAMAGE);
+		}
+		else if (CharacterMonster)
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::DAMAGE);
+		}
+		break;
 	default:
 		break;
 	}
@@ -539,8 +570,6 @@ void UMonsterFSMComponent::UpdateSuspicious(float DeltaTime)
 		}
 		else
 		{
-
-
 			SuspicionGauge += DeltaTime;
 		}
 
@@ -808,6 +837,29 @@ void UMonsterFSMComponent::UpdateAimingBow(float DeltaTime)
 void UMonsterFSMComponent::UpdateDying(float DeltaTime)
 {
 	this->StopMove();
+
+	if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DEAD))
+	{
+		CharacterMonster->Destroy();
+	}
+	else if (PawnMonster && !PawnMonster->IsPlayingMontage(EMonsterMontage::DEAD))
+	{
+		PawnMonster->Destroy();
+	}
+}
+
+void UMonsterFSMComponent::UpdateDamage(float DeltaTime)
+{
+	this->StopMove();
+
+	if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
+	{
+		ChangeState(EMonsterState::Combat);
+	}
+	else if (PawnMonster && !PawnMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
+	{
+		ChangeState(EMonsterState::Combat);
+	}
 }
 
 void UMonsterFSMComponent::MoveToLocation(const FVector& InLocation)

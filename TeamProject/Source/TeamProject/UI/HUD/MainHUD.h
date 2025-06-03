@@ -25,6 +25,13 @@ public:
     void ShowInteractWidget(bool bIsShow);
     void ShowInteractName(bool bIsShow, FString Name);
 
+    void ShowBowAimgUI(bool bIsShow, int32 Count);
+    void ShowAbilityAimUI(bool bIsShow);
+
+    void ShowBossHpUI(bool bIsShow, float Hp, float MaxHp, FString Name);
+
+    void UpdateHp();
+
 protected:
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<UMainHUDWidget> MainWidgetClass;

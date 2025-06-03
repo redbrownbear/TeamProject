@@ -14,7 +14,7 @@
 // Sets default values
 AIcePillar::AIcePillar()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
@@ -41,7 +41,6 @@ void AIcePillar::BeginPlay()
 	SetActorLocation(StartLocation - FVector(0, 0, MaxHeight));
 	CurrentRise = 0.f;
 	bIsRising = true;
-
 }
 
 // Called every frame
@@ -51,16 +50,21 @@ void AIcePillar::Tick(float DeltaTime)
 
 	if (!bIsRising) return;
 
-	float DeltaZ = MaxSpeed * DeltaTime;
-	CurrentRise += DeltaZ;
+	const FVector CurrentLocation = GetActorLocation();
 
-	if (CurrentRise >= MaxHeight)
+	// Stop
+
+	const float fDistance = FVector::Dist(CurrentLocation, PivotLocation);
+
+	if (fDistance < MaxHeight)
 	{
-		DeltaZ -= (CurrentRise - MaxHeight); // 초과 제거
+		FVector NextLocation = CurrentLocation + RiseDirection * MaxSpeed * DeltaTime;
+		SetActorLocation(NextLocation);
+	}
+	else
+	{
 		bIsRising = false;
 	}
-
-	AddActorWorldOffset(FVector(0, 0, DeltaZ));
 }
 
 void AIcePillar::DestroyPillar()
@@ -73,5 +77,18 @@ void AIcePillar::DestroyPillar()
 	}*/
 
 	Destroy();
+}
+
+void AIcePillar::SetRiseDirection(FVector InDirection)
+{
+	RiseDirection = InDirection;
+}
+
+void AIcePillar::SetPivotLocation(FVector InPosition)
+{
+	PivotLocation = InPosition;
+	const FVector ReverseDirection = RiseDirection * -1;
+	PivotLocation += ReverseDirection * MaxHeight;
+	SetActorLocation(PivotLocation);
 }
 
