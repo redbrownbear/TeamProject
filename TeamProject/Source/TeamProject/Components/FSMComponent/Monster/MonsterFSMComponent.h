@@ -55,6 +55,9 @@ public:
 	const AWorldWeapon* GetCurrentWeapon() const { return CurrentWeapon; }
 
 protected:
+	void DropWeapons();
+
+protected:
 	UPROPERTY()
 	TObjectPtr<ACharacterMonster> CharacterMonster = nullptr;
 	UPROPERTY()

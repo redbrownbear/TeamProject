@@ -165,6 +165,18 @@ void UMonsterFSMComponent::DrawBowWeapon()
 	}
 }
 
+void UMonsterFSMComponent::DropWeapons()
+{
+	if (MeleeWeapon)
+	{
+		MeleeWeapon->DetachFromMonster();
+	}
+	if (BowWeapon)
+	{ 
+		BowWeapon->DetachFromMonster();
+	}
+}
+
 void UMonsterFSMComponent::SetMonsterGroupType(EMonsterGroupType NewGroupType)
 {
 	eGroupType = NewGroupType;
@@ -858,10 +870,26 @@ void UMonsterFSMComponent::UpdateDying(float DeltaTime)
 
 	if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DEAD))
 	{
+		if (MeleeWeapon)
+		{
+			MeleeWeapon->DetachFromMonster();
+		}
+		if (BowWeapon)
+		{
+			BowWeapon->DetachFromMonster();
+		}
 		CharacterMonster->Destroy();
 	}
 	else if (PawnMonster && !PawnMonster->IsPlayingMontage(EMonsterMontage::DEAD))
 	{
+		if (MeleeWeapon)
+		{
+			MeleeWeapon->DetachFromMonster();
+		}
+		if (BowWeapon)
+		{
+			BowWeapon->DetachFromMonster();
+		}
 		PawnMonster->Destroy();
 	}
 }

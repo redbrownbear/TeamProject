@@ -63,7 +63,7 @@ void ULynelFSMComponent::HandleState(float DeltaTime)
 		UpdateSignal(DeltaTime);
 		break;
 	case EMonsterState::Dead:
-		UpdateDead(DeltaTime);
+		UpdateDying(DeltaTime);
 		break;
 	case EMonsterState::AimingBowUpper:
 		UpdateAimingBowUpper(DeltaTime);
@@ -230,6 +230,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		return;
 		break;
 	case EMonsterState::Dead:
+		CharacterMonster->PlayMontage(EMonsterMontage::DEAD);
 		break;
 	case EMonsterState::Fire:
 		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::ChangeState // Unexpected MonsterState"));
@@ -596,6 +597,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 	{
 	case EMonsterState::Idle:
 	case EMonsterState::Suspicious:
+	case EMonsterState::Dead:
 		if (UWorld* World = CharacterMonster->GetWorld())
 		{
 			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
@@ -612,7 +614,6 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::Alert:
 	case EMonsterState::Combat:
-	case EMonsterState::Dead:
 	case EMonsterState::Fire:
 	case EMonsterState::Signal:
 	case EMonsterState::AimingBow:
@@ -975,11 +976,6 @@ void ULynelFSMComponent::UpdateRunningAttack(float DeltaTime)
 			return;
 		}
 	}
-}
-
-void ULynelFSMComponent::UpdateDead(float DeltaTime)
-{
-	// Pattern will be handled in AnimNotify
 }
 
 void ULynelFSMComponent::UpdateRebound(float DeltaTime)
