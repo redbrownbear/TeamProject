@@ -66,8 +66,7 @@ void ABarrier::Tick(float DeltaTime)
 
 void ABarrier::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    AActor* OwnerActor = OverlappedComponent->GetOwner();
-    if (AProjectile* Projectile = Cast<AProjectile>(OwnerActor))
+    if (AProjectile* Projectile = Cast<AProjectile>(OtherActor))
     {
         Projectile->Destroy();
     }

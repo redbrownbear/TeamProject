@@ -37,6 +37,10 @@ public: // FSM
 	UPROPERTY(EditAnywhere, Category = "Monster|FSM")
 	EMonsterGroupType eMonsterGroupType = EMonsterGroupType::TreasureBox;
 
+public:
+	UPROPERTY(EditAnywhere, Category = "Monster|Status")
+	float MaxHP = 10.f;
+
 
 public: // Animation
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
@@ -208,6 +212,7 @@ public: // Animation
 	UAnimMontage* ATTACK_BALL_SECOND_START = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Monster|Animation")
 	UAnimMontage* ATTACK_BALL_SECOND_END = nullptr;
+
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Monster|AI")

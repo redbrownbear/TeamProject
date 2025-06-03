@@ -73,7 +73,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 		UCapsuleComponent* CC = GetCapsuleComponent();
 		CC->SetCapsuleRadius(PLAYER_CAPSULE_RADIUS);
 		CC->SetCapsuleHalfHeight(PLAYER_CAPSULE_HALF_HEIGHT);
-
+		
 	}
 
 	{
@@ -111,6 +111,22 @@ void APlayerCharacter::BeginPlay()
 
 	GetMesh()->SetCollisionProfileName(TEXT("Player"));
 
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		// Get the current level name
+		FString LevelName = World->GetName();
+		if (LevelName.Equals(TEXT("GameMap")))
+		{
+			UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+
+			FVector LinkLocation = PlayerManager->GetPlayerStatus().PreviousLoction;
+			if (LinkLocation != FVector::Zero())
+			{
+				SetActorLocation(LinkLocation);
+			}
+		}
+	}
 }
 
 // Called every frame
@@ -140,18 +156,32 @@ void APlayerCharacter::OnConstruction(const FTransform& Transform)
 
 }
 
+void APlayerCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(GetCharacterMovement());
+	Movement->SetGlideMode(false);
+	GetMesh()->GetAnimInstance()->Montage_Play(Movement->GetGlideUnEquipMontage());
+	
+
+}
+
 void APlayerCharacter::TimelineProgress(float Value)
 {
 
 	float Length = FMath::Lerp(300.f, 150.f, Value);
 
 	FVector SpringArmLocation = FVector::Zero();
-	float Z = FMath::Lerp(30.f, 40.f, Value);
+	float Z = FMath::Lerp(30.f, 50.f, Value);
 	
 	SpringArmLocation.Z = Z;
 	SpringArm->SetRelativeLocation(SpringArmLocation);
 	SpringArm->TargetArmLength = Length;
 }
+
+
+
 
 
 

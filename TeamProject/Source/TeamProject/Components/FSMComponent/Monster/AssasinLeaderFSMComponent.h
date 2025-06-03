@@ -36,4 +36,5 @@ protected:
 protected:
 	float AttackCoolTime = 0.f;
 	float AttackBigCoolTime = 0.f;
+	bool bUp = true;
 };

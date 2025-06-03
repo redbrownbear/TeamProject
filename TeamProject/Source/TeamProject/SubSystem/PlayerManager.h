@@ -33,12 +33,12 @@ struct sPlayerStatus
 	FTransform PlayerTransform;
 	FName LevelName;
 
-	FVector PreviousLoction;
+	FVector PreviousLoction = FVector::Zero();
 
 	float StaminaRegenSpeed;
 
 	bool bIsUseStamina;
-	//Ãß°¡ÇÒ°Í ÇÏ½Ê¼õ~
+	//ï¿½ß°ï¿½ï¿½Ò°ï¿½ ï¿½Ï½Ê¼ï¿½~
 };
 
 /**
@@ -52,15 +52,15 @@ class TEAMPROJECT_API UPlayerManager : public UGameInstanceSubsystem
 private:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-	//QuestÀü¿ë
+	//Questï¿½ï¿½ï¿½ï¿½
 public:
 	void SetQuestData(FQuestDataRow QuestRow);
 	void ShowQuestUI();
 	const TArray<FQuestDataRow>& GetAllQuestData() const { return QuestList; }
 private:
-	//QuestÀü¿ë
+	//Questï¿½ï¿½ï¿½ï¿½
 
-	//ItemÀü¿ë
+	//Itemï¿½ï¿½ï¿½ï¿½
 public:
 	void SetInvenData(FItemData ItemRow);
 	void ShowInvenUI();
@@ -78,8 +78,11 @@ private:
 	void UpDateInvenEquipUI(const TArray<FItemData>& ItemMap);
 
 	//ItemÀü¿ë
+=======
+	void UpDateInvenUI(const TArray<FItemData>& QuestList);
+	//Itemï¿½ï¿½ï¿½ï¿½
 
-	//StatusÀü¿ë
+	//Statusï¿½ï¿½ï¿½ï¿½
 public:
 	void InitStatus();
 
@@ -104,7 +107,7 @@ public:
 	void SetStaminaUSe(bool bIsUse) { PlayerStatus.bIsUseStamina = bIsUse; }
 	bool IsStaminaUse() const { return PlayerStatus.bIsUseStamina; }
 	bool IsStaminaFull() const { return PlayerStatus.Stamina >= PlayerStatus.MaxStamina;}
-	//StatusÀü¿ë
+	//Statusï¿½ï¿½ï¿½ï¿½
 
 public:
 	UPROPERTY(BlueprintAssignable)

@@ -20,8 +20,6 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "Data/MonsterTableRow.h"
-
 void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 {
 	UAnimInstance* AnimInstance = GetAnimInstance();
@@ -863,9 +861,23 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 {
 	UMonsterStatusComponent * UMonsterStatusComponent = GetStatusComponent();
 	const float fDamage = UMonsterStatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-	if (fDamage > 0.f)
+	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 	{
-		PlayMontage(EMonsterMontage::DAMAGE);
+		if (fDamage > 0.f)
+		{
+			if (Cast<AActor>(this) == DamageCauser)
+			{
+				FSMComponent->ChangeState(EMonsterState::Stun);
+			}
+			else
+			{
+				FSMComponent->ChangeState(EMonsterState::Damage);
+			}
+		}
+		else
+		{
+			FSMComponent->ChangeState(EMonsterState::Dead);
+		}
 	}
 
 }

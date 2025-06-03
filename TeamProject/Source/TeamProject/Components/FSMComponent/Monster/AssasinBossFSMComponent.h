@@ -29,6 +29,7 @@ protected:
 	virtual void UpdateStun(float DeltaTime);
 	virtual void UpdateBarrier(float DeltaTime);
 	virtual void UpdateStone(float DeltaTime);
+	virtual void UpdateDamage(float DeltaTime);
 
 protected:
 	EAssasinBossPhase ePhase = EAssasinBossPhase::PHASE_1;
@@ -49,5 +50,6 @@ protected:
 	float BarrierElapsedTime = 0.f;
 	float StoneElapsedTime = 0.f;
 	float StunElapsedTime = 0.f;
+	float DamageElapsedTime = 0.f;
 
 };
