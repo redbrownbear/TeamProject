@@ -33,11 +33,6 @@ void ABallBox::BeginPlay()
 	StaticMeshComponent->SetCollisionObjectType(ECC_WorldStatic);
 	StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
 
-	/*if (CollisionComponent)
-	{
-		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ABallBox::OnBeginOverlapWithBall);
-	}*/
-
 	GetWorldTimerManager().SetTimer(
 		SpawnDelayTimer,
 		this,
@@ -64,19 +59,4 @@ void ABallBox::CheckAndSpawnTempleActor()
 	}
 
 }
-
-//void ABallBox::Tick(float DeltaSeconds)
-//{
-//	if (!bHasSpawnedOnce) return;
-//
-//}
-//
-//void ABallBox::OnBeginOverlapWithBall(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-//{
-//	ATempleActor* TempleBall = Cast<ATempleActor>(OtherActor);
-//	if (TempleBall)
-//	{
-//		bHasSpawnedOnce = false;
-//	}
-//}
 

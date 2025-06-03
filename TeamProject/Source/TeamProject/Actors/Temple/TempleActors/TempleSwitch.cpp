@@ -2,7 +2,6 @@
 #include "Components/SphereComponent.h"
 #include "TempleActor.h"
 #include "LockedGate.h"
-#include "TempleActorSpawner.h"
 
 #include "Data/TempleActorTableRow.h"
 
@@ -53,6 +52,8 @@ void ATempleSwitch::UnlockGate()
 
 void ATempleSwitch::OnBeginOverlapWithBall(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {	
+	if (bIsOpenedGate) return;
+
 	ATempleActor* OverlappedTempleActor = Cast<ATempleActor>(OtherActor);
 	if (!OverlappedTempleActor) return;
 

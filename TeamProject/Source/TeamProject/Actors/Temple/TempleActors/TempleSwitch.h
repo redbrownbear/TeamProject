@@ -49,12 +49,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Temple")
 	TObjectPtr<ALockedGate> LockedGate;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Temple")
-	TObjectPtr<ATempleActorSpawner> TempleActorSpawner;
-
 private:
-	FTimerHandle SpawnDelayTimer;
-
 	bool bHasSpawnedOnce = false;
 	bool bIsOpenedGate = false;
 };

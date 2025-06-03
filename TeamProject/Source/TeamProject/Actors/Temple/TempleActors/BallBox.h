@@ -26,13 +26,6 @@ protected:
 
 	void CheckAndSpawnTempleActor();
 
-public:
-	//virtual void Tick(float DeltaSeconds) override;:
-	/*UFUNCTION()
-	void OnBeginOverlapWithBall(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-		const FHitResult& SweepResult);*/
-
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> CollisionComponent;
