@@ -45,7 +45,7 @@ protected:
 	UPROPERTY(EditAnywhere, meta = (RowType = "ProjectileTableRow"))
 	FDataTableRowHandle DataTableRowHandle;
 	const UDataTable* ProjectileDataTable;
-	const FProjectileTableRow* ProjectileTableRow;
+	TObjectPtr<FProjectileTableRow> ProjectileTableRow;
 
 protected:
 	ECollisionChannel CollisionChannel;

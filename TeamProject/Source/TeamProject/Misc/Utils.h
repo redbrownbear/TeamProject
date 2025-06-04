@@ -51,6 +51,15 @@ namespace ProjectileName
     static inline FName Player_Arrow = TEXT("Player_Arrow");
 }
 
+namespace ParticleEffectName
+{
+    static inline FName MonsterDeath = TEXT("MonsterDeath");
+    static inline FName UnopenedBox = TEXT("UnopenedBox");
+    static inline FName Hinox_AttackShockWave = TEXT("Hinox_AttackShockWave");
+    static inline FName Hinox_HipdropShockWave = TEXT("Hinox_HipdropShockWave");
+}
+
+
 namespace Monster_SocketName
 {
     //static inline FName Weapon_R = TEXT("Weapon_R");

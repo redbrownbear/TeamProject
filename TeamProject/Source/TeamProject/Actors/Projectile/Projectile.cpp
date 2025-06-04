@@ -18,6 +18,7 @@
 #include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Monster/PawnMonster.h"
 #include "Actors/Item/WorldWeapon.h"
+#include "Actors/Effect/ParticleEffect.h"
 
 
 // Sets default values
@@ -110,8 +111,23 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
-		|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig)
+		|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig
+		|| DataTableRowHandle.RowName == ProjectileName::Monster_HinoxStone
+		)
 	{
+		if (UWorld* World = GetWorld())
+		{
+			AParticleEffect* ParticleEffect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+			FTransform NewTransform;
+			ParticleEffect->SetData(ParticleEffectName::Hinox_AttackShockWave);
+
+			const FVector Location = GetActorLocation();
+			NewTransform.SetLocation(Location);
+
+			ParticleEffect->FinishSpawning(NewTransform);
+		}
 		Destroy();
 	}
 }
@@ -121,7 +137,7 @@ void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	ProjectileMovementComponent->Velocity = GetActorForwardVector() * ProjectileMovementComponent->MaxSpeed;
+	//ProjectileMovementComponent->Velocity = GetActorForwardVector() * ProjectileMovementComponent->MaxSpeed;
 }
 
 FVector AProjectile::GetVelocity()

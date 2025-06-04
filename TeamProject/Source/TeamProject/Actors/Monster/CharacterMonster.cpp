@@ -57,21 +57,6 @@ void ACharacterMonster::BeginPlay()
 	{
 		FSMComponent->SetCharacterMonster(this);
 		FSMComponent->BindHitEvent();
-		//if (ULynelFSMComponent* LynelFSMComponent = Cast<ULynelFSMComponent>(FSMComponent))
-		//{
-		//	LynelFSMComponent->SetCharacterMonster(this);
-		//	LynelFSMComponent->BindHitEvent();
-		//}
-		//else if (UHinoxFSMComponent* HinoxFSMComponent = Cast<UHinoxFSMComponent>(FSMComponent))
-		//{
-		//	HinoxFSMComponent->SetCharacterMonster(this);
-		//	HinoxFSMComponent->BindHitEvent();
-		//}
-		//else if (UHinoxFSMComponent* HinoxFSMComponent = Cast<UHinoxFSMComponent>(FSMComponent))
-		//{
-		//	HinoxFSMComponent->SetCharacterMonster(this);
-		//	HinoxFSMComponent->BindHitEvent();
-		//}
 	}
 	SetData(DataTableRowHandle);
 
@@ -502,6 +487,7 @@ void ACharacterMonster::SetSpeedRun()
 void ACharacterMonster::OnDie()
 {
 	IMonsterInterface::OnDie();
+	OnDeadEnd();
 }
 
 void ACharacterMonster::OnDeadEnd()
