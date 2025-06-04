@@ -3,6 +3,8 @@
 
 #include "Actors/Projectile/Projectile.h"
 #include "Data/ProjectileTableRow.h"
+#include "Data/NiagaraEffectTableRow.h"
+#include "Data/ParticleEffectTableRow.h"
 
 #include "Misc/Utils.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -19,6 +21,12 @@
 #include "Actors/Monster/PawnMonster.h"
 #include "Actors/Item/WorldWeapon.h"
 #include "Actors/Effect/ParticleEffect.h"
+#include "Actors/Effect/NiagaraEffect.h"
+
+#include "Particles/ParticleSystemComponent.h"
+#include "Particles/ParticleSystem.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 
 
 // Sets default values
@@ -80,9 +88,42 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 
 	SetLifeSpan(ProjectileTableRow->LifeSpan);
 
-	if (ProjectileName::Monster_Attack == ProjectileName)
+	if (ProjectileName::Monster_Attack == ProjectileName
+	|| ProjectileName::Monster_Arrow == ProjectileName
+	|| ProjectileName::Monster_LynelAttack == ProjectileName
+	|| ProjectileName::Monster_AL_Attack == ProjectileName
+	|| ProjectileName::Monster_AL_AttackBig == ProjectileName)
+
 	{
 		bGetDamageFromWeapon = true;
+	}
+
+
+	////////////////////////////
+	// Effect
+
+	const FDataTableRowHandle NiagaraEffectDataTable = ProjectileTableRow->NiagaraEffectTableRowHandle;
+	if (!NiagaraEffectDataTable.IsNull())
+	{
+		FNiagaraEffectTableRow* Data = NiagaraEffectDataTable.GetRow<FNiagaraEffectTableRow>(NiagaraEffectDataTable.RowName.ToString());
+
+		NiagaraEffectComponent = NewObject<UNiagaraComponent>(this, UNiagaraComponent::StaticClass(), TEXT("NiagaraEffectComponent"));
+		NiagaraEffectComponent->SetAsset(Data->EffectNiagaraSystem);
+		NiagaraEffectComponent->SetRelativeTransform(Data->Transform);
+		NiagaraEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		NiagaraEffectComponent->RegisterComponent();
+	}
+
+	const FDataTableRowHandle ParticleEffectDataTable = ProjectileTableRow->ParticleEffectTableRowHandle;
+	if (!ParticleEffectDataTable.IsNull())
+	{
+		FParticleEffectTableRow* Data = ParticleEffectDataTable.GetRow<FParticleEffectTableRow>(ParticleEffectDataTable.RowName.ToString());
+
+		ParticleEffectComponent = NewObject<UParticleSystemComponent>(this, UParticleSystemComponent::StaticClass(), TEXT("ParticleEffectComponent"));
+		ParticleEffectComponent->SetTemplate(Data->EffectParticleSystem);
+		ParticleEffectComponent->SetRelativeTransform(Data->Transform);
+		ParticleEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		ParticleEffectComponent->RegisterComponent();
 	}
 }
 

@@ -57,9 +57,6 @@ void AParticleEffect::SetData(const FName& ParticleEffectName)
     }
 
     ParticleEffectComponent->SetRelativeTransform(ParticleEffectTableRow->Transform);
-    //ParticleEffectComponent->SetRelativeLocation(ParticleEffectTableRow->Transform.GetLocation());
-    //ParticleEffectComponent->SetWorldRotation(ParticleEffectTableRow->Transform.GetRotation());
-    //ParticleEffectComponent->SetWorldScale3D(ParticleEffectTableRow->Transform.GetScale3D());
 }
 
 void AParticleEffect::SetParticleSystem(UParticleSystem* ParticleSystem)

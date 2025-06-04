@@ -17,6 +17,7 @@ class TEAMPROJECT_API ANiagaraEffect : public AActor
 public:
 	ANiagaraEffect(const FObjectInitializer& ObjectInitializer);
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+	virtual void SetData(const FName& NiagaraEffectName);
 
 protected:
 	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
@@ -33,7 +34,8 @@ public:
 protected:
 	UPROPERTY(EditAnywhere)
 	FDataTableRowHandle DataTableRowHandle;
-	TObjectPtr<FNiagaraEffectTableRow> NiagaraEffectData;
+	const UDataTable* NiagaraEffectDataTable;
+	FNiagaraEffectTableRow* NiagaraEffectTableRow;
 
 protected:
 	UPROPERTY()

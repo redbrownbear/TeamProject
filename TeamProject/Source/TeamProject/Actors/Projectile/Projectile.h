@@ -7,6 +7,8 @@
 #include "Projectile.generated.h"
 
 struct FProjectileTableRow;
+class UNiagaraComponent;
+class UParticleSystemComponent;
 
 UCLASS()
 class TEAMPROJECT_API AProjectile : public AActor
@@ -45,7 +47,7 @@ protected:
 	UPROPERTY(EditAnywhere, meta = (RowType = "ProjectileTableRow"))
 	FDataTableRowHandle DataTableRowHandle;
 	const UDataTable* ProjectileDataTable;
-	TObjectPtr<FProjectileTableRow> ProjectileTableRow;
+	const FProjectileTableRow* ProjectileTableRow;
 
 protected:
 	ECollisionChannel CollisionChannel;
@@ -55,4 +57,10 @@ public:
 	virtual FName GetProjectileName();
 	float GetDamage();
 
+
+protected:
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> NiagaraEffectComponent;
+	UPROPERTY()
+	TObjectPtr<UParticleSystemComponent> ParticleEffectComponent;
 };
