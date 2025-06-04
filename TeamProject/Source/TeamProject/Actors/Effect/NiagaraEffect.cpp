@@ -35,6 +35,7 @@ void ANiagaraEffect::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 
 	NiagaraEffectComponent->SetRelativeTransform(NiagaraEffectTableRow->Transform);
 
+	NiagaraEffectComponent->Activate(true);
 }
 void ANiagaraEffect::SetData(const FName& NiagaraEffectName)
 {
@@ -56,6 +57,8 @@ void ANiagaraEffect::SetData(const FName& NiagaraEffectName)
 	}
 
 	NiagaraEffectComponent->SetRelativeTransform(NiagaraEffectTableRow->Transform);
+
+	NiagaraEffectComponent->Activate(true);
 }
 void ANiagaraEffect::BeginPlay()
 {

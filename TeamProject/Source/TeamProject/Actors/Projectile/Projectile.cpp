@@ -109,8 +109,8 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 
 		NiagaraEffectComponent = NewObject<UNiagaraComponent>(this, UNiagaraComponent::StaticClass(), TEXT("NiagaraEffectComponent"));
 		NiagaraEffectComponent->SetAsset(Data->EffectNiagaraSystem);
-		NiagaraEffectComponent->SetRelativeTransform(Data->Transform);
 		NiagaraEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		NiagaraEffectComponent->SetRelativeTransform(Data->Transform);
 		NiagaraEffectComponent->RegisterComponent();
 	}
 
@@ -121,8 +121,8 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 
 		ParticleEffectComponent = NewObject<UParticleSystemComponent>(this, UParticleSystemComponent::StaticClass(), TEXT("ParticleEffectComponent"));
 		ParticleEffectComponent->SetTemplate(Data->EffectParticleSystem);
-		ParticleEffectComponent->SetRelativeTransform(Data->Transform);
 		ParticleEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		ParticleEffectComponent->SetRelativeTransform(Data->Transform);
 		ParticleEffectComponent->RegisterComponent();
 	}
 }

@@ -60,6 +60,11 @@ namespace ParticleEffectName
     static inline FName Lynel_Explosion = TEXT("Lynel_Explosion");
 }
 
+namespace NiagaraEffectName
+{
+    static inline FName AL_Attack = TEXT("AL_Attack");
+    static inline FName AL_AttackBig = TEXT("AL_AttackBig");
+}
 
 namespace Monster_SocketName
 {
