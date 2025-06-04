@@ -52,15 +52,15 @@ class TEAMPROJECT_API UPlayerManager : public UGameInstanceSubsystem
 private:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-	//QuestÀü¿ë
+	//Questï¿½ï¿½ï¿½ï¿½
 public:
 	void SetQuestData(FQuestDataRow QuestRow);
 	void ShowQuestUI();
 	const TArray<FQuestDataRow>& GetAllQuestData() const { return QuestList; }
 private:
-	//QuestÀü¿ë
+	//Questï¿½ï¿½ï¿½ï¿½
 
-	//ItemÀü¿ë
+	//Itemï¿½ï¿½ï¿½ï¿½
 public:
 	void SetInvenData(FItemData ItemRow);
 	void ShowInvenUI();
@@ -76,7 +76,7 @@ private:
 	void UpDateInvenUI(const TArray<FItemData>& ItemList);
 
 	void UpDateInvenEquipUI(const TArray<FItemData>& ItemMap);
-	//ItemÀü¿ë
+	//Itemï¿½ï¿½ï¿½ï¿½
 
 public:
 	void InitStatus();
