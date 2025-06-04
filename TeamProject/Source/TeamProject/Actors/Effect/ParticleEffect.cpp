@@ -31,8 +31,10 @@ void AParticleEffect::SetData(const FDataTableRowHandle& InDataTableRowHandle)
         fLifeTime = ParticleEffectTableRow->LifeTime;
     }
 
-    ParticleEffectComponent->SetWorldRotation(ParticleEffectTableRow->Transform.GetRotation());
-    ParticleEffectComponent->SetWorldScale3D(ParticleEffectTableRow->Transform.GetScale3D());
+    ParticleEffectComponent->SetRelativeTransform(ParticleEffectTableRow->Transform);
+    //ParticleEffectComponent->SetRelativeLocation(ParticleEffectTableRow->Transform.GetLocation());
+    //ParticleEffectComponent->SetWorldRotation(ParticleEffectTableRow->Transform.GetRotation());
+    //ParticleEffectComponent->SetWorldScale3D(ParticleEffectTableRow->Transform.GetScale3D());
 }
 
 void AParticleEffect::SetData(const FName& ParticleEffectName)
@@ -54,8 +56,10 @@ void AParticleEffect::SetData(const FName& ParticleEffectName)
         fLifeTime = ParticleEffectTableRow->LifeTime;
     }
 
-    ParticleEffectComponent->SetWorldRotation(ParticleEffectTableRow->Transform.GetRotation());
-    ParticleEffectComponent->SetWorldScale3D(ParticleEffectTableRow->Transform.GetScale3D());
+    ParticleEffectComponent->SetRelativeTransform(ParticleEffectTableRow->Transform);
+    //ParticleEffectComponent->SetRelativeLocation(ParticleEffectTableRow->Transform.GetLocation());
+    //ParticleEffectComponent->SetWorldRotation(ParticleEffectTableRow->Transform.GetRotation());
+    //ParticleEffectComponent->SetWorldScale3D(ParticleEffectTableRow->Transform.GetScale3D());
 }
 
 void AParticleEffect::SetParticleSystem(UParticleSystem* ParticleSystem)
