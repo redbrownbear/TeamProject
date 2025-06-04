@@ -778,15 +778,16 @@ void APC_InGame::SpawnIcePillar()
 {	
 	if (!LastHit.IsValidBlockingHit()) return;
 
-	FVector SpawnLoc = LastHit.Location;
-	FVector Normal = LastHit.Normal;
+	const FVector PivotLocation = IcePreviewActor->GetPivotLocation();
+	FTransform PreviewTransform = IcePreviewActor->GetActorTransform();
+	PreviewTransform.SetLocation(PivotLocation);
 
-	AIcePillar* IcePillarActor = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass, SpawnLoc, FRotationMatrix::MakeFromZ(Normal).Rotator());
+	AIcePillar* IcePillarActor = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass, PreviewTransform);
 
 	if (!IcePillarActor) return;
 
-	IcePillarActor->SetRiseDirection(Normal);
-	IcePillarActor->SetPivotLocation(SpawnLoc);
+	IcePillarActor->SetRiseDirection(IcePreviewActor->GetRiseDirection());
+	IcePillarActor->SetPivotLocation(PivotLocation);
 
 	IcePillarActor->SetActorHiddenInGame(false);
 
@@ -974,7 +975,7 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 			MoveTimerHandle,
 			this,
 			&APC_InGame::ScanMetalActorInView,
-			0.1f,  // 주기 (초)
+			0.16f,  // 주기 (초)
 			true   // 반복
 		);
 	}
