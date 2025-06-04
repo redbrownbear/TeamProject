@@ -69,3 +69,8 @@ void UInventorySlot::SetSelected(bool bIsSelected)
 {
     HighlightBg->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
+
+void UInventorySlot::SetEquiped(bool bIsEquiped)
+{
+    EquipedBg->SetVisibility(bIsEquiped ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}

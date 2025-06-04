@@ -76,10 +76,8 @@ private:
 	void UpDateInvenUI(const TArray<FItemData>& ItemList);
 
 	void UpDateInvenEquipUI(const TArray<FItemData>& ItemMap);
-
 	//Item����
 
-	//Status����
 public:
 	void InitStatus();
 
