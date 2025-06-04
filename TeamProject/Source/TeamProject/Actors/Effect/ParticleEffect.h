@@ -29,7 +29,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (RowType = "ParticleEffectTableRow"))
 	FDataTableRowHandle DataTableRowHandle;
 	TObjectPtr<FParticleEffectTableRow> ParticleEffectData;
 

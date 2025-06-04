@@ -30,6 +30,9 @@ void AParticleEffect::SetData(const FDataTableRowHandle& InDataTableRowHandle)
     {
         fLifeTime = ParticleEffectData->LifeTime;
     }
+
+    ParticleEffectComponent->SetWorldRotation(ParticleEffectData->Transform.GetRotation());
+    ParticleEffectComponent->SetWorldScale3D(ParticleEffectData->Transform.GetScale3D());
 }
 
 void AParticleEffect::SetParticleSystem(UParticleSystem* ParticleSystem)
