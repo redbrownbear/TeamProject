@@ -113,6 +113,27 @@ void UInventoryScroll::InitSelectItem()
     OnInventoryDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
 }
 
+void UInventoryScroll::EquipCurrentItem()
+{
+    for (UInventorySlot* slot : ActiveSlots)
+    {
+        slot->SetEquiped(false);
+    }
+
+    if (ActiveSlots[CurrentIndex])
+    {
+        ActiveSlots[CurrentIndex]->SetEquiped(true);
+    }
+}
+
+void UInventoryScroll::UnEquipCurrentItem()
+{
+    if (ActiveSlots[CurrentIndex])
+    {
+        ActiveSlots[CurrentIndex]->SetEquiped(false);
+    }
+}
+
 FVector2D UInventoryScroll::GetItemListLocation()
 {
     FGeometry Geometry = ActiveSlots[CurrentIndex]->GetCachedGeometry();
