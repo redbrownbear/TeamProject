@@ -19,7 +19,7 @@
 #include "GenericTeamAgentInterface.h"
 #include "Misc/Utils.h"
 #include "PlayerCharacter.generated.h"
-
+class UPlayerManager;
 
 
 UCLASS()
@@ -55,6 +55,7 @@ public:
 	UPlayerStatusComponent* GetPlayerStatusComponent() { return StatusComponent; }
 	UWeaponManagerComponent* GetWeaponManagerComponent() { return WeaponManagerComponent; }
 	USpringArmComponent* GetSpringArm() { return SpringArm; }
+
 
 	virtual void Landed(const FHitResult& Hit) override;
 
@@ -93,7 +94,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Zoom")
 	UCurveFloat* ZoomCurve;
 
-
+	//PlayerManagerClass
+	
 	
 
 

@@ -45,6 +45,11 @@ public:
 
 	void SetNiagaraSystemAssetNone() { NiagaraComponent->SetAsset(nullptr); }
 
+
+
+public:
+	bool GetIsFire() { return bIsFire; }
+
 protected:
 	UPROPERTY(EditAnywhere, meta = (RowType = "ProjectileTableRow"))
 	FDataTableRowHandle NiagaraDataTableRowHandle;
@@ -53,5 +58,7 @@ protected:
 	const FNiagaraEffectTableRow* NiagaraTableRow;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UNiagaraComponent> NiagaraComponent;
+
+	bool bIsFire = false;
 
 };

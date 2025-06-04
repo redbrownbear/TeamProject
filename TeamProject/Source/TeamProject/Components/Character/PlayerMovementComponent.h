@@ -36,10 +36,15 @@ public:
 	bool CanClimbUpLand();
 	bool CanClimbDownLand();
 
+
+
 	void SetClimbMode(bool _bool);
 	void SetGlideMode(bool _bool);
 
 	void GlidingMove(FVector2D ActionValue);
+
+	void SetMoveState(EMove_State _State) { Move_State = _State; }
+	EMove_State GetMoveState() { return Move_State; }
 
 	UAnimMontage* GTEST() { return LandUpMontage; }
 
@@ -56,6 +61,8 @@ private:
 	UAnimMontage* LandUpMontage;
 	UPROPERTY()
 	EClimb_State Climb_State = EClimb_State::Climb;
+	UPROPERTY()
+	EMove_State Move_State = EMove_State::Run;
 
 public:
 

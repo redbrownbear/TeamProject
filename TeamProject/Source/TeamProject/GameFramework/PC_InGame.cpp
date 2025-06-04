@@ -253,8 +253,11 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
+
+	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+
 	// 클라이밍 상태일 때의 캐릭터 무브
-	if (Movement->IsClimbing())
+	if (Movement->GetMoveState()==EMove_State::Climb)
 	{
 		if (Movement->GetClimbMode() == EClimb_State::Land)
 		{
@@ -263,15 +266,10 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	
 		FHitResult HitResult;
 		
-
-
 		FVector Normal_Vec = HitResult.Normal;
-
 		
-
 		const FRotator Rotation = Player_C->K2_GetActorRotation();
-		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
-		
+				
 		const FVector UpVector = UKismetMathLibrary::GetUpVector(Rotation);
 		const FVector RightVector = UKismetMathLibrary::GetRightVector(Rotation);
 
@@ -288,9 +286,9 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 		
 	}
-	else if (Movement->bIsGliding)
+	else if (Movement->GetMoveState()==EMove_State::Glide)
 	{
-		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+		
 
 		P_Anim->ActionValue = ActionValue;
 		
@@ -301,9 +299,6 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	// 노말 상태일 때의 캐릭터 무브
 	else
 	{
-
-		const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
-
 		P_Anim->ActionValue = ActionValue;
 
 		const FRotator Rotation = K2_GetActorRotation();
@@ -318,8 +313,17 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
 		ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
 
+		if (Movement->GetMoveState() == EMove_State::Dash)
+		{
+			UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+			PlayerManager->SetStaminaUSe(true);
+			float Stemina = PlayerManager->GetStamina();
+			float DeltaTime = GetWorld()->DeltaTimeSeconds;
+
+			Stemina -= DeltaTime * STEMINA_USE_SPEED;
+			PlayerManager->SetPlayerStamina(Stemina);
+		}
 	}
-	
 }
 
 void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
@@ -367,14 +371,28 @@ void APC_InGame::JumpGlide(const FInputActionValue& InputActionValue)
 void APC_InGame::StartedDash(const FInputActionValue& InputActionValue)
 {
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
-	Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_DASH;
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+	
+	if (Movement->GetMoveState() == EMove_State::Run)
+	{
+		Movement->MaxWalkSpeed = PLAYER_MOVE_DASH;
+		Movement->SetMoveState(EMove_State::Dash);
+	}
 
 }
 
 void APC_InGame::CompletedDash(const FInputActionValue& InputActionValue)
 {
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
-	Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+
+	if (Movement->GetMoveState() == EMove_State::Dash)
+	{
+		Movement->MaxWalkSpeed = PLAYER_MOVE_NML;
+		Movement->SetMoveState(EMove_State::Run); 
+		UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+		PlayerManager->SetStaminaUSe(false);
+	}
 }
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)

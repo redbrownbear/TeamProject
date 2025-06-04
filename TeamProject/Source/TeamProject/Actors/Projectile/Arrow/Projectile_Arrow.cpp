@@ -64,12 +64,16 @@ void AProjectile_Arrow::SetData(const FName& ProjectileName, FName ProfileName)
 		if (NiagaraTableRow->EffectNiagaraSystem)
 		{
 			NiagaraComponent->SetAsset(NiagaraTableRow->EffectNiagaraSystem);
+			bIsFire = true;
 		}
 	}
 	else
 	{
 		NiagaraComponent->SetAsset(nullptr);
+		bIsFire = false;
 	}
+	StaticMeshComponent->SetRelativeLocation(FVector::ZeroVector);
+	StaticMeshComponent->SetRelativeRotation(FRotator::ZeroRotator);
 }
 
 void AProjectile_Arrow::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

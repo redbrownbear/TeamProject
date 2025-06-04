@@ -82,20 +82,33 @@ void ATorchStand::BeginPlay()
 void ATorchStand::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     APlayerCharacter* Player_C = Cast<APlayerCharacter>(OtherActor);
-    if (Player_C == nullptr)
+    if (Player_C)
     {
-        return;
+        {
+            UWeaponManagerComponent* WeaponManager = Player_C->GetWeaponManagerComponent();
+            if (Player_C->GetWeaponManagerComponent()->GetEquipState() != EEquip_State::Bow)
+            {
+                return;
+            }
+            if (WeaponManager->GetCanShot())
+            {
+                AWeaponBow* Actor_Bow = Cast<AWeaponBow>(WeaponManager->GetBow()->GetChildActor());
+                Actor_Bow->SetArrowFire(true);
+            }
+        }
     }
-    UWeaponManagerComponent* WeaponManager = Player_C->GetWeaponManagerComponent();
-    if (Player_C->GetWeaponManagerComponent()->GetEquipState() != EEquip_State::Bow)
+    
+  /*  else
     {
-        return;
-    }
-    if (WeaponManager->GetCanShot())
-    {
-        AWeaponBow* Actor_Bow = Cast<AWeaponBow>(WeaponManager->GetBow()->GetChildActor());
-        Actor_Bow->SetArrowFire(true);
-    }
+        AProjectile_Arrow* Projectile = Cast<AProjectile_Arrow>(OtherActor);
+        if (!Projectile)
+        {
+            return;
+        }
+        Projectile->SetData(TEXT("Player_FireArrow"), TEXT("ToMonster"));
+
+    }*/
+
 
 }
 

@@ -84,3 +84,5 @@
 #define PLAYER_GLIDE_MIN_SPEED														100.f
 #define PLAYER_GLIDE_MODIFY_SPEED													600.f
 #define PLAYER_GLIDE_ROTATE_SPEED													100.f
+
+#define STEMINA_USE_SPEED															5.f
