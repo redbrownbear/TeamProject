@@ -16,6 +16,8 @@ void UAnimNotify_HinoxGrab::Notify(USkeletalMeshComponent* MeshComp, UAnimSequen
 
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(MeshComp->GetOwner()))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UAnimNotify_HinoxGrab::Notify"));
+
 		UWorld* World = MeshComp->GetWorld();
 
 		AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),

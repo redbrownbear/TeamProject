@@ -284,3 +284,18 @@ void AWorldWeapon::AttachToMonster(IMonsterInterface* Monster, FName SocketName)
 		}
 	}
 }
+
+void AWorldWeapon::DetachFromMonster()
+{
+	bIsCatched = false;
+	StaticMeshComponent->SetRelativeLocation(ItemTableRow->Transform.GetLocation());
+	StaticMeshComponent->SetRelativeScale3D(ItemTableRow->Transform.GetScale3D());
+	CollisionComponent->SetSimulatePhysics(true);
+
+	this->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+}
+
+float AWorldWeapon::GetDamage() const
+{
+	return ItemTableRow->Damage;
+}

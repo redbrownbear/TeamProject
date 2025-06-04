@@ -21,6 +21,7 @@
 #include "PlayerCharacter.generated.h"
 class UPlayerManager;
 
+class AProjectile_Arrow;
 
 UCLASS()
 class TEAMPROJECT_API APlayerCharacter : public ACharacter, public IGenericTeamAgentInterface
@@ -45,6 +46,8 @@ public:
 	// 에디터에서 엑터의 변경마다 호출되는 함수
 	virtual void OnConstruction(const FTransform& Transform);
 
+	virtual void Landed(const FHitResult& Hit) override;
+	
 	
 	
 
@@ -56,8 +59,7 @@ public:
 	UWeaponManagerComponent* GetWeaponManagerComponent() { return WeaponManagerComponent; }
 	USpringArmComponent* GetSpringArm() { return SpringArm; }
 
-
-	virtual void Landed(const FHitResult& Hit) override;
+	void Damaged(int32 Damage);
 
 	UFUNCTION()
 	void TimelineProgress(float Value);
@@ -65,6 +67,16 @@ public:
 
 	void ZoomIn();
 	void ZoomOut();
+public:
+
+
+	void SetArrowFire(bool _bool);
+
+	void SetArrowVisibility(bool _bool) { ChargedArrow->GetStaticMeshComp()->SetVisibility(_bool); }
+
+	void SetNiagaraSystemAssetNone() { ChargedArrow->SetNiagaraSystemAssetNone(); }
+
+	bool GetIsFire() { return bIsFire; }
 protected:
 
 	/*UPROPERTY(EditAnywhere, Category="Weapon")
@@ -90,15 +102,17 @@ protected:
 
 	bool bZoomedIn;
 
+	bool bIsFire;
+
 
 	UPROPERTY(EditAnywhere, Category = "Zoom")
 	UCurveFloat* ZoomCurve;
 
 	//PlayerManagerClass
-	
-	
+	FName SocketName = "Arrow_Socket";
 
-
+	UPROPERTY()
+	AProjectile_Arrow* ChargedArrow;
 public:
 	virtual uint8 GetGenericTeamId() { return FGenericTeamId(PLAYER_GENERIC_TEAM_ID); }
 };

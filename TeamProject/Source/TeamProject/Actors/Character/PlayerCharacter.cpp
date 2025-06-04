@@ -13,7 +13,9 @@
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "SubSystem/PlayerManager.h"
-
+#include "UI/HUD/MainHUD.h"
+#include "Actors/Projectile/Arrow/Projectile_Arrow.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 // Sets default values
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -71,7 +73,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 		UCapsuleComponent* CC = GetCapsuleComponent();
 		CC->SetCapsuleRadius(PLAYER_CAPSULE_RADIUS);
 		CC->SetCapsuleHalfHeight(PLAYER_CAPSULE_HALF_HEIGHT);
-		
+		CC->SetCollisionProfileName(TEXT("Player"));
 	}
 
 	{
@@ -125,6 +127,35 @@ void APlayerCharacter::BeginPlay()
 			}
 		}
 	}
+
+	FVector SpawnLocation = GetMesh()->GetSocketLocation(SocketName);
+
+	// 조준 방향 계산: 예) 카메라 방향, 또는 컨트롤러 방향
+	FVector AimDirection = GetControlRotation().Vector(); // 또는 캐릭터 카메라 방향
+
+	// 조준 방향을 회전으로 변환
+	FRotator SpawnRotation = AimDirection.Rotation();
+
+	// 스폰 파라미터
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Owner = this;
+
+	// 화살 액터 스폰
+	ChargedArrow = GetWorld()->SpawnActor<AProjectile_Arrow>(
+		AProjectile_Arrow::StaticClass(),
+		SpawnLocation,
+		SpawnRotation,
+		SpawnParams
+	);
+
+
+	ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
+	ChargedArrow->GetStaticMeshComp()->SetRelativeLocation(FVector::ZeroVector);
+	ChargedArrow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+	ChargedArrow->SetLifeSpan(0.f);
+	ChargedArrow->GetProjectileMovement()->Deactivate();
+	//ChargedArrow->GetStaticMeshComp()->SetVisibility(false);
 }
 
 // Called every frame
@@ -165,6 +196,23 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 }
 
+void APlayerCharacter::Damaged(int32 Damage)
+{
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	const int32 CurrentHP = PlayerManager->GetHp();
+	
+	if (CurrentHP != 0)
+	{
+		int32 AfterHP = CurrentHP - Damage;
+		PlayerManager->SetPlayerHp(AfterHP);
+		Cast<UPlayerMovementComponent>(GetCharacterMovement())->Hited();
+		Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateHp();
+		UE_LOG(LogTemp, Warning, TEXT("%d"), AfterHP);
+	}
+	
+	
+}
+
 void APlayerCharacter::TimelineProgress(float Value)
 {
 
@@ -200,4 +248,20 @@ void APlayerCharacter::ZoomOut()
 		bZoomedIn = false;
 		ZoomTimeline->Reverse();
 	}
+}
+
+void APlayerCharacter::SetArrowFire(bool _bool)
+{
+	bIsFire = _bool;
+	if (_bool)
+	{
+		ChargedArrow->SetData(TEXT("Player_Charged_Arrow_Fire"), TEXT("NoCollision"));
+	}
+	else
+	{
+		ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
+	}
+
+	ChargedArrow->GetStaticMeshComp()->SetRelativeLocation(FVector::ZeroVector);
+	ChargedArrow->GetStaticMeshComp()->SetRelativeRotation(FRotator::ZeroRotator);
 }

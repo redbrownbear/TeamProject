@@ -17,12 +17,12 @@ AWeaponShield::AWeaponShield()
         RootComponent = DefaultSceneRoot;
 
 
-        ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Shield/Weapon_Shield_001.Weapon_Shield_001'"));
+        ConstructorHelpers::FObjectFinder<UStaticMesh> Asset(TEXT("/Script/Engine.StaticMesh'/Game/Resources/Weapon/ShieldStaticMesh/Shield_001.Shield_001'"));
 
-        SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
-        SkeletalMeshComponent->SetupAttachment(RootComponent);
-        SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        SkeletalMeshComponent->SetSkeletalMesh(Asset.Object);
+        StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+        StaticMeshComponent->SetupAttachment(RootComponent);
+        StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        StaticMeshComponent->SetStaticMesh(Asset.Object);
 
     }
 

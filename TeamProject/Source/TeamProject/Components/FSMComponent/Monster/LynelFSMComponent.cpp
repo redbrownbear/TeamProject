@@ -8,6 +8,13 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Item/WorldWeapon.h"
 
+#include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
+
+#include "GameFramework/PC_InGame.h"
+
+#include "UI/HUD/MainHUD.h"
+
+#include "Data/MonsterTableRow.h"
 
 ULynelFSMComponent::ULynelFSMComponent()
 {
@@ -56,7 +63,7 @@ void ULynelFSMComponent::HandleState(float DeltaTime)
 		UpdateSignal(DeltaTime);
 		break;
 	case EMonsterState::Dead:
-		UpdateDead(DeltaTime);
+		UpdateDying(DeltaTime);
 		break;
 	case EMonsterState::AimingBowUpper:
 		UpdateAimingBowUpper(DeltaTime);
@@ -223,6 +230,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		return;
 		break;
 	case EMonsterState::Dead:
+		CharacterMonster->PlayMontage(EMonsterMontage::DEAD);
 		break;
 	case EMonsterState::Fire:
 		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::ChangeState // Unexpected MonsterState"));
@@ -575,7 +583,64 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::ReadyToAttack:
 		break;
+	case EMonsterState::Damage:
+		return;
+		break;
 	case EMonsterState::Temp:
+		break;
+	default:
+		break;
+	}
+
+
+	switch (NewState)
+	{
+	case EMonsterState::Idle:
+	case EMonsterState::Suspicious:
+	case EMonsterState::Dead:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(false, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
+		break;
+	case EMonsterState::Alert:
+	case EMonsterState::Combat:
+	case EMonsterState::Fire:
+	case EMonsterState::Signal:
+	case EMonsterState::AimingBow:
+	case EMonsterState::AimingBowUpper:
+	case EMonsterState::DashAttack:
+	case EMonsterState::ExplosionAttack:
+	case EMonsterState::FireAttack:
+	case EMonsterState::HornAttack:
+	case EMonsterState::RunningAttack:
+	case EMonsterState::Rebound:
+	case EMonsterState::Rodeo:
+	case EMonsterState::Stun:
+	case EMonsterState::ReadyToAttack:
+	case EMonsterState::Temp:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(true, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
 		break;
 	default:
 		break;
@@ -674,9 +739,9 @@ void ULynelFSMComponent::UpdateCombat(float DeltaTime)
 		ChangeState(EMonsterState::RunningAttack);
 		return;
 	case ELynelCombatIndex::End:
+	default:
 		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::UpdateCombat // Unexpected CombatIndex"));
 		check(false);
-	default:
 		break;
 	}
 }
@@ -911,11 +976,6 @@ void ULynelFSMComponent::UpdateRunningAttack(float DeltaTime)
 			return;
 		}
 	}
-}
-
-void ULynelFSMComponent::UpdateDead(float DeltaTime)
-{
-	// Pattern will be handled in AnimNotify
 }
 
 void ULynelFSMComponent::UpdateRebound(float DeltaTime)

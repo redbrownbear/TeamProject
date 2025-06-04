@@ -56,7 +56,7 @@ protected:
 	USceneComponent* DefaultSceneRoot;
 
 	UPROPERTY(VisibleAnywhere)
-	USkeletalMeshComponent* SkeletalMeshComponent;
+	UStaticMeshComponent* StaticMeshComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	UAnimMontage* EquipMontage;

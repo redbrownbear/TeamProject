@@ -31,11 +31,7 @@ public:
 
 	void FireArrow();
 
-	void SetArrowFire(bool _bool);
 
-	void SetArrowVisibility(bool _bool) { ChargedArrow->GetStaticMeshComp()->SetVisibility(_bool); }
-	
-	void SetNiagaraSystemAssetNone() { ChargedArrow->SetNiagaraSystemAssetNone(); }
 
 private:
 
@@ -46,8 +42,7 @@ private:
 	UAnimMontage* ChargingMTG;
 	UPROPERTY()
 	UAnimMontage* ShootMTG;
-	UPROPERTY()
-	AProjectile_Arrow* ChargedArrow;
+
 
 
 
@@ -56,5 +51,5 @@ private:
 
 	
 
-	FName SocketName = "Arrow_Socket";
+	
 };

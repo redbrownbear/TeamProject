@@ -83,7 +83,10 @@ void UAssasinLeaderFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Signal:
 		break;
 	case EMonsterState::Combat:
-		CharacterMonster->PlayMontage(EMonsterMontage::SEARCH);
+		if (NewState != EMonsterState::Damage)
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::SEARCH);
+		}
 		break;
 	case EMonsterState::Happy:
 		break;
@@ -107,6 +110,21 @@ void UAssasinLeaderFSMComponent::ChangeState(EMonsterState NewState)
 		CharacterMonster->PlayMontage(EMonsterMontage::DRAW_LSWORD);
 		break;
 	case EMonsterState::Happy:
+		break;
+	case EMonsterState::Damage:
+		if (eCurrentState != EMonsterState::Combat
+			&& !CharacterMonster->IsPlayingMontage(EMonsterMontage::FIND)
+			&& !CharacterMonster->IsPlayingMontage(EMonsterMontage::SIGNAL_START)
+			&& !CharacterMonster->IsPlayingMontage(EMonsterMontage::SIGNAL_END)
+			)
+		{
+			ChangeState(EMonsterState::Alert);
+			return;
+		}
+		else
+		{
+			return;
+		}
 		break;
 	}
 

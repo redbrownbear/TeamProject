@@ -5,6 +5,6 @@
 
 ACM_InGame::ACM_InGame()
 {
-	ViewPitchMax = 30.f;
+	ViewPitchMax = 50.f;
 	ViewPitchMin = -70.f;
 }

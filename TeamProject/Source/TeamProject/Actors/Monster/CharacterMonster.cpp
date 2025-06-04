@@ -55,14 +55,8 @@ void ACharacterMonster::BeginPlay()
 
 	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 	{
-		if (ULynelFSMComponent* LynelFSMComponent = Cast<ULynelFSMComponent>(FSMComponent))
-		{
-			LynelFSMComponent->SetCharacterMonster(this);
-		}
-		else if (UHinoxFSMComponent* HinoxFSMComponent = Cast<UHinoxFSMComponent>(FSMComponent))
-		{
-			HinoxFSMComponent->SetCharacterMonster(this);
-		}
+		FSMComponent->SetCharacterMonster(this);
+		FSMComponent->BindHitEvent();
 	}
 	SetData(DataTableRowHandle);
 
@@ -117,7 +111,8 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		//CapsuleComp->SetSphereRadius(MonsterData->CollisionSphereRadius); // SetCapsuleHalfHeight와 충돌 가능성 있음
 		CapsuleComp->SetCollisionProfileName(CollisionProfileName::Monster);
 		CapsuleComp->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
-		CapsuleComp->SetCapsuleHalfHeight(MonsterData->CollisionSphereRadius);
+		CapsuleComp->SetCapsuleHalfHeight(MonsterData->CapsuleHalfHeight);
+		CapsuleComp->SetCapsuleRadius(MonsterData->CapsuleRadius);
 	}
 
 	// 스켈레탈 메쉬 컴포넌트 설정 (이미 ACharacter에 의해 생성되고 등록된 상태)
@@ -127,7 +122,9 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		MeshComp->SetSkeletalMesh(MonsterData->SkeletalMesh);
 		MeshComp->SetAnimClass(MonsterData->AnimClass);
 		MeshComp->SetRelativeScale3D(MonsterData->MeshTransform.GetScale3D());
-		MeshComp->SetRelativeLocation(FVector(0.0, 0.0, -MonsterData->CollisionSphereRadius));
+		FVector RelativeLocation = MonsterData->MeshTransform.GetLocation();
+		RelativeLocation += FVector(0.0, 0.0, -MonsterData->CapsuleHalfHeight);
+		MeshComp->SetRelativeLocation(RelativeLocation);
 	}
 
 
@@ -157,7 +154,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 			{
 				FVector Scale = MeleeWeapon->GetActorScale3D();
 
-				if (ULynelFSMComponent* LynelFSMComponent = Cast<ULynelFSMComponent>(FSMComponent))
+				if (FSMComponent->IsA<ULynelFSMComponent>())
 				{
 					Scale *= 2.f;
 				}
@@ -239,8 +236,29 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 
 				NewSphereCollider->SetCanEverAffectNavigation(false);
 				NewSphereCollider->SetCollisionProfileName(CollisionProfileName::Monster); // 몬스터 피격 판정에 적합한 프로파일
-				NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
 
+				if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+				{
+					if (static_cast<EAdditionalCollider>(i) == EAdditionalCollider::Eye_Ball)
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnEyeBeginOverlap);
+					}
+					else
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+					}
+				}
+				else if (DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
+				{
+					if (static_cast<EAdditionalCollider>(i) == EAdditionalCollider::Chin)
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnEyeBeginOverlap);
+					}
+					else
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+					}
+				}
 				FAttachmentTransformRules AttachRules = FAttachmentTransformRules::SnapToTargetNotIncludingScale;
 
 				FName AttachSocketName = NAME_None; // 기본은 메시의 루트
@@ -288,7 +306,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 						break;
 					case EAdditionalCollider::Eye_Ball:
 						AttachSocketName = Monster_SocketName::EyeBall;
-						NewSphereCollider->SetSphereRadius(50.f);
+						NewSphereCollider->SetSphereRadius(70.f);
 						break;
 					default:
 						UE_LOG(LogTemp, Error, TEXT("ACharacterMonster::SetData // Hinox: Unexpected AdditionalCollider index: %d"), i);
@@ -420,6 +438,28 @@ void ACharacterMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 		}
 	}
 }
+void ACharacterMonster::OnEyeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (AProjectile* Projectile = Cast<AProjectile>(OtherActor))
+	{
+		if (ProjectileName::Player_Arrow == Projectile->GetProjectileName())
+		{
+			// float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser
+			FDamageEvent DamageEvent;
+
+			if (UWorld* World = GetWorld())
+			{
+				if (AController* PlayerController = World->GetFirstPlayerController())
+				{
+					if (AActor* Player = PlayerController->GetPawn())
+					{
+						IMonsterInterface::TakeDamage(Projectile->GetDamage(), DamageEvent, PlayerController, Player, 1);
+					}
+				}
+			}
+		}
+	}
+}
 void ACharacterMonster::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 }
@@ -447,6 +487,7 @@ void ACharacterMonster::SetSpeedRun()
 void ACharacterMonster::OnDie()
 {
 	IMonsterInterface::OnDie();
+	OnDeadEnd();
 }
 
 void ACharacterMonster::OnDeadEnd()

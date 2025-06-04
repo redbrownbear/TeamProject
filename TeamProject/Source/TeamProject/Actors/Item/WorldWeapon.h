@@ -70,9 +70,12 @@ public:
 	EWeaponKind GetWorldWeaponKind() const;
 	void AddForce(FVector _Direction, float Force);
 	void AttachToMonster(IMonsterInterface* Monster, FName SocketName);
+	void DetachFromMonster();
 
 protected:
 	bool bIsCatched = false;
 public:
-	bool GetCatched() { return bIsCatched; }
+	bool GetCatched() const { return bIsCatched; }
+	float GetDamage() const;
+
 };

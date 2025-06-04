@@ -33,6 +33,7 @@ public:
 	void SetCanMove();
 
 	void Attack();
+	void EmptyDamagedActors();
 
 private:
 
@@ -51,4 +52,6 @@ private:
 
 	bool bCanAttack= true;
 
+
+	TArray<TObjectPtr<AActor>> DamagedActors;
 };

@@ -19,12 +19,12 @@ void AWeaponBase::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	FWeaponTableRow* Data = DataTableRowHandle.GetRow<FWeaponTableRow>(TEXT("Weapon"));
 	if (!Data) { ensure(false); return; }
 
-	SkeletalMeshComponent->SetSkeletalMesh(Data->SkeletalMesh);
+	/*StaticMeshComponent->SetStaticMesh(Data->StaticMesh);
 	SkeletalMeshComponent->SetRelativeTransform(Data->Transform);
 	check(Data->AnimClass);
 	USkeletalMeshComponent* MeshComponent = GetOwner()->GetComponentByClass<USkeletalMeshComponent>();
 	check(MeshComponent);
-	MeshComponent->SetAnimClass(Data->AnimClass);
+	MeshComponent->SetAnimClass(Data->AnimClass);*/
 }
 
 void AWeaponBase::OnConstruction(const FTransform& Transform)

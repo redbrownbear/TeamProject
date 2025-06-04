@@ -10,15 +10,25 @@
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+
+#include "Actors/Monster/CharacterMonster.h"
+#include "Actors/Monster/PawnMonster.h"
+#include "Actors/Item/WorldWeapon.h"
+#include "Actors/Effect/ParticleEffect.h"
+#include "Actors/Character/PlayerCharacter.h"
+#include "SubSystem/PlayerManager.h"
+#include "Components/Character/PlayerMovementComponent.h"
+
 
 // Sets default values
 AProjectile::AProjectile()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 
@@ -26,7 +36,7 @@ AProjectile::AProjectile()
 	ProjectileMovementComponent->InitialSpeed = 0.f;
 	ProjectileMovementComponent->MaxSpeed = 0.f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
-	InitialLifeSpan = 15.f;
+	InitialLifeSpan = 3.f;
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->SetCanEverAffectNavigation(false);
@@ -71,7 +81,12 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		SphereCom->SetSphereRadius(ProjectileTableRow->CollisionSphereRadius);
 	}
 
-	// @TODO : Set Size of other kinds of ShapeComponent
+	SetLifeSpan(ProjectileTableRow->LifeSpan);
+
+	if (ProjectileName::Monster_Attack == ProjectileName)
+	{
+		bGetDamageFromWeapon = true;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -85,13 +100,47 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 {
 	if (!IsValid(this)) { return; }
 
-	//Destroy();
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(OtherActor);
+	if (Player_C)
+	{
+		
+		Player_C->Damaged(GetDamage());
+	}
+
+
+	Destroy();
+
+	//if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
+	//	|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig)
+	//{
+	//	Destroy();
+	//}
+
 
 }
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	Destroy();
+	if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
+		|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig
+		|| DataTableRowHandle.RowName == ProjectileName::Monster_HinoxStone
+		)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			AParticleEffect* ParticleEffect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+			FTransform NewTransform;
+			ParticleEffect->SetData(ParticleEffectName::Hinox_AttackShockWave);
+
+			const FVector Location = GetActorLocation();
+			NewTransform.SetLocation(Location);
+
+			ParticleEffect->FinishSpawning(NewTransform);
+		}
+		Destroy();
+	}
 }
 
 // Called every frame
@@ -99,6 +148,7 @@ void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//ProjectileMovementComponent->Velocity = GetActorForwardVector() * ProjectileMovementComponent->MaxSpeed;
 }
 
 FVector AProjectile::GetVelocity()
@@ -114,13 +164,51 @@ FName AProjectile::GetProjectileName()
 
 float AProjectile::GetDamage()
 {
-	if (ProjectileTableRow)
+	if (bGetDamageFromWeapon)
 	{
-		return ProjectileTableRow->Damage;
+		if (ACharacterMonster* CM = Cast<ACharacterMonster>(GetOwner()))
+		{
+			if (const AWorldWeapon* WW = CM->GetFSMComponent()->GetCurrentWeapon())
+			{
+				float fDamage = WW->GetDamage();
+				return fDamage;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No WorldWeapon"));
+				return 1.f;
+			}
+		}
+		else if (APawnMonster* PM = Cast<APawnMonster>(GetOwner()))
+		{
+			if (const AWorldWeapon* WW = PM->GetFSMComponent()->GetCurrentWeapon())
+			{
+				float fDamage = WW->GetDamage();
+				return fDamage;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No WorldWeapon"));
+				return 1.f;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // Not Monster"));
+			return 1.f;
+		}
 	}
 	else
 	{
-		return 1.f;
+		if (ProjectileTableRow)
+		{
+			return ProjectileTableRow->Damage;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No ProjectileTableRow"));
+			return 1.f;
+		}
 	}
 }
 
