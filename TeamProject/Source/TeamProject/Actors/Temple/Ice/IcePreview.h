@@ -48,6 +48,9 @@ private:
 
 public:
     void SetRiseDirection(FVector InDirection);
+    FVector GetRiseDirection() const { return RiseDirection; }
+    FVector GetPivotLocation() const { return PivotLocation; }
     void SetPivotLocation(FVector InPosition);
     void SetCanSpawn(bool bFlag) { bCanSpawn = bFlag; }
 };
+

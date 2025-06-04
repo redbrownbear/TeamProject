@@ -725,15 +725,51 @@ void APC_InGame::OnControlDistance(const FInputActionValue& InputActionValue)
 		FVector Right = -FRotationMatrix(YawOnlyRot).GetUnitAxis(EAxis::Y); // 화면 오른쪽
 
 		// 이동 방향 계산
-		FVector MoveDirection = Forward * InputValue.Y + Right * InputValue.X;
-		MoveDirection.Z = 0.0f;
 
-		if (MoveDirection.IsNearlyZero()) return;
+		// 두 벡터 정규화
+		FVector NormalizedA = LastHit.Normal.GetSafeNormal();
+		FVector NormalizedB = FVector(0.f, 0.f, 1.f).GetSafeNormal();
+
+		// 내적 계산
+		float Dot = FVector::DotProduct(NormalizedA, NormalizedB);
+
+		// 각도로 변환
+		float AngleDegrees = FMath::Acos(FMath::Clamp(Dot, -1.0f, 1.0f)) * (180.0f / PI);
+
+		// 90도 ± 허용 오차 내에 있는지 확인
+		bool bIsPerpendicular = false;
+		if (FMath::Abs(AngleDegrees - 90.0f) <= 5.0f) // 5.f is ToleranceDegrees 
+		{
+			bIsPerpendicular = true;
+		}
+
+		// IcePillarPreview is on the wall; 
+		FVector MoveDirection = FVector::Zero();
+		if (bIsPerpendicular)
+		{
+			MoveDirection = FVector(0.f, 0.f, 1.f) * InputValue.Y + Right * InputValue.X;
+		}
+		else
+		{
+			MoveDirection = Forward * InputValue.Y + Right * InputValue.X;
+		}
+
+		LastHit.Normal.Normalize();
+
+		FVector N = LastHit.Normal.GetSafeNormal();  // 반드시 단위 벡터로
+		FVector V = MoveDirection;
+
+		FVector VProjected = V - FVector::DotProduct(V, N) * N;
+
+
+		if (VProjected.IsNearlyZero()) return;
 
 		if (bIceMaker)
 		{
-			IcePreviewActor->AddActorWorldOffset(MoveDirection.GetSafeNormal() * MoveStep);
-			//UE_LOG(LogTemp, Warning, TEXT("X=%f Y=%f"), InputValue.X, InputValue.Y);
+			IcePreviewActor->AddActorWorldOffset(VProjected.GetSafeNormal() * MoveStep);
+			FVector PivotLocation = IcePreviewActor->GetPivotLocation();
+			PivotLocation += VProjected.GetSafeNormal() * MoveStep;
+			IcePreviewActor->SetPivotLocation(PivotLocation);
 		}
 	}	
 }
@@ -791,7 +827,7 @@ void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 
 		bIceMaker = true;
 
-		UpdateIcePreview();
+		InitIcePreview();
 
 		if (bIcePreviewPlaced)
 		{
@@ -815,7 +851,7 @@ void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 
 }
 
-void APC_InGame::UpdateIcePreview()
+void APC_InGame::InitIcePreview()
 {
 	if (!IcePreviewActor || bIcePreviewPlaced) return;
 

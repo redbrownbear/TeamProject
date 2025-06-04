@@ -267,9 +267,8 @@ public:
 
 	// --------- SuperPower ----------
 protected:
-	// 매 프레임 업데이트
 	UFUNCTION()
-	void UpdateIcePreview();
+	void InitIcePreview();
 
 	// Create IcePillar
 	UFUNCTION()

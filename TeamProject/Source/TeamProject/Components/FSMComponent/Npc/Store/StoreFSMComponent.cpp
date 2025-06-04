@@ -49,7 +49,7 @@ void UStoreFSMComponent::LookAtPlayer(AActor* PlayerActor)
 
 	// Z값 무시하고 수평 방향만 계산
 	FVector Direction = (PlayerLocation - NpcLocation);
-	Direction.Z = 0.f;
+	Direction.Normalize();
 
 	if (Direction.IsNearlyZero()) return;
 
