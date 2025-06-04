@@ -30,7 +30,7 @@ public:
 
 public:
 	void SetSelected(bool bIsSelected);
-
+	void SetEquiped(bool bIsEquiped);
 private:
 	FItemData ItemData;
 
@@ -38,6 +38,9 @@ private:
 	UImage* Icon;
 	UPROPERTY(meta = (BindWidget))
 	UImage* HighlightBg;
+	UPROPERTY(meta = (BindWidget))
+	UImage* EquipedBg;
+
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Amount;
