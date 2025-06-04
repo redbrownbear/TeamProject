@@ -6,6 +6,8 @@
 #include "Actors/Projectile/Arrow/Projectile_Arrow.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "SubSystem/PlayerManager.h"
+#include "Components/Character/PlayerMovementComponent.h"
 
 AWeaponBow::AWeaponBow()
 {
@@ -152,10 +154,13 @@ void AWeaponBow::LeftClickAction()
 
 
     // 이동 방향으로 자동 회전 비활성화
+    UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
     Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
 
-    Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
-  
+    C_Movement->MaxWalkSpeed = PLAYER_MOVE_NML;
+    
+    Cast<UPlayerMovementComponent>(C_Movement)->SetMoveState(EMove_State::Run);
+
     FireArrow();
 
     Player_C->ZoomOut();
@@ -168,6 +173,17 @@ void AWeaponBow::RightClickAction()
 
 
     UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+
+    UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+
+    Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
+
+    Movement->SetMoveState(EMove_State::Zoom);
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    PlayerManager->SetStaminaUSe(false);
+
+    Movement->bOrientRotationToMovement = false;
 
     if (AnimInst->Montage_IsPlaying(EquipMontage))
     {
@@ -185,12 +201,9 @@ void AWeaponBow::RightClickAction()
     AnimInst->Montage_Play(ChargingMTG);
     UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
 
-    C_Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
-
     Player_C->bUseControllerRotationYaw = true; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
 
-    // 이동 방향으로 자동 회전 비활성화
-    C_Movement->bOrientRotationToMovement = false;
+
 
     USpringArmComponent* C_SpringArm = Player_C->GetSpringArm();
 

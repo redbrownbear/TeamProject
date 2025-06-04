@@ -81,7 +81,7 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Jump,
 		ETriggerEvent::Started, this, &ThisClass::JumpGlide);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
-		ETriggerEvent::Started, this, &ThisClass::StartedDash);
+		ETriggerEvent::Triggered, this, &ThisClass::StartedDash);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
 		ETriggerEvent::Completed, this, &ThisClass::CompletedDash);
 
@@ -354,6 +354,9 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
 	const FVector2D ActionValue = FVector2D::Zero();
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	PlayerManager->SetStaminaUSe(false);
 
 	UE_LOG(LogTemp, Warning, TEXT("ActionValue %f, %f"), ActionValue.X, ActionValue.Y);
 	P_Anim->ActionValue = ActionValue;
