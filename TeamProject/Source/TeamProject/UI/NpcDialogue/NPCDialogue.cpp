@@ -23,6 +23,9 @@ void UNPCDialogue::ShowUI()
     CancelButton->SetVisibility(ESlateVisibility::Hidden);
     ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 
+    ConfrimText->SetText(FText::FromString(TEXT("확인")));
+    CancelText->SetText(FText::FromString(TEXT("취소")));
+
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     {

@@ -96,4 +96,16 @@ void UUIManager::LoadUIClass()
         }
     }
 
+    if (!CachedQuickSlotClass)
+    {
+        CachedQuickSlotClass = CreateWidget<UQuickSlotMain>(World, LoadClass<UQuickSlotMain>(nullptr, TEXT("/Game/Blueprint/UI/QuickSlot/BP_QuickSlot.BP_QuickSlot_C")));
+        if (CachedQuickSlotClass)
+        {
+            CachedQuickSlotClass->AddToViewport();
+            CachedQuickSlotClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedQuickSlotClass->OnCreated();
+            CachedUIs.Add(UQuickSlotMain::StaticClass(), CachedQuickSlotClass);
+        }
+    }
+
 }

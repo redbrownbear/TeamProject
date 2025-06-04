@@ -127,6 +127,12 @@ void APC_InGame::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Build,
 		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);		
+
+	//QuickSlot
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotLeft,
+		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotLeft);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotRight,
+		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotRight);
 }
 
 void APC_InGame::Tick(float DeltaSeconds)
@@ -201,6 +207,8 @@ void APC_InGame::BindInventoryInput()
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenNavigate, ETriggerEvent::Started, this, &APC_InGame::OnNavigate);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenConfirm, ETriggerEvent::Started, this, &APC_InGame::OnConfirm);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenCancel, ETriggerEvent::Started, this, &APC_InGame::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_DropItem, ETriggerEvent::Started, this, &APC_InGame::DropItem);
+
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started, this, &APC_InGame::OnCreateItemTest);
 	}
 }
@@ -597,6 +605,7 @@ void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
 	if (PlayerManager)
 	{
 		PlayerManager->ShowInvenUI();
+		PlayerManager->ShowEquipUI();
 	}
 }
 
@@ -642,6 +651,36 @@ void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
 	IcePreviewActor->SetActorHiddenInGame(true);
 
 	bCanSpawn = false;
+}
+
+void APC_InGame::OnQuickSlotLeft(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if (UIManager)
+	{
+		UIManager->ShowUI(UQuickSlotMain::StaticClass());
+	}
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
+	{
+		PlayerManager->ShowQuickSlot();
+	}
+}
+
+void APC_InGame::OnQuickSlotRight(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if (UIManager)
+	{
+		UIManager->ShowUI(UQuickSlotMain::StaticClass());
+	}
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
+	{
+		PlayerManager->ShowQuickSlot();
+	}
 }
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
@@ -837,6 +876,16 @@ void APC_InGame::OnNextDialogue(const FInputActionValue& InputActionValue)
 		
 		break;
 	}
+}
+
+void APC_InGame::DropItem(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	UInventory* InvenUI = UIManager->FindUI<UInventory>();;
+	if (InvenUI)
+		InvenUI->OnCreateItemInWorld(InputActionValue);
 }
 
 void APC_InGame::OnCreateItemTest(const FInputActionValue& InputActionValue)

@@ -13,6 +13,7 @@
 #include "UI/Shop/Shop.h"
 #include "UI/Quest/Quest.h"
 #include "UI/Popup/PopupGetItem.h"
+#include "UI/QuickSlot/QuickSlotMain.h"
 
 #include "UIManager.generated.h"
 
@@ -98,6 +99,8 @@ public:
     UQuest* CachedQuestClass;
     UPROPERTY()
     UPopupGetItem* CachedPopupClass;
+    UPROPERTY()
+    UQuickSlotMain* CachedQuickSlotClass;
 
 public:
     UPROPERTY(BlueprintAssignable)

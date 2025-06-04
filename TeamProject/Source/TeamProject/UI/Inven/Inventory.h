@@ -9,11 +9,12 @@
 #include "Components/Image.h"
 #include "Data/ItemDataRow.h"
 
+#include "UI/Base/BaseUI.h"
 #include "UI/Inven/InventoryScroll.h"
 #include "UI/Inven/InventoryEquip.h"
 #include "UI/Inven/InventorySelectSet.h"
+#include "Actors/Item/WorldWeapon.h"
 
-#include "UI/Base/BaseUI.h"
 #include "Inventory.generated.h"
 
 /**
@@ -41,6 +42,8 @@ public: //바인딩을 위해 퍼블릭선언
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	void OnConfirm(const FInputActionValue& InputActionValue);
 	void OnCancel(const FInputActionValue& InputActionValue);
+	void OnCreateItemInWorld(const FInputActionValue& InputActionValue);
+
 	void OnCreateItemTest(const FInputActionValue& InputActionValue);
 
 private:
@@ -67,4 +70,9 @@ private:
 private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CoinText;
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Drop")
+	TSubclassOf<class AWorldWeapon> WorldItemActorClass;
+
 };

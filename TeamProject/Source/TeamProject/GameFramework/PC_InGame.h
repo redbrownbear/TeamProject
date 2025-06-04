@@ -12,6 +12,7 @@
 #include "UI/Shop/Shop.h"
 #include "UI/Quest/Quest.h"
 #include "UI/Popup/PopupGetItem.h"
+#include "UI/QuickSlot/QuickSlotMain.h"
 
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
@@ -114,6 +115,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_InvenCancel = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_DropItem = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_InvenAddItem = nullptr;
 
 	//Dialogue
@@ -135,6 +138,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_Build = nullptr;
 
+	//QuickSlot
+public:
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_QuickSlotLeft = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_QuickSlotRight = nullptr;
+
 	void CheckValid() const
 	{
 		check(IMC_InGame);
@@ -154,12 +165,15 @@ public:
 		check(IA_InvenConfirm);
 		check(IA_InvenCancel);
 		check(IA_InvenAddItem);
+		check(IA_DropItem);
 		check(IA_DialogueNavigate);
 		check(IA_DialogueConfirm);
 		check(IA_DialogueCancel);
 		check(IA_DialogueNext);
 		check(IA_IceMaker);		
 		check(IA_Build);
+		check(IA_QuickSlotLeft);
+		check(IA_QuickSlotRight);
 	}
 };
 
@@ -227,7 +241,6 @@ protected:
 	// --------- Ice Maker ------------------------------
 
 	void BeginIcePreview(const FInputActionValue& InputActionValue);
-	void EndIcePreview(const FInputActionValue& InputActionValue);
 
 	//UI
 	void OnNavigate(const FInputActionValue& InputActionValue);
@@ -235,11 +248,16 @@ protected:
 	void OnCancel(const FInputActionValue& InputActionValue);
 	void OnNextDialogue(const FInputActionValue& InputActionValue);
 
+	void DropItem(const FInputActionValue& InputActionValue);
+
 	void OnCreateItemTest(const FInputActionValue& InputActionValue);
 	//UI
 
 	void SpawnIcePillar(const FInputActionValue& InputActionValue);
-	
+
+	void OnQuickSlotLeft(const FInputActionValue& InputActionValue);
+	void OnQuickSlotRight(const FInputActionValue& InputActionValue);
+
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
 

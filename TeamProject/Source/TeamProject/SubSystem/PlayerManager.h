@@ -18,6 +18,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, const FItemData
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInvenEquipItemAllUpdated, const TArray<FItemData>&, ItemData);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuickSlotUpdated, const TArray<FItemData>&, ItemData);
+
 struct sPlayerStatus
 {
 	int32 MaxHp;
@@ -38,7 +40,6 @@ struct sPlayerStatus
 	float StaminaRegenSpeed;
 
 	bool bIsUseStamina;
-	//ï¿½ß°ï¿½ï¿½Ò°ï¿½ ï¿½Ï½Ê¼ï¿½~
 };
 
 /**
@@ -64,18 +65,27 @@ private:
 public:
 	void SetInvenData(FItemData ItemRow);
 	void ShowInvenUI();
-	const TArray<FItemData>& GetAllItemData() const { return ItemList; }
+	const TArray<FItemData>& GetAllItemData() const { return ItemInvenList; }
 
 	UFUNCTION()
 	void SetEquipData(const FItemData& ItemRow);
 	void ShowEquipUI();
 	const TArray<FItemData>& GetAllEquipData() const { return EquipItemList; }
 
+	bool IsEquipPart(eEquipParts Parts);
+	FItemData GetItemByUniqueID(const FString& UniqueItemID);
+	FItemData RemoveItemByUniqueID(FString UniqueID);
+
+	void ShowQuickSlot();
+
 private:
 	void UpDateInvenUI(const FItemData& ItemData);
 	void UpDateInvenUI(const TArray<FItemData>& ItemList);
 
-	void UpDateInvenEquipUI(const TArray<FItemData>& ItemMap);
+	void UpDateInvenEquipUI(const TArray<FItemData>& ItemList);
+
+	void UpDataQuickSlot(const TArray<FItemData>& ItemList);
+
 	//ItemÀü¿ë
 
 public:
@@ -113,12 +123,14 @@ public:
 	FOnInventoryAllUpdated OnInventoryAllUpdated;
 	UPROPERTY(BlueprintAssignable)
 	FOnInvenEquipItemAllUpdated OnInvenEquipItemAllUpdated;
+	UPROPERTY(BlueprintAssignable)
+	FOnQuickSlotUpdated OnQuickSlotUpdated;
 
 private:
 	sPlayerStatus PlayerStatus;
 
 	TArray<FQuestDataRow> QuestList;
-	TArray<FItemData> ItemList;
+	TArray<FItemData> ItemInvenList;
 
 	TArray<FItemData> EquipItemList;
 

@@ -26,6 +26,7 @@ public:
 	// for spawn from codes
 	virtual void SetDataWithName(const FName& WorldWeaponName);
 	virtual void SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHandle);
+	virtual void SetDataWithData(const FItemData& InItemData);
 
 protected:
 	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
