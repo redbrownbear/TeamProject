@@ -92,7 +92,6 @@ void ATorchStand::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
             }
             if (WeaponManager->GetCanShot())
             {
-                AWeaponBow* Actor_Bow = Cast<AWeaponBow>(WeaponManager->GetBow()->GetChildActor());
                 Player_C->SetArrowFire(true);
             }
         }

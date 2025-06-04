@@ -155,7 +155,7 @@ void APlayerCharacter::BeginPlay()
 	ChargedArrow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 	ChargedArrow->SetLifeSpan(0.f);
 	ChargedArrow->GetProjectileMovement()->Deactivate();
-	//ChargedArrow->GetStaticMeshComp()->SetVisibility(false);
+	ChargedArrow->GetStaticMeshComp()->SetVisibility(false);
 }
 
 // Called every frame

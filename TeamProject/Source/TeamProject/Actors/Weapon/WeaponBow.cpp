@@ -7,6 +7,7 @@
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "SubSystem/PlayerManager.h"
+#include "UI/HUD/MainHUD.h"
 #include "Components/Character/PlayerMovementComponent.h"
 
 AWeaponBow::AWeaponBow()
@@ -129,6 +130,8 @@ void AWeaponBow::LeftClickAction()
     
     Cast<UPlayerMovementComponent>(C_Movement)->SetMoveState(EMove_State::Run);
 
+    Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ShowBowAimgUI(false, 0);
+
     FireArrow();
 
     Player_C->ZoomOut();
@@ -168,6 +171,8 @@ void AWeaponBow::RightClickAction()
 
     AnimInst->Montage_Play(ChargingMTG);
     UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
+
+    Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ShowBowAimgUI(true, 0);
 
     Player_C->bUseControllerRotationYaw = true; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
 

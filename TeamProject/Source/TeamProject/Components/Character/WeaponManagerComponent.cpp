@@ -6,7 +6,7 @@
 #include "Actors/Weapon/WeaponShield.h"
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
-
+#include "UI/HUD/MainHUD.h"
 // Sets default values for this component's properties
 UWeaponManagerComponent::UWeaponManagerComponent()
 {
@@ -479,6 +479,7 @@ void UWeaponManagerComponent::RightClickEnd()
 
 			Player_C->ZoomOut();
 
+			Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ShowBowAimgUI(false, 0);
 
 			AWeaponBow* WBow = Cast<AWeaponBow>(Bow->GetChildActor());
 
@@ -486,6 +487,8 @@ void UWeaponManagerComponent::RightClickEnd()
 			{
 				AnimInst->Montage_Stop(0.f);
 			}
+			Player_C->SetArrowFire(false);
+
 			Player_C->SetArrowVisibility(false);
 
 			Player_C->SetNiagaraSystemAssetNone();
