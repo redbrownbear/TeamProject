@@ -7,9 +7,9 @@
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 #include "NpcCharacterTableRow.generated.h"
 
-#define QUESTCHARDIALOGUE_FURIKO				0
-#define QUESTCHARDIALOGUE_FURIKO_FIND			100
-#define QUESTCHARDIALOGUE_STORE					200
+//#define QUESTCHARDIALOGUE_FURIKO				0
+//#define QUESTCHARDIALOGUE_FURIKO_FIND			100
+//#define QUESTCHARDIALOGUE_STORE					200
 
 UENUM()
 enum class EDialogType
@@ -27,7 +27,6 @@ enum class EQuestCharacter
 
 	Furiko,
 	Korok,
-	//����� ĳ���͸�
 	//Store,
 
 	End,
@@ -39,6 +38,7 @@ enum class EQuestCharacter
 //	Furiko = 0,
 //	Furiko_Found = 100,
 //	Store = 200,
+//	Store_Buy = 1000,
 //};
 
 USTRUCT()

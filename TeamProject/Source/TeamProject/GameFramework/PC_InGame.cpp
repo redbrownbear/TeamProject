@@ -588,7 +588,7 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 	{
 		if (UNpcFSMComponent* FSM = Npc->GetFSMComponent())
 		{
-			if(Npc->GetData()->DialogType == EDialogType::Shop)
+			if(Npc->GetCurrentDialogueType() == EDialogType::Shop)
 			{
 				FSM->ChangeState(ENpcState::Sell);
 			}
@@ -597,11 +597,17 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 				FSM->ChangeState(ENpcState::Talk);
 			}			
 		}
+
+		return;
 	}
 
 	if (TreasureBox && TreasureBox->GetOpenBox())
 	{
 		TreasureBox->OpenTBox();
+	}	
+	else if(TreasureBox && !TreasureBox->GetOpenBox())
+	{
+		TreasureBox->CloseUI();
 	}
 }
 
@@ -647,7 +653,7 @@ void APC_InGame::TrySuperPower(const FInputActionValue& InputActionValue)
 		}
 	}
 
-	if (bMagnesisKeyPressed)
+	else if (bMagnesisKeyPressed)
 	{
 		if (IsHoldingObject()) return;
 

@@ -12,6 +12,7 @@ class USkeletalMeshComponent;
 class UNpcFSMComponent;
 class AStrollPath;
 class UAdvancedFloatingPawnMovement;
+class UConversationManagerComponent;
 
 UCLASS()
 class TEAMPROJECT_API ANpc : public APawn
@@ -51,12 +52,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	TObjectPtr<UAdvancedFloatingPawnMovement> MovementComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ConverSation")
+	TObjectPtr<UConversationManagerComponent> ConversationManager;
+
 public:
 	UNpcFSMComponent* GetFSMComponent() const;
 
 	AStrollPath* GetStrollPath() const { return StrollPath; }
 
 	USkeletalMeshComponent* GetBodyMesh() const { return BodyMeshComponent; }
+
+	UConversationManagerComponent* GetConversationManager() const { return ConversationManager; }
 
 	bool GetCanTalk() { return bPlayerInRange; }
 
@@ -96,7 +102,10 @@ protected:
 
 public:
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
-	FNpcCharacterTableRow* GetData() { return NpcData; }
+	const FNpcCharacterTableRow* GetData() const { return NpcData; }
+
+	void SetCurrentDialogueType(EDialogType InDialogueType) { CurrentDialogueType = InDialogueType; }
+	const EDialogType GetCurrentDialogueType() const { return CurrentDialogueType; }
 
 public:
 	void PlayMontage(ENpcMontage _InEnum, bool bIsLoop = false);
@@ -154,6 +163,8 @@ protected:
 	UFUNCTION()
 	void OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	EDialogType CurrentDialogueType;
 
 public:
 	void SetSpeedWalk();

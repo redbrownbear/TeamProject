@@ -56,7 +56,7 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 		Owner->SetNpc(EQuestCharacter::Furiko);
 	}
 
-	if (Controller->GetConversationManager()->GetEndTalked())
+	if (Owner->GetConversationManager()->GetEndTalked())
 	{
 		bool IsConfirmed = Owner->GetIsConfirmed();
 		bool IsFound = Owner->GetIsHide();

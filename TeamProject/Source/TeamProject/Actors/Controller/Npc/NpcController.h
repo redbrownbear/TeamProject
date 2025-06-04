@@ -5,7 +5,6 @@
 #include "NpcController.generated.h"
 
 class UNpcFSMComponent;
-class UConversationManagerComponent;
 
 UCLASS()
 class TEAMPROJECT_API ANpcController : public AAIController
@@ -18,7 +17,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	UConversationManagerComponent* GetConversationManager() const { return ConversationManager;  }
+	
 
 protected:
 	virtual void BeginPlay() override;
@@ -33,9 +32,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UNpcFSMComponent> NpcFSMComponent;
 	
-	UPROPERTY()
-	TObjectPtr<UConversationManagerComponent> ConversationManager;
-
 public:
 	bool bPerceive = false;
 	bool bTalk = false; 

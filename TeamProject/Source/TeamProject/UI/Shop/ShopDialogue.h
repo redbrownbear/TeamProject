@@ -77,4 +77,6 @@ private:
 	FTimerHandle TypingTimerHandle;
 	bool bIsTyping = false;
 
+	UPROPERTY()
+	TObjectPtr<ANpc> Npc = nullptr;
 };

@@ -15,6 +15,12 @@ UConversationManagerComponent::UConversationManagerComponent()
 {	
 	PrimaryComponentTick.bCanEverTick = true;
 
+	static ConstructorHelpers::FObjectFinder<UDataTable> DialogueTableAsset(TEXT("/Game/Data/NPC/DT_NPCDialogue.DT_NPCDialogue"));
+	if (DialogueTableAsset.Succeeded())
+	{
+		NpcDialogueTable = DialogueTableAsset.Object;
+	}
+
 }
 
 void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacter* Player)
@@ -35,31 +41,46 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 		if (QuestManager->IsConversation())
 			return;
 
-		EDialogType DialogType = Npc->GetData()->DialogType;
+		UIManager->ShowUI(UNPCDialogue::StaticClass());
+		
+		EDialogType DialogType = Npc->GetCurrentDialogueType();
+		EQuestCharacter QuestCharacter = Npc->GetData()->QuestCharacter;
+		int32 DialogueID = 0;
 
+		if ((QuestCharacter == EQuestCharacter::Furiko && (DialogType == EDialogType::None || DialogType == EDialogType::Quest)) ||
+			(QuestCharacter == EQuestCharacter::Korok && (DialogType == EDialogType::None || DialogType == EDialogType::Shop)))
+		{
+			DialogueID = GetDialogueID(NpcDialogueTable, QuestCharacter, DialogType);
+		}
+
+		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, DialogueID);
+		
 		//로직 수정 해야함
 		//임시 수정해놓음 -> EQuestCharDialogue::Furiko_Found 이런 하드코딩 지양하길 바라 ㅠㅠ
-		UIManager->ShowUI(UNPCDialogue::StaticClass());
-		bool IsQuest = Npc->GetDoQuest();
-		if (!DialogueDataRow.bIsEndConversation && IsQuest)
-		{
-			//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko_Found));
-			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_FURIKO_FIND);
-		}
-		else
-		{
-			if (DialogType == EDialogType::Shop)
-			{
-				//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
-				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_STORE);
-
-			}
-			else
-			{
-				//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko));
-				QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_FURIKO);
-			}
-		}
+		// UIManager->ShowUI(UNPCDialogue::StaticClass());
+		// bool IsQuest = Npc->GetDoQuest();
+		//if (!DialogueDataRow.bIsEndConversation && IsQuest)
+		//{
+		//	QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko_Found));
+		//	//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_FURIKO_FIND);
+		//}
+		//else
+		//{
+		//	if (DialogType == EDialogType::Shop)
+		//	{
+		//		if (Npc->GetBuy() && !Npc->GetShopping())
+		//		{
+		//			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store_Buy));
+		//		}
+		//		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
+		//		//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_STORE);			
+		//	}
+		//	else
+		//	{
+		//		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko));
+		//		//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_FURIKO);
+		//	}
+		//}
 	}
 }
 
@@ -84,16 +105,36 @@ void UConversationManagerComponent::BeginPlay()
 	}
 }
 
+int32 UConversationManagerComponent::GetDialogueID(UDataTable* DialogueTable, EQuestCharacter Character, EDialogType DialogType)
+{
+	if (!DialogueTable) return -1;
+
+	const TArray<FName> RowNames = DialogueTable->GetRowNames();
+
+	for (const FName& RowName : RowNames)
+	{
+		const FNPCDialogueTableRow* Row = DialogueTable->FindRow<FNPCDialogueTableRow>(RowName, TEXT("Dialogue Lookup"));
+		if (!Row) continue;
+
+		if (Row->QuestCharacter == Character && Row->DialogType == DialogType)
+		{
+			return Row->CurrentDialogueID;
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("No matching dialogue found for Character: %d, DialogType: %d"), (uint8)Character, (uint8)DialogType);
+	return -1;
+}
+
+
 void UConversationManagerComponent::PlayTalkAnimations()
 {
-	// NPC �� ��Ÿ��
 	if (UAnimInstance* NpcAnim = CurrentNpc->GetBodyMesh()->GetAnimInstance())
 	{
 		NpcAnim->Montage_Play(NpcTalkMontage);
 		//NpcAnim->Montage_Play(NpcIdleMontage);
 	}
 
-	// Player �� ��Ÿ�� // �ʿ� ���� ����?
 	if (UAnimInstance* PlayerAnim = CurrentPlayer->GetMesh()->GetAnimInstance())
 	{
 		PlayerAnim->Montage_Play(PlayerTalkMontage); 
@@ -111,13 +152,11 @@ void UConversationManagerComponent::LockCharacters(ANpc* Npc, APlayerCharacter* 
 
 	if (Player)
 	{
-		// �̵��� ����
 		if (UCharacterMovementComponent* MoveComp = Player->GetCharacterMovement())
 		{
-			MoveComp->SetMovementMode(MOVE_None); // �̵� �Ұ� (Jump, �ȱ� �� ��� ����)
+			MoveComp->SetMovementMode(MOVE_None); 
 		}
 
-		// ȸ���� ���� ����� �ٲ�
 		Player->bUseControllerRotationYaw = false;
 	}
 }
@@ -128,7 +167,7 @@ void UConversationManagerComponent::UnlockCharacters(ANpc* Npc, APlayerCharacter
 	{
 		if (UCharacterMovementComponent* MoveComp = Player->GetCharacterMovement())
 		{
-			MoveComp->SetMovementMode(MOVE_Walking); // �̵� ���� ���� ����
+			MoveComp->SetMovementMode(MOVE_Walking); 
 		}
 	}
 }

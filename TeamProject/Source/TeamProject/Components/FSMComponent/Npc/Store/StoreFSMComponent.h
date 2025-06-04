@@ -21,5 +21,5 @@ protected:
 
 private:
 	void LookAtPlayer(AActor* PlayerActor);
-	bool CanSeePlayer() const;
+	//bool CanSeePlayer() const;
 };

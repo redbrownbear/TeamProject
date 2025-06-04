@@ -6,6 +6,8 @@
 #include "GameFramework/PC_InGame.h"
 
 #include "UI/HUD/MainHUD.h"
+#include "Data/ItemDataRow.h"
+#include "SubSystem/UI/UIManager.h"
 
 // Sets default values
 ATreasureBox::ATreasureBox()
@@ -51,9 +53,19 @@ void ATreasureBox::BeginPlay()
 
 void ATreasureBox::OpenTBox()
 {
-	if (!bCanTakeItem) return;
+	if (!bCanTakeItem && !bCanOpenBox)
+	{
+		UE_LOG(LogTemp, Log, (TEXT("This Box is empty")));
+	}
+
+	ShowItemByRowName(ItemRowHandle.RowName);
 
 	GetTreasure();
+}
+
+void ATreasureBox::CloseUI()
+{
+	PopupItemUI->HideUI(UPopupGetItem::StaticClass());
 }
 
 void ATreasureBox::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -100,14 +112,24 @@ void ATreasureBox::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedCompone
 
 void ATreasureBox::GetTreasure()
 {
-	if (bCanTakeItem)
+	APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+	if (PC_InGame)
 	{
-		// open Item UI
-		// Add Item to Inventory
+		if (ItemDataPtr && bCanTakeItem)
+		{
+			// open Item UI
+			ShowItemPopup(ItemRowHandle.RowName);
 
-		DynamicMaterialInstance->SetScalarParameterValue("Color", 1.f);
-		bCanTakeItem = false;
-	}	
+			// Add Item to Inventory
+			AddItemInventory();
+
+			DynamicMaterialInstance->SetScalarParameterValue("Color", 1.f); 
+			
+			EmptyBox();
+		}
+
+		PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
+	}
 }
 
 
@@ -130,5 +152,47 @@ void ATreasureBox::GetParticleEffect()
 			Effect->SetData(ParticleEffectTableRowHandle);
 			Effect->FinishSpawning(SpawnTransform);
 		}
+	}
+}
+
+void ATreasureBox::ShowItemByRowName(FName RowName)
+{
+	/*if (!ItemDataTable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ItemDataTable is null"));
+		return;
+	}*/
+
+	//ItemDataPtr = ItemDataTable->FindRow<FItemData>(RowName, TEXT("Find Item Row"));
+
+	ItemDataPtr = ItemRowHandle.GetRow<FItemData>(TEXT("Find Item Row"));
+
+	if (!ItemDataPtr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Item Row not found: %s"), *RowName.ToString());
+	}
+}
+
+void ATreasureBox::ShowItemPopup(FName ItemRowName)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if (UIManager)
+	{
+		UIManager->ShowUI(UPopupGetItem::StaticClass());
+	}
+
+	PopupItemUI = UIManager->FindUI<UPopupGetItem>();
+	if (PopupItemUI)
+	{
+		PopupItemUI->ShowData(*ItemDataPtr);
+	}
+}
+
+void ATreasureBox::AddItemInventory()
+{
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
+	{
+		PlayerManager->SetInvenData(*ItemDataPtr);
 	}
 }

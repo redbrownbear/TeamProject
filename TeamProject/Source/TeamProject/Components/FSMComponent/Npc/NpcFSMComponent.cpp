@@ -48,9 +48,9 @@ void UNpcFSMComponent::BeginPlay()
 	}
 
 	Controller = Cast<ANpcController>(Owner->GetController());
-	if (Controller && Controller->GetConversationManager())
+	if (Controller && Owner->GetConversationManager())
 	{
-		UConversationManagerComponent* ConversationManager = Controller->GetConversationManager();
+		UConversationManagerComponent* ConversationManager = Owner->GetConversationManager();
 
 		if (!ConversationManager)
 		{
@@ -122,7 +122,7 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 
 	eCurrentState = NewState;
 
-	Controller->GetConversationManager()->SetEndTalked(false);
+	Owner->GetConversationManager()->SetEndTalked(false);
 
 	switch (NewState)
 	{
@@ -145,7 +145,7 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		// @TODO Play Sequence
 		//PlayInterectSequence();
 		Owner->PlayMontage(ENpcMontage::TALK);
-		Controller->GetConversationManager()->StartConversation(Owner, Player);
+		Owner->GetConversationManager()->StartConversation(Owner, Player);
 		break;
 	case ENpcState::Hide:
 		Owner->PlayMontage(ENpcMontage::HIDE);
@@ -153,6 +153,7 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		break;
 	case ENpcState::Sell:
 		Owner->PlayMontage(ENpcMontage::SELL);
+
 		break;
 	case ENpcState::End:
 		Owner->PlayMontage(ENpcMontage::END);
@@ -251,11 +252,10 @@ void UNpcFSMComponent::HideFuriko()
 {
 	if (HidePoints.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HidePoints ë°°ì—´??ë¹„ì–´?ˆìŠµ?ˆë‹¤."));
+		UE_LOG(LogTemp, Warning, TEXT("HidePoints is nullptr"));
 		return;
 	}
 
-	// ?œë¤ ?¸ë±??? íƒ
 	const int32 Index = FMath::RandRange(0, HidePoints.Num() - 1);
 	AHidePoint* Target = HidePoints[Index];
 
@@ -282,23 +282,19 @@ void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 
 	// À§Ä¡ È®ÀÎ
 	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation ¿Ï·á. Owner À§Ä¡: %s"), *Owner->GetActorLocation().ToString());
-	// ?´ë™ ë°©í•´ ì°¨ë‹¨
+
 	if (Owner->GetController()) Owner->GetController()->StopMovement();
 
 	// ?œê°„?´ë™
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	Owner->SetIsHide(true);
 
-	// ?„ì¹˜ ?•ì¸
-	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation ?„ë£Œ. Owner ?„ì¹˜: %s"), *Owner->GetActorLocation().ToString());
 }
 
 void UNpcFSMComponent::PlayInterectSequence()
 {
 	// Talk ½Ã Ä³¸¯ÅÍ À§Ä¡¸¸ °íÁ¤µÇ°Ô Á¶Á¤ÇÑ µÚ ±× ´ÙÀ½¿¡ »ý¼ºÇØ¾ß ÇÒ µí
-
-	// Talk ??ìºë¦­???„ì¹˜ë§?ê³ ì •?˜ê²Œ ì¡°ì •????ê·??¤ìŒ???ì„±?´ì•¼ ????
-
+	
 	/*if (Player)
 	{
 		FVector PlayerLocation = Player->GetActorLocation();

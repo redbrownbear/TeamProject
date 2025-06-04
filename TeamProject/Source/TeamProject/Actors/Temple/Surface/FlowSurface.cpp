@@ -17,8 +17,8 @@ AFlowSurface::AFlowSurface()
 	SplineComponent->SetClosedLoop(true);
 	SplineComponent->SetupAttachment(RootComponent);
 
-	CollisionComponent_Array.Reserve(FLOWSURFACE_FLOOR_NUM); // Reserve�� ���⼭ �ص� �����մϴ�.
-	fDistanceAlongSpline_Array.Reserve(FLOWSURFACE_FLOOR_NUM); // Reserve�� ���⼭ �ص� �����մϴ�.
+	CollisionComponent_Array.Reserve(FLOWSURFACE_FLOOR_NUM); 
+	fDistanceAlongSpline_Array.Reserve(FLOWSURFACE_FLOOR_NUM); 
 
 	FlowSpeed = FLOWSURFACE_MOVING_SPEED;
 }

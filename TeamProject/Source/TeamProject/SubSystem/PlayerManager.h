@@ -78,11 +78,8 @@ private:
 	void UpDateInvenEquipUI(const TArray<FItemData>& ItemMap);
 
 	//ItemÀü¿ë
-=======
-	void UpDateInvenUI(const TArray<FItemData>& QuestList);
-	//Itemï¿½ï¿½ï¿½ï¿½
 
-	//Statusï¿½ï¿½ï¿½ï¿½
+	//StatusÀü¿ë
 public:
 	void InitStatus();
 

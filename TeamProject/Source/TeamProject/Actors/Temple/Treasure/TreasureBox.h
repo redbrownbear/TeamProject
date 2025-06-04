@@ -7,6 +7,8 @@
 #include "TreasureBox.generated.h"
 
 class UBoxComponent;
+class UPopupGetItem;
+struct FItemData;
 
 UCLASS()
 class TEAMPROJECT_API ATreasureBox : public AActor
@@ -21,9 +23,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void EmptyBox() 
+	{
+		bCanOpenBox = false;
+		bCanTakeItem = false;
+	}
+
 public:
 	UFUNCTION()
 	void OpenTBox();
+
+	UFUNCTION()
+	void CloseUI();
 
 	bool GetOpenBox() { return bCanOpenBox; }
 
@@ -44,9 +55,19 @@ protected:
 
 	void GetParticleEffect();
 
+	void ShowItemByRowName(FName RowName);
+	void ShowItemPopup(FName ItemRowName);
+	void AddItemInventory();
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Effect", meta = (RowType = "ParticleEffectTableRow"))
 	FDataTableRowHandle ParticleEffectTableRowHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+	FDataTableRowHandle ItemRowHandle;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	UDataTable* ItemDataTable;*/
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -54,6 +75,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TObjectPtr<UPopupGetItem> PopupItemUI;
 
 protected:
 	UMaterialInterface* MaterialInterface;
@@ -65,5 +89,8 @@ private:
 
 	// 상호작용 가능 변수
 	UPROPERTY()
-	bool bPlayerInRange = false;
+	bool bPlayerInRange = false;	
+
+	const FItemData* ItemDataPtr;
+
 };

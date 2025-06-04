@@ -5,6 +5,8 @@
 
 #include "SubSystem/UI/UIManager.h"
 
+#include "Actors/Npc/Npc.h"
+
 void UShopDialogue::NativeConstruct()
 {
     Super::NativeConstruct();
@@ -51,7 +53,7 @@ void UShopDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 
 void UShopDialogue::OnConfirm()
 {
-    //구매 완료
+    //구매 완료   
 }
 
 void UShopDialogue::OnCancel()
