@@ -37,7 +37,6 @@ void AKogaStone::Tick(float DeltaTime)
 
 	if (!bFall)
 	{
-
 		if (ACharacterMonster* CharacterMonster = Cast<ACharacterMonster>(Owner))
 		{
 			if (UAssasinBossFSMComponent* FSMComponent = Cast<UAssasinBossFSMComponent>(CharacterMonster->GetFSMComponent()))

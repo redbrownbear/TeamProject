@@ -18,15 +18,13 @@ void UAnimNotify_AL_AttackBig::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 			FTransform::Identity, nullptr, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 		FTransform NewTransform;
-		const FVector MonsterForwardVector = Monster->GetActorForwardVector();
-		NewTransform.SetRotation(MonsterForwardVector.Rotation().Quaternion());
-
 
 		Projectile->SetData(ProjectileName::Monster_AL_AttackBig, CollisionProfileName::ToPlayer);
 
 		const FVector Location = Monster->GetActorLocation();
+		const FRotator Rotation = Monster->GetActorForwardVector().Rotation();
 		NewTransform.SetLocation(Location);
-
+		NewTransform.SetRotation(Rotation.Quaternion());
 
 
 		Projectile->FinishSpawning(NewTransform);
