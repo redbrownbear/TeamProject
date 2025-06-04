@@ -38,7 +38,6 @@
 #define NPC_SIGHT_ANGLE																90.f
 
 
-
 #define Arrow_Speed																	800.f
 #define LYNEL_DASH_GOAL_OFFSET														100.f
 #define LYNEL_FIRE_ATTACK_MAX_TIMES													3
@@ -73,8 +72,8 @@
 
 #define PLAYER_MOVE_CROUCH															200.f
 #define PLAYER_MOVE_DASH															800.f
-#define PLAYER_MOVE_NML																500.f
-#define	PLAYER_MOVE_BOW_ZOOM														200.f
+#define PLAYER_MOVE_NML                                                             500.f
+#define PLAYER_MOVE_BOW_ZOOM														200.f
 #define PLAYER_CLIMB_SPEED															80.f
 #define PLAYER_CAPSULE_HALF_HEIGHT													41.f
 #define PLAYER_CAPSULE_RADIUS														20.f
@@ -86,3 +85,5 @@
 
 #define ICEPILLAR_MAXSPEED														    300.f
 #define ICEPILLAR_MAXHEIGT															300.F
+
+#define STEMINA_USE_SPEED															5.f

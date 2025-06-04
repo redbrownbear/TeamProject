@@ -129,7 +129,7 @@ void UInventory::OnConfirm(const FInputActionValue& InputActionValue)
     FVector2D ItemWidgetPosition = BP_InvenScroll->GetItemListLocation();
     FVector2D Offset(100.f, -100.0f); 
 
-    BP_InvenSelectSet->ShowButton(true, BP_InvenScroll->GetCurItem());
+    BP_InvenSelectSet->ShowButton(true, BP_InvenScroll->GetCurItemData());
 
     if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(BP_InvenSelectSet->Slot))
     {
@@ -188,4 +188,5 @@ void UInventory::RefreshDescription(const FItemData& ItemData)
 void UInventory::RefreshEquip(const TArray<FItemData>& ItemDataMap)
 {
     BP_InvenEquip->SetEquipMakeData(ItemDataMap);
+    BP_InvenScroll->EquipCurrentItem();
 }

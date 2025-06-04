@@ -77,9 +77,6 @@ private:
 
 	void UpDateInvenEquipUI(const TArray<FItemData>& ItemMap);
 
-	//Item전용
-
-	//Status전용
 public:
 	void InitStatus();
 

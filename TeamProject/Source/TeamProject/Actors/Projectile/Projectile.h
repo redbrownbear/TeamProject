@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -36,7 +36,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UShapeComponent> CollisionComponent;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* StaticMeshComponent;
 	UPROPERTY()
 	class UProjectileMovementComponent* ProjectileMovementComponent;
@@ -54,5 +54,6 @@ public:
 	FVector GetVelocity();
 	virtual FName GetProjectileName();
 	float GetDamage();
-
+	UStaticMeshComponent* GetStaticMeshComp() { return StaticMeshComponent; }
+	UProjectileMovementComponent* GetProjectileMovement() { return ProjectileMovementComponent; }
 };

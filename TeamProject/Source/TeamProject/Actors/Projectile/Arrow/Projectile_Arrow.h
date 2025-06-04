@@ -1,10 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Actors/Projectile/Projectile.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "Projectile_Arrow.generated.h"
+
+class UStaticMeshComponent;
+class USphereComponent;
+class UNiagaraComponent;
+struct FNiagaraEffectTableRow;
 
 /**
  * 
@@ -21,7 +28,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
@@ -34,5 +41,24 @@ public:
 
 	virtual FName GetProjectileName() override;
 
+	virtual void SetData(const FName& ProjectileName, FName ProfileName) override;
+
+	void SetNiagaraSystemAssetNone() { NiagaraComponent->SetAsset(nullptr); }
+
+
+
+public:
+	bool GetIsFire() { return bIsFire; }
+
+protected:
+	UPROPERTY(EditAnywhere, meta = (RowType = "ProjectileTableRow"))
+	FDataTableRowHandle NiagaraDataTableRowHandle;
+	const UDataTable* NiagaraDataTable;
+	
+	const FNiagaraEffectTableRow* NiagaraTableRow;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UNiagaraComponent> NiagaraComponent;
+
+	bool bIsFire = false;
 
 };
