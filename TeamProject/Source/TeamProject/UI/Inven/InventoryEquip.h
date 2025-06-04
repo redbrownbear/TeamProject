@@ -10,6 +10,7 @@
 #include "Components/SizeBox.h"
 
 #include "Data/ItemDataRow.h"
+#include "SubSystem/PlayerManager.h"
 
 #include "InventoryEquip.generated.h"
 
@@ -28,6 +29,12 @@ protected:
 public:
 	void RefreshDescription(const FItemData& ItemData);
 
+	void SetEquipMakeData(const TArray<FItemData>& ItemDataList);
+
+	void RefreshEquip(const TMap<eEquipParts, FItemData>& ItemDataMap);
+
+
+
 private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* TextItemName;
@@ -43,5 +50,21 @@ private:
 	USizeBox* BoxItemOptionCompare;
 	UPROPERTY(meta = (BindWidget))
 	USizeBox* BoxItemHp;
+
+
+	UPROPERTY(meta = (BindWidget))
+	UImage* HeadImg;
+	UPROPERTY(meta = (BindWidget))
+	UImage* ArmorImg;
+	UPROPERTY(meta = (BindWidget))
+	UImage* UnderImg;
+	UPROPERTY(meta = (BindWidget))
+	UImage* RightImg;
+	UPROPERTY(meta = (BindWidget))
+	UImage* LeftImg;
+	UPROPERTY(meta = (BindWidget))
+	UImage* RightBowImg;
+	UPROPERTY(meta = (BindWidget))
+	UImage* LeftArrowImg;
 
 };

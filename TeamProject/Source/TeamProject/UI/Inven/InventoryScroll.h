@@ -39,6 +39,7 @@ public:
 	void InitSelectItem();
 
 	const FItemData& GetCurItem()& { return ActiveSlots[CurrentIndex]->GetItemData(); }
+	FVector2D GetItemListLocation();
 
 private:
 	void SetSort(EItemCategory Type);

@@ -12,6 +12,7 @@
 #include "UI/NpcDialogue/NPCDialogue.h"
 #include "UI/Shop/Shop.h"
 #include "UI/Quest/Quest.h"
+#include "UI/Popup/PopupGetItem.h"
 
 #include "UIManager.generated.h"
 
@@ -95,7 +96,8 @@ public:
     UShop* CachedShopClass;
     UPROPERTY()
     UQuest* CachedQuestClass;
-
+    UPROPERTY()
+    UPopupGetItem* CachedPopupClass;
 
 public:
     UPROPERTY(BlueprintAssignable)

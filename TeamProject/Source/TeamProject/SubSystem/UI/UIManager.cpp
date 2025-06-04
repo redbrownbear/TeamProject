@@ -84,4 +84,16 @@ void UUIManager::LoadUIClass()
         }
     }
 
+    if (!CachedPopupClass)
+    {
+        CachedPopupClass = CreateWidget<UPopupGetItem>(World, LoadClass<UPopupGetItem>(nullptr, TEXT("/Game/Blueprint/UI/Popup/BP_PopupGetItem.BP_PopupGetItem_C")));
+        if (CachedPopupClass)
+        {
+            CachedPopupClass->AddToViewport();
+            CachedPopupClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedPopupClass->OnCreated();
+            CachedUIs.Add(UPopupGetItem::StaticClass(), CachedPopupClass);
+        }
+    }
+
 }
