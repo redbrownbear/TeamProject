@@ -236,7 +236,7 @@ void UPlayerMovementComponent::SetClimbMode(bool _bool)
 	}
 	MovementMode = _bool ? MOVE_Flying : MOVE_Walking;
 
-	
+	_bool ? SetMoveState(EMove_State::Climb) : SetMoveState(EMove_State::Run);
 
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
@@ -268,7 +268,9 @@ void UPlayerMovementComponent::SetGlideMode(bool _bool)
 		}
 
 	}
-	
+
+	_bool ? SetMoveState(EMove_State::Glide) : SetMoveState(EMove_State::Run);
+
   	bIsGliding = _bool;
 
 	GravityScale = _bool ? 0.07: 1.f;

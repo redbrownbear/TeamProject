@@ -16,7 +16,7 @@
 
 #include "UIManager.generated.h"
 
-//Äù½ºÆ®´ëÈ­¸¦ À§ÇÑ µ¨¸®°ÔÀÌÆ®
+//ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDialogueNextRequested, EQuestCharacter, QuestChar, int32, DialogueID);
 
 
@@ -33,11 +33,11 @@ public:
     void BindDelegates();
     void LoadUIClass();
 
-//---°ÇµéÁö ¸»±â
+//---ï¿½Çµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 private:
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-    //UI »ý¼º
+    //UI ï¿½ï¿½ï¿½ï¿½
 public:
     template <typename T>
     T* FindUI()
@@ -82,7 +82,7 @@ public:
             }
         }
     };
-//---°ÇµéÁö ¸»±â
+//---ï¿½Çµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 public:
     UPROPERTY()
