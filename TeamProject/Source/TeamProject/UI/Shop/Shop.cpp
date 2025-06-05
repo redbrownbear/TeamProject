@@ -4,12 +4,14 @@
 #include "UI/Shop/Shop.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "SubSystem/UI/ShopManager.h"
 #include "SubSystem/PlayerManager.h"
 
 #include "GameFramework/PC_InGame.h"
 #include "UI/HUD/MainHUD.h"
+#include "Components/ConversationComponent/ConversationManagerComponent.h"
 
 
 void UShop::OnCreated()
@@ -42,12 +44,6 @@ void UShop::ShowUI()
 
 void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
-    }
-
     UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
     check(QuestManager);
     if (QuestManager)
@@ -62,11 +58,11 @@ void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 void UShop::InitUI()
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->BindShopInput();
-    }
+    //APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    //if (PC_InGame)
+    //{
+    //    PC_InGame->BindShopInput();
+    //}
 }
 
 void UShop::SetRupeeUI()
@@ -92,7 +88,15 @@ void UShop::BindDelegates()
         ShopManager->OnShopUpdated.AddDynamic(this, &UShop::RefreshShopList);
     }
 
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        PlayerManager->OnInventoryAllUpdated.AddDynamic(this, &UShop::RefreshAllInventory);
+    }
+
     BP_ShopScroll->OnShopHighlightChanged.AddDynamic(this, &UShop::RefreshDescription);
+
+    BP_ShopSellScroll->OnShopDescriptionUpdated.AddDynamic(this, &UShop::RefreshDescriptionSellItem);
 }
 
 void UShop::RemoveDelegates()
@@ -110,18 +114,46 @@ void UShop::RemoveDelegates()
         ShopManager->OnShopUpdated.RemoveDynamic(this, &UShop::RefreshShopList);
     }
 
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        PlayerManager->OnInventoryAllUpdated.RemoveDynamic(this, &UShop::RefreshAllInventory);
+    }
+
     BP_ShopScroll->OnShopHighlightChanged.RemoveDynamic(this, &UShop::RefreshDescription);
+
+    BP_ShopSellScroll->OnShopDescriptionUpdated.RemoveDynamic(this, &UShop::RefreshDescriptionSellItem);
 }
 
 void UShop::SetShopOpen()
 {
-
     BP_ShopDialogue->InitUI();
+
+    FInputModeGameAndUI InputMode;
+    InputMode.SetWidgetToFocus(TakeWidget());
 }
 
 void UShop::SetItemBuy()
 {
-    BP_ShopDialogue->SetBuy();
+    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
+    check(ShopManager);
+
+    if(ShopManager->IsBuy())
+        BP_ShopDialogue->SetBuy();
+
+    else
+        BP_ShopDialogue->SetSell();
+
+}
+
+void UShop::RefreshAllInventory(const TArray<FItemData>& ItemDataList)
+{
+    SetShopOpen();
+
+    BP_ShopScroll->SetVisibility(ESlateVisibility::Hidden);
+
+    BP_ShopSellScroll->SetVisibility(ESlateVisibility::Visible);
+    BP_ShopSellScroll->UpdateSlots(ItemDataList);
 }
 
 void UShop::OnNavigate(const FInputActionValue& InputActionValue)
@@ -159,6 +191,19 @@ void UShop::OnConfirm()
 void UShop::OnCancel()
 {
     HideUI(UShop::StaticClass());
+
+    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+  
+    UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+    check(UIManager);
+
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    if (PC_InGame)
+    {
+        UIManager->ShowUI(UNPCDialogue::StaticClass());
+        QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
+    }
 }
 
 void UShop::OnNextDialogue(const FInputActionValue& InputActionValue)
@@ -177,7 +222,17 @@ void UShop::RefreshDescription(int32 CurrentIdx)
     BP_ShopDescription->RefreshUI(ItemData);
 }
 
+void UShop::RefreshDescriptionSellItem(const FItemData& ItemData)
+{
+    BP_ShopDescription->RefreshUI(ItemData);
+}
+
 void UShop::RefreshShopList(const TArray<FShopDataRow>& ShopList)
 {
+    SetShopOpen();
+
+    BP_ShopSellScroll->SetVisibility(ESlateVisibility::Hidden);
+
+    BP_ShopScroll->SetVisibility(ESlateVisibility::Visible);
     BP_ShopScroll->UpdateSlots(ShopList);
 }

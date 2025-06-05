@@ -7,6 +7,8 @@
 
 void UShopDialogue::NativeConstruct()
 {
+    Super::NativeConstruct();
+
     ConfirmButton->OnClicked.AddDynamic(this, &UShopDialogue::OnConfirm);
     CancelButton->OnClicked.AddDynamic(this, &UShopDialogue::OnCancel);
 }
@@ -27,7 +29,19 @@ void UShopDialogue::SetBuy()
 
     ActionLay->SetVisibility(ESlateVisibility::Hidden);
 
-    //인풋 바인드!
+    FInputModeGameAndUI InputMode;
+    InputMode.SetWidgetToFocus(TakeWidget());
+}
+
+void UShopDialogue::SetSell()
+{
+    ConfirmButton->SetVisibility(ESlateVisibility::Visible);
+    CancelButton->SetVisibility(ESlateVisibility::Visible);
+
+    ActionLay->SetVisibility(ESlateVisibility::Hidden);
+
+    ConfrimText->SetText(FText::FromString(TEXT("판매")));
+    CancelText->SetText(FText::FromString(TEXT("취소")));
 }
 
 void UShopDialogue::OnNavigate(const FInputActionValue& InputActionValue)

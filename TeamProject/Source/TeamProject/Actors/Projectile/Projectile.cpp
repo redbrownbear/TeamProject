@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Actors/Projectile/Projectile.h"
@@ -72,7 +72,7 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 	if (ProjectileTableRow->StaticMesh)
 	{
 		StaticMeshComponent->SetStaticMesh(ProjectileTableRow->StaticMesh);
-		StaticMeshComponent->SetWorldTransform(ProjectileTableRow->Transform);
+		StaticMeshComponent->SetRelativeTransform(ProjectileTableRow->Transform);
 	}
 
 	CollisionComponent->SetCollisionProfileName(ProfileName);
@@ -239,6 +239,19 @@ float AProjectile::GetDamage()
 			UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No ProjectileTableRow"));
 			return 1.f;
 		}
+	}
+}
+
+void AProjectile::SetProjectileMovementActivate(bool bFlag)
+{
+	ProjectileMovementComponent->Activate(bFlag);
+}
+
+void AProjectile::SetStaticMeshVisibility(bool bFlag)
+{
+	if (StaticMeshComponent)
+	{
+		StaticMeshComponent->SetVisibility(bFlag);
 	}
 }
 

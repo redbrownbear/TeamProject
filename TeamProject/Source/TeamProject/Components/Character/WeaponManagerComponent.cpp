@@ -483,6 +483,9 @@ void UWeaponManagerComponent::RightClickEnd()
 			{
 				AnimInst->Montage_Stop(0.f);
 			}
+			WBow->SetArrowVisibility(false);
+
+			WBow->SetNiagaraSystemAssetNone();
 		}
 	}
 	else if (Equip_State == EEquip_State::Shield || Equip_State == EEquip_State::Sword_Shield)

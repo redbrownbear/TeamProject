@@ -27,7 +27,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	// »óÈ£ÀÛ¿ë 
+	// ï¿½ï¿½È£ï¿½Û¿ï¿½ 
 	UFUNCTION()
 	void OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
@@ -45,7 +45,7 @@ protected:
 	TObjectPtr<UStaticMeshComponent> ProductMeshComponent;
 
 private:
-	// »óÈ£ÀÛ¿ë °¡´É º¯¼ö
+	// ï¿½ï¿½È£ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY()
 	bool bPlayerInRange = false;
 };

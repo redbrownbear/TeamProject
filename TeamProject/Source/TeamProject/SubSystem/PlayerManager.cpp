@@ -11,7 +11,7 @@ void UPlayerManager::Initialize(FSubsystemCollectionBase& Collection)
 
 void UPlayerManager::SetQuestData(FQuestDataRow QuestRow)
 {
-    //ÀÓ½ÃÀÓ½Ã!!!!!!
+    //ï¿½Ó½ï¿½ï¿½Ó½ï¿½!!!!!!
     UQuestManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestManager>();
     check(QuestManager);
 
@@ -45,6 +45,17 @@ void UPlayerManager::ShowInvenUI()
     UpDateInvenUI(ItemList);
 }
 
+void UPlayerManager::SetEquipData(const FItemData& ItemRow)
+{
+    EquipItemList.Add(ItemRow);
+    UpDateInvenEquipUI(EquipItemList);
+}
+
+void UPlayerManager::ShowEquipUI()
+{
+    UpDateInvenEquipUI(EquipItemList);
+}
+
 void UPlayerManager::UpDateInvenUI(const FItemData& ItemData)
 {
     OnInventoryUpdated.Broadcast(ItemData);
@@ -52,7 +63,12 @@ void UPlayerManager::UpDateInvenUI(const FItemData& ItemData)
 
 void UPlayerManager::UpDateInvenUI(const TArray<FItemData>& ItemRows)
 {
-    OnInventoryAllUpdated.Broadcast(ItemRows); // UI¿¡°Ô ¾Ë¸²
+    OnInventoryAllUpdated.Broadcast(ItemRows); // UIï¿½ï¿½ï¿½ï¿½ ï¿½Ë¸ï¿½
+}
+
+void UPlayerManager::UpDateInvenEquipUI(const TArray<FItemData>& ItemMap)
+{   
+    OnInvenEquipItemAllUpdated.Broadcast(ItemMap);
 }
 
 void UPlayerManager::InitStatus()
@@ -65,11 +81,11 @@ void UPlayerManager::InitStatus()
     status.Damage = 0.0f;
     status.Armor = 0.0f;
 
-    status.Runspeed = 100.f;            //¾Ë¾Æ¼­ Á¤ÇÏ¼î~
-    status.LevelName;                   //ÃÊ±â°ªÀ» ¾îµð¼­ ÇÒ°ÇÁö?
-    status.PlayerTransform;             //¸¶Âù°¡Áö!
-    status.PreviousLoction;             //¾Ë¾Æ¼­ ¾²¼î
-    status.StaminaRegenSpeed = 4.0f;    //¾Ë¾Æ¼­
+    status.Runspeed = 100.f;            //ï¿½Ë¾Æ¼ï¿½ ï¿½ï¿½ï¿½Ï¼ï¿½~
+    status.LevelName;                   //ï¿½Ê±â°ªï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½ï¿½ï¿½?
+    status.PlayerTransform;             //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!
+    status.PreviousLoction;             //ï¿½Ë¾Æ¼ï¿½ ï¿½ï¿½ï¿½ï¿½
+    status.StaminaRegenSpeed = 4.0f;    //ï¿½Ë¾Æ¼ï¿½
 
     status.Rupee = 0;
 
@@ -83,11 +99,11 @@ void UPlayerManager::SetPlayerStamina(float InStamina)
 
 void UPlayerManager::TickStamina(float DeltaTime)
 {
-    //½ºÅ×¹Ì³Ê »ç¿ëÁßÀÌ¸é ¾È ´Ã¾î³²
+    //ï¿½ï¿½ï¿½×¹Ì³ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ ï¿½Ã¾î³²
     if (PlayerStatus.bIsUseStamina)
         return;
 
-    // ÀÌ¹Ì ÃÖ´ë¸é ¾È ´Ã¾î³²
+    // ï¿½Ì¹ï¿½ ï¿½Ö´ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã¾î³²
     if (PlayerStatus.Stamina >= PlayerStatus.MaxStamina)
         return;
 

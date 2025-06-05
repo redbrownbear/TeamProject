@@ -429,6 +429,15 @@ enum class EEquip_State
 
 };
 UENUM()
+enum class EMove_State
+{
+    Run,
+    Glide,
+    Climb,
+    Dash
+};
+
+UENUM()
 enum class EClimb_State
 {
     Climb,

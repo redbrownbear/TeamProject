@@ -38,7 +38,11 @@ public:
 	void MoveSelection(FIntPoint Direction);
 	void InitSelectItem();
 
-	const FItemData& GetCurItem()& { return ActiveSlots[CurrentIndex]->GetItemData(); }
+	void EquipCurrentItem();
+	void UnEquipCurrentItem();
+
+	const FItemData& GetCurItemData()& { return ActiveSlots[CurrentIndex]->GetItemData(); }
+	FVector2D GetItemListLocation();
 
 private:
 	void SetSort(EItemCategory Type);
