@@ -61,6 +61,7 @@ void UInventoryScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
         ActiveSlots.Add(NewSlot);      
     }
 
+    SetSort(CurrentCategory);
     InitSelectItem();
 }
 
@@ -111,18 +112,29 @@ void UInventoryScroll::InitSelectItem()
 
     FItemData Itemdata = ActiveSlots[CurrentIndex]->GetItemData();
     OnInventoryDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
+
+    EquipCurrentItem();
 }
 
 void UInventoryScroll::EquipCurrentItem()
 {
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    check(PlayerManager);
+
+    if (ActiveSlots.IsEmpty())
+        return;
+
     for (UInventorySlot* slot : ActiveSlots)
     {
-        slot->SetEquiped(false);
-    }
-
-    if (ActiveSlots[CurrentIndex])
-    {
-        ActiveSlots[CurrentIndex]->SetEquiped(true);
+        FItemData Item = PlayerManager->GetItemByUniqueID(slot->GetItemData().UniqueID);
+        if (PlayerManager->IsEquipPart(Item.GetParts()) && Item.UniqueID == slot->GetItemData().UniqueID)
+        {
+            slot->SetEquiped(true);
+        }
+        else
+        {
+            slot->SetEquiped(false);
+        }
     }
 }
 
@@ -169,7 +181,7 @@ void UInventoryScroll::SetSort(EItemCategory Type)
         {
             // 이미 동일한 ItemCode가 있는지 확인
             FItemData* Found = Items.FindByPredicate([&](const FItemData& Other) {
-                return Other.ItemID == Item.ItemID;
+                return Other.UniqueID == Item.UniqueID;
                 });
 
             if (Found)

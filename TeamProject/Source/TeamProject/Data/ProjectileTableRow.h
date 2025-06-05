@@ -51,4 +51,6 @@ public:
 public:
 	UPROPERTY(EditAnywhere, Category = "NiagaraEffect", meta = (RowType = "NiagaraEffectTableRow"))
 	FDataTableRowHandle NiagaraEffectTableRowHandle;
+	UPROPERTY(EditAnywhere, Category = "ParticleEffect", meta = (RowType = "ParticleEffectTableRow"))
+	FDataTableRowHandle ParticleEffectTableRowHandle;
 };

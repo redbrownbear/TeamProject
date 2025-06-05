@@ -17,7 +17,7 @@ void UAnimNotify_LynelShootFire::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 			FTransform::Identity, nullptr, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 		FTransform NewTransform;
-		Projectile->SetData(ProjectileName::Monster_LynelArrow, CollisionProfileName::ToPlayer);
+		Projectile->SetData(ProjectileName::Monster_LynelFire, CollisionProfileName::ToPlayer);
 
 		const USkeletalMeshComponent* Mesh = Monster->GetMonsterMesh();;
 		const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Chin);

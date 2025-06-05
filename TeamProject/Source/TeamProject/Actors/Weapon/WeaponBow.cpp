@@ -94,7 +94,7 @@ void AWeaponBow::BeginPlay()
 {
     Super::BeginPlay();
 
-    
+
 }
 
 void AWeaponBow::LeftClickAction()
@@ -224,9 +224,11 @@ void AWeaponBow::FireArrow()
     else {
         Arrow->SetData(TEXT("Player_Arrow"), TEXT("ToMonster"));
     }
-    Arrow->GetStaticMeshComp()->SetRelativeLocation(FVector::ZeroVector);
+
     Player_C->SetArrowFire(false);
 
+
     Player_C->SetArrowVisibility(false);
+
 
 }

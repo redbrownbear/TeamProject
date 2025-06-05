@@ -57,8 +57,15 @@ namespace ParticleEffectName
     static inline FName UnopenedBox = TEXT("UnopenedBox");
     static inline FName Hinox_AttackShockWave = TEXT("Hinox_AttackShockWave");
     static inline FName Hinox_HipdropShockWave = TEXT("Hinox_HipdropShockWave");
+    static inline FName Lynel_Explosion = TEXT("Lynel_Explosion");
 }
 
+namespace NiagaraEffectName
+{
+    static inline FName AL_Attack = TEXT("AL_Attack");
+    static inline FName AL_AttackBig = TEXT("AL_AttackBig");
+    static inline FName Lynel_Attack = TEXT("Lynel_Attack");
+}
 
 namespace Monster_SocketName
 {

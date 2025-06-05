@@ -32,7 +32,6 @@ public:
 	void FireArrow();
 
 
-
 private:
 
 

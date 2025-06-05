@@ -32,8 +32,8 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, meta = (RowType = "ParticleEffectTableRow"))
 	FDataTableRowHandle DataTableRowHandle;
-	const UDataTable* ParticleEffectDataTable;
-	TObjectPtr<FParticleEffectTableRow> ParticleEffectTableRow;
+	const UDataTable* ParticleEffectDataTable = nullptr;
+	FParticleEffectTableRow* ParticleEffectTableRow = nullptr;
 
 protected:
 	UPROPERTY()

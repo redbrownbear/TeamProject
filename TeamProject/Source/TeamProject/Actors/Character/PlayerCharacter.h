@@ -81,9 +81,7 @@ public:
 
 	void SetArrowFire(bool _bool);
 
-	void SetArrowVisibility(bool _bool) { ChargedArrow->GetStaticMeshComp()->SetVisibility(_bool); }
-
-	void SetNiagaraSystemAssetNone() { ChargedArrow->SetNiagaraSystemAssetNone(); }
+	void SetArrowVisibility(bool _bool) { ChargedArrow->SetStaticMeshVisibility(_bool); }
 
 	bool GetIsFire() { return bIsFire; }
 protected:

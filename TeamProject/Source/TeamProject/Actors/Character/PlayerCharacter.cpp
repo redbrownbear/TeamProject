@@ -151,11 +151,12 @@ void APlayerCharacter::BeginPlay()
 
 
 	ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
-	ChargedArrow->GetStaticMeshComp()->SetRelativeLocation(FVector::ZeroVector);
+	ChargedArrow->SetNiagaraVisibility(false);
 	ChargedArrow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 	ChargedArrow->SetLifeSpan(0.f);
-	ChargedArrow->GetProjectileMovement()->Deactivate();
-	ChargedArrow->GetStaticMeshComp()->SetVisibility(false);
+	ChargedArrow->SetProjectileMovementActivate(false);
+	ChargedArrow->SetGravityScale(0.f);
+	ChargedArrow->SetStaticMeshVisibility(false);
 }
 
 // Called every frame
@@ -260,13 +261,11 @@ void APlayerCharacter::SetArrowFire(bool _bool)
 	bIsFire = _bool;
 	if (_bool)
 	{
-		ChargedArrow->SetData(TEXT("Player_Charged_Arrow_Fire"), TEXT("NoCollision"));
+		ChargedArrow->SetNiagaraVisibility(true);
 	}
 	else
 	{
-		ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
+		ChargedArrow->SetNiagaraVisibility(false);
 	}
 
-	ChargedArrow->GetStaticMeshComp()->SetRelativeLocation(FVector::ZeroVector);
-	ChargedArrow->GetStaticMeshComp()->SetRelativeRotation(FRotator::ZeroRotator);
 }

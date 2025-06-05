@@ -71,7 +71,7 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 	switch (PrevState)
 	{
 	case EMonsterState::Idle:
-		CharacterMonster->PlayMontage(EMonsterMontage::SLEEP_END);
+		//CharacterMonster->PlayMontage(EMonsterMontage::SLEEP_END);
 		break;
 	case EMonsterState::Alert:
 		break;
@@ -187,9 +187,21 @@ void UHinoxFSMComponent::UpdateIdle(float DeltaTime)
 {
 	this->StopMove();
 
+
 	if (Player)
 	{
-		ChangeState(EMonsterState::Combat);
+		FTimerHandle TimerHandle;
+		EMonsterState TargetState = EMonsterState::Combat;
+
+		if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::SLEEP_END))
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::SLEEP_END);
+		}
+
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, TargetState]()
+			{
+				ChangeState(TargetState);
+			}, 0.5f, false);
 	}
 }
 
@@ -380,6 +392,7 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 
 void UHinoxFSMComponent::UpdateDying(float DeltaTime)
 {
+	this->StopMove();
 	Super::UpdateDying(DeltaTime);
 }
 

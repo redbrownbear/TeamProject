@@ -10,6 +10,8 @@ void UInventorySlot::NativeConstruct()
     Super::NativeConstruct();
 
     SetIsFocusable(true);
+
+    EquipedBg->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void UInventorySlot::SetItemData(const FItemData& Item)

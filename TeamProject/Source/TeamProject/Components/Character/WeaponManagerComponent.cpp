@@ -512,8 +512,6 @@ void UWeaponManagerComponent::RightClickEnd()
 			Player_C->SetArrowFire(false);
 
 			Player_C->SetArrowVisibility(false);
-
-			Player_C->SetNiagaraSystemAssetNone();
 		}
 	}
 	else if (Equip_State == EEquip_State::Shield || Equip_State == EEquip_State::Sword_Shield)

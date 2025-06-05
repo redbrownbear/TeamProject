@@ -3,6 +3,8 @@
 
 #include "Actors/Projectile/Projectile.h"
 #include "Data/ProjectileTableRow.h"
+#include "Data/NiagaraEffectTableRow.h"
+#include "Data/ParticleEffectTableRow.h"
 
 #include "Misc/Utils.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -11,6 +13,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
+#include "Components/Character/PlayerMovementComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -21,7 +24,13 @@
 #include "Actors/Effect/ParticleEffect.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "SubSystem/PlayerManager.h"
-#include "Components/Character/PlayerMovementComponent.h"
+
+#include "Actors/Effect/NiagaraEffect.h"
+
+#include "Particles/ParticleSystemComponent.h"
+#include "Particles/ParticleSystem.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 
 
 // Sets default values
@@ -67,7 +76,7 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 	if (ProjectileTableRow->StaticMesh)
 	{
 		StaticMeshComponent->SetStaticMesh(ProjectileTableRow->StaticMesh);
-		StaticMeshComponent->SetWorldTransform(ProjectileTableRow->Transform);
+		StaticMeshComponent->SetRelativeTransform(ProjectileTableRow->Transform);
 	}
 
 	CollisionComponent->SetCollisionProfileName(ProfileName);
@@ -83,9 +92,42 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 
 	SetLifeSpan(ProjectileTableRow->LifeSpan);
 
-	if (ProjectileName::Monster_Attack == ProjectileName)
+	if (ProjectileName::Monster_Attack == ProjectileName
+	|| ProjectileName::Monster_Arrow == ProjectileName
+	|| ProjectileName::Monster_LynelAttack == ProjectileName
+	|| ProjectileName::Monster_AL_Attack == ProjectileName
+	|| ProjectileName::Monster_AL_AttackBig == ProjectileName)
+
 	{
 		bGetDamageFromWeapon = true;
+	}
+
+
+	////////////////////////////
+	// Effect
+
+	const FDataTableRowHandle NiagaraEffectDataTable = ProjectileTableRow->NiagaraEffectTableRowHandle;
+	if (!NiagaraEffectDataTable.IsNull())
+	{
+		FNiagaraEffectTableRow* Data = NiagaraEffectDataTable.GetRow<FNiagaraEffectTableRow>(NiagaraEffectDataTable.RowName.ToString());
+
+		NiagaraEffectComponent = NewObject<UNiagaraComponent>(this, UNiagaraComponent::StaticClass(), TEXT("NiagaraEffectComponent"));
+		NiagaraEffectComponent->SetAsset(Data->EffectNiagaraSystem);
+		NiagaraEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		NiagaraEffectComponent->SetRelativeTransform(Data->Transform);
+		NiagaraEffectComponent->RegisterComponent();
+	}
+
+	const FDataTableRowHandle ParticleEffectDataTable = ProjectileTableRow->ParticleEffectTableRowHandle;
+	if (!ParticleEffectDataTable.IsNull())
+	{
+		FParticleEffectTableRow* Data = ParticleEffectDataTable.GetRow<FParticleEffectTableRow>(ParticleEffectDataTable.RowName.ToString());
+
+		ParticleEffectComponent = NewObject<UParticleSystemComponent>(this, UParticleSystemComponent::StaticClass(), TEXT("ParticleEffectComponent"));
+		ParticleEffectComponent->SetTemplate(Data->EffectParticleSystem);
+		ParticleEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		ParticleEffectComponent->SetRelativeTransform(Data->Transform);
+		ParticleEffectComponent->RegisterComponent();
 	}
 }
 
@@ -106,9 +148,10 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		
 		Player_C->Damaged(GetDamage());
 	}
-
-
-	Destroy();
+	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert))
+	{
+		Destroy();
+	}
 
 	//if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
 	//	|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig)
@@ -209,6 +252,36 @@ float AProjectile::GetDamage()
 			UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No ProjectileTableRow"));
 			return 1.f;
 		}
+	}
+}
+
+void AProjectile::SetProjectileMovementActivate(bool bFlag)
+{
+	ProjectileMovementComponent->Deactivate();
+}
+
+void AProjectile::SetGravityScale(float Scale)
+{
+	ProjectileMovementComponent->ProjectileGravityScale = Scale;
+}
+
+void AProjectile::SetStaticMeshVisibility(bool bFlag)
+{
+	if (StaticMeshComponent)
+	{
+		StaticMeshComponent->SetVisibility(bFlag);
+	}
+}
+
+void AProjectile::SetNiagaraVisibility(bool bFlag)
+{
+	if(bFlag)
+	{
+		NiagaraEffectComponent->Activate();
+	}
+	else
+	{
+		NiagaraEffectComponent->Deactivate();
 	}
 }
 

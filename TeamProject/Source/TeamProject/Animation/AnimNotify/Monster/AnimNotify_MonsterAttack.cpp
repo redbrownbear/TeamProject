@@ -23,8 +23,6 @@ void UAnimNotify_MonsterAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 			FTransform NewTransform;
 			Projectile->SetData(ProjectileName::Monster_Attack, CollisionProfileName::ToPlayer);
 
-			//const USkeletalMeshComponent* Mesh = Monster->GetMonsterMesh();
-			//const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Toe_L);
 			FVector Location = Pawn->GetActorLocation();
 			const FVector ForwardVector = Pawn->GetActorForwardVector();
 			Location += ForwardVector * 100.f;
