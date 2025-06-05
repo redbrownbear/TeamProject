@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Actors/Object/TorchStand.h"
@@ -6,6 +6,7 @@
 #include "NiagaraSystem.h"
 #include "Components/SphereComponent.h"
 #include "Actors/TriggerBox/TorchTriggerBox.h"
+#include "Actors/Character/PlayerCharacter.h"
 #include "Misc/Utils.h"
 
 
@@ -80,6 +81,34 @@ void ATorchStand::BeginPlay()
 
 void ATorchStand::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+    APlayerCharacter* Player_C = Cast<APlayerCharacter>(OtherActor);
+    if (Player_C)
+    {
+        {
+            UWeaponManagerComponent* WeaponManager = Player_C->GetWeaponManagerComponent();
+            if (Player_C->GetWeaponManagerComponent()->GetEquipState() != EEquip_State::Bow)
+            {
+                return;
+            }
+            if (WeaponManager->GetCanShot())
+            {
+                AWeaponBow* Actor_Bow = Cast<AWeaponBow>(WeaponManager->GetBow()->GetChildActor());
+                Actor_Bow->SetArrowFire(true);
+            }
+        }
+    }
+    
+  /*  else
+    {
+        AProjectile_Arrow* Projectile = Cast<AProjectile_Arrow>(OtherActor);
+        if (!Projectile)
+        {
+            return;
+        }
+        Projectile->SetData(TEXT("Player_FireArrow"), TEXT("ToMonster"));
+
+    }*/
+
 
 }
 

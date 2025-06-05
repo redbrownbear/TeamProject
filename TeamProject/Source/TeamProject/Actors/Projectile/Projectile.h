@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,6 +7,8 @@
 #include "Projectile.generated.h"
 
 struct FProjectileTableRow;
+class UNiagaraComponent;
+class UParticleSystemComponent;
 
 UCLASS()
 class TEAMPROJECT_API AProjectile : public AActor
@@ -36,7 +38,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UShapeComponent> CollisionComponent;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* StaticMeshComponent;
 	UPROPERTY()
 	class UProjectileMovementComponent* ProjectileMovementComponent;
@@ -49,10 +51,19 @@ protected:
 
 protected:
 	ECollisionChannel CollisionChannel;
-
+	bool bGetDamageFromWeapon = false;
 public:
 	FVector GetVelocity();
 	virtual FName GetProjectileName();
 	float GetDamage();
 
+protected:
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> NiagaraEffectComponent;
+	UPROPERTY()
+	TObjectPtr<UParticleSystemComponent> ParticleEffectComponent;
+
+public:
+	void SetProjectileMovementActivate(bool bFlag);
+	void SetStaticMeshVisibility(bool bFlag);
 };

@@ -5,6 +5,15 @@
 #include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Character/PlayerCharacter.h"
 
+#include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
+
+#include "GameFramework/PC_InGame.h"
+
+#include "UI/HUD/MainHUD.h"
+
+#include "Data/MonsterTableRow.h"
+
+
 UHinoxFSMComponent::UHinoxFSMComponent()
 {
 	eCurrentState = EMonsterState::Idle;
@@ -62,12 +71,11 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 	switch (PrevState)
 	{
 	case EMonsterState::Idle:
-		CharacterMonster->PlayMontage(EMonsterMontage::SLEEP_END);
+		//CharacterMonster->PlayMontage(EMonsterMontage::SLEEP_END);
 		break;
 	case EMonsterState::Alert:
 		break;
 	case EMonsterState::Combat:
-		CharacterMonster->PlayMontage(EMonsterMontage::SLEEP_END);
 
 		//switch (eCombatIndex)
 		//{
@@ -96,6 +104,8 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::Dead:
 		break;
+	case EMonsterState::Damage:
+		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("ULynelFSMComponent::ChangeState // Unexpected MonsterState"));
 		check(false);
@@ -117,6 +127,10 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 		CharacterMonster->PlayMontage(EMonsterMontage::DAMAGE_EYE_START);
 		break;
 	case EMonsterState::Dead:
+		CharacterMonster->PlayMontage(EMonsterMontage::DEAD);
+		break;
+	case EMonsterState::Damage:
+		return;
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("UHinoxFSMComponent::ChangeState // Unexpected MonsterState, ChangeState Failed"));
@@ -124,6 +138,47 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	}
 
+	switch (NewState)
+	{
+	case EMonsterState::Idle:
+	case EMonsterState::Alert:
+	case EMonsterState::Dead:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(false, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
+		break;
+	case EMonsterState::Combat:
+	case EMonsterState::Damage_Eye:
+	case EMonsterState::Damage:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(true, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
+		break;
+	default:
+		UE_LOG(LogTemp, Error, TEXT("UHinoxFSMComponent::ChangeState // Unexpected MonsterState, ChangeState Failed"));
+		return;
+		break;
+	}
 
 	eCurrentState = NewState;
 }
@@ -132,9 +187,21 @@ void UHinoxFSMComponent::UpdateIdle(float DeltaTime)
 {
 	this->StopMove();
 
+
 	if (Player)
 	{
-		ChangeState(EMonsterState::Combat);
+		FTimerHandle TimerHandle;
+		EMonsterState TargetState = EMonsterState::Combat;
+
+		if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::SLEEP_END))
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::SLEEP_END);
+		}
+
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, TargetState]()
+			{
+				ChangeState(TargetState);
+			}, 0.5f, false);
 	}
 }
 
@@ -154,6 +221,18 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 
 	const FVector PlayerLocation = Player->GetActorLocation();
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+
+
+
 
 	if (CharacterMonster->IsPlayingMontage(EMonsterMontage::END))
 	{
@@ -194,12 +273,14 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 				{
 					//SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 10.f);
 					CharacterMonster->PlayMontage(EMonsterMontage::TURN_180_R); // 오른쪽
+					SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 					return;
 				}
 				else if (RightDot < -0.3f)
 				{
 					//SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 10.f);
 					CharacterMonster->PlayMontage(EMonsterMontage::TURN_180_L); // 왼쪽
+					SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 					return;
 				}
 
@@ -288,6 +369,10 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 		float ForwardDot = FVector::DotProduct(Forward, ToPlayer);
 		float RightDot = FVector::DotProduct(Right, ToPlayer);
 
+
+		SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 1.f);
+
+
 		// 정면 조건: ForwardDot이 높고, 좌우 편차가 작을 때
 		if (ForwardDot > 0.7f && FMath::Abs(RightDot) < 0.3f
 			&& !CharacterMonster->IsPlayingMontage(EMonsterMontage::RUN)) // 현재 몬스터가 RUN 몽타주를 재생 중이 아닐 때)
@@ -303,6 +388,12 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 			CharacterMonster->PlayMontage(EMonsterMontage::RUN_CURVE_L); // 왼쪽
 		}
 	}
+}
+
+void UHinoxFSMComponent::UpdateDying(float DeltaTime)
+{
+	this->StopMove();
+	Super::UpdateDying(DeltaTime);
 }
 
 void UHinoxFSMComponent::UpdateDamageEye(float DeltaTime)

@@ -2,8 +2,14 @@
 
 
 #include "Actors/Object/Barrier.h"
-#include "Components/StaticMeshComponent.h"
 #include "Actors/Projectile/Projectile.h"
+
+#include "Components/StaticMeshComponent.h"
+
+#include "Particles/ParticleSystemComponent.h"
+#include "Particles/ParticleSystem.h"
+
+#include "Data/NiagaraEffectTableRow.h"
 
 #include "Misc/Utils.h"
 
@@ -41,6 +47,24 @@ ABarrier::ABarrier()
     {
         UE_LOG(LogTemp, Error, TEXT("ABarrier::ABarrier // Failed to load Material."));
     }
+
+    ParticleEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleEffectComponent"));
+    ParticleEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+    ParticleEffectComponent->SetAutoActivate(true);
+
+    static ConstructorHelpers::FObjectFinder<UParticleSystem> EffectAsset
+    { TEXT("/Script/Engine.ParticleSystem'/Game/Vefects/FXVarietyPack/Particles/BarrierEffect.BarrierEffect'") };
+
+    if (EffectAsset.Object)
+    {
+        ParticleEffectComponent->SetTemplate(EffectAsset.Object);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("ABarrier::ABarrier // Load Effect Asset failed"));
+    }
+
+    ParticleEffectComponent->SetRelativeScale3D(FVector(5.0, 5.0, 5.0));
 }
 
 // Called when the game starts or when spawned

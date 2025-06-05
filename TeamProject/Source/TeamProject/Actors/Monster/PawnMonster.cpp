@@ -56,6 +56,7 @@ void APawnMonster::BeginPlay()
 	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 	{
 		FSMComponent->SetPawnMonster(this);
+		FSMComponent->BindHitEvent();
 	}
 
 	StatusComponent->OnDie.AddDynamic(this, &ThisClass::OnDie);
@@ -180,7 +181,7 @@ void APawnMonster::PostDuplicate(EDuplicateMode::Type DuplicateMode)
 	if (DuplicateMode == EDuplicateMode::Normal)
 	{
 		FTransform Backup = GetActorTransform();
-		CollisionComponent->DestroyComponent();
+		//CollisionComponent->DestroyComponent();
 		SetData(DataTableRowHandle);
 		SetActorTransform(Backup);
 	}

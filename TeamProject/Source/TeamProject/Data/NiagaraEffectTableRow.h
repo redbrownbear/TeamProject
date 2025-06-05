@@ -20,4 +20,8 @@ public:
 	float LifeTime = 2.f;
 	UPROPERTY(EditAnywhere, Category = "NiagaraEffect|LifeTime")
 	bool bIsLifeTime = true;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "NiagaraEffect|Transform")
+	FTransform Transform = FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector(1.f));
 };

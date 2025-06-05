@@ -54,7 +54,7 @@ public:
 	virtual void SetSpeedRun() = 0;
 
 public:
-	virtual void TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	virtual void TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, int32 iOption = 0);
 
 protected:
 	virtual void OnDie();
@@ -66,4 +66,7 @@ protected:
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) = 0;
 
+public:
+	FName GetName() const;
+	float GetDamageFromWeapon();
 };
