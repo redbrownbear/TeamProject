@@ -247,11 +247,13 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 	if (!Player_C)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("NoPlayer"));
 		return;
 	}
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 	if (Movement->MovementMode == MOVE_None)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("MoveNone"));
 		return;
 	}
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
@@ -327,6 +329,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 			Stemina -= DeltaTime * STEMINA_USE_SPEED;
 			PlayerManager->SetPlayerStamina(Stemina);
+			UE_LOG(LogTemp, Warning, TEXT("Dash"));
 		}
 	}
 }

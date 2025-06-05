@@ -55,9 +55,18 @@ public:
 	UWeaponChildActorComponent* GetSword() { return WeaponManagerComponent->GetSword(); }
 	UWeaponChildActorComponent* GetShield() { return WeaponManagerComponent->GetShield(); }
 	UWeaponChildActorComponent* GetBow() { return WeaponManagerComponent->GetBow(); }
+	
+	
 	UPlayerStatusComponent* GetPlayerStatusComponent() { return StatusComponent; }
 	UWeaponManagerComponent* GetWeaponManagerComponent() { return WeaponManagerComponent; }
 	USpringArmComponent* GetSpringArm() { return SpringArm; }
+
+	
+	void SetBowStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetBowStaticMesh(InMesh); }
+	void SetSwordStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetSwordStaticMesh(InMesh); }
+	void SetShieldStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetShieldStaticMesh(InMesh); }
+
+
 
 	void Damaged(int32 Damage);
 
@@ -94,7 +103,6 @@ protected:
 	TObjectPtr<UTimelineComponent> ZoomTimeline;
 
 	FOnTimelineFloat InterpFunction{};
-
 
 
 	UPROPERTY(EditAnywhere, Category = "Status")

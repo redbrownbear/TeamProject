@@ -32,7 +32,6 @@ class TEAMPROJECT_API AWeaponBase : public AActor
 public:
 
 	AWeaponBase();
-	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
@@ -43,7 +42,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
+	void SetStaticMesh(UStaticMesh* InMesh);
 public:
 	virtual void LeftClickAction();
 	virtual void RightClickAction();

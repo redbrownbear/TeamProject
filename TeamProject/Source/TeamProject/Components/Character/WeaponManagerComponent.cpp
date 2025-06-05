@@ -120,6 +120,29 @@ void UWeaponManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	// ...
 }
 
+void UWeaponManagerComponent::SetBowStaticMesh(UStaticMesh* InMesh)
+{
+	AWeaponBase* WeaponBase = Cast<AWeaponBase>(Bow->GetChildActor());
+	WeaponBase->SetStaticMesh(InMesh);
+}
+
+void UWeaponManagerComponent::SetSwordStaticMesh(UStaticMesh* InMesh)
+{
+	AWeaponBase* WeaponBase = Cast<AWeaponBase>(Sword->GetChildActor());
+	WeaponBase->SetStaticMesh(InMesh);
+}
+
+void UWeaponManagerComponent::SetShieldStaticMesh(UStaticMesh* InMesh)
+{
+	AWeaponBase* WeaponBase = Cast<AWeaponBase>(Shield->GetChildActor());
+	WeaponBase->SetStaticMesh(InMesh);
+}
+
+void UWeaponManagerComponent::SetCanSwordAttack()
+{
+	Cast<AWeaponSword>(Sword->GetChildActor())->SetCanAttack();
+}
+
 void UWeaponManagerComponent::TryEquipWeapon()
 {
 	ACharacter* CRT = Cast<ACharacter>(GetOwner());

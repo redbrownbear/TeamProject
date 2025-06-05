@@ -107,7 +107,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	//Arrow->GetChildActor()->SetOwner(this);
-	SpringArm->ProbeChannel = ECC_GameTraceChannel1;
+	
 
 	GetMesh()->SetCollisionProfileName(TEXT("Player"));
 
@@ -196,6 +196,8 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 }
 
+
+
 void APlayerCharacter::Damaged(int32 Damage)
 {
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
@@ -208,6 +210,9 @@ void APlayerCharacter::Damaged(int32 Damage)
 		Cast<UPlayerMovementComponent>(GetCharacterMovement())->Hited();
 		Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateHp();
 		UE_LOG(LogTemp, Warning, TEXT("%d"), AfterHP);
+
+		GetCharacterMovement()->SetMovementMode(MOVE_None);
+
 	}
 	
 	

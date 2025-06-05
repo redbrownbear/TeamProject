@@ -15,5 +15,4 @@ void UWeaponChildActorComponent::SetData(FDataTableRowHandle InDataTableRowHandl
 	AWeaponBase* Weapon = Cast<AWeaponBase>(GetChildActor());
 	check(Weapon);
 
-	Weapon->SetData(InDataTableRowHandle);
 }
