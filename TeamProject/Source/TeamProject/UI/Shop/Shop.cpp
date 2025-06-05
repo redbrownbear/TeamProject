@@ -89,9 +89,8 @@ void UShop::SubtractItemInventory()
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     if (PlayerManager)
-    {
-        //물량을 빼야함
-        //PlayerManager->SetInvenData(SelectedItem);
+    {        
+        PlayerManager->RemoveItemByUniqueID(SelectedItem.UniqueID);
     }
 }
 

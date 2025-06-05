@@ -51,7 +51,6 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 	DataTableRowHandle.RowName = WorldWeaponName;
 	ItemTableRow = DataTableRowHandle.GetRow<FItemData>(DataTableRowHandle.RowName.ToString());
 
-
 	if (!IsValid(CollisionComponent) && ItemTableRow->CollisionClass)
 	{
 		EObjectFlags SubobjectFlags = GetMaskedFlags(RF_PropagateToSubObjects) | RF_DefaultSubObject;
@@ -83,6 +82,10 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 		{
 			CapsuleComponent->SetCapsuleSize(ItemTableRow->CollisionCapsuleRadius, ItemTableRow->CollisionCapsuleHalfHeight);
 		}
+
+		CollisionComponent->BodyInstance.bUseCCD = true;
+		CollisionComponent->SetEnableGravity(true);
+		CollisionComponent->SetSimulatePhysics(true);
 	}
 	else
 	{
@@ -116,7 +119,7 @@ void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHa
 		CollisionComponent = NewObject<UShapeComponent>(this, ItemTableRow->CollisionClass, TEXT("CollisionComponent"), SubobjectFlags);
 		CollisionComponent->RegisterComponent();
 		SetRootComponent(CollisionComponent);
-		DefaultSceneRoot->SetRelativeTransform(FTransform::Identity);
+		//DefaultSceneRoot->SetRelativeTransform(FTransform::Identity);
 		DefaultSceneRoot->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
@@ -138,6 +141,10 @@ void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHa
 		{
 			CapsuleComponent->SetCapsuleSize(ItemTableRow->CollisionCapsuleRadius, ItemTableRow->CollisionCapsuleHalfHeight);
 		}
+
+		CollisionComponent->BodyInstance.bUseCCD = true;
+		CollisionComponent->SetEnableGravity(true);
+		CollisionComponent->SetSimulatePhysics(true);
 	}
 	else
 	{
@@ -157,6 +164,64 @@ void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHa
 	}
 }
 
+void AWorldWeapon::SetDataWithData(const FItemData& InItemData)
+{
+	if (!IsValid(CollisionComponent) && InItemData.CollisionClass)
+	{
+		EObjectFlags SubobjectFlags = GetMaskedFlags(RF_PropagateToSubObjects) | RF_DefaultSubObject;
+
+		FTransform WorldTransform = GetActorTransform();
+
+		CollisionComponent = NewObject<UShapeComponent>(this, InItemData.CollisionClass, TEXT("CollisionComponent"));
+		CollisionComponent->RegisterComponent();
+		CollisionComponent->SetWorldTransform(WorldTransform);
+		SetRootComponent(CollisionComponent);
+
+		DefaultSceneRoot->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		CollisionComponent->SetCanEverAffectNavigation(false);
+		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
+		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+
+		if (!HasAnyFlags(RF_ClassDefaultObject))
+		{
+			CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
+		}
+		if (USphereComponent* SphereComponent = Cast<USphereComponent>(CollisionComponent))
+		{
+			SphereComponent->SetSphereRadius(InItemData.CollisionSphereRadius);
+		}
+		else if (UBoxComponent* BoxComponent = Cast<UBoxComponent>(CollisionComponent))
+		{
+			BoxComponent->SetBoxExtent(InItemData.CollisionBoxExtent);
+		}
+		else if (UCapsuleComponent* CapsuleComponent = Cast<UCapsuleComponent>(CollisionComponent))
+		{
+			CapsuleComponent->SetCapsuleSize(InItemData.CollisionCapsuleRadius, InItemData.CollisionCapsuleHalfHeight);
+		}
+
+		CollisionComponent->BodyInstance.bUseCCD = true;
+		CollisionComponent->SetEnableGravity(false);
+		CollisionComponent->SetSimulatePhysics(false);
+	}
+	else
+	{
+		SetRootComponent(CollisionComponent);
+		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
+	}
+
+	CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+
+	// StaticMesh
+	if (InItemData.StaticMesh)
+	{
+		StaticMeshComponent->SetStaticMesh(InItemData.StaticMesh);
+		StaticMeshComponent->SetWorldScale3D(FVector(45.0f, 45.0f, 45.0f));
+		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	}
+
+	ItemTableRow = &InItemData;
+}
+
 void AWorldWeapon::PostDuplicate(EDuplicateMode::Type DuplicateMode)
 {
 	Super::PostDuplicate(DuplicateMode);
@@ -164,9 +229,11 @@ void AWorldWeapon::PostDuplicate(EDuplicateMode::Type DuplicateMode)
 	if (DuplicateMode == EDuplicateMode::Normal)
 	{
 		FTransform Backup = GetActorTransform();
-		CollisionComponent->DestroyComponent();
-		SetDataWithHandle(DataTableRowHandle);
+		CollisionComponent->DestroyComponent();	
 		SetActorTransform(Backup);
+
+		if(!DataTableRowHandle.IsNull())
+			SetDataWithHandle(DataTableRowHandle);
 	}
 }
 
@@ -201,10 +268,6 @@ void AWorldWeapon::BeginPlay()
 
 	StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
 	StimuliSource->RegisterWithPerceptionSystem();
-
-	CollisionComponent->BodyInstance.bUseCCD = true;
-	CollisionComponent->SetEnableGravity(true);
-	CollisionComponent->SetSimulatePhysics(true);
 }
 
 void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -283,4 +346,19 @@ void AWorldWeapon::AttachToMonster(IMonsterInterface* Monster, FName SocketName)
 			check(false);
 		}
 	}
+}
+
+void AWorldWeapon::DetachFromMonster()
+{
+	bIsCatched = false;
+	StaticMeshComponent->SetRelativeLocation(ItemTableRow->Transform.GetLocation());
+	StaticMeshComponent->SetRelativeScale3D(ItemTableRow->Transform.GetScale3D());
+	CollisionComponent->SetSimulatePhysics(true);
+
+	this->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+}
+
+float AWorldWeapon::GetDamage() const
+{
+	return ItemTableRow->Damage;
 }

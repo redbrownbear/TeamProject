@@ -6,6 +6,8 @@
 #include "AI/Navigation/NavigationDataInterface.h"
 #include "AI/NavigationSystemBase.h"
 
+#include "Actors/Npc/Npc.h"
+
 float GetAxisDeltaRotation2(float InAxisRotationRate, float DeltaTime)
 {
 	// Values over 360 don't do anything, see FMath::FixedTurn. However we are trying to avoid giant floats from overflowing other calculations.
@@ -199,6 +201,14 @@ void UAdvancedFloatingPawnMovement::TickComponent(float DeltaTime, ELevelTick Ti
 	{
 		return;
 	}
+
+	AActor* TempActor = GetOwner();
+	ANpc* Npc = Cast<ANpc>(TempActor);
+	if (Npc)
+	{
+		int a = 0;
+	}
+
 
 	{
 		const AController* Controller = PawnOwner->GetController();

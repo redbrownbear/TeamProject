@@ -8,7 +8,11 @@
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PC_InGame.h"
 
+#include "UI/HUD/MainHUD.h"
+
+#include "Data/MonsterTableRow.h"
 
 UAssasinBossFSMComponent::UAssasinBossFSMComponent()
 {
@@ -131,14 +135,20 @@ void UAssasinBossFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	}
 
+
+
+
 	switch (NewState)
 	{
 	case EMonsterState::Idle:
 		EnableFlyingMode(false);
+
 		break;
 	case EMonsterState::Combat:
 		EnableFlyingMode(true);
 		CharacterMonster->PlayMontage(EMonsterMontage::APPEAR_START);
+
+
 		break;
 	case EMonsterState::Stone:
 		switch (ePhase)
@@ -157,25 +167,75 @@ void UAssasinBossFSMComponent::ChangeState(EMonsterState NewState)
 		default:
 			break;
 		}
+
 		break;
 	case EMonsterState::Barrier:
 		BarrierElapsedTime = 0.f;
 		CharacterMonster->PlayMontage(EMonsterMontage::BARRIER_START);
 		break;
+
 	case EMonsterState::Stun:
 		StunElapsedTime = 0.f;
 		EnableFlyingMode(false);
 		CharacterMonster->PlayMontage(EMonsterMontage::STUN_START);
+
+
 		break;
 	case EMonsterState::Dead:
 		EnableFlyingMode(false);
 		CharacterMonster->PlayMontage(EMonsterMontage::DEAD);
+
 		break;
 	case EMonsterState::Damage:
 		DamageElapsedTime = 0.f;
 		CharacterMonster->StopAnimMontage();
+
+
 		break;
 	}
+
+
+	// UI
+
+	switch (NewState)
+	{
+	case EMonsterState::Idle:
+	case EMonsterState::Dead:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(false, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
+		break;
+	case EMonsterState::Combat:
+	case EMonsterState::Stone:
+	case EMonsterState::Barrier:
+	case EMonsterState::Stun:
+	case EMonsterState::Damage:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(true, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
+		break;
+	}
+
 
 	eCurrentState = NewState;
 }

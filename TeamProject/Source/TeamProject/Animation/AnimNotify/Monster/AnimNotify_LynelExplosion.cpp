@@ -4,6 +4,7 @@
 #include "Animation/AnimNotify/Monster/AnimNotify_LynelExplosion.h"
 #include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Projectile/Projectile.h"
+#include "Actors/Effect/ParticleEffect.h"
 
 void UAnimNotify_LynelExplosion::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
@@ -13,15 +14,29 @@ void UAnimNotify_LynelExplosion::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 	{
 		UWorld* World = MeshComp->GetWorld();
 
-		AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
-			FTransform::Identity, nullptr, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		{
+			AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
+				FTransform::Identity, nullptr, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-		FTransform NewTransform;
-		Projectile->SetData(ProjectileName::Monster_LynelExplosion, CollisionProfileName::ToPlayer);
+			FTransform NewTransform;
+			Projectile->SetData(ProjectileName::Monster_LynelExplosion, CollisionProfileName::ToPlayer);
 
-		const FVector Location = Monster->GetActorLocation();
-		NewTransform.SetLocation(Location);
+			const FVector Location = Monster->GetActorLocation();
+			NewTransform.SetLocation(Location);
 
-		Projectile->FinishSpawning(NewTransform);
+			Projectile->FinishSpawning(NewTransform);
+		}
+		{
+			AParticleEffect* ParticleEffect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+			FTransform NewTransform;
+			ParticleEffect->SetData(ParticleEffectName::Lynel_Explosion);
+
+			const FVector Location = Monster->GetActorLocation();
+			NewTransform.SetLocation(Location);
+
+			ParticleEffect->FinishSpawning(NewTransform);
+		}
 	}
 }

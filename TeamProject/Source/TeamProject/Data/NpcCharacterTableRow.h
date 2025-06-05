@@ -60,6 +60,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Npc")
 	USkeletalMesh* SkeletalMesh = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Npc")
+	USkeletalMesh* FaceMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Npc")
+	USkeletalMesh* HairMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Npc")
+	USkeletalMesh* NoseMesh = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform MeshTransform;
 

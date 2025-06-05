@@ -13,6 +13,11 @@ USTRUCT()
 struct TEAMPROJECT_API FMonsterTableRow : public FTableRowBase
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Monster|Status")
+	FName Name = FName(TEXT("Monster"));
+
 public:
 	UPROPERTY(EditAnywhere, Category = "Monster")
 	USkeletalMesh* SkeletalMesh = nullptr;
@@ -26,6 +31,10 @@ public:
 public:
 	UPROPERTY(EditAnywhere, Category = "Monster|Collision")
 	float CollisionSphereRadius = 32.f;
+	UPROPERTY(EditAnywhere, Category = "Monster|Collision")
+	float CapsuleHalfHeight= 32.f;
+	UPROPERTY(EditAnywhere, Category = "Monster|Collision")
+	float CapsuleRadius = 32.f;
 
 public: // Movement
 	UPROPERTY(EditAnywhere, Category = "Monster|Movement")

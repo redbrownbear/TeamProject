@@ -12,6 +12,7 @@
 #include "UI/Shop/Shop.h"
 #include "UI/Quest/Quest.h"
 #include "UI/Popup/PopupGetItem.h"
+#include "UI/QuickSlot/QuickSlotMain.h"
 
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
@@ -71,17 +72,13 @@ public:
 	UInputAction* IA_Dash = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_Crouch = nullptr;
-
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
+	UInputAction* IA_Step = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_LeftClick = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_RightClick = nullptr;
-
-
-
-
-
 
 	// --------- Weapon Swap-----------------------------
 
@@ -114,6 +111,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_InvenCancel = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_DropItem = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_InvenAddItem = nullptr;
 
 	//Dialogue
@@ -142,6 +141,20 @@ public:
 	UInputAction* IA_ControlDistance = nullptr;
 
 
+	//QuickSlot
+public:
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_QuickSlotLeft = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_QuickSlotRight = nullptr;
+
+	//Map
+public:
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_MapOpen = nullptr;
+
+
 	void CheckValid() const
 	{
 		check(IMC_InGame);
@@ -161,14 +174,18 @@ public:
 		check(IA_InvenConfirm);
 		check(IA_InvenCancel);
 		check(IA_InvenAddItem);
+		check(IA_DropItem);
 		check(IA_DialogueNavigate);
 		check(IA_DialogueConfirm);
 		check(IA_DialogueCancel);
 		check(IA_DialogueNext);
-		check(IA_IceMaker);		
+		check(IA_IceMaker);	
 		check(IA_Magnesis);
 		check(IA_TrySuperPower);
 		check(IA_ControlDistance);
+		check(IA_QuickSlotLeft);
+		check(IA_QuickSlotRight);
+		check(IA_MapOpen);
 	}
 };
 
@@ -235,7 +252,8 @@ protected:
 	void OnControlDistance(const FInputActionValue& InputActionValue);
 
 	// Ice Maker
-	void BeginIcePreview(const FInputActionValue& InputActionValue);	
+	void BeginIcePreview(const FInputActionValue& InputActionValue);
+	void SpawnIcePillar(const FInputActionValue& InputActionValue);
 	
 	// Magnesis
 	void ShowMetalActorPreview(const FInputActionValue& InputActionValue);
@@ -246,10 +264,15 @@ protected:
 	void OnCancel(const FInputActionValue& InputActionValue);
 	void OnNextDialogue(const FInputActionValue& InputActionValue);
 
+	void DropItem(const FInputActionValue& InputActionValue);
+
 	void OnCreateItemTest(const FInputActionValue& InputActionValue);
 	//UI
-	
-	
+
+	void OnQuickSlotLeft(const FInputActionValue& InputActionValue);
+	void OnQuickSlotRight(const FInputActionValue& InputActionValue);
+
+	void OnMapOpen(const FInputActionValue& InputActionValue);
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
 

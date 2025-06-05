@@ -27,7 +27,8 @@ void AKogaStone::BeginPlay()
 // Called every frame
 void AKogaStone::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	// To Prevent Project Tick called
+	AActor::Tick(DeltaTime);
 
 	WaitTime += DeltaTime;
 
@@ -36,7 +37,6 @@ void AKogaStone::Tick(float DeltaTime)
 
 	if (!bFall)
 	{
-
 		if (ACharacterMonster* CharacterMonster = Cast<ACharacterMonster>(Owner))
 		{
 			if (UAssasinBossFSMComponent* FSMComponent = Cast<UAssasinBossFSMComponent>(CharacterMonster->GetFSMComponent()))
@@ -109,6 +109,7 @@ void AKogaStone::SetVelocity()
 				Direction.Normalize();
 
 				ProjectileMovementComponent->Velocity = Direction * ProjectileTableRow->MaxSpeed;
+				SetActorRotation(Direction.Rotation());
 			}
 		}
 	}

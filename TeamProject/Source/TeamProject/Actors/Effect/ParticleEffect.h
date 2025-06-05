@@ -15,6 +15,7 @@ class TEAMPROJECT_API AParticleEffect : public AActor
 public:
 	AParticleEffect(const FObjectInitializer& ObjectInitializer);
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+	virtual void SetData(const FName& ParticleEffectName);
 	void SetParticleSystem(UParticleSystem* ParticleSystem);
 protected:
 	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
@@ -29,9 +30,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (RowType = "ParticleEffectTableRow"))
 	FDataTableRowHandle DataTableRowHandle;
-	TObjectPtr<FParticleEffectTableRow> ParticleEffectData;
+	const UDataTable* ParticleEffectDataTable = nullptr;
+	FParticleEffectTableRow* ParticleEffectTableRow = nullptr;
 
 protected:
 	UPROPERTY()

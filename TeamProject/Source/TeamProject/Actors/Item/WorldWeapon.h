@@ -26,6 +26,7 @@ public:
 	// for spawn from codes
 	virtual void SetDataWithName(const FName& WorldWeaponName);
 	virtual void SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHandle);
+	virtual void SetDataWithData(const FItemData& InItemData);
 
 protected:
 	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
@@ -70,9 +71,12 @@ public:
 	EWeaponKind GetWorldWeaponKind() const;
 	void AddForce(FVector _Direction, float Force);
 	void AttachToMonster(IMonsterInterface* Monster, FName SocketName);
+	void DetachFromMonster();
 
 protected:
 	bool bIsCatched = false;
 public:
-	bool GetCatched() { return bIsCatched; }
+	bool GetCatched() const { return bIsCatched; }
+	float GetDamage() const;
+
 };

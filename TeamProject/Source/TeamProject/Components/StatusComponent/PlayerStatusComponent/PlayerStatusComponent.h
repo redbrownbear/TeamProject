@@ -15,25 +15,15 @@ class TEAMPROJECT_API UPlayerStatusComponent : public UStatusComponent
 {
 	GENERATED_BODY()
 	
-
+private:
 	UPROPERTY()
-	int32 Health;
-	UPROPERTY()
-	int32 Damage;
+	int32 Damage = 1;
 	
 
 public:
 	UPlayerStatusComponent();
 
-	
-	
-	
-	
-	
-
-
-
-
-
-
+public:
+	int32 GetDamage() const { return Damage; }
+	void SetDamage(int32 InDamage) { Damage = InDamage; }
 };

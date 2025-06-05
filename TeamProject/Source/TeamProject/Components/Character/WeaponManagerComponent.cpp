@@ -4,8 +4,9 @@
 #include "Components/Character/WeaponManagerComponent.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Weapon/WeaponShield.h"
+#include "Components/Character/PlayerMovementComponent.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
-
+#include "UI/HUD/MainHUD.h"
 // Sets default values for this component's properties
 UWeaponManagerComponent::UWeaponManagerComponent()
 {
@@ -117,6 +118,29 @@ void UWeaponManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UWeaponManagerComponent::SetBowStaticMesh(UStaticMesh* InMesh)
+{
+	AWeaponBase* WeaponBase = Cast<AWeaponBase>(Bow->GetChildActor());
+	WeaponBase->SetStaticMesh(InMesh);
+}
+
+void UWeaponManagerComponent::SetSwordStaticMesh(UStaticMesh* InMesh)
+{
+	AWeaponBase* WeaponBase = Cast<AWeaponBase>(Sword->GetChildActor());
+	WeaponBase->SetStaticMesh(InMesh);
+}
+
+void UWeaponManagerComponent::SetShieldStaticMesh(UStaticMesh* InMesh)
+{
+	AWeaponBase* WeaponBase = Cast<AWeaponBase>(Shield->GetChildActor());
+	WeaponBase->SetStaticMesh(InMesh);
+}
+
+void UWeaponManagerComponent::SetCanSwordAttack()
+{
+	Cast<AWeaponSword>(Sword->GetChildActor())->SetCanAttack();
 }
 
 void UWeaponManagerComponent::TryEquipWeapon()
@@ -429,7 +453,7 @@ void UWeaponManagerComponent::RightClickAction()
 
 		}
 
-		BowActor->RightClickAction();		
+		BowActor->RightClickAction();
 	}
 
 	else
@@ -441,7 +465,6 @@ void UWeaponManagerComponent::RightClickAction()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Shield is not Valid"));
 			return;
-			//check(ShieldActor);
 		}
 
 		ShieldActor->RightClickAction();
@@ -465,17 +488,20 @@ void UWeaponManagerComponent::RightClickEnd()
 			
 
 			AnimInst->bIsZoom = false;
-
-			Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+			UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+			Movement->MaxWalkSpeed = PLAYER_MOVE_NML;
+			Movement->SetMoveState(EMove_State::Run);
+			Movement->bOrientRotationToMovement = true;
 
 			Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
 
 
 			// 이동 방향으로 자동 회전 비활성화
-			Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+			
 
 			Player_C->ZoomOut();
 
+			Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ShowBowAimgUI(false, 0);
 
 			AWeaponBow* WBow = Cast<AWeaponBow>(Bow->GetChildActor());
 
@@ -483,9 +509,9 @@ void UWeaponManagerComponent::RightClickEnd()
 			{
 				AnimInst->Montage_Stop(0.f);
 			}
-			WBow->SetArrowVisibility(false);
+			Player_C->SetArrowFire(false);
 
-			WBow->SetNiagaraSystemAssetNone();
+			Player_C->SetArrowVisibility(false);
 		}
 	}
 	else if (Equip_State == EEquip_State::Shield || Equip_State == EEquip_State::Sword_Shield)
@@ -497,13 +523,16 @@ void UWeaponManagerComponent::RightClickEnd()
 			AnimInst->bIsWaitShield = false;
 
 
-			Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+			
 
 			Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
-
+			UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+			Movement->MaxWalkSpeed = PLAYER_MOVE_NML;
+			Movement->SetMoveState(EMove_State::Run);
+			Movement->bOrientRotationToMovement = true;
 
 			// 이동 방향으로 자동 회전 비활성화
-			Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+			
 
 			Player_C->ZoomOut();
 

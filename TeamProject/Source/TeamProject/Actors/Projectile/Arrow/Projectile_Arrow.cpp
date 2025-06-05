@@ -31,8 +31,6 @@ AProjectile_Arrow::AProjectile_Arrow()
 	//CollisionComponent->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel5);
 	CollisionComponent->SetCollisionProfileName(CollisionProfileName::ToMonster);
 
-	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
-	NiagaraComponent->SetupAttachment(RootComponent);
 }
 
 void AProjectile_Arrow::BeginPlay()
@@ -50,30 +48,7 @@ void AProjectile_Arrow::SetData(const FName& ProjectileName, FName ProfileName)
 {
 	Super::SetData(ProjectileName, ProfileName);
 
-	
-	if (!NiagaraDataTable)
-	{
-		NiagaraDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Data/EffectData/DT_NiagaraEffect.DT_NiagaraEffect'"));
-		check(NiagaraDataTable);
-	}
-	NiagaraDataTableRowHandle.DataTable = NiagaraDataTable;
-	NiagaraDataTableRowHandle.RowName = ProjectileTableRow->NiagaraEffectTableRowHandle.RowName;
-	NiagaraTableRow = NiagaraDataTableRowHandle.GetRow<FNiagaraEffectTableRow>(DataTableRowHandle.RowName.ToString());
-	if (NiagaraTableRow)
-	{
-		if (NiagaraTableRow->EffectNiagaraSystem)
-		{
-			NiagaraComponent->SetAsset(NiagaraTableRow->EffectNiagaraSystem);
-			bIsFire = true;
-		}
-	}
-	else
-	{
-		NiagaraComponent->SetAsset(nullptr);
-		bIsFire = false;
-	}
-	StaticMeshComponent->SetRelativeLocation(FVector::ZeroVector);
-	StaticMeshComponent->SetRelativeRotation(FRotator::ZeroRotator);
+
 }
 
 void AProjectile_Arrow::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -83,10 +58,10 @@ void AProjectile_Arrow::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 	Destroy();
 }
 
-void AProjectile_Arrow::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	Super::OnHit(HitComponent, OtherActor,OtherComp,NormalImpulse,Hit);
-}
+//void AProjectile_Arrow::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+//{
+//	Super::OnHit(HitComponent, OtherActor,OtherComp,NormalImpulse,Hit);
+//}
 
 void AProjectile_Arrow::Tick(float DeltaTime)
 {

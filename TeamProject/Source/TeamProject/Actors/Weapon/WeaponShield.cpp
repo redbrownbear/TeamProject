@@ -3,6 +3,8 @@
 
 #include "WeaponShield.h"
 #include "Actors/Character/PlayerCharacter.h"
+#include "Components/Character/PlayerMovementComponent.h"
+#include "SubSystem/PlayerManager.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 
 AWeaponShield::AWeaponShield()
@@ -15,12 +17,12 @@ AWeaponShield::AWeaponShield()
         RootComponent = DefaultSceneRoot;
 
 
-        ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Shield/Weapon_Shield_001.Weapon_Shield_001'"));
+        ConstructorHelpers::FObjectFinder<UStaticMesh> Asset(TEXT("/Script/Engine.StaticMesh'/Game/Resources/Weapon/ShieldStaticMesh/Shield_001.Shield_001'"));
 
-        SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
-        SkeletalMeshComponent->SetupAttachment(RootComponent);
-        SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        SkeletalMeshComponent->SetSkeletalMesh(Asset.Object);
+        StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+        StaticMeshComponent->SetupAttachment(RootComponent);
+        StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        StaticMeshComponent->SetStaticMesh(Asset.Object);
 
     }
 
@@ -61,7 +63,7 @@ AWeaponShield::AWeaponShield()
         else
         {
             UE_LOG(LogTemp, Warning, TEXT("No Shield_Wait_Montage"));
-            check(Wait_MTG);
+            
         }
 
 
@@ -80,7 +82,7 @@ AWeaponShield::AWeaponShield()
         else
         {
             UE_LOG(LogTemp, Warning, TEXT("No Shield_Wait_Montage"));
-            check(Just_MTG);
+            
         }
 
     }
@@ -112,9 +114,14 @@ void AWeaponShield::LeftClickAction()
 
         Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
 
-        Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
+        UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 
-        Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
+        Movement->bOrientRotationToMovement = true;
+
+        Movement->MaxWalkSpeed = PLAYER_MOVE_NML;
+
+        Movement->SetMoveState(EMove_State::Run);
+
 
     }
 
@@ -146,14 +153,22 @@ void AWeaponShield::RightClickAction()
     AnimInst->bIsWaitShield = true;
 
     AnimInst->Montage_Play(Wait_MTG);
-    UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
+    UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 
-    C_Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
+    Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
 
+    Movement->SetMoveState(EMove_State::Zoom);
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    PlayerManager->SetStaminaUSe(false);
+
+    Movement->bOrientRotationToMovement = false;
+    
+    
     Player_C->bUseControllerRotationYaw = true; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
 
     // 이동 방향으로 자동 회전 비활성화
-    C_Movement->bOrientRotationToMovement = false;
+    
 
     USpringArmComponent* C_SpringArm = Player_C->GetSpringArm();
 

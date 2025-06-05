@@ -34,6 +34,9 @@ public:
 	void SetCharacterMonster(ACharacterMonster* InOwner) { CharacterMonster = InOwner; }
 	void SetPlayer(APlayerCharacter* InPlayer) { Player = InPlayer; }
 	void OnHitReceived(bool bIsDead = false);
+	UFUNCTION()
+	void BindHitEvent();
+
 
 public:
 	void SetToCatchWeapon(AWorldWeapon* InWW) { ToCatchWeapon = InWW; }
@@ -50,6 +53,12 @@ public:
 	void DrawMeleeWeapon();
 	void DrawBowWeapon();
 	const AWorldWeapon* GetCurrentWeapon() const { return CurrentWeapon; }
+
+	const AWorldWeapon* GetMeleeWeapon() { return MeleeWeapon; }
+	const AWorldWeapon* GetBowWeapon() { return BowWeapon; }
+
+protected:
+	void DropWeapons();
 
 protected:
 	UPROPERTY()
@@ -120,5 +129,8 @@ protected:
 	void MoveToLocation(const FVector& InLocation);
 	void StopMove();
 	void SpawnProjectile(FName ProjectileName, FName CollisionProfileName);
+	UFUNCTION()
+	void UpdateUIHPBar(float CurrentHP, float MaxHP);
+
 
 };

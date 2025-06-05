@@ -10,7 +10,10 @@
 void UStoreFSMComponent::UpdateIdle(float DeltaTime)
 {
 	Super::UpdateIdle(DeltaTime);
-	
+
+	//Owner->GetController()->StopMovement();
+
+
 	// Player 쳐다보기
 	if (Owner && Player)
 	{

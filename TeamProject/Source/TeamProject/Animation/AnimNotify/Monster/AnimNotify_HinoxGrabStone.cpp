@@ -20,6 +20,9 @@ void UAnimNotify_HinoxGrabStone::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(MeshComp->GetOwner()))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UAnimNotify_HinoxGrabStone::Notify"));
+
+
 		UWorld* World = MeshComp->GetWorld();
 
 		AThrownObject* ThrownObject = World->SpawnActorDeferred<AThrownObject>(AThrownObject::StaticClass(),

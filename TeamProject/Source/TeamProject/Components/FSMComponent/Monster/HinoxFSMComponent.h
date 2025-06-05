@@ -30,6 +30,7 @@ protected:
 	virtual void UpdateIdle(float DeltaTime) override;
 	virtual void UpdateAlert(float DeltaTime) override;
 	virtual void UpdateCombat(float DeltaTime) override;
+	virtual void UpdateDying(float DeltaTime) override;
 	virtual void UpdateDamageEye(float DeltaTime);
 	virtual void UpdateTemp(float DeltaTime);
 

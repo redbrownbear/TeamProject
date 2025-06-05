@@ -218,18 +218,21 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	// Head
 	if (HeadMeshComponent)
 	{
+		HeadMeshComponent->SetSkeletalMesh(NpcData->FaceMesh);
 		HeadMeshComponent->SetRelativeTransform(NpcData->HeadTransform);
 	}
 
 	// Hair
 	if (HairMeshComponent)
 	{
+		HairMeshComponent->SetSkeletalMesh(NpcData->HairMesh);
 		HairMeshComponent->SetRelativeTransform(NpcData->HairTransform);
 	}
 
 	// Nose
 	if (NoseMeshComponent)
 	{
+		NoseMeshComponent->SetSkeletalMesh(NpcData->NoseMesh);
 		NoseMeshComponent->SetRelativeTransform(NpcData->NoseTransform);
 	}
 	

@@ -10,6 +10,8 @@
 
 
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
+#include "Components/FSMComponent/Monster/HinoxFSMComponent.h"
+#include "Components/FSMComponent/Monster/LynelFSMComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
 #include "Data/MonsterTableRow.h"
@@ -857,8 +859,11 @@ bool IMonsterInterface::IsPlayingMontage(EMonsterMontage _InEnum)
 	return bFlag;
 }
 
-void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, int32 iOption)
 {
+	if (FMath::IsNearlyZero(Damage)) return;
+
+
 	UMonsterStatusComponent * UMonsterStatusComponent = GetStatusComponent();
 	const float fDamage = UMonsterStatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
@@ -871,10 +876,25 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 			}
 			else
 			{
-				FSMComponent->ChangeState(EMonsterState::Damage);
+				if (iOption)
+				{
+					if (FSMComponent->IsA<UHinoxFSMComponent>())
+					{
+						FSMComponent->ChangeState(EMonsterState::Damage_Eye);
+					}
+					else if (FSMComponent->IsA<ULynelFSMComponent>())
+					{
+						FSMComponent->ChangeState(EMonsterState::Stun);
+					}
+				}
+				else
+				{
+					FSMComponent->ChangeState(EMonsterState::Damage);
+				}
+
 			}
 		}
-		else
+		else if (FMath::IsNearlyZero(fDamage))
 		{
 			FSMComponent->ChangeState(EMonsterState::Dead);
 		}
@@ -885,7 +905,6 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 void IMonsterInterface::OnDie()
 {
 	GetFSMComponent()->ChangeState(EMonsterState::Dead);
-	PlayMontage(EMonsterMontage::DAMAGE);
 }
 
 void IMonsterInterface::OnDeadEnd()
@@ -928,4 +947,24 @@ void IMonsterInterface::OnDeadEnd()
 		}
 		Actor->Destroy();
 	}
+}
+
+FName IMonsterInterface::GetName() const
+{
+	if (FMonsterTableRow* MonsterData = GetMonsterData())
+	{
+		return MonsterData->Name;
+	}
+	return FName(TEXT(""));
+}
+
+float IMonsterInterface::GetDamageFromWeapon()
+{
+	UMonsterFSMComponent* FSMComponent = GetFSMComponent();
+	if (const AWorldWeapon* WW = FSMComponent->GetCurrentWeapon())
+	{
+		float fDamage = WW->GetDamage();
+		return fDamage;
+	}
+	return 0.0f;
 }

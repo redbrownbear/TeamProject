@@ -9,6 +9,8 @@
 
 class UStaticMeshComponent;
 class UBoxComponent;
+class UParticleSystemComponent;
+
 UCLASS()
 class TEAMPROJECT_API ABarrier : public AActor
 {
@@ -24,7 +26,8 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
-
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UParticleSystemComponent> ParticleEffectComponent;
 protected:
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

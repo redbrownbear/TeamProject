@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "EngineUtils.h"
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
@@ -108,7 +109,7 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Jump,
 		ETriggerEvent::Started, this, &ThisClass::JumpGlide);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
-		ETriggerEvent::Started, this, &ThisClass::StartedDash);
+		ETriggerEvent::Triggered, this, &ThisClass::StartedDash);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
 		ETriggerEvent::Completed, this, &ThisClass::CompletedDash);
 
@@ -159,7 +160,16 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::TrySuperPower);
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_ControlDistance, 
-		ETriggerEvent::Triggered, this, &ThisClass::OnControlDistance);
+		ETriggerEvent::Triggered, this, &ThisClass::OnControlDistance);	
+
+	//QuickSlot
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotLeft,
+		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotLeft);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotRight,
+		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotRight);
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_MapOpen,
+		ETriggerEvent::Started, this, &ThisClass::OnMapOpen);
 }
 
 void APC_InGame::Tick(float DeltaSeconds)
@@ -227,6 +237,8 @@ void APC_InGame::BindInventoryInput()
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenNavigate, ETriggerEvent::Started, this, &APC_InGame::OnNavigate);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenConfirm, ETriggerEvent::Started, this, &APC_InGame::OnConfirm);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenCancel, ETriggerEvent::Started, this, &APC_InGame::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_DropItem, ETriggerEvent::Started, this, &APC_InGame::DropItem);
+
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started, this, &APC_InGame::OnCreateItemTest);
 	}
 }
@@ -273,11 +285,13 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 	if (!Player_C)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("NoPlayer"));
 		return;
 	}
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 	if (Movement->MovementMode == MOVE_None)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("MoveNone"));
 		return;
 	}
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
@@ -353,6 +367,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 			Stemina -= DeltaTime * STEMINA_USE_SPEED;
 			PlayerManager->SetPlayerStamina(Stemina);
+			UE_LOG(LogTemp, Warning, TEXT("Dash"));
 		}
 	}
 }
@@ -380,6 +395,9 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
 	const FVector2D ActionValue = FVector2D::Zero();
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	PlayerManager->SetStaminaUSe(false);
 
 	UE_LOG(LogTemp, Warning, TEXT("ActionValue %f, %f"), ActionValue.X, ActionValue.Y);
 	P_Anim->ActionValue = ActionValue;
@@ -673,6 +691,7 @@ void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
 	if (PlayerManager)
 	{
 		PlayerManager->ShowInvenUI();
+		PlayerManager->ShowEquipUI();
 	}
 }
 
@@ -840,6 +859,66 @@ void APC_InGame::DestroyIcePillar()
 	if (!IcePillarActor) return;
 
 	IcePillarActor->Destroy();
+}
+
+void APC_InGame::OnQuickSlotLeft(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if (UIManager)
+	{
+		UIManager->ShowUI(UQuickSlotMain::StaticClass());
+	}
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
+	{
+		PlayerManager->ShowQuickSlot();
+	}
+}
+
+void APC_InGame::OnQuickSlotRight(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if (UIManager)
+	{
+		UIManager->ShowUI(UQuickSlotMain::StaticClass());
+	}
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
+	{
+		PlayerManager->ShowQuickSlot();
+	}
+}
+
+void APC_InGame::OnMapOpen(const FInputActionValue& InputActionValue)
+{
+	AMapDataExtractor* Extractor = nullptr;
+
+	for (TActorIterator<AMapDataExtractor> It(GetWorld()); It; ++It)
+	{
+		Extractor = *It;
+		break;
+	}
+
+	if (Extractor)
+	{
+		Extractor->ExtractLandscapeData();
+
+		UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+		if (UIManager)
+		{
+			UIManager->ShowUI(UMainMap::StaticClass());
+		}
+
+		UMainMap* MainMapUI = UIManager->FindUI<UMainMap>();
+		if (MainMapUI)
+			MainMapUI->SetMapData(Extractor->GetMapTiles());
+	}
+	else
+	{
+		//없음
+	}
 }
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
@@ -1347,6 +1426,16 @@ void APC_InGame::OnNextDialogue(const FInputActionValue& InputActionValue)
 		
 		break;
 	}
+}
+
+void APC_InGame::DropItem(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	UInventory* InvenUI = UIManager->FindUI<UInventory>();;
+	if (InvenUI)
+		InvenUI->OnCreateItemInWorld(InputActionValue);
 }
 
 void APC_InGame::OnCreateItemTest(const FInputActionValue& InputActionValue)

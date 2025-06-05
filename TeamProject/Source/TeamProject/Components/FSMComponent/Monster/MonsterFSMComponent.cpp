@@ -18,6 +18,12 @@
 
 #include "Navigation/PathFollowingComponent.h"
 
+#include "GameFramework/PC_InGame.h"
+
+#include "UI/HUD/MainHUD.h"
+
+#include "Data/MonsterTableRow.h"
+
 
 UMonsterFSMComponent::UMonsterFSMComponent()
 {
@@ -49,6 +55,8 @@ void UMonsterFSMComponent::BeginPlay()
 	default:
 		break;
 	}
+
+
 }
 
 
@@ -69,6 +77,18 @@ void UMonsterFSMComponent::OnHitReceived(bool bIsDead)
 	else
 	{
 		ChangeState(EMonsterState::Damage);
+	}
+}
+
+void UMonsterFSMComponent::BindHitEvent()
+{
+	if (CharacterMonster)
+	{
+		CharacterMonster->GetStatusComponent()->OnHPChanged.AddDynamic(this, &ThisClass::UpdateUIHPBar);
+	}
+	else if (PawnMonster)
+	{
+		PawnMonster->GetStatusComponent()->OnHPChanged.AddDynamic(this, &ThisClass::UpdateUIHPBar);
 	}
 }
 
@@ -145,6 +165,18 @@ void UMonsterFSMComponent::DrawBowWeapon()
 	}
 }
 
+void UMonsterFSMComponent::DropWeapons()
+{
+	if (MeleeWeapon)
+	{
+		MeleeWeapon->DetachFromMonster();
+	}
+	if (BowWeapon)
+	{ 
+		BowWeapon->DetachFromMonster();
+	}
+}
+
 void UMonsterFSMComponent::SetMonsterGroupType(EMonsterGroupType NewGroupType)
 {
 	eGroupType = NewGroupType;
@@ -215,6 +247,9 @@ void UMonsterFSMComponent::HandleState(float DeltaTime)
 		break;
 	case EMonsterState::Dead:
 		UpdateDying(DeltaTime);
+		break;
+	case EMonsterState::Damage:
+		UpdateDamage(DeltaTime);
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // Unexpected MonsterState"));
@@ -338,7 +373,7 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 		if (PawnMonster)
 		{
 			PawnMonster->PlayMontage(EMonsterMontage::SIGNAL_START);
-			SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
+			//SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
 		}
 		else if (CharacterMonster)
 		{
@@ -442,8 +477,7 @@ void UMonsterFSMComponent::UpdateToDance(float DeltaTime)
 		{
 			const FVector CampFireLocation = CampFireActor->GetActorLocation();
 			MoveToLocation(CampFireLocation);
-			AActor* TempActor = Cast<AActor>(PawnMonster);
-			float fDistance = FVector::Dist(TempActor->GetActorLocation(), CampFireLocation);
+			float fDistance = FVector::Dist(PawnMonster->GetActorLocation(), CampFireLocation);
 			if (fDistance < MONSTER_CAMPFIRE_MIN_LENGTH)
 			{
 				this->StopMove();
@@ -457,8 +491,7 @@ void UMonsterFSMComponent::UpdateToDance(float DeltaTime)
 		{
 			const FVector CampFireLocation = CampFireActor->GetActorLocation();
 			MoveToLocation(CampFireLocation);
-			AActor* TempActor = Cast<AActor>(CharacterMonster);
-			float fDistance = FVector::Dist(TempActor->GetActorLocation(), CampFireLocation);
+			float fDistance = FVector::Dist(CharacterMonster->GetActorLocation(), CampFireLocation);
 			if (fDistance < MONSTER_CAMPFIRE_MIN_LENGTH)
 			{
 				this->StopMove();
@@ -840,10 +873,26 @@ void UMonsterFSMComponent::UpdateDying(float DeltaTime)
 
 	if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DEAD))
 	{
+		if (MeleeWeapon)
+		{
+			MeleeWeapon->DetachFromMonster();
+		}
+		if (BowWeapon)
+		{
+			BowWeapon->DetachFromMonster();
+		}
 		CharacterMonster->Destroy();
 	}
 	else if (PawnMonster && !PawnMonster->IsPlayingMontage(EMonsterMontage::DEAD))
 	{
+		if (MeleeWeapon)
+		{
+			MeleeWeapon->DetachFromMonster();
+		}
+		if (BowWeapon)
+		{
+			BowWeapon->DetachFromMonster();
+		}
 		PawnMonster->Destroy();
 	}
 }
@@ -852,11 +901,11 @@ void UMonsterFSMComponent::UpdateDamage(float DeltaTime)
 {
 	this->StopMove();
 
-	if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
+	if (PawnMonster && !PawnMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
 	{
 		ChangeState(EMonsterState::Combat);
 	}
-	else if (PawnMonster && !PawnMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
+	else if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
 	{
 		ChangeState(EMonsterState::Combat);
 	}
@@ -947,4 +996,34 @@ void UMonsterFSMComponent::SpawnProjectile(FName ProjectileName, FName Collision
 	NewTransform.SetLocation(Location);
 	NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
 	Projectile->FinishSpawning(NewTransform);
+}
+
+void UMonsterFSMComponent::UpdateUIHPBar(float CurrentHP, float MaxHP)
+{
+	if (CharacterMonster)
+	{ 
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					HUD->ShowBossHpUI(true, CurrentHP, MaxHP, CharacterMonster->GetMonsterData()->Name.ToString());
+				}
+			}
+		}
+	}
+	else if (PawnMonster)
+	{
+		if (UWorld* World = PawnMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					HUD->ShowBossHpUI(false, CurrentHP, MaxHP, PawnMonster->GetMonsterData()->Name.ToString());
+				}
+			}
+		}
+	}
 }

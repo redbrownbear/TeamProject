@@ -12,11 +12,8 @@ void UStoreAnimInstance::NativeInitializeAnimation()
 
 	APawn* Pawn = TryGetPawnOwner();
 
-	if (GIsEditor && FApp::IsGame() && !Pawn)
-	{
-		checkf(false, TEXT("UStoreAnimInstance�� ����Ϸ��� �������ڰ� Pawn�̾�� �մϴ�."));
-		return;
-	}
+	if (GIsEditor && FApp::IsGame() && !Pawn) return;
+	
 	else if (!Pawn) { return; }
 
 	ANpc* Npc = Cast<ANpc>(Pawn);
