@@ -79,11 +79,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_RightClick = nullptr;
 
-
-
-
-
-
 	// --------- Weapon Swap-----------------------------
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
@@ -146,6 +141,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_QuickSlotRight = nullptr;
 
+	//Map
+public:
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
+	UInputAction* IA_MapOpen = nullptr;
+
+
 	void CheckValid() const
 	{
 		check(IMC_InGame);
@@ -174,6 +175,7 @@ public:
 		check(IA_Build);
 		check(IA_QuickSlotLeft);
 		check(IA_QuickSlotRight);
+		check(IA_MapOpen);
 	}
 };
 
@@ -257,6 +259,8 @@ protected:
 
 	void OnQuickSlotLeft(const FInputActionValue& InputActionValue);
 	void OnQuickSlotRight(const FInputActionValue& InputActionValue);
+
+	void OnMapOpen(const FInputActionValue& InputActionValue);
 
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }

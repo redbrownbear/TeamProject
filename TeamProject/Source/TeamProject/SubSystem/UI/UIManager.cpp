@@ -108,4 +108,16 @@ void UUIManager::LoadUIClass()
         }
     }
 
+    if (!CachedMainMapClass)
+    {
+        CachedMainMapClass = CreateWidget<UMainMap>(World, LoadClass<UMainMap>(nullptr, TEXT("/Game/Blueprint/UI/Map/BP_MainMap.BP_MainMap_C")));
+        if (CachedMainMapClass)
+        {
+            CachedMainMapClass->AddToViewport();
+            CachedMainMapClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedMainMapClass->OnCreated();
+            CachedUIs.Add(UMainMap::StaticClass(), CachedMainMapClass);
+        }
+    }
+
 }

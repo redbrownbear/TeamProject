@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "EngineUtils.h"
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
@@ -133,6 +134,9 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotLeft);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotRight,
 		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotRight);
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_MapOpen,
+		ETriggerEvent::Started, this, &ThisClass::OnMapOpen);
 }
 
 void APC_InGame::Tick(float DeltaSeconds)
@@ -680,6 +684,36 @@ void APC_InGame::OnQuickSlotRight(const FInputActionValue& InputActionValue)
 	if (PlayerManager)
 	{
 		PlayerManager->ShowQuickSlot();
+	}
+}
+
+void APC_InGame::OnMapOpen(const FInputActionValue& InputActionValue)
+{
+	AMapDataExtractor* Extractor = nullptr;
+
+	for (TActorIterator<AMapDataExtractor> It(GetWorld()); It; ++It)
+	{
+		Extractor = *It;
+		break;
+	}
+
+	if (Extractor)
+	{
+		Extractor->ExtractLandscapeData();
+
+		UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+		if (UIManager)
+		{
+			UIManager->ShowUI(UMainMap::StaticClass());
+		}
+
+		UMainMap* MainMapUI = UIManager->FindUI<UMainMap>();
+		if (MainMapUI)
+			MainMapUI->SetMapData(Extractor->GetMapTiles());
+	}
+	else
+	{
+		//없음
 	}
 }
 
