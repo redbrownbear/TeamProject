@@ -197,6 +197,11 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;
 		break;
+	case EInputContext::IC_Map:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 4);
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+		break;
 
 	}
 
@@ -707,32 +712,16 @@ void APC_InGame::OnQuickSlotRight(const FInputActionValue& InputActionValue)
 
 void APC_InGame::OnMapOpen(const FInputActionValue& InputActionValue)
 {
-	AMapDataExtractor* Extractor = nullptr;
-
-	for (TActorIterator<AMapDataExtractor> It(GetWorld()); It; ++It)
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if (UIManager)
 	{
-		Extractor = *It;
-		break;
+		UIManager->ShowUI(UMainMap::StaticClass());
 	}
 
-	if (Extractor)
-	{
-		Extractor->ExtractLandscapeData();
+	UMainMap* MainMapUI = UIManager->FindUI<UMainMap>();
+	if (MainMapUI)
+		MainMapUI->SetPlayerData();
 
-		UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-		if (UIManager)
-		{
-			UIManager->ShowUI(UMainMap::StaticClass());
-		}
-
-		UMainMap* MainMapUI = UIManager->FindUI<UMainMap>();
-		if (MainMapUI)
-			MainMapUI->SetMapData(Extractor->GetMapTiles());
-	}
-	else
-	{
-		//없음
-	}
 }
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
@@ -870,6 +859,7 @@ void APC_InGame::OnCancel(const FInputActionValue& InputActionValue)
 	UNPCDialogue* DialogUI = nullptr;
 	UQuest* QuestUI = nullptr;
 	UPopupGetItem* PopupUI = nullptr;
+	UMainMap* MainMapUI = nullptr;
 
 	switch (CurrentInputContext)
 	{
@@ -903,6 +893,12 @@ void APC_InGame::OnCancel(const FInputActionValue& InputActionValue)
 		PopupUI = UIManager->FindUI<UPopupGetItem>();
 		if (PopupUI)
 			PopupUI->OnCancel();
+		break;
+
+	case EInputContext::IC_Map:
+		MainMapUI = UIManager->FindUI<UMainMap>();
+		if (MainMapUI)
+			MainMapUI->OnCancel();
 
 		break;
 	}
@@ -923,7 +919,7 @@ void APC_InGame::OnNextDialogue(const FInputActionValue& InputActionValue)
 		break;
 	case EInputContext::IC_Dialogue:
 		DialogUI = UIManager->FindUI<UNPCDialogue>();
-		if (DialogUI)	
+		if (DialogUI && DialogUI->IsVisible())	
 			DialogUI->OnNextDialogue(InputActionValue);
 		
 		break;

@@ -26,6 +26,7 @@ enum class EInputContext
 	IC_Shop,
 	IC_Quest,
 	IC_Popup,
+	IC_Map,
 	//필요하면 추가해서 사용합니다.
 
 	IC_End,
