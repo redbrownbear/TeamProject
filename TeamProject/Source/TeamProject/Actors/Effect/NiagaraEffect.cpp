@@ -24,9 +24,41 @@ void ANiagaraEffect::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	if (DataTableRowHandle.IsNull()) { return; }
 	FNiagaraEffectTableRow* Data = DataTableRowHandle.GetRow<FNiagaraEffectTableRow>(DataTableRowHandle.RowName.ToString());
 	if (!Data) { return; }
-	NiagaraEffectData = Data;
-	fLifeTime = NiagaraEffectData->LifeTime;
-	NiagaraEffectComponent->SetAsset(NiagaraEffectData->EffectNiagaraSystem);
+	NiagaraEffectTableRow = Data;
+	fLifeTime = NiagaraEffectTableRow->LifeTime;
+	NiagaraEffectComponent->SetAsset(NiagaraEffectTableRow->EffectNiagaraSystem);
+
+	if (NiagaraEffectTableRow->bIsLifeTime)
+	{
+		fLifeTime = NiagaraEffectTableRow->LifeTime;
+	}
+
+	NiagaraEffectComponent->SetRelativeTransform(NiagaraEffectTableRow->Transform);
+
+	NiagaraEffectComponent->Activate(true);
+}
+void ANiagaraEffect::SetData(const FName& NiagaraEffectName)
+{
+	if (!NiagaraEffectDataTable)
+	{
+		NiagaraEffectDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Data/EffectData/DT_NiagaraEffect.DT_NiagaraEffect'"));
+		check(NiagaraEffectDataTable);
+	}
+	if (!NiagaraEffectDataTable->GetRowMap().Find(NiagaraEffectName)) { ensure(false); return; }
+	DataTableRowHandle.DataTable = NiagaraEffectDataTable;
+	DataTableRowHandle.RowName = NiagaraEffectName;
+	NiagaraEffectTableRow = DataTableRowHandle.GetRow<FNiagaraEffectTableRow>(DataTableRowHandle.RowName.ToString());
+
+	NiagaraEffectComponent->SetAsset(NiagaraEffectTableRow->EffectNiagaraSystem);
+
+	if (NiagaraEffectTableRow->bIsLifeTime)
+	{
+		fLifeTime = NiagaraEffectTableRow->LifeTime;
+	}
+
+	NiagaraEffectComponent->SetRelativeTransform(NiagaraEffectTableRow->Transform);
+
+	NiagaraEffectComponent->Activate(true);
 }
 void ANiagaraEffect::BeginPlay()
 {
@@ -46,7 +78,7 @@ void ANiagaraEffect::Tick(float DeltaTime)
 }
 void ANiagaraEffect::SetNiagaraSystem(UNiagaraSystem* InAsset)
 {
-	NiagaraEffectComponent->SetAsset(NiagaraEffectData->EffectNiagaraSystem);
+	NiagaraEffectComponent->SetAsset(NiagaraEffectTableRow->EffectNiagaraSystem);
 }
 
 void ANiagaraEffect::SetLifeTime(float _LifeTime)

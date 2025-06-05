@@ -119,11 +119,10 @@ void AWeaponBow::BeginPlay()
    
 
     ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
-    ChargedArrow->GetStaticMeshComp()->SetRelativeLocation(FVector::ZeroVector);
     ChargedArrow->AttachToComponent(SkeletalMeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
     ChargedArrow->SetLifeSpan(0.f);
-    ChargedArrow->GetProjectileMovement()->Deactivate();
-    ChargedArrow->GetStaticMeshComp()->SetVisibility(false);
+    ChargedArrow->SetProjectileMovementActivate(false);
+    ChargedArrow->SetStaticMeshVisibility(false);
 }
 
 void AWeaponBow::LeftClickAction()
@@ -238,7 +237,7 @@ void AWeaponBow::FireArrow()
     else {
         Arrow->SetData(TEXT("Player_Arrow"), TEXT("ToMonster"));
     }
-    Arrow->GetStaticMeshComp()->SetRelativeLocation(FVector::ZeroVector);
+
     SetArrowFire(false);
 
     SetArrowVisibility(false);
@@ -256,7 +255,4 @@ void AWeaponBow::SetArrowFire(bool _bool)
     {
         ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
     }
-    
-    ChargedArrow->GetStaticMeshComp()->SetRelativeLocation(FVector::ZeroVector);
-    ChargedArrow->GetStaticMeshComp()->SetRelativeRotation(FRotator::ZeroRotator);
 }

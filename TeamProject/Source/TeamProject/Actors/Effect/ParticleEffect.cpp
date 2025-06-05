@@ -23,13 +23,40 @@ void AParticleEffect::SetData(const FDataTableRowHandle& InDataTableRowHandle)
     if (DataTableRowHandle.IsNull()) { return; }
     FParticleEffectTableRow* Data = DataTableRowHandle.GetRow<FParticleEffectTableRow>(DataTableRowHandle.RowName.ToString());
     if (!Data) { return; }
-    ParticleEffectData = Data;
-    ParticleEffectComponent->SetTemplate(ParticleEffectData->EffectParticleSystem);
+    ParticleEffectTableRow = Data;
+    ParticleEffectComponent->SetTemplate(ParticleEffectTableRow->EffectParticleSystem);
 
-    if (ParticleEffectData->bIsLifeTime)
+    if (ParticleEffectTableRow->bIsLifeTime)
     {
-        fLifeTime = ParticleEffectData->LifeTime;
+        fLifeTime = ParticleEffectTableRow->LifeTime;
     }
+
+    ParticleEffectComponent->SetRelativeTransform(ParticleEffectTableRow->Transform);
+    //ParticleEffectComponent->SetRelativeLocation(ParticleEffectTableRow->Transform.GetLocation());
+    //ParticleEffectComponent->SetWorldRotation(ParticleEffectTableRow->Transform.GetRotation());
+    //ParticleEffectComponent->SetWorldScale3D(ParticleEffectTableRow->Transform.GetScale3D());
+}
+
+void AParticleEffect::SetData(const FName& ParticleEffectName)
+{
+    if (!ParticleEffectDataTable)
+    {
+        ParticleEffectDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Data/EffectData/DT_ParticleEffect.DT_ParticleEffect'"));
+        check(ParticleEffectDataTable);
+    }
+    if (!ParticleEffectDataTable->GetRowMap().Find(ParticleEffectName)) { ensure(false); return; }
+    DataTableRowHandle.DataTable = ParticleEffectDataTable;
+    DataTableRowHandle.RowName = ParticleEffectName;
+    ParticleEffectTableRow = DataTableRowHandle.GetRow<FParticleEffectTableRow>(DataTableRowHandle.RowName.ToString());
+
+    ParticleEffectComponent->SetTemplate(ParticleEffectTableRow->EffectParticleSystem);
+
+    if (ParticleEffectTableRow->bIsLifeTime)
+    {
+        fLifeTime = ParticleEffectTableRow->LifeTime;
+    }
+
+    ParticleEffectComponent->SetRelativeTransform(ParticleEffectTableRow->Transform);
 }
 
 void AParticleEffect::SetParticleSystem(UParticleSystem* ParticleSystem)
@@ -83,7 +110,7 @@ void AParticleEffect::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (ParticleEffectData->bIsLifeTime)
+    if (ParticleEffectTableRow->bIsLifeTime)
     {
         fCurrentLifeTime += DeltaTime;
         if (fCurrentLifeTime > fLifeTime)
