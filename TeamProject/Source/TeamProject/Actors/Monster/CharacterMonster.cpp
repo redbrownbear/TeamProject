@@ -487,7 +487,6 @@ void ACharacterMonster::SetSpeedRun()
 void ACharacterMonster::OnDie()
 {
 	IMonsterInterface::OnDie();
-	OnDeadEnd();
 }
 
 void ACharacterMonster::OnDeadEnd()

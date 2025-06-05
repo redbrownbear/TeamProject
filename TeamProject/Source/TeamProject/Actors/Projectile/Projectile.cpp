@@ -138,7 +138,10 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 {
 	if (!IsValid(this)) { return; }
 
-	Destroy();
+	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert))
+	{
+		Destroy();
+	}
 
 	//if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
 	//	|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig)

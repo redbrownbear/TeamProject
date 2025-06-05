@@ -373,7 +373,7 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 		if (PawnMonster)
 		{
 			PawnMonster->PlayMontage(EMonsterMontage::SIGNAL_START);
-			SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
+			//SpawnProjectile(ProjectileName::Monster_PlayerAlert, CollisionProfileName::ToMonster);
 		}
 		else if (CharacterMonster)
 		{

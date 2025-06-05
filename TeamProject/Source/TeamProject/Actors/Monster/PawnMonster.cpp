@@ -181,7 +181,7 @@ void APawnMonster::PostDuplicate(EDuplicateMode::Type DuplicateMode)
 	if (DuplicateMode == EDuplicateMode::Normal)
 	{
 		FTransform Backup = GetActorTransform();
-		CollisionComponent->DestroyComponent();
+		//CollisionComponent->DestroyComponent();
 		SetData(DataTableRowHandle);
 		SetActorTransform(Backup);
 	}

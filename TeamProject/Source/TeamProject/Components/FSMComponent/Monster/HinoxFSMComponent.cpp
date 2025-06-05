@@ -392,6 +392,7 @@ void UHinoxFSMComponent::UpdateCombat(float DeltaTime)
 
 void UHinoxFSMComponent::UpdateDying(float DeltaTime)
 {
+	this->StopMove();
 	Super::UpdateDying(DeltaTime);
 }
 
