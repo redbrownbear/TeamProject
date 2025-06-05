@@ -19,4 +19,6 @@ void UShopDescription::RefreshUI(const FItemData& ItemData)
 
 	//이후로 가지고 있는 아이템 갯수
 	//매니저를 통해 가져오자...
+
+	CurrentItemData = ItemData; // 인벤토리에 데이터 전달하기 위한 함수
 }

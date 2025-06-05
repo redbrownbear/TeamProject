@@ -1,5 +1,8 @@
 #include "TempleActorSpawner.h"
 #include "TempleActor.h"
+#include "KeyBallVolume.h"
+
+#include "Data/TempleActorTableRow.h"
 
 // Sets default values
 ATempleActorSpawner::ATempleActorSpawner()
@@ -17,6 +20,12 @@ void ATempleActorSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (SpawnBlockVolume)
+	{
+		SpawnBlockVolume->OnActorBeginOverlap.AddDynamic(this, &ATempleActorSpawner::OnTriggerEnter);
+		SpawnBlockVolume->OnActorEndOverlap.AddDynamic(this, &ATempleActorSpawner::OnTriggerExit);
+	}
+
 	if (TempleActorClass)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
@@ -26,6 +35,51 @@ void ATempleActorSpawner::BeginPlay()
 			SpawnInterval,
 			true
 		);
+	}
+
+	DrawDebugBox(
+		GetWorld(),
+		GetActorLocation(),       
+		SpawnAreaExtent,          
+		FQuat::Identity,          
+		FColor::Cyan,            
+		false,                    
+		10.f,                     
+		0,                        
+		2.0f                      
+	);
+}
+
+void ATempleActorSpawner::OnTriggerEnter(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (ATempleActor* TempleActor = Cast<ATempleActor>(OtherActor))
+	{
+		const FTempleActorTableRow* Data = TempleActor->GetTempleActorData();
+		if (Data && Data->ActorName == FName("Key_Ball"))
+		{
+			GetWorld()->GetTimerManager().ClearTimer(SpawnTimer);
+		}
+	}
+}
+
+void ATempleActorSpawner::OnTriggerExit(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (ATempleActor* TempleActor = Cast<ATempleActor>(OtherActor))
+	{
+		const FTempleActorTableRow* Data = TempleActor->GetTempleActorData();
+		if (Data && Data->ActorName.Equals(TEXT("Key_Ball")))
+		{
+			if (!GetWorld()->GetTimerManager().IsTimerActive(SpawnTimer))
+			{
+				GetWorld()->GetTimerManager().SetTimer(
+					SpawnTimer,
+					this,
+					&ATempleActorSpawner::SpawnActor,
+					SpawnInterval,
+					true
+				);
+			}
+		}
 	}
 }
 

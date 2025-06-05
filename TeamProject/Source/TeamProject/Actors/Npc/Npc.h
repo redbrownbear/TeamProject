@@ -93,6 +93,8 @@ public:
 
 	void SetBuy(bool IsBuy) { bBuy = IsBuy; }
 
+	void SetSell(bool IsSell) { bSell = IsSell; }
+
 	void AttachToSocket();
 
 protected:
@@ -152,6 +154,9 @@ private:
 
 	UPROPERTY()
 	bool bBuy = false;
+
+	UPROPERTY()
+	bool bSell = false;
 
 protected:
 	// 상호작용 

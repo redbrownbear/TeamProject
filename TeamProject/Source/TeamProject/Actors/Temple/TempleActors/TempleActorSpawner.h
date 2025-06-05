@@ -6,6 +6,7 @@
 
 //class UTempleBallSpawnerComponent;
 class ATempleActor;
+class AKeyBallVolume;
 
 UCLASS()
 class TEAMPROJECT_API ATempleActorSpawner : public AActor
@@ -19,6 +20,13 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnTriggerEnter(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION()
+	void OnTriggerExit(AActor* OverlappedActor, AActor* OtherActor);
+
 
 public:
 	UFUNCTION()
@@ -41,6 +49,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Spawning", meta = (RowType = "TempleActorTableRow"))
 	FDataTableRowHandle SpawnRowHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	AKeyBallVolume* SpawnBlockVolume = nullptr;
 
 
 private:

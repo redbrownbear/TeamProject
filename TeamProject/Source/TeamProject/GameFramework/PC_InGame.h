@@ -275,6 +275,9 @@ protected:
 	void SpawnIcePillar();
 
 	UFUNCTION()
+	void DestroyIcePillar();
+
+	UFUNCTION()
 	bool IsSurfaceActor(AActor* Actor) const;
 
 	UFUNCTION()
@@ -318,6 +321,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<AIcePreview> IcePreviewActor = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<AIcePillar> IcePillarActor = nullptr;
 
 	// ------------ Magnesis ---------------
 

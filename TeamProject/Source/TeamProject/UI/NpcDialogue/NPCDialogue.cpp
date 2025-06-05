@@ -220,6 +220,7 @@ void UNPCDialogue::OnSell()
 
             QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
         }
+        PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
     }
     else
     {
@@ -331,14 +332,17 @@ void UNPCDialogue::OnNextButtonClicked()
 
         if (DialogueDataRow.bIsEndConversation == true)
         {
-            ConfirmButton->SetVisibility(ESlateVisibility::Visible);
-            CancelButton->SetVisibility(ESlateVisibility::Visible);
-            ExtraButton->SetVisibility(ESlateVisibility::Hidden);
+            if (PC_InGame->Npc->GetCurrentDialogueType() != EDialogType::Shop)
+            {
+                ConfirmButton->SetVisibility(ESlateVisibility::Visible);
+                CancelButton->SetVisibility(ESlateVisibility::Visible);
+                ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 
-            ConfrimText->SetText(FText::FromString(TEXT("확인")));
-            CancelText->SetText(FText::FromString(TEXT("취소")));
+                ConfrimText->SetText(FText::FromString(TEXT("확인")));
+                CancelText->SetText(FText::FromString(TEXT("취소")));
 
-            CancelButton->SetRenderTranslation(FVector2D(0.0f, -95.0f));
+                CancelButton->SetRenderTranslation(FVector2D(0.0f, -95.0f));
+            }
 
             return;
         }

@@ -153,7 +153,6 @@ void UNpcFSMComponent::ChangeState(ENpcState NewState)
 		break;
 	case ENpcState::Sell:
 		Owner->PlayMontage(ENpcMontage::SELL);
-
 		break;
 	case ENpcState::End:
 		Owner->PlayMontage(ENpcMontage::END);
@@ -285,7 +284,6 @@ void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 
 	if (Owner->GetController()) Owner->GetController()->StopMovement();
 
-	// ?œê°„?´ë™
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	Owner->SetIsHide(true);
 

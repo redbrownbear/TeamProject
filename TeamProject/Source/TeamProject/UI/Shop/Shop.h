@@ -27,6 +27,13 @@ public:
 	virtual void ShowUI() override;
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
+public:
+	UFUNCTION()
+	void AddItemInventory();
+
+	UFUNCTION()
+	void SubtractItemInventory();
+
 private:
 	void InitUI();
 	void SetRupeeUI();
@@ -44,7 +51,6 @@ private:
 
 	UFUNCTION()
 	void RefreshAllInventory(const TArray<FItemData>& ItemDataList);
-
 
 public: //바인딩을 위해 퍼블릭선언
 	UFUNCTION()

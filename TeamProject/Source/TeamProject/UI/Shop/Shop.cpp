@@ -12,6 +12,7 @@
 #include "GameFramework/PC_InGame.h"
 #include "UI/HUD/MainHUD.h"
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
+#include "UI/NpcDialogue/NPCDialogue.h"
 
 
 void UShop::OnCreated()
@@ -54,6 +55,44 @@ void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
     RemoveDelegates();
     Super::HideUI(UShop::StaticClass());
 
+}
+
+void UShop::AddItemInventory()
+{
+    FItemData SelectedItem;
+
+    if (BP_ShopDescription)
+    {
+        SelectedItem = BP_ShopDescription->GetCurrentItemData();        
+    }
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        PlayerManager->SetInvenData(SelectedItem);
+    }
+
+    // 상점 수량 업데이트
+    /*SelectedItem.ItemCount - 1;
+
+    BP_ShopScroll->SlotWidgetClass->SetItemData*/
+}
+
+void UShop::SubtractItemInventory()
+{
+    FItemData SelectedItem;
+
+    if (BP_ShopDescription)
+    {
+        SelectedItem = BP_ShopDescription->GetCurrentItemData();
+    }
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        //물량을 빼야함
+        //PlayerManager->SetInvenData(SelectedItem);
+    }
 }
 
 void UShop::InitUI()
@@ -192,28 +231,6 @@ void UShop::OnCancel()
 {
     HideUI(UShop::StaticClass());
 
-    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
-    check(QuestManager);
-  
-    UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-    check(UIManager);
-
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-
-    UConversationManagerComponent* ConverSationManager = Cast<UConversationManagerComponent>(PC_InGame->Npc->GetComponentByClass(UConversationManagerComponent::StaticClass()));
-    check(ConverSationManager);
-
-    EQuestCharacter QuestChar = PC_InGame->Npc->GetData()->QuestCharacter;
-    EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
-
-    int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
-
-    if (PC_InGame)
-    {
-        UIManager->ShowUI(UNPCDialogue::StaticClass());        
-        QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
-        //QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_STORE);
-    }
 }
 
 void UShop::OnNextDialogue(const FInputActionValue& InputActionValue)

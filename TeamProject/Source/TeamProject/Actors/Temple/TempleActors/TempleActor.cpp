@@ -1,6 +1,7 @@
 #include "TempleActor.h"
 #include "Components/SphereComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "TempleActorSpawner.h"
 #include "ActorDeleteVolume.h"
 
 #include "Data/TempleActorTableRow.h"

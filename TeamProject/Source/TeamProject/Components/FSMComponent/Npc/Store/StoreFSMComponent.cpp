@@ -61,14 +61,3 @@ void UStoreFSMComponent::LookAtPlayer(AActor* PlayerActor)
 	FRotator SmoothRot = FMath::RInterpTo(CurrentRot, TargetRot, GetWorld()->GetDeltaSeconds(), Speed);
 	Owner->SetActorRotation(SmoothRot);
 }
-
-//bool UStoreFSMComponent::CanSeePlayer() const
-//{
-//	if (!Owner || !Player) return false;
-//
-//	AStoreController* KoroguCon = Cast<AStoreController>(Owner->GetController());
-//	if (!KoroguCon) return false;
-//
-//	return KoroguCon->LineOfSightTo(Player);
-//}
-
