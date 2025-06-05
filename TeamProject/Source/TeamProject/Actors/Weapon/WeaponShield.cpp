@@ -63,7 +63,7 @@ AWeaponShield::AWeaponShield()
         else
         {
             UE_LOG(LogTemp, Warning, TEXT("No Shield_Wait_Montage"));
-            check(Wait_MTG);
+            
         }
 
 
@@ -82,7 +82,7 @@ AWeaponShield::AWeaponShield()
         else
         {
             UE_LOG(LogTemp, Warning, TEXT("No Shield_Wait_Montage"));
-            check(Just_MTG);
+            
         }
 
     }

@@ -13,6 +13,6 @@ void UWeaponChildActorComponent::BeginPlay()
 void UWeaponChildActorComponent::SetData(FDataTableRowHandle InDataTableRowHandle)
 {
 	AWeaponBase* Weapon = Cast<AWeaponBase>(GetChildActor());
-	check(Weapon);
+	
 
 }

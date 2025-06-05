@@ -71,7 +71,8 @@ public:
 	UInputAction* IA_Dash = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_Crouch = nullptr;
-
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
+	UInputAction* IA_Step = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_LeftClick = nullptr;
