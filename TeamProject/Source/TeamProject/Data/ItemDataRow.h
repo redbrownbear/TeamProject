@@ -29,11 +29,14 @@ struct TEAMPROJECT_API FItemData : public FTableRowBase
 	GENERATED_BODY()
 
 public:
+	eEquipParts GetParts() const;
+
+public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
     FString Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	int32 ItemID;
+	FString UniqueID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	int32 ItemCount = 1;

@@ -11,6 +11,7 @@
 
 #include "GameFramework/PC_InGame.h"
 
+
 void UInventory::OnCreated()
 {
     InitUI();
@@ -142,6 +143,38 @@ void UInventory::OnCancel(const FInputActionValue& InputActionValue)
     HideUI(UInventory::StaticClass());
 }
 
+void UInventory::OnCreateItemInWorld(const FInputActionValue& InputActionValue)
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (!PlayerManager || !WorldItemActorClass) return;
+
+    // 선택된 아이템 얻기 (예: 인벤 UI에서 선택한 아이템 등)
+    const FItemData& SelectedItem = BP_InvenScroll->GetCurItemData();
+
+    // 고유 ID 기반으로 제거 및 반환
+    FItemData DroppedItem = PlayerManager->RemoveItemByUniqueID(SelectedItem.UniqueID);
+
+    // 월드에 액터 스폰
+    UWorld* World = GetWorld();
+    if (!World) return;
+
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (!PC) return;
+
+    APawn* Pawn = PC->GetPawn();
+    if (!Pawn) return;
+
+    FVector SpawnLocation = Pawn->GetActorLocation() + Pawn->GetActorForwardVector() * 100.f + FVector(0, 0, 50.f);
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = Pawn;
+
+    AWorldWeapon* SpawnedActor = World->SpawnActor<AWorldWeapon>(WorldItemActorClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+    if (SpawnedActor)
+    {
+        SpawnedActor->SetDataWithData(DroppedItem);
+    }
+}
+
 void UInventory::OnCreateItemTest(const FInputActionValue& InputActionValue)
 {
     UInventoryManager* InventoryManager = GetGameInstance()->GetSubsystem<UInventoryManager>();
@@ -155,7 +188,8 @@ void UInventory::OnCreateItemTest(const FInputActionValue& InputActionValue)
             if (FoundRows.Num() > 0)
             {
                 int32 RandomIndex = FMath::RandRange(0, FoundRows.Num() - 1);
-                const FItemData RandomItem = (FoundRows)[RandomIndex];
+                FItemData RandomItem = (FoundRows)[RandomIndex];
+                RandomItem.UniqueID = FGuid::NewGuid().ToString();
                 PlayerManager->SetInvenData(RandomItem);
 
                 // 사용 예

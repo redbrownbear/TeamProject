@@ -77,7 +77,8 @@
 #define PLAYER_CLIMB_SPEED															80.f
 #define PLAYER_CAPSULE_HALF_HEIGHT													41.f
 #define PLAYER_CAPSULE_RADIUS														20.f
-
+#define PLAYER_MOVE_NML                                                             500.f
+#define PLAYER_MOVE_BOW_ZOOM                                                        200.f
 
 
 #define PLAYER_GLIDE_MAX_SPEED														700.f

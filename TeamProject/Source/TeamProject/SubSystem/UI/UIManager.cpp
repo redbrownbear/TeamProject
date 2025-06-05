@@ -96,4 +96,28 @@ void UUIManager::LoadUIClass()
         }
     }
 
+    if (!CachedQuickSlotClass)
+    {
+        CachedQuickSlotClass = CreateWidget<UQuickSlotMain>(World, LoadClass<UQuickSlotMain>(nullptr, TEXT("/Game/Blueprint/UI/QuickSlot/BP_QuickSlot.BP_QuickSlot_C")));
+        if (CachedQuickSlotClass)
+        {
+            CachedQuickSlotClass->AddToViewport();
+            CachedQuickSlotClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedQuickSlotClass->OnCreated();
+            CachedUIs.Add(UQuickSlotMain::StaticClass(), CachedQuickSlotClass);
+        }
+    }
+
+    if (!CachedMainMapClass)
+    {
+        CachedMainMapClass = CreateWidget<UMainMap>(World, LoadClass<UMainMap>(nullptr, TEXT("/Game/Blueprint/UI/Map/BP_MainMap.BP_MainMap_C")));
+        if (CachedMainMapClass)
+        {
+            CachedMainMapClass->AddToViewport();
+            CachedMainMapClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedMainMapClass->OnCreated();
+            CachedUIs.Add(UMainMap::StaticClass(), CachedMainMapClass);
+        }
+    }
+
 }
