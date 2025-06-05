@@ -6,6 +6,9 @@
 #include "Actors/Projectile/Arrow/Projectile_Arrow.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "SubSystem/PlayerManager.h"
+#include "UI/HUD/MainHUD.h"
+#include "Components/Character/PlayerMovementComponent.h"
 
 AWeaponBow::AWeaponBow()
 {
@@ -17,12 +20,12 @@ AWeaponBow::AWeaponBow()
         RootComponent = DefaultSceneRoot;
 
 
-        ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Bow/Weapon_Bow_001.Weapon_Bow_001'"));
+        ConstructorHelpers::FObjectFinder<UStaticMesh> Asset(TEXT("/Script/Engine.StaticMesh'/Game/Resources/Weapon/BowStaticMesh/Bow001.Bow001'"));
 
-        SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
-        SkeletalMeshComponent->SetupAttachment(RootComponent);
-        SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        SkeletalMeshComponent->SetSkeletalMesh(Asset.Object);
+        StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SkeletalMeshComponent"));
+        StaticMeshComponent->SetupAttachment(RootComponent);
+        StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        StaticMeshComponent->SetStaticMesh(Asset.Object);
 
     }
 
@@ -83,10 +86,7 @@ AWeaponBow::AWeaponBow()
         ArrowClass = AProjectile_Arrow::StaticClass();
     }
 
-    {
-        ChargedArrow = CreateDefaultSubobject<AProjectile_Arrow>(TEXT("ChargedArrow"));
-        
-    }
+   
     
 }
 
@@ -94,35 +94,7 @@ void AWeaponBow::BeginPlay()
 {
     Super::BeginPlay();
 
-    APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 
-    FVector SpawnLocation = SkeletalMeshComponent->GetSocketLocation(SocketName);
-
-    // 조준 방향 계산: 예) 카메라 방향, 또는 컨트롤러 방향
-    FVector AimDirection = Player_C->GetControlRotation().Vector(); // 또는 캐릭터 카메라 방향
-
-    // 조준 방향을 회전으로 변환
-    FRotator SpawnRotation = AimDirection.Rotation();
-
-    // 스폰 파라미터
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    SpawnParams.Owner = this;
-
-    // 화살 액터 스폰
-    ChargedArrow = GetWorld()->SpawnActor<AProjectile_Arrow>(
-        AProjectile_Arrow::StaticClass(),
-        SpawnLocation,
-        SpawnRotation,
-        SpawnParams
-    );
-   
-
-    ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
-    ChargedArrow->AttachToComponent(SkeletalMeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
-    ChargedArrow->SetLifeSpan(0.f);
-    ChargedArrow->SetProjectileMovementActivate(false);
-    ChargedArrow->SetStaticMeshVisibility(false);
 }
 
 void AWeaponBow::LeftClickAction()
@@ -151,10 +123,15 @@ void AWeaponBow::LeftClickAction()
 
 
     // 이동 방향으로 자동 회전 비활성화
+    UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
     Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
 
-    Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
-  
+    C_Movement->MaxWalkSpeed = PLAYER_MOVE_NML;
+    
+    Cast<UPlayerMovementComponent>(C_Movement)->SetMoveState(EMove_State::Run);
+
+    Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ShowBowAimgUI(false, 0);
+
     FireArrow();
 
     Player_C->ZoomOut();
@@ -167,6 +144,17 @@ void AWeaponBow::RightClickAction()
 
 
     UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+
+    UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+
+    Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
+
+    Movement->SetMoveState(EMove_State::Zoom);
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    PlayerManager->SetStaminaUSe(false);
+
+    Movement->bOrientRotationToMovement = false;
 
     if (AnimInst->Montage_IsPlaying(EquipMontage))
     {
@@ -184,12 +172,11 @@ void AWeaponBow::RightClickAction()
     AnimInst->Montage_Play(ChargingMTG);
     UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
 
-    C_Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
+    Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ShowBowAimgUI(true, 0);
 
     Player_C->bUseControllerRotationYaw = true; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
 
-    // 이동 방향으로 자동 회전 비활성화
-    C_Movement->bOrientRotationToMovement = false;
+
 
     USpringArmComponent* C_SpringArm = Player_C->GetSpringArm();
 
@@ -210,7 +197,7 @@ void AWeaponBow::FireArrow()
 
     APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 
-    FVector SpawnLocation = SkeletalMeshComponent->GetSocketLocation(SocketName);
+    FVector SpawnLocation = GetActorLocation();
 
     // 조준 방향 계산: 예) 카메라 방향, 또는 컨트롤러 방향
     FVector AimDirection = Player_C->GetControlRotation().Vector(); // 또는 캐릭터 카메라 방향
@@ -230,7 +217,7 @@ void AWeaponBow::FireArrow()
         SpawnRotation,
         SpawnParams
     );
-    if (bIsFire)
+    if (Player_C->GetIsFire())
     {
         Arrow->SetData(TEXT("Player_FireArrow"), TEXT("ToMonster"));
     }
@@ -238,21 +225,10 @@ void AWeaponBow::FireArrow()
         Arrow->SetData(TEXT("Player_Arrow"), TEXT("ToMonster"));
     }
 
-    SetArrowFire(false);
+    Player_C->SetArrowFire(false);
 
-    SetArrowVisibility(false);
 
-}
+    Player_C->SetArrowVisibility(false);
 
-void AWeaponBow::SetArrowFire(bool _bool)
-{
-    bIsFire = _bool;
-    if (_bool)
-    {
-        ChargedArrow->SetData(TEXT("Player_Charged_Arrow_Fire"), TEXT("NoCollision"));
-    }
-    else
-    {
-        ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
-    }
+
 }

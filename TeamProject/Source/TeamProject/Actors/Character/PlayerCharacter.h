@@ -21,6 +21,7 @@
 #include "PlayerCharacter.generated.h"
 class UPlayerManager;
 
+class AProjectile_Arrow;
 
 UCLASS()
 class TEAMPROJECT_API APlayerCharacter : public ACharacter, public IGenericTeamAgentInterface
@@ -45,6 +46,8 @@ public:
 	// 에디터에서 엑터의 변경마다 호출되는 함수
 	virtual void OnConstruction(const FTransform& Transform);
 
+	virtual void Landed(const FHitResult& Hit) override;
+	
 	
 	
 
@@ -52,12 +55,20 @@ public:
 	UWeaponChildActorComponent* GetSword() { return WeaponManagerComponent->GetSword(); }
 	UWeaponChildActorComponent* GetShield() { return WeaponManagerComponent->GetShield(); }
 	UWeaponChildActorComponent* GetBow() { return WeaponManagerComponent->GetBow(); }
+	
+	
 	UPlayerStatusComponent* GetPlayerStatusComponent() { return StatusComponent; }
 	UWeaponManagerComponent* GetWeaponManagerComponent() { return WeaponManagerComponent; }
 	USpringArmComponent* GetSpringArm() { return SpringArm; }
 
+	
+	void SetBowStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetBowStaticMesh(InMesh); }
+	void SetSwordStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetSwordStaticMesh(InMesh); }
+	void SetShieldStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetShieldStaticMesh(InMesh); }
 
-	virtual void Landed(const FHitResult& Hit) override;
+
+
+	void Damaged(int32 Damage);
 
 	UFUNCTION()
 	void TimelineProgress(float Value);
@@ -65,6 +76,14 @@ public:
 
 	void ZoomIn();
 	void ZoomOut();
+public:
+
+
+	void SetArrowFire(bool _bool);
+
+	void SetArrowVisibility(bool _bool) { ChargedArrow->SetStaticMeshVisibility(_bool); }
+
+	bool GetIsFire() { return bIsFire; }
 protected:
 
 	/*UPROPERTY(EditAnywhere, Category="Weapon")
@@ -84,21 +103,22 @@ protected:
 	FOnTimelineFloat InterpFunction{};
 
 
-
 	UPROPERTY(EditAnywhere, Category = "Status")
 	TObjectPtr<UPlayerStatusComponent> StatusComponent;
 
 	bool bZoomedIn;
+
+	bool bIsFire;
 
 
 	UPROPERTY(EditAnywhere, Category = "Zoom")
 	UCurveFloat* ZoomCurve;
 
 	//PlayerManagerClass
-	
-	
+	FName SocketName = "Arrow_Socket";
 
-
+	UPROPERTY()
+	AProjectile_Arrow* ChargedArrow;
 public:
 	virtual uint8 GetGenericTeamId() { return FGenericTeamId(PLAYER_GENERIC_TEAM_ID); }
 };

@@ -82,7 +82,7 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Jump,
 		ETriggerEvent::Started, this, &ThisClass::JumpGlide);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
-		ETriggerEvent::Started, this, &ThisClass::StartedDash);
+		ETriggerEvent::Triggered, this, &ThisClass::StartedDash);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
 		ETriggerEvent::Completed, this, &ThisClass::CompletedDash);
 
@@ -259,11 +259,13 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 	if (!Player_C)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("NoPlayer"));
 		return;
 	}
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 	if (Movement->MovementMode == MOVE_None)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("MoveNone"));
 		return;
 	}
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
@@ -339,6 +341,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 			Stemina -= DeltaTime * STEMINA_USE_SPEED;
 			PlayerManager->SetPlayerStamina(Stemina);
+			UE_LOG(LogTemp, Warning, TEXT("Dash"));
 		}
 	}
 }
@@ -366,6 +369,9 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
 	const FVector2D ActionValue = FVector2D::Zero();
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	PlayerManager->SetStaminaUSe(false);
 
 	UE_LOG(LogTemp, Warning, TEXT("ActionValue %f, %f"), ActionValue.X, ActionValue.Y);
 	P_Anim->ActionValue = ActionValue;

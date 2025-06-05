@@ -13,6 +13,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
+#include "Components/Character/PlayerMovementComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -21,6 +22,9 @@
 #include "Actors/Monster/PawnMonster.h"
 #include "Actors/Item/WorldWeapon.h"
 #include "Actors/Effect/ParticleEffect.h"
+#include "Actors/Character/PlayerCharacter.h"
+#include "SubSystem/PlayerManager.h"
+
 #include "Actors/Effect/NiagaraEffect.h"
 
 #include "Particles/ParticleSystemComponent.h"
@@ -138,6 +142,12 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 {
 	if (!IsValid(this)) { return; }
 
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(OtherActor);
+	if (Player_C)
+	{
+		
+		Player_C->Damaged(GetDamage());
+	}
 	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert))
 	{
 		Destroy();
@@ -247,7 +257,12 @@ float AProjectile::GetDamage()
 
 void AProjectile::SetProjectileMovementActivate(bool bFlag)
 {
-	ProjectileMovementComponent->Activate(bFlag);
+	ProjectileMovementComponent->Deactivate();
+}
+
+void AProjectile::SetGravityScale(float Scale)
+{
+	ProjectileMovementComponent->ProjectileGravityScale = Scale;
 }
 
 void AProjectile::SetStaticMeshVisibility(bool bFlag)
@@ -255,6 +270,18 @@ void AProjectile::SetStaticMeshVisibility(bool bFlag)
 	if (StaticMeshComponent)
 	{
 		StaticMeshComponent->SetVisibility(bFlag);
+	}
+}
+
+void AProjectile::SetNiagaraVisibility(bool bFlag)
+{
+	if(bFlag)
+	{
+		NiagaraEffectComponent->Activate();
+	}
+	else
+	{
+		NiagaraEffectComponent->Deactivate();
 	}
 }
 

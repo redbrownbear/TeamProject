@@ -81,7 +81,7 @@
 #define PLAYER_MOVE_BOW_ZOOM                                                        200.f
 
 
-#define PLAYER_GLIDE_MAX_SPEED														700.f
+#define PLAYER_GLIDE_MAX_SPEED														1200.f
 #define PLAYER_GLIDE_MIN_SPEED														100.f
 #define PLAYER_GLIDE_MODIFY_SPEED													600.f
 #define PLAYER_GLIDE_ROTATE_SPEED													100.f
