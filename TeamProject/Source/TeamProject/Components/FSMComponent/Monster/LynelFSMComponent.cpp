@@ -777,9 +777,20 @@ void ULynelFSMComponent::UpdateAimingBowUpper(float DeltaTime)
 		return;
 	}
 
+	const FVector PlayerLocation = Player->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+
 	this->StopMove();
 	AimingBowElapsedTime += DeltaTime;
-	const FVector PlayerLocation = Player->GetActorLocation();
 	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 
 	if (AimingBowElapsedTime > MONSTER_AIMINGBOW_MAX_TIME)
@@ -802,6 +813,16 @@ void ULynelFSMComponent::UpdateDashAttack(float DeltaTime)
 
 	const FVector PlayerLocation = Player->GetActorLocation();
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+
 
 	if (CharacterMonster->IsPlayingMontage(EMonsterMontage::END))
 	{
@@ -851,6 +872,25 @@ void ULynelFSMComponent::UpdateDashAttack(float DeltaTime)
 
 void ULynelFSMComponent::UpdateExplosionAttack(float DeltaTime)
 {
+	if (!Player)
+	{
+		AimingBowElapsedTime = 0.f;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+	const FVector PlayerLocation = Player->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+
 	// Do Nothing
 	// Pattern will be handled in AnimNotify
 	this->StopMove();
@@ -865,8 +905,19 @@ void ULynelFSMComponent::UpdateFireAttack(float DeltaTime)
 		return;
 	}
 
-	this->StopMove();
 	const FVector PlayerLocation = Player->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+
+	this->StopMove();
 	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 }
 
@@ -926,9 +977,23 @@ void ULynelFSMComponent::UpdateRunningAttack(float DeltaTime)
 		return;
 	}
 
+	if (!Player)
+	{
+		AimingBowElapsedTime = 0.f;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
 	const FVector PlayerLocation = Player->GetActorLocation();
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
 
 	FVector Direction = PlayerLocation - MonsterLocation;
 	Direction.Z = 0.f; // ignore Z
@@ -985,6 +1050,24 @@ void ULynelFSMComponent::UpdateRebound(float DeltaTime)
 
 void ULynelFSMComponent::UpdateRodeo(float DeltaTime)
 {
+	if (!Player)
+	{
+		AimingBowElapsedTime = 0.f;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+	const FVector PlayerLocation = Player->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
 	RodeoElapsedTime += DeltaTime;
 	if (RodeoElapsedTime > LYNEL_RODEO_MAX_TIME)
 	{
@@ -995,6 +1078,25 @@ void ULynelFSMComponent::UpdateRodeo(float DeltaTime)
 
 void ULynelFSMComponent::UpdateStun(float DeltaTime)
 {
+	if (!Player)
+	{
+		AimingBowElapsedTime = 0.f;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+	const FVector PlayerLocation = Player->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+
 	StunElapsedTime += DeltaTime;
 
 	if (StunElapsedTime > LYNEL_STUN_MAX_TIME)
@@ -1008,12 +1110,21 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 {
 	if (!Player)
 	{
+		AimingBowElapsedTime = 0.f;
 		ChangeState(EMonsterState::Idle);
-		eReadyToAttackStep = EReadyToAttackStep::RunToLink;
+		return;
 	}
 
 	const FVector PlayerLocation = Player->GetActorLocation();
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
 
 	switch (eReadyToAttackStep)
 	{
@@ -1070,7 +1181,6 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 			CharacterMonster->PlayMontage(EMonsterMontage::GEAR_3_FORWARD);
 		}
 
-		float fDistance = FVector::Dist(MonsterLocation, PlayerLocation);
 		if (fDistance > LYNEL_AWAY_FROM_LINK_OFFSET)
 		{
 			eReadyToAttackStep = EReadyToAttackStep::TurnLeft;
@@ -1115,4 +1225,22 @@ void ULynelFSMComponent::UpdateTemp(float DeltaTime)
 {
 	// This state is a state to wait until AnimNontage end
 	// Do nothing in here
+
+	if (!Player)
+	{
+		AimingBowElapsedTime = 0.f;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+	const FVector PlayerLocation = Player->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
 }
