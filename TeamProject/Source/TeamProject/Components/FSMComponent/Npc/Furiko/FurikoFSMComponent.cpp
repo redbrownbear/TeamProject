@@ -58,14 +58,20 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 
 	if (Owner->GetConversationManager()->GetEndTalked())
 	{
-		bool IsConfirmed = Owner->GetIsConfirmed();
+		/*bool IsConfirmed = Owner->GetIsConfirmed();
 		bool IsFound = Owner->GetIsHide();
 		if (!IsConfirmed || IsFound)
 		{
 			ChangeState(ENpcState::Run);
 			Owner->SetIsHide(false);
+		}*/
+
+		if (EDialogType::None == Owner->GetCurrentDialogueType())
+		{
+			ChangeState(ENpcState::Run);
+			Owner->SetIsHide(false);
 		}
-		else
+		else if(EDialogType::Quest == Owner->GetCurrentDialogueType())
 		{
 			ChangeState(ENpcState::Hide);
 			Owner->SetIsConfirmed(false);

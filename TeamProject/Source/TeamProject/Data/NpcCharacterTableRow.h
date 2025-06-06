@@ -18,6 +18,7 @@ enum class EDialogType
 	Quest,
 	Shop,
 	Buy,
+	SoldOut,
 	Sell,
 	End
 };

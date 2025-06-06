@@ -43,7 +43,8 @@ void AFlowSurface::BeginPlay()
 
 		if (NewBoxComponent)
 		{
-			NewBoxComponent->SetBoxExtent(FLOWSURFACE_DEFAULT_BOX_EXTENT);
+			//NewBoxComponent->SetBoxExtent(FLOWSURFACE_DEFAULT_BOX_EXTENT);
+			NewBoxComponent->SetBoxExtent(DefaultBoxExtent);
 			NewBoxComponent->RegisterComponent();
 
 			CollisionComponent_Array.Add(NewBoxComponent);
@@ -70,10 +71,9 @@ void AFlowSurface::Tick(float DeltaTime)
 		{
 			fDistanceAlongSpline_Array[i] += DeltaTime * FlowSpeed;
 
-			// ���ö����� ���̸� �ʰ����� �ʵ��� ó��
 			if (fDistanceAlongSpline_Array[i] > SplineComponent->GetSplineLength())
 			{
-				fDistanceAlongSpline_Array[i] = 0.f; // �ٽ� ó������
+				fDistanceAlongSpline_Array[i] = 0.f; 
 			}
 			FVector NewLocation = SplineComponent->GetLocationAtDistanceAlongSpline(fDistanceAlongSpline_Array[i], ESplineCoordinateSpace::World);
 

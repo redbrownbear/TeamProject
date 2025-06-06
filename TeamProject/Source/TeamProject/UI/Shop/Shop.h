@@ -29,6 +29,9 @@ public:
 
 public:
 	UFUNCTION()
+	void CheckSoldout();
+
+	UFUNCTION()
 	void AddItemInventory();
 
 	UFUNCTION()
@@ -43,16 +46,16 @@ private:
 	void RemoveDelegates();
 
 private:
-	//´ëÈ­ ÀÌÈÄ »óÁ¡ ¿ÀÇÂ
+	//ï¿½ï¿½È­ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	void SetShopOpen();
 
-	//»óÇ° °í¸£°í ±¸¸Å?
+	//ï¿½ï¿½Ç° ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½?
 	void SetItemBuy();
 
 	UFUNCTION()
 	void RefreshAllInventory(const TArray<FItemData>& ItemDataList);
 
-public: //¹ÙÀÎµùÀ» À§ÇØ ÆÛºí¸¯¼±¾ð
+public: //ï¿½ï¿½ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ûºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	UFUNCTION()

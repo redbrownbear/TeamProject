@@ -29,7 +29,7 @@ public:
 	void SetBuy();
 	void SetSell();
 
-public: //바인딩을 위해 퍼블릭선언
+public: 
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	UFUNCTION()
@@ -70,8 +70,7 @@ private:
 	FNPCDialogueTableRow DialogueDataRow;
 	EQuestCharacter CurQuestChar;
 	int32 NextDialogueID;
-
-	//한글자씩 보이는 기능을 위한 변수
+	
 	FString FullText;
 	int32 CurrentCharIndex = 0;
 	FTimerHandle TypingTimerHandle;

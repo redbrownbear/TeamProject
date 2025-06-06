@@ -264,7 +264,6 @@ void UNpcFSMComponent::HideFuriko()
 
 		SetHideLocation(Target->GetActorLocation());
 
-		// <푸리코와 놀자!> 퀘스트 UI 생성할까 말까 윤호오빠랑 얘기해보기
 	}
 }
 
@@ -272,15 +271,12 @@ void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 {
 	if (!Owner) return;
 	
-	// 이동 방해 차단
 	if (Owner->GetController()) Owner->GetController()->StopMovement();
 
-	// 순간이동
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	Owner->SetIsHide(true);
 
-	// 위치 확인
-	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation 완료. Owner 위치: %s"), *Owner->GetActorLocation().ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation 占싹뤄옙. Owner 占쏙옙치: %s"), *Owner->GetActorLocation().ToString());
 
 	if (Owner->GetController()) Owner->GetController()->StopMovement();
 
@@ -291,7 +287,6 @@ void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 
 void UNpcFSMComponent::PlayInterectSequence()
 {
-	// Talk 시 캐릭터 위치만 고정되게 조정한 뒤 그 다음에 생성해야 할 듯
 	
 	/*if (Player)
 	{

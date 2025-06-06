@@ -85,12 +85,6 @@ void UShopDialogue::OnConfirm()
 
     int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
 
-    if (PC_InGame)
-    {
-        QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
-        
-    }
-    
     UShop* ShopClass = UIManager->CachedShopClass;
     if (ShopClass)
     {
@@ -104,6 +98,12 @@ void UShopDialogue::OnConfirm()
         }
     }
 
+    if (PC_InGame)
+    {
+        QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
+        
+    }
+    
     PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Shop);
 }
 

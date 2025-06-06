@@ -57,6 +57,33 @@ void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 }
 
+void UShop::CheckSoldout()
+{ 
+    if (!BP_ShopDescription) return;
+
+
+    //FShopDataRowÏúºÎ°ú Ï≤òÎ¶¨Ìï¥Ïïº Ìï† ÎìØ
+    FItemData SelectedItem = BP_ShopDescription->GetCurrentItemData();
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        const FString TargetID = SelectedItem.UniqueID;
+
+        FItemData InventoryItem = PlayerManager->GetItemByUniqueID(TargetID);
+
+        // ItemCount == 0 Ïù¥Î©¥ Îß§ÏßÑ Ï≤òÎ¶¨
+        if (InventoryItem.ItemCount != 0)
+            return;
+
+        APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+        if (PC_InGame && PC_InGame->Npc)
+        {
+            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SoldOut);
+        }
+    }
+}
+
 void UShop::AddItemInventory()
 {
     FItemData SelectedItem;
@@ -72,10 +99,17 @@ void UShop::AddItemInventory()
         PlayerManager->SetInvenData(SelectedItem);
     }
 
-    // ªÛ¡° ºˆ∑Æ æ˜µ•¿Ã∆Æ
-    /*SelectedItem.ItemCount - 1;
+    //FShopDataRowÏúºÎ°ú Ï≤òÎ¶¨Ìï¥Ïïº Ìï† ÎìØ
+    /*SelectedItem.ItemCount -= 1;
 
-    BP_ShopScroll->SlotWidgetClass->SetItemData*/
+    TArray<UShopSlot*> ActiveSlots = BP_ShopScroll->GetActiveSlots();
+    int32 Index = BP_ShopScroll->GetItemDataIndex();
+
+    if (ActiveSlots.IsValidIndex(Index))
+    {
+        ActiveSlots[Index]->SetItemData(SelectedItem);
+    }*/
+
 }
 
 void UShop::SubtractItemInventory()
@@ -92,6 +126,8 @@ void UShop::SubtractItemInventory()
     {        
         PlayerManager->RemoveItemByUniqueID(SelectedItem.UniqueID);
     }
+
+    //@TODO FShopDataRow Îç∞Ïù¥ÌÑ∞ Í∞±Ïã†
 }
 
 void UShop::InitUI()
@@ -198,14 +234,14 @@ void UShop::OnNavigate(const FInputActionValue& InputActionValue)
 {
     const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
-    // Deadzone πÊ¡ˆ
+    // Deadzone ÔøΩÔøΩÔøΩÔøΩ
     if (ActionValue.IsNearlyZero())
         return;
 
-    // ∞°¿Â ∞≠«— πÊ«‚ «œ≥™∏∏ «ÿºÆ
+    // ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ ÔøΩœ≥ÔøΩÔøΩÔøΩ ÔøΩÿºÔøΩ
     if (FMath::Abs(ActionValue.X) > FMath::Abs(ActionValue.Y))
     {
-        // ¡¬øÏ
+        // ÔøΩ¬øÔøΩ
         if (ActionValue.X > 0)
             BP_ShopScroll->MoveSelection(FIntPoint(1, 0));
         else
@@ -213,7 +249,7 @@ void UShop::OnNavigate(const FInputActionValue& InputActionValue)
     }
     else
     {
-        // ªÛ«œ
+        // ÔøΩÔøΩÔøΩÔøΩ
         if (ActionValue.Y > 0)
             BP_ShopScroll->MoveSelection(FIntPoint(0, -1));
         else
