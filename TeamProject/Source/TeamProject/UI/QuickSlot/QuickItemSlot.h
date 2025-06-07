@@ -38,6 +38,8 @@ public:
 public:
 	void SetSelected(bool bIsSelected);
 	void SetEquiped(bool bIsEquiped);
+
+	void SetEquipDate();
 private:
 	FItemData ItemData;
 
