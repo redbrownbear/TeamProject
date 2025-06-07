@@ -132,7 +132,14 @@ public:
 	UInputAction* IA_IceMaker = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_Build = nullptr;
+	UInputAction* IA_Magnesis = nullptr;
+	
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_TrySuperPower = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_ControlDistance = nullptr;
+
 
 	//QuickSlot
 public:
@@ -144,7 +151,7 @@ public:
 
 	//Map
 public:
-	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_MapOpen = nullptr;
 
 
@@ -172,8 +179,10 @@ public:
 		check(IA_DialogueConfirm);
 		check(IA_DialogueCancel);
 		check(IA_DialogueNext);
-		check(IA_IceMaker);		
-		check(IA_Build);
+		check(IA_IceMaker);	
+		check(IA_Magnesis);
+		check(IA_TrySuperPower);
+		check(IA_ControlDistance);
 		check(IA_QuickSlotLeft);
 		check(IA_QuickSlotRight);
 		check(IA_MapOpen);
@@ -181,9 +190,6 @@ public:
 };
 
 
-class AIcePillar;
-class AIcePreview;
-class ATreasureBox;
 /**
  *
  */
@@ -241,9 +247,16 @@ protected:
 	void OpenInventory(const FInputActionValue& InputActionValue);
 	void OpenQuest(const FInputActionValue& InputActionValue);
 
-	// --------- Ice Maker ------------------------------
+	// --------- SuperPower ------------------------------
+	void TrySuperPower(const FInputActionValue& InputActionValue);
+	void OnControlDistance(const FInputActionValue& InputActionValue);
 
+	// Ice Maker
 	void BeginIcePreview(const FInputActionValue& InputActionValue);
+	void SpawnIcePillar(const FInputActionValue& InputActionValue);
+	
+	// Magnesis
+	void ShowMetalActorPreview(const FInputActionValue& InputActionValue);
 
 	//UI
 	void OnNavigate(const FInputActionValue& InputActionValue);
@@ -256,13 +269,10 @@ protected:
 	void OnCreateItemTest(const FInputActionValue& InputActionValue);
 	//UI
 
-	void SpawnIcePillar(const FInputActionValue& InputActionValue);
-
 	void OnQuickSlotLeft(const FInputActionValue& InputActionValue);
 	void OnQuickSlotRight(const FInputActionValue& InputActionValue);
 
 	void OnMapOpen(const FInputActionValue& InputActionValue);
-
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
 
@@ -273,46 +283,104 @@ public:
 	UPROPERTY()
 	TObjectPtr<class ANpc> Npc = nullptr;
 
+	UPROPERTY()
+	TObjectPtr<class ATreasureBox> TreasureBox = nullptr;
+
 	EInputContext CurrentInputContext = EInputContext::IC_Start;
 
-	// --------- Supernatural ----------
+	// --------- SuperPower ----------
 protected:
-	// 매 프레임 업데이트
 	UFUNCTION()
-	void UpdateIcePreview();
+	void InitIcePreview();
 
-	// 충돌 체크
+	// Create IcePillar
 	UFUNCTION()
-	void CheckCollision();
+	void SpawnIcePillar();
 
-	// 수면 체크
 	UFUNCTION()
-	void CheckSurface();
+	void DestroyIcePillar();
+
+	UFUNCTION()
+	bool IsSurfaceActor(AActor* Actor) const;
+
+	UFUNCTION()
+	AActor* FindVisibleActorOnScreen(FHitResult& OutHit);
+
+	// Magnesis
+	UFUNCTION()
+	void Magnesis();
+
+	// Check Metal
+	UFUNCTION()
+	void CheckMetalActor();
+
+	// Magnesis 입력 함수
+	UFUNCTION()
+	void StartMagnetGrab();
+	UFUNCTION()
+	void StopMagnetGrab();
+
+	//  Magnesis 내부 기능 함수
+	UFUNCTION()
+	bool TraceForMetal(FHitResult& OutHit);
+
+	UFUNCTION()
+	void MoveGrabbedObject();
+
+	// 상태 체크
+	UFUNCTION()
+	bool IsHoldingObject() const;
+
+	UFUNCTION()
+	void ScanMetalActorInView();
 
 protected:
+	// ------------ Ice Maker ---------------
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	TSubclassOf<AIcePillar> IcePillarClass;
+	TSubclassOf<class AIcePillar> IcePillarClass;
 
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	TSubclassOf<AIcePreview> IcePreviewClass;
-
-	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	float TraceDistance = 300.0f;
+	TSubclassOf<class AIcePreview> IcePreviewClass;
 
 	UPROPERTY()
 	TObjectPtr<AIcePreview> IcePreviewActor = nullptr;
 
-protected:
 	UPROPERTY()
-	TObjectPtr<ATreasureBox> TreasureBoxActor = nullptr;
+	TObjectPtr<AIcePillar> IcePillarActor = nullptr;
+
+	// ------------ Magnesis ---------------
+
+	UPROPERTY(EditAnywhere, Category = "Magnesis")
+	TSubclassOf<class AMetalActor> MetalActorClass;
+
+	UPROPERTY()
+	TObjectPtr<class AMetalActor> MetalActor = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Magnet | Trace")
+	float TraceDistance = 5000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Magnet | Grab")
+	float HoldDistance = 0.f;
+
+	UPROPERTY(VisibleAnywhere)
+	class UPhysicsHandleComponent* PhysicsHandle;
+
+	UPROPERTY()
+	UPrimitiveComponent* GrabbedComponent;
+
+	FTimerHandle MoveTimerHandle;
 
 private:
-	bool bQPressed = false;
-	bool bCanSpawn = false;
-	bool bHitResult = false;
-
 	bool bIsCameraLocked = false;
 
+	bool bIceKeyPressed = false;
+	bool bIceMaker = false;
+	bool bCanSpawn = false;
+	bool bIcePreviewPlaced = false;
 
-	FHitResult Hit;
+	bool bMagnesisKeyPressed = false;
+	bool bCanControlMetal = false;
+
+	FHitResult LastHit;
+	bool bHitResult = false;
 };

@@ -6,12 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "TempleActor.generated.h"
 
-#define FLOATINGACTOR_FORCE						800.f
-#define FLOATINGACTOR_MASS_KG			        1000.f
-#define FLOATINGACTOR_LINEAR_DAMPING			1.2f
-
 class USphereComponent;
 class UPhysicalMaterial;
+class ATempleActorSpawner;
 struct FTempleActorTableRow;
 
 UCLASS()
@@ -28,9 +25,18 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	virtual void OnConstruction(const FTransform& Transform);
+
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
 
-	USphereComponent* GetCollisionComponent() { return CollisionComponent; }
+	void Initialize(ATempleActorSpawner* InOwner) { SpawnerOwner = InOwner; }
+	void DeactivateActor() { bIsActive = false; }
+	void ActivateActor() { bIsActive = true; }
+	bool IsActive() const { return bIsActive; }
+
+	USphereComponent* GetCollisionComponent() const { return CollisionComponent; }
+	ATempleActorSpawner* GetTempleActorSpawner() const { return SpawnerOwner; }
+	FTempleActorTableRow* GetTempleActorData() const { return TempleActorData; }
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -47,4 +53,12 @@ protected:
 	FDataTableRowHandle DataTableRowHandle;
 
 	FTempleActorTableRow* TempleActorData;
+
+	UPROPERTY()
+	TObjectPtr<ATempleActorSpawner> SpawnerOwner;
+
+private:
+	UPROPERTY()
+	bool bIsActive = false;
+
 };

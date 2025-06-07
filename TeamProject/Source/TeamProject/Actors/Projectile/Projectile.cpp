@@ -275,6 +275,11 @@ void AProjectile::SetStaticMeshVisibility(bool bFlag)
 
 void AProjectile::SetNiagaraVisibility(bool bFlag)
 {
+	if (!NiagaraEffectComponent)
+	{
+		return;
+	}
+
 	if(bFlag)
 	{
 		NiagaraEffectComponent->Activate();

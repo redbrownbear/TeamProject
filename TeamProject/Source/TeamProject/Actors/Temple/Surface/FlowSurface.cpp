@@ -1,5 +1,4 @@
 #include "Actors/Temple/Surface/FlowSurface.h"
-//#include "FloatingActor.h"
 #include "Actors/Temple/TempleActors/TempleActor.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
@@ -18,8 +17,8 @@ AFlowSurface::AFlowSurface()
 	SplineComponent->SetClosedLoop(true);
 	SplineComponent->SetupAttachment(RootComponent);
 
-	CollisionComponent_Array.Reserve(FLOWSURFACE_FLOOR_NUM); // Reserve�� ���⼭ �ص� �����մϴ�.
-	fDistanceAlongSpline_Array.Reserve(FLOWSURFACE_FLOOR_NUM); // Reserve�� ���⼭ �ص� �����մϴ�.
+	CollisionComponent_Array.Reserve(FLOWSURFACE_FLOOR_NUM); 
+	fDistanceAlongSpline_Array.Reserve(FLOWSURFACE_FLOOR_NUM); 
 
 	FlowSpeed = FLOWSURFACE_MOVING_SPEED;
 }
@@ -44,7 +43,8 @@ void AFlowSurface::BeginPlay()
 
 		if (NewBoxComponent)
 		{
-			NewBoxComponent->SetBoxExtent(FLOWSURFACE_DEFAULT_BOX_EXTENT);
+			//NewBoxComponent->SetBoxExtent(FLOWSURFACE_DEFAULT_BOX_EXTENT);
+			NewBoxComponent->SetBoxExtent(DefaultBoxExtent);
 			NewBoxComponent->RegisterComponent();
 
 			CollisionComponent_Array.Add(NewBoxComponent);
@@ -54,7 +54,6 @@ void AFlowSurface::BeginPlay()
 
 			FAttachmentTransformRules AttachRules = FAttachmentTransformRules::KeepRelativeTransform;
 
-			// ���� ���� ����
 			NewBoxComponent->AttachToComponent(RootComponent, AttachRules);
 			NewBoxComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
 		}
@@ -72,10 +71,9 @@ void AFlowSurface::Tick(float DeltaTime)
 		{
 			fDistanceAlongSpline_Array[i] += DeltaTime * FlowSpeed;
 
-			// ���ö����� ���̸� �ʰ����� �ʵ��� ó��
 			if (fDistanceAlongSpline_Array[i] > SplineComponent->GetSplineLength())
 			{
-				fDistanceAlongSpline_Array[i] = 0.f; // �ٽ� ó������
+				fDistanceAlongSpline_Array[i] = 0.f; 
 			}
 			FVector NewLocation = SplineComponent->GetLocationAtDistanceAlongSpline(fDistanceAlongSpline_Array[i], ESplineCoordinateSpace::World);
 
@@ -90,12 +88,11 @@ void AFlowSurface::Tick(float DeltaTime)
 				ATempleActor* Floating = Cast<ATempleActor>(Actor);
 				if (Floating && Floating->GetCollisionComponent())
 				{
-					// �帧 ���� ���
 					FVector FlowDirection = SplineComponent->GetDirectionAtDistanceAlongSpline(
 						fDistanceAlongSpline_Array[i], ESplineCoordinateSpace::World);
 					FlowDirection.Z = 0.f;
 
-					FVector FlowForce = FlowDirection.GetSafeNormal() * FLOATINGACTOR_FORCE; // �� ���� ����
+					FVector FlowForce = FlowDirection.GetSafeNormal() * FLOATINGACTOR_FORCE; 
 					Floating->GetCollisionComponent()->AddForce(FlowForce, NAME_None, true);
 				}
 			}

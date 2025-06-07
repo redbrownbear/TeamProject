@@ -60,9 +60,9 @@ void UShopScroll::MoveSelection(FIntPoint Direction)
 
     int32 NextIndex = CurrentIndex;
 
-    //ÁÂ¿ì Á¦°Å
+    //ï¿½Â¿ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-    if (Direction.Y != 0) // »óÇÏ
+    if (Direction.Y != 0) // ï¿½ï¿½ï¿½ï¿½
     {
         NextIndex += Direction.Y;
     }

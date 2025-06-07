@@ -22,6 +22,7 @@ public:
 public:
 	void StartConversation(ANpc* Npc, APlayerCharacter* Player);
 	void EndConversation();
+	int32 GetDialogueID(UDataTable* DialogueTable, EQuestCharacter Character, EDialogType DialogType);
 
 protected:
 	virtual void BeginPlay() override;
@@ -33,6 +34,7 @@ public:
 
 	void SetEndTalked(bool IsEndTalked) { bEndTalk = IsEndTalked; }
 	bool GetEndTalked() { return bEndTalk; }
+	UDataTable* GetDataTable() { return NpcDialogueTable; }
 
 private:
 	UPROPERTY()
@@ -53,6 +55,9 @@ private:
 
 	UPROPERTY()
 	UAnimMontage* PlayerTalkMontage = nullptr;
+
+	UPROPERTY()
+	UDataTable* NpcDialogueTable = nullptr;
 
 private:
 	bool bEndTalk = false;

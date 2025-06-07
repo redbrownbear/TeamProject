@@ -20,6 +20,9 @@ struct TEAMPROJECT_API FNPCDialogueTableRow : public FTableRowBase
 	EQuestCharacter QuestCharacter = EQuestCharacter::None;
 
 	UPROPERTY(EditAnywhere)
+	EDialogType DialogType = EDialogType::None;
+
+	UPROPERTY(EditAnywhere)
 	int32 CurrentDialogueID;
 
 	UPROPERTY(EditAnywhere)
@@ -33,6 +36,4 @@ struct TEAMPROJECT_API FNPCDialogueTableRow : public FTableRowBase
 
 	int32 questId = 1100;
 
-	UPROPERTY(EditAnywhere)
-	bool bDoQuest;
 };

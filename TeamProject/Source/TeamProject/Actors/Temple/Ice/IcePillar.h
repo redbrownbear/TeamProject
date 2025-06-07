@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Misc/Defines.h"
 #include "IcePillar.generated.h"
 
 class UBoxComponent;
@@ -42,10 +43,10 @@ protected:
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	float MaxSpeed = 300.f;
+	float MaxSpeed = ICEPILLAR_MAXSPEED;
 
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
-	float MaxHeight = 300.0f; // ��ũ�η� �ٲܱ�
+	float MaxHeight = ICEPILLAR_MAXHEIGT;
 
 	/*UPROPERTY(EditDefaultsOnly, Category = "Cryonis")
 	TObjectPtr<UNiagaraSystem> BreakEffect;*/

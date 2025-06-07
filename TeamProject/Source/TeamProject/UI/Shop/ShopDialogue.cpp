@@ -4,13 +4,21 @@
 #include "UI/Shop/ShopDialogue.h"
 
 #include "SubSystem/UI/UIManager.h"
+#include "SubSystem/UI/QuestDialogueManager.h"
+#include "SubSystem/UI/ShopManager.h"
+#include "SubSystem/PlayerManager.h"
+
+#include "Components/ConversationComponent/ConversationManagerComponent.h"
+
+#include "Actors/Npc/Npc.h"
+#include "GameFramework/PC_InGame.h"
 
 void UShopDialogue::NativeConstruct()
 {
     Super::NativeConstruct();
 
     ConfirmButton->OnClicked.AddDynamic(this, &UShopDialogue::OnConfirm);
-    CancelButton->OnClicked.AddDynamic(this, &UShopDialogue::OnCancel);
+    CancelButton->OnClicked.AddDynamic(this, &UShopDialogue::OnCancel);   
 }
 
 void UShopDialogue::InitUI()
@@ -20,6 +28,12 @@ void UShopDialogue::InitUI()
     ExtraButton->SetVisibility(ESlateVisibility::Collapsed);
 
     ActionLay->SetVisibility(ESlateVisibility::Visible);
+
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    if (PC_InGame)
+    {
+        PC_InGame->BindDialogueInput();
+    }
 }
 
 void UShopDialogue::SetBuy()
@@ -31,6 +45,9 @@ void UShopDialogue::SetBuy()
 
     FInputModeGameAndUI InputMode;
     InputMode.SetWidgetToFocus(TakeWidget());
+
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Buy);    
 }
 
 void UShopDialogue::SetSell()
@@ -50,15 +67,75 @@ void UShopDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 }
 
 void UShopDialogue::OnConfirm()
-{
-    //구매 완료
+{ 
+    //구매 완료   
+    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+
+    UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+    check(UIManager);
+
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+
+    UConversationManagerComponent* ConverSationManager = Cast<UConversationManagerComponent>(PC_InGame->Npc->GetComponentByClass(UConversationManagerComponent::StaticClass()));
+    check(ConverSationManager);
+
+    EQuestCharacter QuestChar = PC_InGame->Npc->GetData()->QuestCharacter;
+    EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
+
+    int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
+
+    UShop* ShopClass = UIManager->CachedShopClass;
+    if (ShopClass)
+    {
+        if (EDialogType::Buy == PC_InGame->Npc->GetCurrentDialogueType())
+        {
+            ShopClass->AddItemInventory();
+        }
+        else if (EDialogType::Sell == PC_InGame->Npc->GetCurrentDialogueType())
+        {
+            ShopClass->SubtractItemInventory();
+        }
+    }
+
+    if (PC_InGame)
+    {
+        QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
+        
+    }
+    
+    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Shop);
 }
 
 void UShopDialogue::OnCancel()
 {
     InitUI();
 
-    //바인드 돌리기
+    //바인드 돌리기 
+
+    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+
+    UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+    check(UIManager);
+
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+
+    UConversationManagerComponent* ConverSationManager = Cast<UConversationManagerComponent>(PC_InGame->Npc->GetComponentByClass(UConversationManagerComponent::StaticClass()));
+    check(ConverSationManager);
+
+    EQuestCharacter QuestChar = PC_InGame->Npc->GetData()->QuestCharacter;
+    EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
+
+    int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
+
+    if (PC_InGame)
+    {
+        QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
+        PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Shop);
+    }
+
+    PC_InGame->Npc->SetBuy(true);
 }
 
 void UShopDialogue::RefreshDialogue(const FNPCDialogueTableRow& QuestData)
