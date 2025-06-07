@@ -65,5 +65,7 @@ protected:
 
 public:
 	void SetProjectileMovementActivate(bool bFlag);
+	void SetGravityScale(float Scale);
 	void SetStaticMeshVisibility(bool bFlag);
+	void SetNiagaraVisibility(bool bFlag);
 };

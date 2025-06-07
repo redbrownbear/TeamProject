@@ -12,6 +12,7 @@
 #include "GameFramework/PC_InGame.h"
 #include "UI/HUD/MainHUD.h"
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
+#include "UI/NpcDialogue/NPCDialogue.h"
 
 
 void UShop::OnCreated()
@@ -54,6 +55,79 @@ void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
     RemoveDelegates();
     Super::HideUI(UShop::StaticClass());
 
+}
+
+void UShop::CheckSoldout()
+{ 
+    if (!BP_ShopDescription) return;
+
+
+    //FShopDataRowÏúºÎ°ú Ï≤òÎ¶¨Ìï¥Ïïº Ìï† ÎìØ
+    FItemData SelectedItem = BP_ShopDescription->GetCurrentItemData();
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        const FString TargetID = SelectedItem.UniqueID;
+
+        FItemData InventoryItem = PlayerManager->GetItemByUniqueID(TargetID);
+
+        // ItemCount == 0 Ïù¥Î©¥ Îß§ÏßÑ Ï≤òÎ¶¨
+        if (InventoryItem.ItemCount != 0)
+            return;
+
+        APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+        if (PC_InGame && PC_InGame->Npc)
+        {
+            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SoldOut);
+        }
+    }
+}
+
+void UShop::AddItemInventory()
+{
+    FItemData SelectedItem;
+
+    if (BP_ShopDescription)
+    {
+        SelectedItem = BP_ShopDescription->GetCurrentItemData();        
+    }
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        PlayerManager->SetInvenData(SelectedItem);
+    }
+
+    //FShopDataRowÏúºÎ°ú Ï≤òÎ¶¨Ìï¥Ïïº Ìï† ÎìØ
+    SelectedItem.ItemCount -= 1;
+
+    TArray<UShopSlot*> ActiveSlots = BP_ShopScroll->GetActiveSlots();
+    int32 Index = BP_ShopScroll->GetItemDataIndex();
+
+    if (ActiveSlots.IsValidIndex(Index))
+    {
+        ActiveSlots[Index]->SetItemData(SelectedItem);
+    }
+
+}
+
+void UShop::SubtractItemInventory()
+{
+    FItemData SelectedItem;
+
+    if (BP_ShopDescription)
+    {
+        SelectedItem = BP_ShopDescription->GetCurrentItemData();
+    }
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {        
+        PlayerManager->RemoveItemByUniqueID(SelectedItem.UniqueID);
+    }
+
+    //@TODO FShopDataRow Îç∞Ïù¥ÌÑ∞ Í∞±Ïã†
 }
 
 void UShop::InitUI()
@@ -160,14 +234,14 @@ void UShop::OnNavigate(const FInputActionValue& InputActionValue)
 {
     const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
-    // Deadzone πÊ¡ˆ
+    // Deadzone ÔøΩÔøΩÔøΩÔøΩ
     if (ActionValue.IsNearlyZero())
         return;
 
-    // ∞°¿Â ∞≠«— πÊ«‚ «œ≥™∏∏ «ÿºÆ
+    // ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩ ÔøΩœ≥ÔøΩÔøΩÔøΩ ÔøΩÿºÔøΩ
     if (FMath::Abs(ActionValue.X) > FMath::Abs(ActionValue.Y))
     {
-        // ¡¬øÏ
+        // ÔøΩ¬øÔøΩ
         if (ActionValue.X > 0)
             BP_ShopScroll->MoveSelection(FIntPoint(1, 0));
         else
@@ -175,7 +249,7 @@ void UShop::OnNavigate(const FInputActionValue& InputActionValue)
     }
     else
     {
-        // ªÛ«œ
+        // ÔøΩÔøΩÔøΩÔøΩ
         if (ActionValue.Y > 0)
             BP_ShopScroll->MoveSelection(FIntPoint(0, -1));
         else
@@ -192,18 +266,6 @@ void UShop::OnCancel()
 {
     HideUI(UShop::StaticClass());
 
-    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
-    check(QuestManager);
-  
-    UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-    check(UIManager);
-
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        UIManager->ShowUI(UNPCDialogue::StaticClass());
-        QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
-    }
 }
 
 void UShop::OnNextDialogue(const FInputActionValue& InputActionValue)

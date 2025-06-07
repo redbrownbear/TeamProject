@@ -49,13 +49,13 @@ void UPlayerManager::SetEquipData(const FItemData& ItemRow)
 {
     eEquipParts NewParts = ItemRow.GetParts();
 
-    // °°Àº ºÎÀ§ ¾ÆÀÌÅÛ Á¦°Å
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     EquipItemList.RemoveAll([&](const FItemData& Item)
         {
             return Item.GetParts() == NewParts;
         });
 
-    // »õ ¾ÆÀÌÅÛ Ãß°¡
+    // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
     EquipItemList.Add(ItemRow);
 
     UpDateInvenEquipUI(EquipItemList);
@@ -121,7 +121,7 @@ FItemData UPlayerManager::RemoveItemByUniqueID(FString UniqueID)
         {
             FItemData Removed = ItemInvenList[i];
             ItemInvenList.RemoveAt(i);
-            UpDateInvenUI(ItemInvenList); // UI µ¿±âÈ­
+            UpDateInvenUI(ItemInvenList); // UI ï¿½ï¿½ï¿½ï¿½È­
             return Removed;
         }
     }
@@ -165,7 +165,7 @@ void UPlayerManager::InitStatus()
     status.Armor = 0.0f;
 
     status.Runspeed = 100.f;            //ï¿½Ë¾Æ¼ï¿½ ï¿½ï¿½ï¿½Ï¼ï¿½~
-    status.LevelName;                   //ï¿½Ê±â°ªï¿½ï¿½ ï¿½ï¿½ï¿?ï¿½Ò°ï¿½ï¿½ï¿½?
+    status.LevelName;                   //ï¿½Ê±â°ªï¿½ï¿½ ï¿½ï¿½ï¿½?ï¿½Ò°ï¿½ï¿½ï¿½?
     status.PlayerTransform;             //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!
     status.PreviousLoction;             //ï¿½Ë¾Æ¼ï¿½ ï¿½ï¿½ï¿½ï¿½
     status.StaminaRegenSpeed = 4.0f;    //ï¿½Ë¾Æ¼ï¿½
@@ -182,11 +182,11 @@ void UPlayerManager::SetPlayerStamina(float InStamina)
 
 void UPlayerManager::TickStamina(float DeltaTime)
 {
-    //ï¿½ï¿½ï¿½×¹Ì³ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¸ï¿?ï¿½ï¿½ ï¿½Ã¾î³²
+    //ï¿½ï¿½ï¿½×¹Ì³ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¸ï¿½?ï¿½ï¿½ ï¿½Ã¾î³²
     if (PlayerStatus.bIsUseStamina)
         return;
 
-    // ï¿½Ì¹ï¿½ ï¿½Ö´ï¿½ï¿?ï¿½ï¿½ ï¿½Ã¾î³²
+    // ï¿½Ì¹ï¿½ ï¿½Ö´ï¿½ï¿½?ï¿½ï¿½ ï¿½Ã¾î³²
     if (PlayerStatus.Stamina >= PlayerStatus.MaxStamina)
         return;
 

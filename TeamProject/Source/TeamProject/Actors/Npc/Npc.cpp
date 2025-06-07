@@ -11,7 +11,7 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "GameFramework/PC_InGame.h"
 
-//#include "Components/ConversationComponent/ConversationManagerComponent.h"
+#include "Components/ConversationComponent/ConversationManagerComponent.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
 
 #include "UI/HUD/MainHUD.h"
@@ -52,6 +52,8 @@ ANpc::ANpc()
 	BodyMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	BodyMeshComponent->SetCollisionProfileName(TEXT("Pawn"));
 
+
+	ConversationManager = CreateDefaultSubobject<UConversationManagerComponent>(TEXT("ConversationManager"));
 }
 
 void ANpc::BeginPlay()
@@ -105,11 +107,10 @@ void ANpc::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AA
 
 			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
 			{
-				HUD->ShowInteractWidget(bPlayerInRange);
+				HUD->ShowInteractWidget(bPlayerInRange); // Create Interact UI
 				HUD->ShowInteractName(bPlayerInRange, NpcData->NPCName);
 			}
-		}
-		// Create Interact UI
+		}		
 	}
 }
 
@@ -143,20 +144,11 @@ void ANpc::SetSpeedRun()
 
 void ANpc::AttachToSocket()
 {
-	if (BodyMeshComponent && HeadMeshComponent && BodyMeshComponent->SkeletalMesh)
+	// Head → Hair 연결
+	if (HeadMeshComponent && HairMeshComponent)
 	{
-		if (BodyMeshComponent->DoesSocketExist(TEXT("Head")))
-		{
-			HeadMeshComponent->AttachToComponent(
-				BodyMeshComponent,
-				FAttachmentTransformRules::SnapToTargetIncludingScale,
-				TEXT("Head"));
-		}
-	}
-
-	if (HeadMeshComponent && HairMeshComponent && HeadMeshComponent->SkeletalMesh)
-	{
-		if (HeadMeshComponent->DoesSocketExist(TEXT("Hair")))
+		USkeletalMesh* HeadMesh = HeadMeshComponent->SkeletalMesh;
+		if (HeadMesh && HeadMesh->FindSocket(TEXT("Hair")))
 		{
 			HairMeshComponent->AttachToComponent(
 				HeadMeshComponent,
@@ -167,9 +159,11 @@ void ANpc::AttachToSocket()
 		HairMeshComponent->SetLeaderPoseComponent(HeadMeshComponent);
 	}
 
-	if (HeadMeshComponent && NoseMeshComponent && HeadMeshComponent->SkeletalMesh)
+	// Head → Nose 연결
+	if (HeadMeshComponent && NoseMeshComponent)
 	{
-		if (HeadMeshComponent->DoesSocketExist(TEXT("Nose")))
+		USkeletalMesh* HeadMesh = HeadMeshComponent->SkeletalMesh;
+		if (HeadMesh && HeadMesh->FindSocket(TEXT("Nose")))
 		{
 			NoseMeshComponent->AttachToComponent(
 				HeadMeshComponent,
@@ -179,7 +173,19 @@ void ANpc::AttachToSocket()
 
 		NoseMeshComponent->SetLeaderPoseComponent(HeadMeshComponent);
 	}
-	
+
+	// Body → Head 연결
+	if (BodyMeshComponent && HeadMeshComponent)
+	{
+		USkeletalMesh* BodyMesh = BodyMeshComponent->SkeletalMesh;
+		if (BodyMesh && BodyMesh->FindSocket(TEXT("Head")))
+		{
+			HeadMeshComponent->AttachToComponent(
+				BodyMeshComponent,
+				FAttachmentTransformRules::SnapToTargetIncludingScale,
+				TEXT("Head"));
+		}
+	}
 }
 
 void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -212,18 +218,21 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	// Head
 	if (HeadMeshComponent)
 	{
+		HeadMeshComponent->SetSkeletalMesh(NpcData->FaceMesh);
 		HeadMeshComponent->SetRelativeTransform(NpcData->HeadTransform);
 	}
 
 	// Hair
 	if (HairMeshComponent)
 	{
+		HairMeshComponent->SetSkeletalMesh(NpcData->HairMesh);
 		HairMeshComponent->SetRelativeTransform(NpcData->HairTransform);
 	}
 
 	// Nose
 	if (NoseMeshComponent)
 	{
+		NoseMeshComponent->SetSkeletalMesh(NpcData->NoseMesh);
 		NoseMeshComponent->SetRelativeTransform(NpcData->NoseTransform);
 	}
 	
@@ -253,6 +262,8 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	{
 		AttachToSocket(); // Head 계열 메시가 하나라도 있을 때만 연결
 	}
+
+	CurrentDialogueType = NpcData->DialogType;
 }
 
 void ANpc::PlayMontage(ENpcMontage _InEnum, bool bIsLoop)

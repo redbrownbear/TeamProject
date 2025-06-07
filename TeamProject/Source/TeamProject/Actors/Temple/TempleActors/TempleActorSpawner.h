@@ -6,6 +6,7 @@
 
 //class UTempleBallSpawnerComponent;
 class ATempleActor;
+class AKeyBallVolume;
 
 UCLASS()
 class TEAMPROJECT_API ATempleActorSpawner : public AActor
@@ -20,12 +21,24 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnTriggerEnter(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION()
+	void OnTriggerExit(AActor* OverlappedActor, AActor* OtherActor);
+
+
 public:
 	UFUNCTION()
 	void SpawnActor();
 
+	void ReturnActorToPool(ATempleActor* Actor);
+
 protected:
-	UPROPERTY(EditAnywhere, Category = "Spawning")
+	TObjectPtr<ATempleActor> GetPooledActor();
+
+protected:
+	UPROPERTY()
 	TSubclassOf<ATempleActor> TempleActorClass;
 
 	UPROPERTY(EditAnywhere, Category = "Spawning")
@@ -34,16 +47,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	float SpawnInterval;
 
-	//UPROPERTY(EditAnywhere, Category = "Spawning")
-	//UDataTable* TempleActorDataTable;
-
-	//UPROPERTY(EditAnywhere, Category = "Spawning")
-	//FName RowToSpawn;
-
 	UPROPERTY(EditAnywhere, Category = "Spawning", meta = (RowType = "TempleActorTableRow"))
 	FDataTableRowHandle SpawnRowHandle;
 
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	AKeyBallVolume* SpawnBlockVolume = nullptr;
+
+
 private:
 	FTimerHandle SpawnTimer;
+
+	UPROPERTY()
+	TArray<TObjectPtr<ATempleActor>> ActorPool;
 
 };

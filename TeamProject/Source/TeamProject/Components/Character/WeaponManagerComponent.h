@@ -51,7 +51,11 @@ public:
 	void SetCanShot(bool _CanShot) { bCanShot = _CanShot; }
 	bool GetCanShot() { return bCanShot; }
 
+	void SetBowStaticMesh(UStaticMesh* InMesh);
+	void SetSwordStaticMesh(UStaticMesh* InMesh);
+	void SetShieldStaticMesh(UStaticMesh* InMesh);
 
+	void SetCanSwordAttack();
 
 
 	EWeapon_Type GetUnEquipWeaponType() {

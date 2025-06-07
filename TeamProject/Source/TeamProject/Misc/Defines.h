@@ -80,10 +80,12 @@
 #define PLAYER_MOVE_NML                                                             500.f
 #define PLAYER_MOVE_BOW_ZOOM                                                        200.f
 
-
-#define PLAYER_GLIDE_MAX_SPEED														700.f
+#define PLAYER_GLIDE_MAX_SPEED														1200.f
 #define PLAYER_GLIDE_MIN_SPEED														100.f
 #define PLAYER_GLIDE_MODIFY_SPEED													600.f
 #define PLAYER_GLIDE_ROTATE_SPEED													100.f
+
+#define ICEPILLAR_MAXSPEED														    300.f
+#define ICEPILLAR_MAXHEIGT															300.F
 
 #define STEMINA_USE_SPEED															5.f

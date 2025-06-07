@@ -43,7 +43,6 @@ public:
 
 	virtual void SetData(const FName& ProjectileName, FName ProfileName) override;
 
-	void SetNiagaraSystemAssetNone() { NiagaraComponent->SetAsset(nullptr); }
 
 
 
@@ -51,13 +50,6 @@ public:
 	bool GetIsFire() { return bIsFire; }
 
 protected:
-	UPROPERTY(EditAnywhere, meta = (RowType = "ProjectileTableRow"))
-	FDataTableRowHandle NiagaraDataTableRowHandle;
-	const UDataTable* NiagaraDataTable;
-	
-	const FNiagaraEffectTableRow* NiagaraTableRow;
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UNiagaraComponent> NiagaraComponent;
 
 	bool bIsFire = false;
 

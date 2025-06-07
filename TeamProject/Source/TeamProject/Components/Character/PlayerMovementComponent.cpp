@@ -36,9 +36,18 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 			GlideUnEquip = Asset.Object;
 		}
 	}
+	{
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset{
+			TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/HitAnim/Nml_Damage_S_F_Montage.Nml_Damage_S_F_Montage'")
+		};
+
+		if (Asset.Object)
+		{
+			HitMontage = Asset.Object;
+		}
+	}
 	MaxWalkSpeedCrouched = PLAYER_MOVE_CROUCH;
 	MaxWalkSpeed = PLAYER_MOVE_NML;
-
 }
 
 void UPlayerMovementComponent::BeginPlay()
@@ -356,6 +365,13 @@ void UPlayerMovementComponent::GlidingMove(FVector2D ActionValue)
 	}
 
 
+}
+
+
+void UPlayerMovementComponent::Hited()
+{
+	ACharacter* Owner_C = Cast<ACharacter>(GetOwner());
+	Owner_C->GetMesh()->GetAnimInstance()->Montage_Play(HitMontage);
 }
 
 bool UPlayerMovementComponent::CanGlide()

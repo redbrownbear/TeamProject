@@ -30,7 +30,7 @@ void UAnimNotify_BowChargeEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 
 		AWeaponBow* Actor_Bow = Cast<AWeaponBow>(WeaponManagerComponent->GetBow()->GetChildActor());
 
-		Actor_Bow->SetArrowVisibility(true);
+		Player_C->SetArrowVisibility(true);
 
 		WeaponManagerComponent->SetCanShot(true);
 

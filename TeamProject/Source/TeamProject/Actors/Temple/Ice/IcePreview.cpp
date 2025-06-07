@@ -39,17 +39,6 @@ void AIcePreview::Tick(float DeltaTime)
 
 	if (!bIsRising) return;
 
-	//float DeltaZ = MaxSpeed * DeltaTime;
-	//CurrentRise += DeltaZ;
-
-	//if (CurrentRise >= MaxHeight)
-	//{
-	//	AddActorWorldOffset(FVector(0, 0, -MaxHeight));
-	//	CurrentRise = 0;
-	//}
-
-	//AddActorWorldOffset(FVector(0, 0, DeltaZ));
-
 	if (bCanSpawn)
 	{
 		const FVector CurrentLocation = GetActorLocation();
@@ -78,14 +67,6 @@ void AIcePreview::SetRiseDirection(FVector InDirection)
 {
 	RiseDirection = InDirection;
 
-	/*const bool bFlag = FMath::IsNearlyZero(InDirection.X);
-	const bool bFlag1 = FMath::IsNearlyZero(InDirection.Y);
-	const bool bFlag2 = FMath::IsNearlyZero(InDirection.Z);*/
-
-	/*if (bFlag && bFlag1 && bFlag2)
-	{
-		int a = 0;
-	}*/
 }
 
 void AIcePreview::SetPivotLocation(FVector InPosition)

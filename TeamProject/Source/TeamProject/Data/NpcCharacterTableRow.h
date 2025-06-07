@@ -7,12 +7,19 @@
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 #include "NpcCharacterTableRow.generated.h"
 
+//#define QUESTCHARDIALOGUE_FURIKO				0
+//#define QUESTCHARDIALOGUE_FURIKO_FIND			100
+//#define QUESTCHARDIALOGUE_STORE					200
+
 UENUM()
 enum class EDialogType
 {
 	None,
 	Quest,
 	Shop,
+	Buy,
+	SoldOut,
+	Sell,
 	End
 };
 
@@ -23,19 +30,19 @@ enum class EQuestCharacter
 
 	Furiko,
 	Korok,
-	//여기는 캐릭터만
 	//Store,
 
 	End,
 };
 
-UENUM(BlueprintType)
-enum class EQuestCharDialogue : uint8
-{
-	Furiko = 0,
-	Furiko_Found = 100,
-	Store = 200,
-};
+//UENUM(BlueprintType)
+//enum class EQuestCharDialogue : uint8
+//{
+//	Furiko = 0,
+//	Furiko_Found = 100,
+//	Store = 200,
+//	Store_Buy = 1000,
+//};
 
 USTRUCT()
 struct TEAMPROJECT_API FNpcCharacterTableRow : public FTableRowBase
@@ -53,6 +60,15 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Npc")
 	USkeletalMesh* SkeletalMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Npc")
+	USkeletalMesh* FaceMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Npc")
+	USkeletalMesh* HairMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Npc")
+	USkeletalMesh* NoseMesh = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform MeshTransform;

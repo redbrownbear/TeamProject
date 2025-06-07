@@ -18,9 +18,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Actor")
 	UStaticMesh* StaticMesh;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform MeshTransform;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform CollisionTransform;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName CollisionProfileName;

@@ -53,15 +53,15 @@ class TEAMPROJECT_API UPlayerManager : public UGameInstanceSubsystem
 private:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-	//Quest����
+	//Quest
 public:
 	void SetQuestData(FQuestDataRow QuestRow);
 	void ShowQuestUI();
 	const TArray<FQuestDataRow>& GetAllQuestData() const { return QuestList; }
 private:
-	//Quest����
+	//Quest
 
-	//Item����
+	//Item
 public:
 	void SetInvenData(FItemData ItemRow);
 	void ShowInvenUI();
@@ -85,8 +85,6 @@ private:
 	void UpDateInvenEquipUI(const TArray<FItemData>& ItemList);
 
 	void UpDataQuickSlot(const TArray<FItemData>& ItemList);
-
-	//Item����
 
 public:
 	void InitStatus();
@@ -112,7 +110,7 @@ public:
 	void SetStaminaUSe(bool bIsUse) { PlayerStatus.bIsUseStamina = bIsUse; }
 	bool IsStaminaUse() const { return PlayerStatus.bIsUseStamina; }
 	bool IsStaminaFull() const { return PlayerStatus.Stamina >= PlayerStatus.MaxStamina;}
-	//Status����
+	//Status
 
 public:
 	UPROPERTY(BlueprintAssignable)
