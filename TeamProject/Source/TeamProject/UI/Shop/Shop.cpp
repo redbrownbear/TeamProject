@@ -100,7 +100,7 @@ void UShop::AddItemInventory()
     }
 
     //FShopDataRow으로 처리해야 할 듯
-    /*SelectedItem.ItemCount -= 1;
+    SelectedItem.ItemCount -= 1;
 
     TArray<UShopSlot*> ActiveSlots = BP_ShopScroll->GetActiveSlots();
     int32 Index = BP_ShopScroll->GetItemDataIndex();
@@ -108,7 +108,7 @@ void UShop::AddItemInventory()
     if (ActiveSlots.IsValidIndex(Index))
     {
         ActiveSlots[Index]->SetItemData(SelectedItem);
-    }*/
+    }
 
 }
 

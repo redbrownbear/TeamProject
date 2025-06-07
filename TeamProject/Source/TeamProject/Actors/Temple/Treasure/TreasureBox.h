@@ -76,7 +76,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
-	UPROPERTY(VisibleAnywhere, Category = "UI")
+	UPROPERTY(EditAnywhere, Category = "UI")
 	TObjectPtr<UPopupGetItem> PopupItemUI;
 
 protected:
