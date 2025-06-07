@@ -62,6 +62,10 @@ public:
 public:
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_Move = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
+	UInputAction* IA_Navigate = nullptr;
+
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_LookMouse = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
@@ -127,6 +131,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_DialogueNext = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_CancelOnlyQuick = nullptr;
+
+
 	//Supernatural
 public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
@@ -162,6 +170,7 @@ public:
 		check(IMC_Inventory);
 		check(IMC_Dialogue);
 		check(IA_Move);
+		check(IA_Navigate);
 		check(IA_LookMouse);
 		check(IA_LeftClick);
 		check(IA_RightClick);
@@ -180,6 +189,7 @@ public:
 		check(IA_DialogueConfirm);
 		check(IA_DialogueCancel);
 		check(IA_DialogueNext);
+		check(IA_CancelOnlyQuick);
 		check(IA_IceMaker);	
 		check(IA_Magnesis);
 		check(IA_TrySuperPower);
@@ -231,7 +241,6 @@ protected:
 	void OnCrouch(const FInputActionValue& InputActionValue);
 	void OnUnCrouch(const FInputActionValue& InputActionValue);
 
-
 	// ------------Attack Sequence ------------------------
 	void LeftClick(const FInputActionValue& InputActionValue);
 	void RightClick(const FInputActionValue& InputActionValue);
@@ -272,6 +281,8 @@ protected:
 
 	void OnQuickSlotLeft(const FInputActionValue& InputActionValue);
 	void OnQuickSlotRight(const FInputActionValue& InputActionValue);
+
+	void OffQuickSlot(const FInputActionValue& InputActionValue);
 
 	void OnMapOpen(const FInputActionValue& InputActionValue);
 public:

@@ -101,6 +101,9 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
 		ETriggerEvent::Completed, this, &ThisClass::OnMoveCancel);
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Navigate,
+		ETriggerEvent::Started, this, &ThisClass::OnNavigate);
+
 
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LookMouse,
@@ -167,6 +170,9 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotLeft);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotRight,
 		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotRight);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_CancelOnlyQuick,
+		ETriggerEvent::Completed, this, &ThisClass::OffQuickSlot);
+	
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_MapOpen,
 		ETriggerEvent::Started, this, &ThisClass::OnMapOpen);
@@ -219,12 +225,12 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		bShowMouseCursor = true;
 		break;
 	case EInputContext::IC_Popup:
-		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 4);
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 5);
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;
 		break;
 	case EInputContext::IC_Map:
-		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 4);
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 7);
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;
 		break;
@@ -876,6 +882,33 @@ void APC_InGame::OnQuickSlotLeft(const FInputActionValue& InputActionValue)
 	{
 		UIManager->ShowUI(UQuickSlotMain::StaticClass());
 	}
+	
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn());
+	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+	EEquip_State eState = WeaponManagerComponent->GetEquipState();
+
+	UQuickSlotMain* QuickSlotUI = UIManager->FindUI<UQuickSlotMain>();
+	if (QuickSlotUI)
+	{
+		switch (eState)
+		{
+		case EEquip_State::None:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::LEFT);
+			break;
+		case EEquip_State::Sword:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::LEFT);
+			break;
+		case EEquip_State::Shield:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::LEFT);
+			break;
+		case EEquip_State::Sword_Shield:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::LEFT);
+			break;
+		case EEquip_State::Bow:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::ARROWLEFT);
+			break;
+		}
+	}
 
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	if (PlayerManager)
@@ -892,10 +925,48 @@ void APC_InGame::OnQuickSlotRight(const FInputActionValue& InputActionValue)
 		UIManager->ShowUI(UQuickSlotMain::StaticClass());
 	}
 
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn());
+	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+	EEquip_State eState = WeaponManagerComponent->GetEquipState();
+
+	UQuickSlotMain* QuickSlotUI = UIManager->FindUI<UQuickSlotMain>();
+	if (QuickSlotUI)
+	{
+		switch (eState)
+		{
+		case EEquip_State::None:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::RIGHT);
+			break;
+		case EEquip_State::Sword:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::RIGHT);
+			break;
+		case EEquip_State::Shield:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::RIGHT);
+			break;
+		case EEquip_State::Sword_Shield:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::RIGHT);
+			break;
+		case EEquip_State::Bow:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::BOWRIGHT);
+			break;
+		}
+	}
+
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	if (PlayerManager)
 	{
 		PlayerManager->ShowQuickSlot();
+	}
+}
+
+void APC_InGame::OffQuickSlot(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if (UIManager)
+	{
+		UQuickSlotMain* QuickSlotUI = UIManager->FindUI<UQuickSlotMain>();
+		if (QuickSlotUI)
+			QuickSlotUI->OnCancel();
 	}
 }
 
@@ -1281,6 +1352,14 @@ void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)
 	UShop* ShopUI = nullptr;
 	UNPCDialogue* DialogUI = nullptr;
 	UQuest* QuestUI = nullptr;
+
+	if (UQuickSlotMain* QuickSlot = UIManager->FindUI<UQuickSlotMain>())
+	{
+		if (QuickSlot->IsVisible())
+		{
+			QuickSlot->OnNavigate(InputActionValue);
+		}
+	}
 
 	switch (CurrentInputContext)
 	{
