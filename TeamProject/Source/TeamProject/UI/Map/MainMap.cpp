@@ -6,8 +6,8 @@
 #include "GameFramework/PC_InGame.h"
 #include "Components/CanvasPanelSlot.h"
 
-const FVector2D UMainMap::MAP_MIN_WORLD = FVector2D(2575.f, -34160.f);
-const FVector2D UMainMap::MAP_MAX_WORLD = FVector2D(36075.f, -17500.f);
+const FVector2D UMainMap::MAP_MIN_WORLD = FVector2D(2850.f, -34510.f);
+const FVector2D UMainMap::MAP_MAX_WORLD = FVector2D(36350.f, -17850.f);
 
 void UMainMap::OnCreated()
 {
@@ -73,6 +73,12 @@ void UMainMap::OnCancel()
 
 int32 UMainMap::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
+    const APlayerController* PlayerController = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+    const APawn* PlayerPawn = PlayerController ? PlayerController->GetPawn() : nullptr;
+
+    if (!PlayerPawn)
+        return LayerId + 1;
+    
     if (PlayerWorldPos == GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation())
         return LayerId + 1;
 
@@ -90,16 +96,12 @@ int32 UMainMap::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 
     PlayerPanelSlot->SetPosition(MapPos);
 
-    APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
-    if (PlayerPawn)
-    {
-        float Yaw = PlayerPawn->GetActorRotation().Yaw;
+    float Yaw = PlayerPawn->GetActorRotation().Yaw;
 
-        FWidgetTransform Transform;
-        Transform.Angle = Yaw + 90.0f;
+    FWidgetTransform Transform;
+    Transform.Angle = Yaw + 90.0f;
 
-        ImagePlayer->SetRenderTransform(Transform);
-    }
-
+    ImagePlayer->SetRenderTransform(Transform);
+    
     return LayerId + 1;
 }
