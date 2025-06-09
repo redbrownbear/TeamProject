@@ -401,6 +401,16 @@ void UMonsterFSMComponent::ChangeState(EMonsterState NewState)
 			CharacterMonster->PlayMontage(EMonsterMontage::DAMAGE);
 		}
 		break;
+	case EMonsterState::Stun:
+		if (PawnMonster)
+		{
+			PawnMonster->PlayMontage(EMonsterMontage::STUN_START);
+		}
+		else if (CharacterMonster)
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::STUN_START);
+		}
+		break;
 	default:
 		break;
 	}
@@ -906,6 +916,20 @@ void UMonsterFSMComponent::UpdateDamage(float DeltaTime)
 		ChangeState(EMonsterState::Combat);
 	}
 	else if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
+	{
+		ChangeState(EMonsterState::Combat);
+	}
+}
+
+void UMonsterFSMComponent::UpdateStun(float DeltaTime)
+{
+	this->StopMove();
+
+	if (PawnMonster && !PawnMonster->IsPlayingMontage(EMonsterMontage::STUN_START))
+	{
+		ChangeState(EMonsterState::Combat);
+	}
+	else if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::STUN_START))
 	{
 		ChangeState(EMonsterState::Combat);
 	}
