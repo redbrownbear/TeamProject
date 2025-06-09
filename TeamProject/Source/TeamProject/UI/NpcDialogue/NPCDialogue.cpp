@@ -223,7 +223,7 @@ void UNPCDialogue::OnSell()
 
             QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
         }
-        PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
+        //PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
     }
     else
     {

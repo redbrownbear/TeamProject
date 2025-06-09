@@ -47,11 +47,13 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 		EQuestCharacter QuestCharacter = Npc->GetData()->QuestCharacter;
 		int32 DialogueID = 0;
 
-		if ((QuestCharacter == EQuestCharacter::Furiko && (DialogType == EDialogType::None || DialogType == EDialogType::Quest)) ||
+		/*if ((QuestCharacter == EQuestCharacter::Furiko && (DialogType == EDialogType::None || DialogType == EDialogType::Quest)) ||
 			(QuestCharacter == EQuestCharacter::Korok && (DialogType == EDialogType::None || DialogType == EDialogType::Shop)))
 		{
 			DialogueID = GetDialogueID(NpcDialogueTable, QuestCharacter, DialogType);
-		}
+		}*/
+
+		DialogueID = GetDialogueID(NpcDialogueTable, QuestCharacter, DialogType);
 
 		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, DialogueID);
 		

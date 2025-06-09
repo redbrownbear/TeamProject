@@ -21,6 +21,8 @@ enum class EDialogType
 	SoldOut,
 	Sell,
 	Cashless,
+	SuccessfulShopping,
+	SuccessfulSale,
 	End
 };
 

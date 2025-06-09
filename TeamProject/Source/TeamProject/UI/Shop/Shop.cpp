@@ -76,12 +76,7 @@ bool UShop::CheckSoldout()
 void UShop::AddItemInventory()
 {    
     FShopDataRow SelectedShopItem;
-
-    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
-    if (ShopManager)
-    {
-        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();  
-    }
+    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
 
     if (SelectedShopItem.ItemData.ItemCount != 0)
     {
@@ -96,12 +91,7 @@ void UShop::AddItemInventory()
 void UShop::SubtractItemInventory()
 {   
     FShopDataRow SelectedShopItem;
-
-    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
-    if (ShopManager)
-    {
-        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
-    }
+    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     if (PlayerManager)
@@ -113,12 +103,7 @@ void UShop::SubtractItemInventory()
 bool UShop::CanIBuyIt()
 {
     FShopDataRow SelectedShopItem;
-
-    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
-    if (ShopManager)
-    {
-        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
-    }
+    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     int32 Rupee = PlayerManager->GetRupee();
@@ -134,12 +119,7 @@ bool UShop::CanIBuyIt()
 void UShop::AddPlayerRupee()
 {
     FShopDataRow SelectedShopItem;
-
-    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
-    if (ShopManager)
-    {
-        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
-    }
+    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     if (PlayerManager)
@@ -155,12 +135,7 @@ void UShop::AddPlayerRupee()
 void UShop::SubtractPlayerRupee()
 {
     FShopDataRow SelectedShopItem;
-
-    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
-    if (ShopManager)
-    {
-        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
-    }
+    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     if (PlayerManager)
@@ -211,25 +186,25 @@ void UShop::SubtractShopItem()
     if (ShopManager)
     {
         SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
-    }
 
-    TArray<UShopSlot*> ActiveSlots = BP_ShopScroll->GetActiveSlots();
-    int32 Index = BP_ShopScroll->GetItemDataIndex();
+        TArray<UShopSlot*> ActiveSlots = BP_ShopScroll->GetActiveSlots();
+        int32 Index = BP_ShopScroll->GetItemDataIndex();
 
-    if (Index != INDEX_NONE)
-    {
-        if (SelectedShopItem.ItemData.ItemCount != 0)
+        if (Index != INDEX_NONE)
         {
-            UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-            if (PlayerManager)
+            if (SelectedShopItem.ItemData.ItemCount != 0)
             {
-                SelectedShopItem.ItemData.ItemCount -= 1;
-                SelectedShopItem.InitialItemCount -= 1;
-                ShopManager->UpdateShopData(EQuestCharacter::Korok, SelectedShopItem);
-
-                if (ActiveSlots.IsValidIndex(Index))
+                UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+                if (PlayerManager)
                 {
-                    ActiveSlots[Index]->SetItemData(SelectedShopItem.ItemData);
+                    SelectedShopItem.ItemData.ItemCount -= 1;
+                    SelectedShopItem.InitialItemCount -= 1;
+                    ShopManager->UpdateShopData(EQuestCharacter::Korok, SelectedShopItem);
+
+                    if (ActiveSlots.IsValidIndex(Index))
+                    {
+                        ActiveSlots[Index]->SetItemData(SelectedShopItem.ItemData);
+                    }
                 }
             }
         }
