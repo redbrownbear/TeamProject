@@ -339,32 +339,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		DefaultCameraShakeBase = NewObject<UDefaultCameraShakeBase>(this, UDefaultCameraShakeBase::StaticClass(), TEXT("DefaultCameraShakeBase"));
 	}
 
-	//USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
 
-	//if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
-	//{
-	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(4);
-	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
-	//	SkeletalMeshComponent->SetMaterial(4, DynamicMaterialInstance);
-	//}
-	//else if (DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
-	//{
-	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(1);
-	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
-	//	SkeletalMeshComponent->SetMaterial(1, DynamicMaterialInstance);
-	//}
-	//else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinLeader"))
-	//{
-	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(0);
-	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
-	//	SkeletalMeshComponent->SetMaterial(0, DynamicMaterialInstance);
-	//}
-	//else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinBoss"))
-	//{
-	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(1);
-	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
-	//	SkeletalMeshComponent->SetMaterial(1, DynamicMaterialInstance);
-	//}
 
 	int32 MaterialSlotIndex = -1;
 	if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))

@@ -330,6 +330,9 @@ void AWorldWeapon::AttachToMonster(IMonsterInterface* Monster, FName SocketName)
 
 	if (UMonsterFSMComponent* FSMComponent = Monster->GetFSMComponent())
 	{
+		AActor* MonsterActor = Cast<AActor>(Monster);
+		SetOwner(MonsterActor);
+
 		bIsCatched = true;
 
 		// if PhyscisSimulates activated, AttachToComponent will fail
@@ -350,12 +353,38 @@ void AWorldWeapon::AttachToMonster(IMonsterInterface* Monster, FName SocketName)
 
 void AWorldWeapon::DetachFromMonster()
 {
+	// 소유자 해제 (필요하다면)
+	SetOwner(nullptr);
+
 	bIsCatched = false;
+
 	StaticMeshComponent->SetRelativeLocation(ItemTableRow->Transform.GetLocation());
 	StaticMeshComponent->SetRelativeScale3D(ItemTableRow->Transform.GetScale3D());
-	CollisionComponent->SetSimulatePhysics(true);
 
 	this->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+	if (!IsValid(CollisionComponent) || !CollisionComponent->IsRegistered())
+	{
+		UE_LOG(LogTemp, Error, TEXT("AWorldWeapon: CollisionComponent is not valid or not registered after DetachFromActor!"));
+		if (IsValid(CollisionComponent) && !CollisionComponent->IsRegistered())
+		{
+			CollisionComponent->RegisterComponentWithWorld(GetWorld());
+			UE_LOG(LogTemp, Warning, TEXT("AWorldWeapon: Attempted to re-register CollisionComponent."));
+		}
+		else
+		{
+			return;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("AWorldWeapon: CollisionComponent is valid and registered after DetachFromActor."));
+	}
+
+	CollisionComponent->SetSimulatePhysics(true);
+	UE_LOG(LogTemp, Log, TEXT("AWorldWeapon: Physics simulation enabled."));
+
+	CollisionComponent->WakeRigidBody();
 }
 
 float AWorldWeapon::GetDamage() const
