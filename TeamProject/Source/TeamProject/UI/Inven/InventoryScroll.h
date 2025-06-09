@@ -49,7 +49,7 @@ private:
 
 	void InitCategory();
 
-	//´«¹°À» ¸Ó±Ý°í °¢°¢¹ÙÀÎµù...
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ó±Ý°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îµï¿½...
 	UFUNCTION()
 	void OnWeaponCheckChanged(bool bIsChecked)		{ SelectCategory(EItemCategory::IT_Weapon, bIsChecked); }
 	UFUNCTION()

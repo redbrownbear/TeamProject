@@ -57,6 +57,8 @@ public:
 
 	void SetCanSwordAttack();
 
+	bool GetIsGuard() { return bIsGuard; }
+	void SetIsGuard(bool bFlag) { bIsGuard = bFlag; }
 
 	EWeapon_Type GetUnEquipWeaponType() {
 		EWeapon_Type _Type;
@@ -112,4 +114,5 @@ protected:
 
 	bool bRightClick;
 	bool bCanShot;
+	bool bIsGuard = false;
 };
