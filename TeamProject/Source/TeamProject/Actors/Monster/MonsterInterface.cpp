@@ -900,6 +900,18 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 		}
 	}
 
+	AddBaseColor(FVector(1.f, 0.f, 0.f));
+
+	FVector ZeroVector = FVector::Zero();
+	FTimerHandle TimerHandle;
+
+	AActor* ThisActor = Cast<AActor>(this);
+
+	ThisActor->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, ZeroVector]()
+		{
+			AddBaseColor(ZeroVector);
+		}, 0.5f, false);
+	
 }
 
 void IMonsterInterface::OnDie()

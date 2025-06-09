@@ -341,6 +341,33 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	{
 		DefaultCameraShakeBase = NewObject<UDefaultCameraShakeBase>(this, UDefaultCameraShakeBase::StaticClass(), TEXT("DefaultCameraShakeBase"));
 	}
+
+	USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
+
+	if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+	{
+		MaterialInterface = SkeletalMeshComponent->GetMaterial(4);
+		DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+		SkeletalMeshComponent->SetMaterial(4, DynamicMaterialInstance);
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
+	{
+		MaterialInterface = SkeletalMeshComponent->GetMaterial(1);
+		DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+		SkeletalMeshComponent->SetMaterial(1, DynamicMaterialInstance);
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinLeader"))
+	{
+		MaterialInterface = SkeletalMeshComponent->GetMaterial(0);
+		DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+		SkeletalMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinBoss"))
+	{
+		MaterialInterface = SkeletalMeshComponent->GetMaterial(1);
+		DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+		SkeletalMeshComponent->SetMaterial(1, DynamicMaterialInstance);
+	}
 }
 void ACharacterMonster::PostDuplicate(EDuplicateMode::Type DuplicateMode)
 {
@@ -493,4 +520,19 @@ void ACharacterMonster::OnDeadEnd()
 {
 	// it would call by AnimNotify 
 	IMonsterInterface::OnDeadEnd();
+}
+
+UMaterialInterface* ACharacterMonster::GetMaterialInterface()
+{
+	return MaterialInterface;
+}
+
+UMaterialInstanceDynamic* ACharacterMonster::GetDynamicMaterialInstance()
+{
+	return DynamicMaterialInstance;
+}
+
+void ACharacterMonster::AddBaseColor(FVector InColor)
+{
+	DynamicMaterialInstance->SetVectorParameterValue(TEXT("BaseColor"), InColor);
 }

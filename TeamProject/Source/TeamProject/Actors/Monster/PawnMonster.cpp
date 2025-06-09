@@ -171,7 +171,20 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		}
 	}
 
-
+	if (DataTableRowHandle.RowName.ToString() == TEXT("Bokoblin_TreasureBox")
+		|| DataTableRowHandle.RowName.ToString() == TEXT("Bokoblin_Patrol"))
+	{
+		MaterialInterface = SkeletalMeshComponent->GetMaterial(2);
+		DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+		SkeletalMeshComponent->SetMaterial(2, DynamicMaterialInstance);
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("Moriblin_TreasureBox")
+		|| DataTableRowHandle.RowName.ToString() == TEXT("Moriblin_Patrol"))
+	{
+		MaterialInterface = SkeletalMeshComponent->GetMaterial(3);
+		DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+		SkeletalMeshComponent->SetMaterial(3, DynamicMaterialInstance);
+	}
 }
 
 void APawnMonster::PostDuplicate(EDuplicateMode::Type DuplicateMode)
@@ -279,4 +292,19 @@ APatrolPath* APawnMonster::GetPatrolPath() const
 ACampFire* APawnMonster::GetCampFire() const
 {
 	return CampFire;
+}
+
+UMaterialInterface* APawnMonster::GetMaterialInterface()
+{
+	return MaterialInterface;
+}
+
+UMaterialInstanceDynamic* APawnMonster::GetDynamicMaterialInstance()
+{
+	return DynamicMaterialInstance;
+}
+
+void APawnMonster::AddBaseColor(FVector InColor)
+{
+	DynamicMaterialInstance->SetVectorParameterValue(TEXT("BaseColor"), InColor);
 }
