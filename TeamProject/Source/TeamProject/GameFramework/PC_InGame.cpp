@@ -6,10 +6,12 @@
 #include "EnhancedInputComponent.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "EngineUtils.h"
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "SubSystem/UI/ShopManager.h"
+#include "UI/HUD/MainHUD.h"
 #include "SubSystem/PlayerManager.h"
 
 #include "Actors/Npc/Npc.h" 
@@ -23,6 +25,9 @@
 #include "Actors/Temple/Ice/IcePreview.h"
 
 #include "Actors/Temple/Treasure/TreasureBox.h"
+
+#include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Actors/Object/MetalActor.h"
 
 APC_InGame::APC_InGame()
 {
@@ -41,6 +46,10 @@ APC_InGame::APC_InGame()
 		IcePillarClass = AIcePillar::StaticClass();
 		IcePreviewClass = AIcePreview::StaticClass();
 	}
+
+	{
+		MetalActorClass = AMetalActor::StaticClass();
+	}
 }
 
 void APC_InGame::BeginPlay()
@@ -49,12 +58,31 @@ void APC_InGame::BeginPlay()
 
 	ChangeInputContext(EInputContext::IC_InGame);
 
-	if (!IcePreviewActor && IcePreviewClass)
+	if (IcePreviewClass && !IcePreviewActor)
 	{
 		IcePreviewActor = GetWorld()->SpawnActor<AIcePreview>(IcePreviewClass);
 		if (IcePreviewActor)
 		{
 			IcePreviewActor->SetActorEnableCollision(false);
+		}
+	}
+
+	if (MetalActorClass && !MetalActor)
+	{
+		MetalActor = GetWorld()->SpawnActor<AMetalActor>(MetalActorClass);
+		if (MetalActor)
+		{
+			MetalActor->SetActorEnableCollision(false);
+		}
+	}
+
+	if (!PhysicsHandle)
+	{
+		PhysicsHandle = NewObject<UPhysicsHandleComponent>(this, UPhysicsHandleComponent::StaticClass(), TEXT("PhysicsHandle"));
+		if (PhysicsHandle)
+		{
+			PhysicsHandle->RegisterComponent();  
+			PhysicsHandle->SetIsReplicated(false);  
 		}
 	}
 }
@@ -73,6 +101,9 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Move,
 		ETriggerEvent::Completed, this, &ThisClass::OnMoveCancel);
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Navigate,
+		ETriggerEvent::Started, this, &ThisClass::OnNavigate);
+
 
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LookMouse,
@@ -81,7 +112,7 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Jump,
 		ETriggerEvent::Started, this, &ThisClass::JumpGlide);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
-		ETriggerEvent::Started, this, &ThisClass::StartedDash);
+		ETriggerEvent::Triggered, this, &ThisClass::StartedDash);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
 		ETriggerEvent::Completed, this, &ThisClass::CompletedDash);
 
@@ -121,25 +152,36 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Quest,
 		ETriggerEvent::Started, this, &ThisClass::OpenQuest);
 
-	// ------------ Supernatural -----------------
-	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
+	// ------------ SuperPower -----------------
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker, 
 		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
 
-	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Build,
-		ETriggerEvent::Started, this, &ThisClass::SpawnIcePillar);		
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Magnesis, 
+		ETriggerEvent::Started, this, &ThisClass::ShowMetalActorPreview);
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_TrySuperPower, 
+		ETriggerEvent::Started, this, &ThisClass::TrySuperPower);
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_ControlDistance, 
+		ETriggerEvent::Triggered, this, &ThisClass::OnControlDistance);	
+
+	//QuickSlot
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotLeft,
+		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotLeft);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotRight,
+		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotRight);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_CancelOnlyQuick,
+		ETriggerEvent::Completed, this, &ThisClass::OffQuickSlot);
+	
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_MapOpen,
+		ETriggerEvent::Started, this, &ThisClass::OnMapOpen);
 }
 
 void APC_InGame::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (bQPressed)
-	{
-		if (IcePreviewActor)
-		{
-			UpdateIcePreview();
-		}
-	}
 }
 
 void APC_InGame::ChangeInputContext(EInputContext NewContext)
@@ -183,7 +225,12 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		bShowMouseCursor = true;
 		break;
 	case EInputContext::IC_Popup:
-		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 4);
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 5);
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+		break;
+	case EInputContext::IC_Map:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 7);
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;
 		break;
@@ -201,6 +248,8 @@ void APC_InGame::BindInventoryInput()
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenNavigate, ETriggerEvent::Started, this, &APC_InGame::OnNavigate);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenConfirm, ETriggerEvent::Started, this, &APC_InGame::OnConfirm);
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenCancel, ETriggerEvent::Started, this, &APC_InGame::OnCancel);
+		EIC->BindAction(PC_InGameDataAsset->IA_DropItem, ETriggerEvent::Started, this, &APC_InGame::DropItem);
+
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started, this, &APC_InGame::OnCreateItemTest);
 	}
 }
@@ -247,11 +296,13 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 	if (!Player_C)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("NoPlayer"));
 		return;
 	}
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 	if (Movement->MovementMode == MOVE_None)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("MoveNone"));
 		return;
 	}
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
@@ -291,6 +342,9 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 		
 	}
+	
+	
+	// Glide Move
 	else if (Movement->GetMoveState()==EMove_State::Glide)
 	{
 		
@@ -327,6 +381,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 			Stemina -= DeltaTime * STEMINA_USE_SPEED;
 			PlayerManager->SetPlayerStamina(Stemina);
+			UE_LOG(LogTemp, Warning, TEXT("Dash"));
 		}
 	}
 }
@@ -354,6 +409,9 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
 
 	const FVector2D ActionValue = FVector2D::Zero();
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	PlayerManager->SetStaminaUSe(false);
 
 	UE_LOG(LogTemp, Warning, TEXT("ActionValue %f, %f"), ActionValue.X, ActionValue.Y);
 	P_Anim->ActionValue = ActionValue;
@@ -453,16 +511,37 @@ void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
 
 	WeaponManagerComponent->LeftClickAction();
 
-	// TreasureBox 열 때
-	{		
-		if (TreasureBoxActor != nullptr)
+	// ------- Destroy IcePilla ---------	
+	// 화면 중앙 기준 라인트레이스
+	FVector Start;
+	FRotator Rot;
+	GetPlayerViewPoint(Start, Rot);
+
+	FVector End = Start + Rot.Vector() * TraceDistance;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetPawn());
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	if (bHit)
+	{
+		// 생성된 아이스 필러가 있으면 Destroy
+		AActor* HitActor = HitResult.GetActor();
+		if (IsValid(HitActor))
 		{
-			bool bCanOpen = TreasureBoxActor->GetOpenBox();
-			if (bCanOpen)
+			UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
+
+			if (AIcePillar* IcePillar = Cast<AIcePillar>(HitActor))
 			{
-				TreasureBoxActor->OpenTBox();
+				IcePillar->Destroy();
 			}
-		}	
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Hit actor is not an IcePillar"));
+			}
+		}
 	}
 }
 
@@ -591,7 +670,7 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 	{
 		if (UNpcFSMComponent* FSM = Npc->GetFSMComponent())
 		{
-			if(Npc->GetData()->DialogType == EDialogType::Shop)
+			if(Npc->GetCurrentDialogueType() == EDialogType::Shop)
 			{
 				FSM->ChangeState(ENpcState::Sell);
 			}
@@ -600,6 +679,17 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 				FSM->ChangeState(ENpcState::Talk);
 			}			
 		}
+
+		return;
+	}
+
+	if (TreasureBox && TreasureBox->GetOpenBox())
+	{
+		TreasureBox->OpenTBox();
+	}	
+	else if(TreasureBox && !TreasureBox->GetOpenBox())
+	{
+		TreasureBox->CloseUI();
 	}
 }
 
@@ -615,6 +705,7 @@ void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
 	if (PlayerManager)
 	{
 		PlayerManager->ShowInvenUI();
+		PlayerManager->ShowEquipUI();
 	}
 }
 
@@ -633,79 +724,622 @@ void APC_InGame::OpenQuest(const FInputActionValue& InputActionValue)
 	}
 }
 
-void APC_InGame::SpawnIcePillar(const FInputActionValue& InputActionValue)
+void APC_InGame::TrySuperPower(const FInputActionValue& InputActionValue)
+{	
+	if (bIceKeyPressed)
+	{
+		if (!IcePillarClass) return;
+
+		if (bCanSpawn)
+		{
+			SpawnIcePillar();
+		}
+	}
+
+	else if (bMagnesisKeyPressed)
+	{
+		if (IsHoldingObject()) return;
+
+		if (!MetalActorClass) return;
+
+		CheckMetalActor();
+
+		if (bCanControlMetal)
+		{
+			Magnesis();
+		}
+	}	
+}
+
+void APC_InGame::OnControlDistance(const FInputActionValue& InputActionValue)
 {
-	if (!IcePillarClass) return;
+	if (!bIceKeyPressed && !bMagnesisKeyPressed) return;
 
-	if (!bQPressed) return;
+	const FVector2D InputValue = InputActionValue.Get<FVector2D>();
+	if (InputValue.IsNearlyZero()) return;
 
-	// 수면 체크: 지형 위라면 충돌, 월드 정적에 한정
-	CheckSurface();
+	const float MoveStep = 10.f;
 
-	if (!bCanSpawn) return;
+	if (bMagnesisKeyPressed)
+	{		
+		const float DistanceStep = 20.f; // HoldDistance 변화량
+		const float MinHoldDistance = 100.f; // 너무 가까워지는 것 방지
+		const float MaxHoldDistance = 2000.f; // 너무 멀어지지 않도록 제한
 
-	FVector SpawnLoc = Hit.Location;
-	FVector Normal = Hit.Normal;
+		// Magnesis 상태일 경우, HoldDistance 조절
+		if (IsHoldingObject())
+		{
+			// 위로 누르면 증가, 아래로 누르면 감소
+			HoldDistance += InputValue.Y * DistanceStep;
+			HoldDistance = FMath::Clamp(HoldDistance, MinHoldDistance, MaxHoldDistance);
 
-	AIcePillar* IcePillarActor = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass);
+			//UE_LOG(LogTemp, Warning, TEXT("HoldDistance: %f"), HoldDistance);
+			return; // IcePreview 조작은 생략
+		}
+	}
+	else if (bIceKeyPressed)
+	{
+		// 카메라 기준 방향 추출
+		FVector CamLoc;
+		FRotator CamRot;
+		GetPlayerViewPoint(CamLoc, CamRot);
 
-	// 호출 순서 중요
-	IcePillarActor->SetRiseDirection(Hit.Normal);
-	IcePillarActor->SetPivotLocation(Hit.Location);
+		// 화면 기준 방향 (Pitch는 제거 → 수평 평면 유지)
+		FRotator YawOnlyRot(0.0f, CamRot.Yaw, 0.0f);
+		FVector Forward = FRotationMatrix(YawOnlyRot).GetUnitAxis(EAxis::X); // 화면 앞
+		FVector Right = -FRotationMatrix(YawOnlyRot).GetUnitAxis(EAxis::Y); // 화면 오른쪽
 
-	// 노멀 방향 회전 적용
-	FRotator SpawnRot = FRotationMatrix::MakeFromZ(Hit.Normal).Rotator();
-	IcePillarActor->SetActorRotation(SpawnRot);
-	IcePillarActor->SetActorHiddenInGame(false); // 보이도록	
+		// 이동 방향 계산
+
+		// 두 벡터 정규화
+		FVector NormalizedA = LastHit.Normal.GetSafeNormal();
+		FVector NormalizedB = FVector(0.f, 0.f, 1.f).GetSafeNormal();
+
+		// 내적 계산
+		float Dot = FVector::DotProduct(NormalizedA, NormalizedB);
+
+		// 각도로 변환
+		float AngleDegrees = FMath::Acos(FMath::Clamp(Dot, -1.0f, 1.0f)) * (180.0f / PI);
+
+		// 90도 ± 허용 오차 내에 있는지 확인
+		bool bIsPerpendicular = false;
+		if (FMath::Abs(AngleDegrees - 90.0f) <= 5.0f) // 5.f is ToleranceDegrees 
+		{
+			bIsPerpendicular = true;
+		}
+
+		// IcePillarPreview is on the wall; 
+		FVector MoveDirection = FVector::Zero();
+		if (bIsPerpendicular)
+		{
+			MoveDirection = FVector(0.f, 0.f, 1.f) * InputValue.Y + Right * InputValue.X;
+		}
+		else
+		{
+			MoveDirection = Forward * InputValue.Y + Right * InputValue.X;
+		}
+
+		LastHit.Normal.Normalize();
+
+		FVector N = LastHit.Normal.GetSafeNormal();  // 반드시 단위 벡터로
+		FVector V = MoveDirection;
+
+		FVector VProjected = V - FVector::DotProduct(V, N) * N;
+
+
+		if (VProjected.IsNearlyZero()) return;
+
+		if (bIceMaker)
+		{
+			IcePreviewActor->AddActorWorldOffset(VProjected.GetSafeNormal() * MoveStep);
+			FVector PivotLocation = IcePreviewActor->GetPivotLocation();
+			PivotLocation += VProjected.GetSafeNormal() * MoveStep;
+			IcePreviewActor->SetPivotLocation(PivotLocation);
+		}
+	}	
+}
+
+void APC_InGame::SpawnIcePillar()
+{	
+	if (!LastHit.IsValidBlockingHit()) return;
+
+	const FVector PivotLocation = IcePreviewActor->GetPivotLocation();
+	FTransform PreviewTransform = IcePreviewActor->GetActorTransform();
+	PreviewTransform.SetLocation(PivotLocation);
+
+	IcePillarActor = GetWorld()->SpawnActor<AIcePillar>(IcePillarClass, PreviewTransform);
+
+	if (!IcePillarActor) return;
+
+	IcePillarActor->SetRiseDirection(IcePreviewActor->GetRiseDirection());
+	IcePillarActor->SetPivotLocation(PivotLocation);
+
+	IcePillarActor->SetActorHiddenInGame(false);
+
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	Player_C->ZoomOut();
+
 	IcePreviewActor->SetActorHiddenInGame(true);
+	SetIgnoreLookInput(false);
 
+	bIcePreviewPlaced = false; // 해제되면 다시 재탐색 가능
 	bCanSpawn = false;
+	bIceMaker = false;
+	bIceKeyPressed = false;
+}
+
+void APC_InGame::DestroyIcePillar()
+{
+	if (!IcePillarActor) return;
+
+	IcePillarActor->Destroy();
+}
+
+void APC_InGame::OnQuickSlotLeft(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if (UIManager)
+	{
+		UIManager->ShowUI(UQuickSlotMain::StaticClass());
+	}
+	
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn());
+	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+	EEquip_State eState = WeaponManagerComponent->GetEquipState();
+
+	UQuickSlotMain* QuickSlotUI = UIManager->FindUI<UQuickSlotMain>();
+	if (QuickSlotUI)
+	{
+		switch (eState)
+		{
+		case EEquip_State::None:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::LEFT);
+			break;
+		case EEquip_State::Sword:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::LEFT);
+			break;
+		case EEquip_State::Shield:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::LEFT);
+			break;
+		case EEquip_State::Sword_Shield:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::LEFT);
+			break;
+		case EEquip_State::Bow:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::ARROWLEFT);
+			break;
+		}
+	}
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
+	{
+		PlayerManager->ShowQuickSlot();
+	}
+}
+
+void APC_InGame::OnQuickSlotRight(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if (UIManager)
+	{
+		UIManager->ShowUI(UQuickSlotMain::StaticClass());
+	}
+
+	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn());
+	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+	EEquip_State eState = WeaponManagerComponent->GetEquipState();
+
+	UQuickSlotMain* QuickSlotUI = UIManager->FindUI<UQuickSlotMain>();
+	if (QuickSlotUI)
+	{
+		switch (eState)
+		{
+		case EEquip_State::None:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::RIGHT);
+			break;
+		case EEquip_State::Sword:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::RIGHT);
+			break;
+		case EEquip_State::Shield:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::RIGHT);
+			break;
+		case EEquip_State::Sword_Shield:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::RIGHT);
+			break;
+		case EEquip_State::Bow:
+			QuickSlotUI->RefreshFirstSlot(eEquipParts::BOWRIGHT);
+			break;
+		}
+	}
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
+	{
+		PlayerManager->ShowQuickSlot();
+	}
+}
+
+void APC_InGame::OffQuickSlot(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if (UIManager)
+	{
+		UQuickSlotMain* QuickSlotUI = UIManager->FindUI<UQuickSlotMain>();
+		if (QuickSlotUI)
+			QuickSlotUI->OnCancel();
+	}
+}
+
+void APC_InGame::OnMapOpen(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	if (UIManager)
+	{
+		UIManager->ShowUI(UMainMap::StaticClass());
+	}
+
+	UMainMap* MainMapUI = UIManager->FindUI<UMainMap>();
+	if (MainMapUI)
+		MainMapUI->SetPlayerData();
+
 }
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 {	
-	bQPressed = !bQPressed;
+	if (bMagnesisKeyPressed) { return; }
+	bIceKeyPressed = !bIceKeyPressed;
+
+	if (!bIceKeyPressed) { bIceKeyPressed = false; }
+
+	AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
+	if (MainHUD)
+	{
+		MainHUD->ShowAbilityAimUI(bIceKeyPressed);
+	}
 
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
-	UCharacterMovementComponent* C_Movement = Player_C->GetCharacterMovement();
 
-	if (bQPressed)
+	if (bIceKeyPressed)
 	{
-		// 캐릭터 이동 및 회전
-		C_Movement->MaxWalkSpeed = PLAYER_MOVE_BOW_ZOOM;
-
-		Player_C->bUseControllerRotationYaw = true; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
-
-		// 이동 방향으로 자동 회전 비활성화
-		C_Movement->bOrientRotationToMovement = false;
-
-		USpringArmComponent* C_SpringArm = Player_C->GetSpringArm();
-
 		Player_C->ZoomIn();
 
-		bIsCameraLocked = true;
+		IcePreviewActor->SetActorHiddenInGame(false);
 
-		// show icepreview
-		IcePreviewActor->SetActorHiddenInGame(false);	
+		//FindVisibleActorOnScreen(LastHit); // Surface에 그리드 표현?
 
-		//// 애니메이션
-		//UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
-		//AnimInst->Montage_Play(ChargingMTG);
+		bIceMaker = true;
+
+		InitIcePreview();
+	
+		/*if (bIcePreviewPlaced)
+		{
+			SetIgnoreLookInput(true); // 카메라 고정
+		}*/
+
+		bIcePreviewPlaced = false; // 새 위치 탐색 허용
+
+		// 캐릭터 IcePreviewActor에 정면 고정?
 	}
 	else
 	{
-		Player_C->bUseControllerRotationYaw = false; // 컨트롤러 Yaw 방향을 따라 캐릭터 회전
-
-		// 이동 방향으로 자동 회전 비활성화
-		Player_C->GetCharacterMovement()->bOrientRotationToMovement = true;
-
-		Player_C->GetCharacterMovement()->MaxWalkSpeed = PLAYER_MOVE_NML;
-
 		Player_C->ZoomOut();
-		bIsCameraLocked = false;
 
-		// hide icepreview
 		IcePreviewActor->SetActorHiddenInGame(true);
+
+		SetIgnoreLookInput(false);
+
+		bIcePreviewPlaced = false; // 해제되면 다시 재탐색 가능
+	}
+
+}
+
+void APC_InGame::InitIcePreview()
+{
+	if (!IcePreviewActor || bIcePreviewPlaced) return;
+
+	// 화면 중앙 기준으로 라인트레이스
+	FVector Start;
+	FRotator Rot;
+	GetPlayerViewPoint(Start, Rot);
+
+	FVector End = Start + Rot.Vector() * TraceDistance;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetPawn());
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	if (bHit)
+	{
+		IcePreviewActor->SetPivotLocation(HitResult.Location);
+		IcePreviewActor->SetRiseDirection(HitResult.Normal);
+
+		FRotator PreviewRot = FRotationMatrix::MakeFromZ(HitResult.Normal).Rotator();
+		IcePreviewActor->SetActorRotation(PreviewRot);
+		IcePreviewActor->SetActorHiddenInGame(false);
+
+		// 중심에 있는 액터가 Surface인지 여부 판단 → 색상 결정
+		bool bCenterIsSurface = IsSurfaceActor(HitResult.GetActor());
+
+		IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", bCenterIsSurface ? 0.0f : 1.0f);
+
+		IcePreviewActor->SetCanSpawn(bCenterIsSurface);
+		bCanSpawn = true;	
+
+		// 위치 저장
+		LastHit = HitResult;
+		bIcePreviewPlaced = true; // 한 번만 배치
+	}
+	else
+	{
+		IcePreviewActor->SetActorHiddenInGame(true);
+		IcePreviewActor->SetCanSpawn(false);
+		bCanSpawn = false;
+	}
+}
+
+bool APC_InGame::IsSurfaceActor(AActor* Actor) const
+{
+	if (!Actor) return false;
+
+#if WITH_EDITOR
+	FString ActorName = Actor->GetActorLabel();
+#else
+	FString ActorName = Actor->GetName();
+#endif
+
+	return ActorName.StartsWith(TEXT("Surface"));
+}
+
+AActor* APC_InGame::FindVisibleActorOnScreen(FHitResult& OutHit)
+{
+	const int GridSize = 5;
+	const float ScreenStep = 1.0f / GridSize;
+
+	int32 ViewX, ViewY;
+	GetViewportSize(ViewX, ViewY);
+
+	for (int X = 0; X <= GridSize; ++X)
+	{
+		for (int Y = 0; Y <= GridSize; ++Y)
+		{
+			float ScreenX = X * ScreenStep * ViewX;
+			float ScreenY = Y * ScreenStep * ViewY;
+
+			FVector WorldOrigin;
+			FVector WorldDirection;
+
+			if (DeprojectScreenPositionToWorld(ScreenX, ScreenY, WorldOrigin, WorldDirection))
+			{
+				FVector End = WorldOrigin + WorldDirection * TraceDistance;
+
+				FHitResult HitResult;
+				FCollisionQueryParams Params;
+				Params.AddIgnoredActor(GetPawn());
+
+				if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldOrigin, End, ECC_Visibility, Params))
+				{
+					AMetalActor* HitMetal = Cast<AMetalActor>(HitResult.GetActor());
+					if (HitMetal)
+					{
+						OutHit = HitResult;
+						return HitMetal;
+					}
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue)
+{
+	if (bIceKeyPressed) { return; }
+
+	bMagnesisKeyPressed = !bMagnesisKeyPressed;
+
+	AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
+	if (MainHUD)
+	{
+		MainHUD->ShowAbilityAimUI(bMagnesisKeyPressed);
+	}
+
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+
+	if (bMagnesisKeyPressed)
+	{
+		Player_C->ZoomIn();
+
+		GetWorld()->GetTimerManager().SetTimer(
+			MoveTimerHandle,
+			this,
+			&APC_InGame::ScanMetalActorInView,
+			0.16f,  // 주기 (초)
+			true   // 반복
+		);
+	}
+	else
+	{
+		Player_C->ZoomOut();
+
+		if (MetalActor)
+		{
+			MetalActor->ChangeNomalColor();
+		}
+
+		if (IsHoldingObject())
+		{
+			StopMagnetGrab();
+		}
+
+		// 타이머 종료
+		GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
+
+		MetalActor = nullptr;
+	}
+
+}
+
+
+void APC_InGame::Magnesis()
+{	
+	if (!bMagnesisKeyPressed) return;
+
+	if (!IsHoldingObject() && bCanControlMetal)
+	{
+		StartMagnetGrab();
+	}
+}
+
+void APC_InGame::CheckMetalActor()
+{
+	// 화면 중앙 기준 라인트레이스
+	FVector Start;
+	FRotator Rot;
+	GetPlayerViewPoint(Start, Rot);
+
+	FVector End = Start + Rot.Vector() * TraceDistance;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetPawn());
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	if (bHit)
+	{
+		AActor* HitActor = HitResult.GetActor();
+		if (!HitActor) return;
+
+#if WITH_EDITOR
+		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
+#else
+		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
+#endif
+
+		if (!ActorName.StartsWith(TEXT("Metal")))
+		{
+			bCanControlMetal = false;
+			return;
+		}
+
+		bCanControlMetal = true;
+
+		// LastHit 업데이트
+		LastHit = HitResult;
+	}
+	else
+	{
+		bCanControlMetal = false;
+	}
+}
+
+void APC_InGame::StartMagnetGrab()
+{
+	if (IsHoldingObject()) return;
+
+	//FHitResult HitResult;
+	if (TraceForMetal(LastHit))
+	{
+		if (UPrimitiveComponent* HitComp = LastHit.GetComponent())
+		{
+			if (HitComp->IsSimulatingPhysics())
+			{
+				// 플레이어 위치와 MetalActor 위치 기준 거리 측정
+				ACharacter* PlayerChar = Cast<ACharacter>(GetPawn());
+				if (PlayerChar)
+				{
+					FVector PlayerLocation = PlayerChar->GetActorLocation();
+					FVector TargetLocation = HitComp->GetOwner()->GetActorLocation();
+					HoldDistance = FVector::Distance(PlayerLocation, TargetLocation);
+				}
+
+				PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, LastHit.ImpactPoint);
+				GrabbedComponent = HitComp;
+
+				// 주기적으로 위치 갱신
+				GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &APC_InGame::MoveGrabbedObject, 0.01f, true);
+			}
+		}
+	}
+}
+
+void APC_InGame::StopMagnetGrab()
+{
+	if (!IsHoldingObject()) return;
+
+	PhysicsHandle->ReleaseComponent();
+	GrabbedComponent = nullptr;
+
+	GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
+}
+
+bool APC_InGame::TraceForMetal(FHitResult& OutHit)
+{
+	FVector Start;
+	FRotator Rot;
+	GetPlayerViewPoint(Start, Rot);
+
+	FVector End = Start + Rot.Vector() * TraceDistance;
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetPawn());
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_PhysicsBody, Params);
+
+	if (bHit && OutHit.GetActor()->IsA(MetalActorClass))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void APC_InGame::MoveGrabbedObject()
+{
+	if (!IsHoldingObject()) return;
+
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	GetPlayerViewPoint(CameraLocation, CameraRotation);
+
+	FVector TargetLocation = CameraLocation + CameraRotation.Vector() * HoldDistance;
+
+	// 현재 위치
+	//FVector CurrentLocation = GrabbedComponent->GetComponentLocation();
+	FVector CurrentLocation = GrabbedComponent->GetOwner()->GetActorLocation();
+
+	// 부드럽게 따라가게 보간 처리
+	FVector SmoothedLocation = FMath::VInterpTo(CurrentLocation, TargetLocation, GetWorld()->GetDeltaSeconds(), 0.01f);
+
+	PhysicsHandle->SetTargetLocation(TargetLocation);	
+
+}
+
+bool APC_InGame::IsHoldingObject() const
+{
+	return PhysicsHandle->GrabbedComponent != nullptr;
+}
+
+void APC_InGame::ScanMetalActorInView()
+{
+	if (!bMagnesisKeyPressed) return;
+
+	FHitResult MetalHit;
+	AMetalActor* FoundMetal = Cast<AMetalActor>(FindVisibleActorOnScreen(MetalHit));
+
+	// 변경이 감지된 경우만 업데이트
+	if (FoundMetal && FoundMetal != MetalActor)
+	{
+		if (MetalActor)
+		{
+			MetalActor->ChangeNomalColor(); // 기존 액터 색상 복구
+		}
+
+		MetalActor = FoundMetal;
+		MetalActor->ThisIsMetal();
 	}
 }
 
@@ -718,6 +1352,14 @@ void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)
 	UShop* ShopUI = nullptr;
 	UNPCDialogue* DialogUI = nullptr;
 	UQuest* QuestUI = nullptr;
+
+	if (UQuickSlotMain* QuickSlot = UIManager->FindUI<UQuickSlotMain>())
+	{
+		if (QuickSlot->IsVisible())
+		{
+			QuickSlot->OnNavigate(InputActionValue);
+		}
+	}
 
 	switch (CurrentInputContext)
 	{
@@ -797,6 +1439,7 @@ void APC_InGame::OnCancel(const FInputActionValue& InputActionValue)
 	UNPCDialogue* DialogUI = nullptr;
 	UQuest* QuestUI = nullptr;
 	UPopupGetItem* PopupUI = nullptr;
+	UMainMap* MainMapUI = nullptr;
 
 	switch (CurrentInputContext)
 	{
@@ -830,6 +1473,12 @@ void APC_InGame::OnCancel(const FInputActionValue& InputActionValue)
 		PopupUI = UIManager->FindUI<UPopupGetItem>();
 		if (PopupUI)
 			PopupUI->OnCancel();
+		break;
+
+	case EInputContext::IC_Map:
+		MainMapUI = UIManager->FindUI<UMainMap>();
+		if (MainMapUI)
+			MainMapUI->OnCancel();
 
 		break;
 	}
@@ -850,11 +1499,21 @@ void APC_InGame::OnNextDialogue(const FInputActionValue& InputActionValue)
 		break;
 	case EInputContext::IC_Dialogue:
 		DialogUI = UIManager->FindUI<UNPCDialogue>();
-		if (DialogUI)	
+		if (DialogUI && DialogUI->IsVisible())	
 			DialogUI->OnNextDialogue(InputActionValue);
 		
 		break;
 	}
+}
+
+void APC_InGame::DropItem(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	UInventory* InvenUI = UIManager->FindUI<UInventory>();;
+	if (InvenUI)
+		InvenUI->OnCreateItemInWorld(InputActionValue);
 }
 
 void APC_InGame::OnCreateItemTest(const FInputActionValue& InputActionValue)
@@ -876,78 +1535,6 @@ void APC_InGame::OnCreateItemTest(const FInputActionValue& InputActionValue)
 		break;
 	case EInputContext::IC_Dialogue:
 		break;
-	}
-}
-
-void APC_InGame::UpdateIcePreview()
-{
-	if (!IcePreviewActor) return;
-
-	CheckSurface();
-
-	if (bHitResult)
-	{
-		IcePreviewActor->SetPivotLocation(Hit.Location);
-
-		// 노멀 방향 회전 적용
-		FRotator PreviewRot = FRotationMatrix::MakeFromZ(Hit.Normal).Rotator();
-		IcePreviewActor->SetActorRotation(PreviewRot);
-		IcePreviewActor->SetActorHiddenInGame(false); // 보이도록	
-
-		IcePreviewActor->SetRiseDirection(Hit.Normal);
-	}
-	else
-	{
-		IcePreviewActor->SetActorHiddenInGame(true); // 일시적으로 숨김 
-	}
-}
-
-void APC_InGame::CheckCollision()
-{
-	FHitResult HitResult;
-	bHitResult = this->GetHitResultUnderCursorByChannel(
-		UEngineTypes::ConvertToTraceType(ECC_Visibility),
-		false,
-		HitResult);
-
-	if (bHitResult)
-	{
-		Hit = HitResult;
-	}
-}
-
-void APC_InGame::CheckSurface()
-{
-	CheckCollision();
-
-	if (bHitResult)
-	{
-		AActor* HitActor = Hit.GetActor();
-		if (!HitActor) return;
-
-#if WITH_EDITOR
-		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
-#else
-		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
-#endif
-
-		if (!ActorName.StartsWith(TEXT("Surface")))
-		{
-			bCanSpawn = false;
-			if (IcePreviewActor)
-			{
-				IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", 1.0f);
-			}
-			return;
-		}
-
-		if (IcePreviewActor)
-		{
-			IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", 0.0f);
-		}
-
-		bCanSpawn = true;
-		IcePreviewActor->SetCanSpawn(bCanSpawn);
 	}
 }
 

@@ -98,7 +98,7 @@ void UShopManager::UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow 
     {
         for (int32 i = 0; i < ShopList->Num(); ++i)
         {
-            if ((*ShopList)[i].ItemData.ItemID == UpdateShopRow.ItemData.ItemID)
+            if ((*ShopList)[i].ItemData.UniqueID == UpdateShopRow.ItemData.UniqueID)
             {
                 (*ShopList)[i] = UpdateShopRow;  // °ª º¹»ç
                 break;

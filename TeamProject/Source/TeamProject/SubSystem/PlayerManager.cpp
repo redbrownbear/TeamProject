@@ -35,25 +35,103 @@ void UPlayerManager::ShowQuestUI()
 
 void UPlayerManager::SetInvenData(FItemData ItemRow)
 {
-    ItemList.Add(ItemRow);  
+    ItemInvenList.Add(ItemRow);
 
     UpDateInvenUI(ItemRow);
 }
 
 void UPlayerManager::ShowInvenUI()
 {
-    UpDateInvenUI(ItemList);
+    UpDateInvenUI(ItemInvenList);
 }
 
 void UPlayerManager::SetEquipData(const FItemData& ItemRow)
 {
+    eEquipParts NewParts = ItemRow.GetParts();
+
+    // ���� ���� ������ ����
+    EquipItemList.RemoveAll([&](const FItemData& Item)
+        {
+            return Item.GetParts() == NewParts;
+        });
+
+    // �� ������ �߰�
     EquipItemList.Add(ItemRow);
+
     UpDateInvenEquipUI(EquipItemList);
 }
 
 void UPlayerManager::ShowEquipUI()
 {
     UpDateInvenEquipUI(EquipItemList);
+}
+
+bool UPlayerManager::IsEquipPart(eEquipParts Parts)
+{
+    for (FItemData ItemData : EquipItemList)
+    {
+        switch (ItemData.eItemCategory)
+        {
+        case EItemCategory::IT_Weapon:
+            if (Parts == eEquipParts::RIGHT)
+                return true;
+        case EItemCategory::IT_Shield:
+            if (Parts == eEquipParts::LEFT)
+                return true;
+        case EItemCategory::IT_Arrow:           
+            if (ItemData.bIsArrow ? Parts == eEquipParts::ARROWLEFT : Parts == eEquipParts::BOWRIGHT)
+                return true;
+        case EItemCategory::IT_Armor:
+            switch (ItemData.eArmorKind)
+            {
+            case EArmorKind::HEAD:
+                if (Parts == eEquipParts::HEAD)
+                    return true;
+            case EArmorKind::ARMOR:
+                if (Parts == eEquipParts::ARMOR)
+                    return true;
+            case EArmorKind::LEG:
+                if (Parts == eEquipParts::UNDER)
+                    return true;
+            }
+            break;
+        }
+    }
+    return false;
+}
+
+FItemData UPlayerManager::GetItemByUniqueID(const FString& UniqueItemID)
+{
+    for (const FItemData& ItemData : EquipItemList)
+    {
+        if (ItemData.UniqueID == UniqueItemID)
+        {
+            return ItemData;
+        }
+    }
+
+    return FItemData();
+}
+
+FItemData UPlayerManager::RemoveItemByUniqueID(FString UniqueID)
+{
+    for (int32 i = 0; i < ItemInvenList.Num(); ++i)
+    {
+        if (ItemInvenList[i].UniqueID == UniqueID)
+        {
+            FItemData Removed = ItemInvenList[i];
+            ItemInvenList.RemoveAt(i);
+            UpDateInvenUI(ItemInvenList); // UI ����ȭ
+            return Removed;
+        }
+    }
+
+    return FItemData();
+}
+
+void UPlayerManager::ShowQuickSlot()
+{
+    UpDataQuickSlot(ItemInvenList);
 }
 
 void UPlayerManager::UpDateInvenUI(const FItemData& ItemData)
@@ -66,9 +144,14 @@ void UPlayerManager::UpDateInvenUI(const TArray<FItemData>& ItemRows)
     OnInventoryAllUpdated.Broadcast(ItemRows); // UI���� �˸�
 }
 
-void UPlayerManager::UpDateInvenEquipUI(const TArray<FItemData>& ItemMap)
+void UPlayerManager::UpDateInvenEquipUI(const TArray<FItemData>& ItemList)
 {   
-    OnInvenEquipItemAllUpdated.Broadcast(ItemMap);
+    OnInvenEquipItemAllUpdated.Broadcast(ItemList);
+}
+
+void UPlayerManager::UpDataQuickSlot(const TArray<FItemData>& ItemList)
+{
+    OnQuickSlotUpdated.Broadcast(ItemList);
 }
 
 void UPlayerManager::InitStatus()
@@ -82,7 +165,7 @@ void UPlayerManager::InitStatus()
     status.Armor = 0.0f;
 
     status.Runspeed = 100.f;            //�˾Ƽ� ���ϼ�~
-    status.LevelName;                   //�ʱⰪ�� ��� �Ұ���?
+    status.LevelName;                   //�ʱⰪ�� ���?�Ұ���?
     status.PlayerTransform;             //��������!
     status.PreviousLoction;             //�˾Ƽ� ����
     status.StaminaRegenSpeed = 4.0f;    //�˾Ƽ�
@@ -99,11 +182,11 @@ void UPlayerManager::SetPlayerStamina(float InStamina)
 
 void UPlayerManager::TickStamina(float DeltaTime)
 {
-    //���׹̳� ������̸� �� �þ
+    //���׹̳� ������̸�?�� �þ
     if (PlayerStatus.bIsUseStamina)
         return;
 
-    // �̹� �ִ�� �� �þ
+    // �̹� �ִ��?�� �þ
     if (PlayerStatus.Stamina >= PlayerStatus.MaxStamina)
         return;
 

@@ -71,12 +71,15 @@ ATorchStand::ATorchStand()
     TriggerColliderComponent->SetupAttachment(RootComponent);
     TriggerColliderComponent->SetRelativeLocation(FVector(0.f, 0.f, 70.f));
     TriggerColliderComponent->OnComponentBeginOverlap.AddDynamic(this, &ATorchStand::OnBeginOverlap);
+    
 }
 
 // Called when the game starts or when spawned
 void ATorchStand::BeginPlay()
 {
     Super::BeginPlay();
+
+    TriggerColliderComponent->SetCollisionProfileName(TEXT("Trigger"));
 }
 
 void ATorchStand::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -92,8 +95,7 @@ void ATorchStand::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
             }
             if (WeaponManager->GetCanShot())
             {
-                AWeaponBow* Actor_Bow = Cast<AWeaponBow>(WeaponManager->GetBow()->GetChildActor());
-                Actor_Bow->SetArrowFire(true);
+                Player_C->SetArrowFire(true);
             }
         }
     }

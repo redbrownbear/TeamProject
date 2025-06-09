@@ -48,6 +48,8 @@ public:
 
 	UAnimMontage* GTEST() { return LandUpMontage; }
 
+	void Hited();
+
 
 private:
 	bool CanGlide();
@@ -57,6 +59,8 @@ private:
 
 	UPROPERTY()
 	UAnimMontage* GlideUnEquip;
+	UPROPERTY()
+	UAnimMontage* HitMontage;
 	UPROPERTY()
 	UAnimMontage* LandUpMontage;
 	UPROPERTY()

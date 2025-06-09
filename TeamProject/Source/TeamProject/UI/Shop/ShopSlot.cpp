@@ -10,10 +10,10 @@ void UShopSlot::NativeConstruct()
 
 void UShopSlot::SetItemData(const FItemData& Item)
 {
-    //µ¥ÀÌÅÍ Ã³¸® ÈÄ UI Ã³¸®
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ ï¿½ï¿½ UI Ã³ï¿½ï¿½
     ItemData = Item;
 
-    // °¹¼ö¸¦ ¾î¶»°Ô Ã³¸®ÇÒ °ÍÀÎ°¡?
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½î¶»ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î°ï¿½?
     UTexture2D* LoadedTexture = Item.ItemIcon.LoadSynchronous();
     if (LoadedTexture)
     {
@@ -21,7 +21,8 @@ void UShopSlot::SetItemData(const FItemData& Item)
     }
 
     ItemText->SetText(FText::FromString(Item.Name));
-    ItemCount->SetText((FText::FromString("1")));
+    //ItemCount->SetText((FText::FromString("1")));
+    ItemCount->SetText(FText::FromString(FString::FromInt(Item.ItemCount)));
     ItemPrice->SetText(FText::FromString(FString::FromInt(Item.price)));
     SetVisibility(ESlateVisibility::Visible);
 }

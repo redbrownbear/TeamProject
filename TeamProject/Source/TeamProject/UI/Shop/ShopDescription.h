@@ -24,6 +24,8 @@ class TEAMPROJECT_API UShopDescription : public UUserWidget
 public:
 	void RefreshUI(const FItemData& ItemData);
 
+public:
+	const FItemData& GetCurrentItemData() const { return CurrentItemData; }
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -39,4 +41,7 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* InfoDescription;
 
+private:
+	UPROPERTY()
+	FItemData CurrentItemData;
 };

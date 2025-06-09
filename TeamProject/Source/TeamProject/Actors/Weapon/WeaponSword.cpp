@@ -28,12 +28,12 @@ AWeaponSword::AWeaponSword()
         
         
 
-        ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Sword/Weapon_Sword_001.Weapon_Sword_001'"));
+        ConstructorHelpers::FObjectFinder<UStaticMesh> Asset(TEXT("/Script/Engine.StaticMesh'/Game/Resources/Weapon/SwordStaticMesh/Sword001.Sword001'"));
 
-        SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
-        SkeletalMeshComponent->SetupAttachment(RootComponent);
-        SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        SkeletalMeshComponent->SetSkeletalMesh(Asset.Object);
+        StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+        StaticMeshComponent->SetupAttachment(RootComponent);
+        StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        StaticMeshComponent->SetStaticMesh(Asset.Object);
     }
     for (int32 i = 1; i <= 4; ++i)
     {

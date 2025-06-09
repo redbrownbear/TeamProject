@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Misc/Defines.h"
 #include "IcePreview.generated.h"
 
 class UTimelineComponent;
@@ -27,10 +28,10 @@ protected:
 
 protected:
     UPROPERTY(EditAnywhere, Category = "Cryonis")
-    float MaxSpeed = 300.f;            // 1�ʿ� �ö� �ӵ� (cm/sec)
+    float MaxSpeed = ICEPILLAR_MAXSPEED;
 
     UPROPERTY(EditAnywhere, Category = "Cryonis")
-    float MaxHeight = 300.0f;         // �� �ö� �Ÿ�
+    float MaxHeight = ICEPILLAR_MAXHEIGT;
 
 protected:
     UMaterialInterface* MaterialInterface;
@@ -44,8 +45,12 @@ private:
 
     FVector RiseDirection;
     FVector PivotLocation;
+
 public:
     void SetRiseDirection(FVector InDirection);
+    FVector GetRiseDirection() const { return RiseDirection; }
+    FVector GetPivotLocation() const { return PivotLocation; }
     void SetPivotLocation(FVector InPosition);
     void SetCanSpawn(bool bFlag) { bCanSpawn = bFlag; }
 };
+

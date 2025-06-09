@@ -37,6 +37,8 @@ public:
 
 public:
 	FItemData GetItemDataAtIndex (int32 Index) const;
+	int32 GetItemDataIndex() { return CurrentIndex; }
+	TArray<UShopSlot*> GetActiveSlots() { return ActiveSlots; }
 
 public:
 	UPROPERTY(BlueprintAssignable)

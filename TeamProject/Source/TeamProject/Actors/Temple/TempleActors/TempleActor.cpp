@@ -1,6 +1,7 @@
 #include "TempleActor.h"
 #include "Components/SphereComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "TempleActorSpawner.h"
 #include "ActorDeleteVolume.h"
 
 #include "Data/TempleActorTableRow.h"
@@ -11,10 +12,8 @@ ATempleActor::ATempleActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
+	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));	
 	RootComponent = CollisionComponent;
-	CollisionComponent->SetCollisionProfileName(TEXT("PhysicsActor"));
-	//CollisionComponent->InitSphereRadius(5000.0f);
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
@@ -38,6 +37,15 @@ void ATempleActor::BeginPlay()
 
 	StaticMeshComponent->SetVisibility(true);
 	StaticMeshComponent->SetHiddenInGame(false);
+
+	SetData(DataTableRowHandle);
+}
+
+void ATempleActor::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	SetData(DataTableRowHandle);
 }
 
 void ATempleActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -50,6 +58,7 @@ void ATempleActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	TempleActorData = Data;
 	if (CollisionComponent && TempleActorData)
 	{
+		CollisionComponent->SetRelativeTransform(TempleActorData->CollisionTransform);
 		CollisionComponent->SetCollisionProfileName(TempleActorData->CollisionProfileName);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->SetSimulatePhysics(true);

@@ -434,7 +434,9 @@ enum class EMove_State
     Run,
     Glide,
     Climb,
-    Dash
+    Dash,
+    Zoom,
+    Crouch,
 };
 
 UENUM()

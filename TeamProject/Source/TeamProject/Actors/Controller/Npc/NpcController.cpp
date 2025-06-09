@@ -6,16 +6,13 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
-#include "Components/ConversationComponent/ConversationManagerComponent.h"
 
 ANpcController::ANpcController()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
-	ConversationManager = CreateDefaultSubobject<UConversationManagerComponent>(TEXT("ConversationManager"));
 
-	// �þ� ����
 	UAISenseConfig_Sight* SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 	SightConfig->SightRadius = NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS;
 	SightConfig->LoseSightRadius = NPC_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS;
@@ -57,7 +54,7 @@ void ANpcController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 		if (APlayerCharacter* DetectedPlayer = Cast<APlayerCharacter>(SeenActor))
 		{
 			Player = DetectedPlayer;
-			break; // �÷��̾� ����
+			break; 
 		}
 	}
 
@@ -76,7 +73,6 @@ void ANpcController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimul
 {
 	if (Stimulus.WasSuccessfullySensed())
 	{
-		// ������
 		APlayerCharacter* Player = Cast<APlayerCharacter>(Actor);
 		if (!Player) return;
 		NpcFSMComponent->SetPlayer(Player);
