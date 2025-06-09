@@ -69,6 +69,7 @@ public:
 
 	UFUNCTION()
 	void SetEquipData(const FItemData& ItemRow);
+	void SetWeaponMesh(eEquipParts Parts, UStaticMesh* _Mesh);
 	void ShowEquipUI();
 	const TArray<FItemData>& GetAllEquipData() const { return EquipItemList; }
 

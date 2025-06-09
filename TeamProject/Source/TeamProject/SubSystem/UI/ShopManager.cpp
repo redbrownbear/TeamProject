@@ -19,7 +19,7 @@ void UShopManager::Initialize(FSubsystemCollectionBase& Collection)
 {
     check(ShopDataTable);
 
-    //ÃÊ±â µ¥ÀÌÅÍ¸¸
+    //ï¿½Ê±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½
     LoadShopData(ShopDataTable);
 }
 
@@ -41,7 +41,7 @@ void UShopManager::LoadShopData(UDataTable* DataTable)
             {
                 FoundRowsPtr->Add(*Row);
             }
-            else // Á¸ÀçÇÏÁö ¾ÊÀ¸¸é »õ ¹è¿­À» ¸¸µé¾î Ãß°¡
+            else // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½è¿­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
             {
                 TArray<FShopDataRow> NewArray;
                 NewArray.Add(*Row);
@@ -67,7 +67,7 @@ TArray<FShopDataRow> UShopManager::GetShopData(EQuestCharacter QuestChar) const
     TArray<FShopDataRow> ConstRows;
     for (const FShopDataRow& Row : *FoundRowsPtr)
     {
-        ConstRows.Add(Row); // º¹»çµÇÁö¸¸ const ÇüÅÂ·Î À¯Áö
+        ConstRows.Add(Row); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ const ï¿½ï¿½ï¿½Â·ï¿½ ï¿½ï¿½ï¿½ï¿½
     }
 
     return ConstRows;
@@ -100,12 +100,12 @@ void UShopManager::UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow 
         {
             if ((*ShopList)[i].ItemData.UniqueID == UpdateShopRow.ItemData.UniqueID)
             {
-                (*ShopList)[i] = UpdateShopRow;  // °ª º¹»ç
+                (*ShopList)[i] = UpdateShopRow;  // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 break;
             }
         }
 
-        //ÀÓ½Ã
+        //ï¿½Ó½ï¿½
         UpdateItem(*ShopList);
     }
     else

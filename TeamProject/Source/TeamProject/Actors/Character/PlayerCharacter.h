@@ -102,6 +102,8 @@ protected:
 
 	FOnTimelineFloat InterpFunction{};
 
+	TObjectPtr<UStaticMeshComponent> Face;
+
 
 	UPROPERTY(EditAnywhere, Category = "Status")
 	TObjectPtr<UPlayerStatusComponent> StatusComponent;

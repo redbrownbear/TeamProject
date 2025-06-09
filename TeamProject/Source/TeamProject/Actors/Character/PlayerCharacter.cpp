@@ -57,6 +57,14 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	Movement->RotationRate = FRotator(0.0, 720.0, 0.0);
 	Movement->bOrientRotationToMovement = true;
 	
+	{
+		Face = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Face"));
+		ConstructorHelpers::FObjectFinder<UStaticMesh> Smesh{ (TEXT("/ Script / Engine.StaticMesh'/Game/Resources/Player/Face/StaticMeshFace.StaticMeshFace'")) };
+		Face->SetupAttachment(GetMesh(),TEXT("FaceSocket"));
+
+		
+		Face->SetStaticMesh(Smesh.Object);
+	}
 
 
 	{
