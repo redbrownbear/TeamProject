@@ -30,7 +30,7 @@ public:
 public:
 	void ShowUI(EQuestCharacter QuestChar, bool IsBuy);
 
-	//╣╔юлем
+	//О©╫О©╫О©╫О©╫О©╫О©╫
 	void UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow);
 
 	//UI

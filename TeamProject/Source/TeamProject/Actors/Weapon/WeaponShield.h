@@ -18,6 +18,8 @@ public:
 	AWeaponShield();
 
 public:
+	void SetGuard();
+
 	virtual void LeftClickAction() override;
 	virtual void RightClickAction() override;
 
