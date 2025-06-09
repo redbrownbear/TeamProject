@@ -900,7 +900,7 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 		}
 	}
 
-	AddBaseColor(FVector(1.f, 0.f, 0.f));
+	AddBaseColor(FVector(1.f, -0.3f, -0.3f));
 
 	FVector ZeroVector = FVector::Zero();
 	FTimerHandle TimerHandle;

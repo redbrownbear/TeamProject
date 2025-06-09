@@ -21,6 +21,9 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Engine/DamageEvents.h"
+
+
 // Sets default values
 APawnMonster::APawnMonster()
 {
@@ -97,7 +100,7 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		CollisionComponent->SetSphereRadius(MonsterData->CollisionSphereRadius);
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Monster);
 		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
-		CollisionComponent->RegisterComponent();
+		//CollisionComponent->RegisterComponent();
 	}
 
 	SkeletalMeshComponent->SetSkeletalMesh(MonsterData->SkeletalMesh);
@@ -171,20 +174,58 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		}
 	}
 
+	int32 MaterialSlotIndex = -1;
 	if (DataTableRowHandle.RowName.ToString() == TEXT("Bokoblin_TreasureBox")
 		|| DataTableRowHandle.RowName.ToString() == TEXT("Bokoblin_Patrol"))
 	{
-		MaterialInterface = SkeletalMeshComponent->GetMaterial(2);
-		DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
-		SkeletalMeshComponent->SetMaterial(2, DynamicMaterialInstance);
+		MaterialSlotIndex = 2;
 	}
 	else if (DataTableRowHandle.RowName.ToString() == TEXT("Moriblin_TreasureBox")
 		|| DataTableRowHandle.RowName.ToString() == TEXT("Moriblin_Patrol"))
 	{
-		MaterialInterface = SkeletalMeshComponent->GetMaterial(3);
-		DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
-		SkeletalMeshComponent->SetMaterial(3, DynamicMaterialInstance);
+		MaterialSlotIndex = 3;
 	}
+
+	if (MaterialSlotIndex != -1)
+	{
+		UMaterialInterface* CurrentMaterialOnMesh = SkeletalMeshComponent->GetMaterial(MaterialSlotIndex);
+
+		if (!CurrentMaterialOnMesh)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SetData: No material found at slot %d. Cannot proceed with DynamicMaterialInstance setup."), MaterialSlotIndex);
+			DynamicMaterialInstance = nullptr; // 기존 포인터도 혹시 모르니 null로
+			return;
+		}
+
+		DynamicMaterialInstance = Cast<UMaterialInstanceDynamic>(CurrentMaterialOnMesh);
+
+		if (!DynamicMaterialInstance)
+		{
+			DynamicMaterialInstance = UMaterialInstanceDynamic::Create(CurrentMaterialOnMesh, this);
+
+			if (DynamicMaterialInstance)
+			{
+				SkeletalMeshComponent->SetMaterial(MaterialSlotIndex, DynamicMaterialInstance);
+				UE_LOG(LogTemp, Log, TEXT("SetData: Created and assigned new DynamicMaterialInstance (%s) to slot %d"), *DynamicMaterialInstance->GetName(), MaterialSlotIndex);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("SetData: Failed to create DynamicMaterialInstance using parent %s!"), *CurrentMaterialOnMesh->GetName());
+				DynamicMaterialInstance = nullptr;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("SetData: Re-using existing DynamicMaterialInstance (%s) at slot %d"), *DynamicMaterialInstance->GetName(), MaterialSlotIndex);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("SetData: No specific material slot handling for %s."), *DataTableRowHandle.RowName.ToString());
+		DynamicMaterialInstance = nullptr; 
+	}
+
+	AddBaseColor(FVector(0.0, 0.0, 0.0));
 }
 
 void APawnMonster::PostDuplicate(EDuplicateMode::Type DuplicateMode)
@@ -276,6 +317,25 @@ void APawnMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 				}
 			}
 		}
+		else if (ProjectileName::Player_Arrow == Projectile->GetProjectileName()
+			|| ProjectileName::Player_FireArrow == Projectile->GetProjectileName()
+			)
+		{
+			// float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser
+			FDamageEvent DamageEvent;
+
+			if (UWorld* World = GetWorld())
+			{
+				if (AController* PlayerController = World->GetFirstPlayerController())
+				{
+					if (APlayerCharacter* Player = Cast<APlayerCharacter>(PlayerController->GetPawn()))
+					{
+						GetFSMComponent()->SetPlayer(Player);
+						IMonsterInterface::TakeDamage(Projectile->GetDamage(), DamageEvent, PlayerController, Player);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -306,5 +366,8 @@ UMaterialInstanceDynamic* APawnMonster::GetDynamicMaterialInstance()
 
 void APawnMonster::AddBaseColor(FVector InColor)
 {
-	DynamicMaterialInstance->SetVectorParameterValue(TEXT("BaseColor"), InColor);
+	if (DynamicMaterialInstance)
+	{
+		DynamicMaterialInstance->SetVectorParameterValue(TEXT("AddColor"), InColor);
+	}
 }
