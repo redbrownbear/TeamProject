@@ -9,16 +9,17 @@
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "GameFramework/PlayerController.h"
+#include "Components/TimelineComponent.h"
 UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& ObjectInitializer)
 {
 
 	BrakingDecelerationFlying = 10000.f;
 	AirControl = 0.f;
 	MaxFlySpeed = PLAYER_CLIMB_SPEED;
-	
+
 	{
-		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset{ 
-			TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Move/Climb_Up_Land.Climb_Up_Land'") 
+		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset{
+			TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Move/Climb_Up_Land.Climb_Up_Land'")
 		};
 
 		if (Asset.Object)
@@ -48,12 +49,29 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 	}
 	MaxWalkSpeedCrouched = PLAYER_MOVE_CROUCH;
 	MaxWalkSpeed = PLAYER_MOVE_NML;
+
+	StepTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("StepTimeLine"));
+
+	if (!StepCurve)
+	{
+		static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveAsset(TEXT("/Script/Engine.CurveFloat'/Game/Resources/Player/Step/StepTimeLine.StepTimeLine'")); // 예시 경로
+		if (CurveAsset.Succeeded())
+		{
+			StepCurve = CurveAsset.Object;
+		}
+	}
+	if (StepCurve)
+	{
+		InterpFunction.BindUFunction(this, FName("StepProgress"));
+		StepTimeLine->AddInterpFloat(StepCurve, InterpFunction);
+
+	}
 }
 
 void UPlayerMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	GetNavAgentPropertiesRef().bCanCrouch = true;
 
 }
@@ -61,17 +79,17 @@ void UPlayerMovementComponent::BeginPlay()
 bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
 {
 	AActor* ComponentOwner = GetOwner();
-	
+
 	const FVector OwnerLocation = ComponentOwner->GetActorLocation();
 	const FRotator OwnerLotator = ComponentOwner->GetActorRotation();
 
 
 	FVector OwnerForwardVector = ComponentOwner->GetActorForwardVector();
-	
+
 	FVector Start = OwnerLocation;
 	FVector End = OwnerLocation + OwnerForwardVector * 50;
 
-	
+
 
 	FCollisionQueryParams TraceParams;
 	TraceParams.AddIgnoredActor(ComponentOwner);
@@ -104,7 +122,7 @@ bool UPlayerMovementComponent::TrySetMoveClimb(FVector2D ActionValue)
 
 	if (ClimbingLineTrace(HitResult))
 	{
-		
+
 		FRotator Normal_Rot = FRotationMatrix::MakeFromX(HitResult.ImpactNormal).Rotator();
 
 		FRotator Player_Rot = Player_C->GetActorRotation();
@@ -125,7 +143,7 @@ bool UPlayerMovementComponent::TrySetMoveClimb(FVector2D ActionValue)
 
 		return true;
 	}
-	
+
 
 	SetClimbMode(false);
 
@@ -153,8 +171,8 @@ bool UPlayerMovementComponent::CanClimbUpLand()
 	TraceParams.AddIgnoredActor(OwnerActor);
 
 	DrawDebugLine(GetWorld(), ForwardEnd, DownEnd, FColor::Red, false, 2.f);
-	
-	
+
+
 	bool CanStand = !GetWorld()->LineTraceSingleByChannel(
 		HitResult,
 		UpEnd,
@@ -185,7 +203,7 @@ bool UPlayerMovementComponent::CanClimbUpLand()
 			Climb_State = EClimb_State::Land;
 
 			Player_C->GetMesh()->GetAnimInstance()->Montage_Play(LandUpMontage);
-			
+
 
 			return true;
 
@@ -205,7 +223,7 @@ bool UPlayerMovementComponent::CanClimbDownLand()
 
 	FVector CharacterUpVector = OwnerActor->GetActorUpVector();
 
-	FVector End = Start - CharacterUpVector * (PLAYER_CAPSULE_HALF_HEIGHT* 1.5);
+	FVector End = Start - CharacterUpVector * (PLAYER_CAPSULE_HALF_HEIGHT * 1.5);
 
 
 	FCollisionQueryParams TraceParams;
@@ -229,7 +247,7 @@ bool UPlayerMovementComponent::CanClimbDownLand()
 
 void UPlayerMovementComponent::SetClimbMode(bool _bool)
 {
-	
+
 
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 	if (!_bool)
@@ -280,9 +298,9 @@ void UPlayerMovementComponent::SetGlideMode(bool _bool)
 
 	_bool ? SetMoveState(EMove_State::Glide) : SetMoveState(EMove_State::Run);
 
-  	bIsGliding = _bool;
+	bIsGliding = _bool;
 
-	GravityScale = _bool ? 0.07: 1.f;
+	GravityScale = _bool ? 0.07 : 1.f;
 
 	AirControl = _bool ? 0.f : 0.f;
 
@@ -291,7 +309,7 @@ void UPlayerMovementComponent::SetGlideMode(bool _bool)
 	FHitResult HitResult;
 
 	Player_C->OnLanded(HitResult);
-	 
+
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 
 	AnimInst->bIsGliding = _bool;
@@ -332,7 +350,7 @@ void UPlayerMovementComponent::GlidingMove(FVector2D ActionValue)
 	Player_C->GetVelocity();
 	float DeltaTime = GetWorld()->GetDeltaSeconds();
 
-	if(ActionValue.Y != 0)
+	if (ActionValue.Y != 0)
 	{
 		FRotator NewRotation = Player_C->GetActorRotation();
 		NewRotation.Yaw += ActionValue.Y * PLAYER_GLIDE_ROTATE_SPEED * DeltaTime;
@@ -349,7 +367,7 @@ void UPlayerMovementComponent::GlidingMove(FVector2D ActionValue)
 	if (ActionValue.X != 0)
 	{
 		float Speed = Velocity.Size2D();
-		float NewSpeed = FMath::Clamp(Speed + DeltaTime* ActionValue.X * PLAYER_GLIDE_MODIFY_SPEED, PLAYER_GLIDE_MIN_SPEED,PLAYER_GLIDE_MAX_SPEED);
+		float NewSpeed = FMath::Clamp(Speed + DeltaTime * ActionValue.X * PLAYER_GLIDE_MODIFY_SPEED, PLAYER_GLIDE_MIN_SPEED, PLAYER_GLIDE_MAX_SPEED);
 
 		if (Speed != NewSpeed)
 		{
@@ -367,6 +385,40 @@ void UPlayerMovementComponent::GlidingMove(FVector2D ActionValue)
 
 }
 
+void UPlayerMovementComponent::StepMove(FVector2D ActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+
+	Prev_StepLocation = GetOwner()->GetActorLocation();
+	// Front, Back
+	if (ActionValue.X != 0)
+	{
+
+
+		if (ActionValue.X == 1)
+		{
+			StepDirection = GetOwner()->GetActorForwardVector();
+		}
+		else
+		{
+			StepDirection = -GetOwner()->GetActorForwardVector();
+		}
+	}
+	// Left, Right
+	else if (ActionValue.Y != 0)
+	{
+		if (ActionValue.Y == 1)
+		{
+			StepDirection = GetOwner()->GetActorRightVector();
+		}
+		else
+		{
+			StepDirection = -GetOwner()->GetActorRightVector();
+		}
+	}
+	StepTimeLine->Play();
+}
+
 
 void UPlayerMovementComponent::Hited()
 {
@@ -377,7 +429,7 @@ void UPlayerMovementComponent::Hited()
 bool UPlayerMovementComponent::CanGlide()
 {
 	AActor* Owner_C = GetOwner();
-	
+
 	FVector Start = Owner_C->GetActorLocation();
 	FVector C_Up_Vector = Owner_C->GetActorUpVector();
 	FVector End = Start - C_Up_Vector * PLAYER_CAPSULE_HALF_HEIGHT * 5;
@@ -395,6 +447,19 @@ bool UPlayerMovementComponent::CanGlide()
 	);
 
 }
+
+void UPlayerMovementComponent::StepProgress(float Value)
+{
+	AActor* Player = GetOwner();
+	Player->GetActorForwardVector();
+	float Length = FMath::Lerp(0.f, 200.f, Value);
+	FVector AddLocation = StepDirection * Length;
+	FVector Result = Prev_StepLocation + AddLocation;
+	Player->SetActorLocation(Result);
+}
+
+
+
 
 void UPlayerMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
