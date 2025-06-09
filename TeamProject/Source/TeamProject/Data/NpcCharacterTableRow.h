@@ -20,6 +20,7 @@ enum class EDialogType
 	Buy,
 	SoldOut,
 	Sell,
+	Cashless,
 	End
 };
 

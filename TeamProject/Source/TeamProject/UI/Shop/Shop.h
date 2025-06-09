@@ -29,13 +29,28 @@ public:
 
 public:
 	UFUNCTION()
-	void CheckSoldout();
+	bool CheckSoldout();
 
 	UFUNCTION()
 	void AddItemInventory();
 
 	UFUNCTION()
 	void SubtractItemInventory();
+
+	UFUNCTION()
+	bool CanIBuyIt();
+
+	UFUNCTION()
+	void AddPlayerRupee();
+
+	UFUNCTION()
+	void SubtractPlayerRupee();
+
+	UFUNCTION()
+	void AddShopItem();
+
+	UFUNCTION()
+	void SubtractShopItem();
 
 private:
 	void InitUI();
@@ -46,16 +61,14 @@ private:
 	void RemoveDelegates();
 
 private:
-	//��ȭ ���� ���� ����
 	void SetShopOpen();
 
-	//��ǰ ����� ����?
 	void SetItemBuy();
 
 	UFUNCTION()
 	void RefreshAllInventory(const TArray<FItemData>& ItemDataList);
 
-public: //���ε��� ���� �ۺ������
+public: 
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	UFUNCTION()

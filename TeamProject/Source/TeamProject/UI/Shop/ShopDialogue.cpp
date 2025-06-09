@@ -47,7 +47,7 @@ void UShopDialogue::SetBuy()
     InputMode.SetWidgetToFocus(TakeWidget());
 
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Buy);    
+    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Buy);
 }
 
 void UShopDialogue::SetSell()
@@ -80,29 +80,42 @@ void UShopDialogue::OnConfirm()
     UConversationManagerComponent* ConverSationManager = Cast<UConversationManagerComponent>(PC_InGame->Npc->GetComponentByClass(UConversationManagerComponent::StaticClass()));
     check(ConverSationManager);
 
-    EQuestCharacter QuestChar = PC_InGame->Npc->GetData()->QuestCharacter;
-    EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
-
-    int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
-
     UShop* ShopClass = UIManager->CachedShopClass;
     if (ShopClass)
     {
         if (EDialogType::Buy == PC_InGame->Npc->GetCurrentDialogueType())
         {
+            if (ShopClass->CheckSoldout())
+            {
+                PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SoldOut);
+                return;
+            }
+            
+            if (!ShopClass->CanIBuyIt())
+            {
+                PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Cashless);
+                return;
+            }
+
+            ShopClass->SubtractPlayerRupee();
             ShopClass->AddItemInventory();
+            ShopClass->SubtractShopItem();
         }
         else if (EDialogType::Sell == PC_InGame->Npc->GetCurrentDialogueType())
         {
+            ShopClass->AddPlayerRupee();
+            ShopClass->AddShopItem();
             ShopClass->SubtractItemInventory();
+
         }
     }
 
-    if (PC_InGame)
-    {
-        QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
-        
-    }
+    EQuestCharacter QuestChar = PC_InGame->Npc->GetData()->QuestCharacter;
+    EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
+
+    int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
+
+    QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
     
     PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Shop);
 }

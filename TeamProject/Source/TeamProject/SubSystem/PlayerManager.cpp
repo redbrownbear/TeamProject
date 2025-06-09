@@ -170,7 +170,7 @@ void UPlayerManager::InitStatus()
     status.PreviousLoction;             //�˾Ƽ� ����
     status.StaminaRegenSpeed = 4.0f;    //�˾Ƽ�
 
-    status.Rupee = 0;
+    status.Rupee = 99999;
 
     PlayerStatus = status;
 }

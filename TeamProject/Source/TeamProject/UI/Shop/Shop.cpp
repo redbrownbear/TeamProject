@@ -57,77 +57,183 @@ void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 }
 
-void UShop::CheckSoldout()
+bool UShop::CheckSoldout()
 { 
-    if (!BP_ShopDescription) return;
-
-
-    //FShopDataRow으로 처리해야 할 듯
-    FItemData SelectedItem = BP_ShopDescription->GetCurrentItemData();
-
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    if (PlayerManager)
+    if (!BP_ShopDescription)
     {
-        const FString TargetID = SelectedItem.UniqueID;
+        UE_LOG(LogTemp, Warning, TEXT("BP_ShopDescription is Null"));
+    }
 
-        FItemData InventoryItem = PlayerManager->GetItemByUniqueID(TargetID);
+    FShopDataRow SelectedShopItem; 
+    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
 
-        // ItemCount == 0 이면 매진 처리
-        if (InventoryItem.ItemCount != 0)
-            return;
+    // ItemCount == 0 이면 매진 처리
+    if (SelectedShopItem.ItemData.ItemCount != 0) return false;
 
-        APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-        if (PC_InGame && PC_InGame->Npc)
+    return true;
+}
+
+void UShop::AddItemInventory()
+{    
+    FShopDataRow SelectedShopItem;
+
+    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
+    if (ShopManager)
+    {
+        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();  
+    }
+
+    if (SelectedShopItem.ItemData.ItemCount != 0)
+    {
+        UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+        if (PlayerManager)
         {
-            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SoldOut);
+            PlayerManager->SetInvenData(SelectedShopItem.ItemData);
         }
     }
 }
 
-void UShop::AddItemInventory()
-{
-    FItemData SelectedItem;
+void UShop::SubtractItemInventory()
+{   
+    FShopDataRow SelectedShopItem;
 
-    if (BP_ShopDescription)
+    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
+    if (ShopManager)
     {
-        SelectedItem = BP_ShopDescription->GetCurrentItemData();        
+        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
     }
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     if (PlayerManager)
     {
-        PlayerManager->SetInvenData(SelectedItem);
+        PlayerManager->RemoveItemByUniqueID(SelectedShopItem.ItemData.UniqueID);
+    }  
+}
+
+bool UShop::CanIBuyIt()
+{
+    FShopDataRow SelectedShopItem;
+
+    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
+    if (ShopManager)
+    {
+        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
     }
 
-    //FShopDataRow으로 처리해야 할 듯
-    SelectedItem.ItemCount -= 1;
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    int32 Rupee = PlayerManager->GetRupee();
+
+    if (Rupee < SelectedShopItem.ItemData.price)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void UShop::AddPlayerRupee()
+{
+    FShopDataRow SelectedShopItem;
+
+    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
+    if (ShopManager)
+    {
+        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
+    }
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        int32 Rupee = PlayerManager->GetRupee();
+        Rupee += SelectedShopItem.ItemData.price;
+
+        PlayerManager->SetRupee(Rupee);
+        SetRupeeUI();
+    }
+}
+
+void UShop::SubtractPlayerRupee()
+{
+    FShopDataRow SelectedShopItem;
+
+    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
+    if (ShopManager)
+    {
+        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
+    }
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        int32 Rupee = PlayerManager->GetRupee();
+        Rupee -= SelectedShopItem.ItemData.price;
+
+        PlayerManager->SetRupee(Rupee);
+        SetRupeeUI();
+    }
+}
+
+void UShop::AddShopItem()
+{
+    FShopDataRow SelectedShopItem;
+
+    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
+    if (ShopManager)
+    {
+        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
+    }
 
     TArray<UShopSlot*> ActiveSlots = BP_ShopScroll->GetActiveSlots();
     int32 Index = BP_ShopScroll->GetItemDataIndex();
 
-    if (ActiveSlots.IsValidIndex(Index))
+    if (Index != INDEX_NONE)
     {
-        ActiveSlots[Index]->SetItemData(SelectedItem);
-    }
+        UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+        if (PlayerManager)
+        {
+            SelectedShopItem.ItemData.ItemCount += 1;
+            SelectedShopItem.InitialItemCount += 1;
+            ShopManager->UpdateShopData(EQuestCharacter::Korok, SelectedShopItem);
 
+            if (ActiveSlots.IsValidIndex(Index))
+            {
+                ActiveSlots[Index]->SetItemData(SelectedShopItem.ItemData);
+            }
+        }
+    }
 }
 
-void UShop::SubtractItemInventory()
+void UShop::SubtractShopItem()
 {
-    FItemData SelectedItem;
+    FShopDataRow SelectedShopItem;
 
-    if (BP_ShopDescription)
+    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
+    if (ShopManager)
     {
-        SelectedItem = BP_ShopDescription->GetCurrentItemData();
+        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
     }
 
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    if (PlayerManager)
-    {        
-        PlayerManager->RemoveItemByUniqueID(SelectedItem.UniqueID);
-    }
+    TArray<UShopSlot*> ActiveSlots = BP_ShopScroll->GetActiveSlots();
+    int32 Index = BP_ShopScroll->GetItemDataIndex();
 
-    //@TODO FShopDataRow 데이터 갱신
+    if (Index != INDEX_NONE)
+    {
+        if (SelectedShopItem.ItemData.ItemCount != 0)
+        {
+            UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+            if (PlayerManager)
+            {
+                SelectedShopItem.ItemData.ItemCount -= 1;
+                SelectedShopItem.InitialItemCount -= 1;
+                ShopManager->UpdateShopData(EQuestCharacter::Korok, SelectedShopItem);
+
+                if (ActiveSlots.IsValidIndex(Index))
+                {
+                    ActiveSlots[Index]->SetItemData(SelectedShopItem.ItemData);
+                }
+            }
+        }
+    }
 }
 
 void UShop::InitUI()
