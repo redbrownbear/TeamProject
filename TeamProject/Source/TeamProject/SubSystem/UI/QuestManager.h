@@ -25,6 +25,8 @@ public:
 
 	TArray<FQuestDataRow> GetQuestData() const;
 
+	FQuestDataRow GetQuestDataByNum(int32 QuestNum) const;
+
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Data")

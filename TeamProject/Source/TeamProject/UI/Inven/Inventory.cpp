@@ -25,8 +25,6 @@ void UInventory::ShowUI()
     if (PC_InGame)
     {
 
-        PC_InGame->ChangeInputContext(EInputContext::IC_Inventory);
-
         FInputModeGameAndUI InputMode;
         InputMode.SetWidgetToFocus(TakeWidget());
         InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
@@ -46,12 +44,6 @@ void UInventory::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 void UInventory::InitUI()
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->BindInventoryInput();
-    }
-
     SetRupeeUI();
 
     check(BP_InvenScroll);

@@ -64,6 +64,8 @@ private:
 	FTimerHandle TypingTimerHandle;
 	bool bIsTyping = false;
 
+	int32 CurQuestNum = 0;
+
 private:
 	UPROPERTY(meta = (BindWidget))
 	UMultiLineEditableTextBox* TextBox;

@@ -21,14 +21,6 @@ void AGM_InGame::PostLogin(APlayerController* NewPlayer)
 	//FTransform SavedTransform;
 	//RestartPlayerAtTransform(NewPlayer, SavedTransform);
 
-	//임시임시
-	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-	if (PlayerManager)
-	{
-		FQuestDataRow Row;
-		PlayerManager->SetQuestData(Row);
-	}
-
 	UGIS_ASyncLoadingScreen * LoadingManager = GetGameInstance()->GetSubsystem<UGIS_ASyncLoadingScreen>();
 	if (LoadingManager)
 		LoadingManager->SetLoadingUI(LoadingWidgetClass);
