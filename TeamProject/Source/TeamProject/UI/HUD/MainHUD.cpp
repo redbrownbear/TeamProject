@@ -22,37 +22,43 @@ void AMainHUD::BeginPlay()
 
 void AMainHUD::SetMainHUDVisible(bool bIsShow)
 {
-    MainWidgetInstance->SetVisibility(bIsShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+    if(MainWidgetInstance)
+        MainWidgetInstance->SetVisibility(bIsShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 void AMainHUD::ShowInteractWidget(bool bIsShow)
 {
-    MainWidgetInstance->ShowInteractUI(bIsShow);
+    if (MainWidgetInstance)
+        MainWidgetInstance->ShowInteractUI(bIsShow);
 }
 
 void AMainHUD::ShowInteractName(bool bIsShow, FString Name)
 {
-    MainWidgetInstance->ShowInteractName(bIsShow, Name);
-
+    if (MainWidgetInstance)
+        MainWidgetInstance->ShowInteractName(bIsShow, Name);
 }
 
 void AMainHUD::ShowBowAimgUI(bool bIsShow, int32 Count)
 {
-    MainWidgetInstance->ShowBowAimgUI(bIsShow, Count);
+    if (MainWidgetInstance)
+        MainWidgetInstance->ShowBowAimgUI(bIsShow, Count);
 }
 
 void AMainHUD::ShowAbilityAimUI(bool bIsShow)
 {
-    MainWidgetInstance->ShowAbilityAimUI(bIsShow);
+    if (MainWidgetInstance)
+        MainWidgetInstance->ShowAbilityAimUI(bIsShow);
 }
 
 void AMainHUD::ShowBossHpUI(bool bIsShow, float Hp, float MaxHp, FString Name)
 {
-    MainWidgetInstance->ShowBossHP(bIsShow, Hp, MaxHp, Name);
+    if (MainWidgetInstance)
+        MainWidgetInstance->ShowBossHP(bIsShow, Hp, MaxHp, Name);
 }
 
 void AMainHUD::UpdateHp()
 {
-    MainWidgetInstance->UpdateHP();
+    if (MainWidgetInstance)
+        MainWidgetInstance->UpdateHP();
 }
 

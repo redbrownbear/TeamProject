@@ -2,12 +2,14 @@
 
 
 #include "UI/QuickSlot/QuickItemSlot.h"
+#include "SubSystem/PlayerManager.h"
 
 void UQuickItemSlot::NativeConstruct()
 {
 	SetIsFocusable(true);
     LoadIconTexture();
 
+    HighlightBg->SetVisibility(ESlateVisibility::Collapsed);
 	EquipedBg->SetVisibility(ESlateVisibility::Collapsed);
     CategoryIconImg->SetVisibility(ESlateVisibility::Collapsed);
 }
@@ -115,8 +117,18 @@ void UQuickItemSlot::SetItemData(const FItemData& Item)
 
 void UQuickItemSlot::SetSelected(bool bIsSelected)
 {
+    HighlightBg->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 void UQuickItemSlot::SetEquiped(bool bIsEquiped)
 {
+    EquipedBg->SetVisibility(bIsEquiped ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}
+
+void UQuickItemSlot::SetEquipDate()
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    check(PlayerManager);
+
+    PlayerManager->SetEquipData(ItemData);
 }
