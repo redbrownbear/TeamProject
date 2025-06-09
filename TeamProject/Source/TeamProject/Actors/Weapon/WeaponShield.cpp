@@ -89,6 +89,12 @@ AWeaponShield::AWeaponShield()
 
 }
 
+void AWeaponShield::SetGuard()
+{
+    UWeaponManagerComponent* WeaponManagerComponent = Cast<APlayerCharacter>(GetOwner())->GetWeaponManagerComponent();
+    WeaponManagerComponent->SetIsGuard(true);
+}
+
 void AWeaponShield::LeftClickAction()
 {
 
@@ -120,9 +126,11 @@ void AWeaponShield::LeftClickAction()
 
         Movement->MaxWalkSpeed = PLAYER_MOVE_NML;
 
+        SetGuard();
+
         Movement->SetMoveState(EMove_State::Run);
 
-
+        
     }
 
 
