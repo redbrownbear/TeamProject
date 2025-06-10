@@ -353,7 +353,6 @@ void AWorldWeapon::AttachToMonster(IMonsterInterface* Monster, FName SocketName)
 
 void AWorldWeapon::DetachFromMonster()
 {
-	// 소유자 해제 (필요하다면)
 	SetOwner(nullptr);
 
 	bIsCatched = false;

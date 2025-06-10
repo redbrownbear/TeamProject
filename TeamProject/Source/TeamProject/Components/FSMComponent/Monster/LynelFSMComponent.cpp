@@ -16,6 +16,7 @@
 
 #include "Data/MonsterTableRow.h"
 
+
 ULynelFSMComponent::ULynelFSMComponent()
 {
 	eCurrentState = EMonsterState::Idle;
@@ -193,7 +194,6 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::Alert:
 		CharacterMonster->PlayMontage(EMonsterMontage::SIGNAL_START);
-		// @TODO : Effect
 		break;
 	case EMonsterState::Combat:
 		// To show Combat Pattern in order
