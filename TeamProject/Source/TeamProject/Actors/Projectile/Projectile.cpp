@@ -145,16 +145,36 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(OtherActor);
 	if (Player_C)
 	{
-		
 		Player_C->Damaged(GetDamage());
+		Destroy();
+		return;
 	}
+
+	if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
+	|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig
+	|| DataTableRowHandle.RowName == ProjectileName::Monster_HinoxStone)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			AParticleEffect* ParticleEffect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+			FTransform NewTransform;
+			ParticleEffect->SetData(ParticleEffectName::Hinox_AttackShockWave);
+
+			const FVector Location = GetActorLocation();
+			NewTransform.SetLocation(Location);
+
+			ParticleEffect->FinishSpawning(NewTransform);
+		}
+	}
+
+
 	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert))
 	{
 		Destroy();
 	}
 
-	//if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
-	//	|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig)
 	//{
 	//	Destroy();
 	//}

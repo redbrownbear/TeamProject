@@ -685,7 +685,7 @@ void ULynelFSMComponent::UpdateSuspicious(float DeltaTime)
 			ChangeState(EMonsterState::Alert);
 			return;
 		}
-		else if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+		else if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS * 1.5f)
 		{
 			ChangeState(EMonsterState::Idle);
 			Player = nullptr;
@@ -781,7 +781,7 @@ void ULynelFSMComponent::UpdateAimingBowUpper(float DeltaTime)
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
-	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS * 1.5f)
 	{
 		Player = nullptr;
 		ChangeState(EMonsterState::Idle);
@@ -815,7 +815,7 @@ void ULynelFSMComponent::UpdateDashAttack(float DeltaTime)
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
-	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS * 1.5f)
 	{
 		Player = nullptr;
 		ChangeState(EMonsterState::Idle);
@@ -883,7 +883,7 @@ void ULynelFSMComponent::UpdateExplosionAttack(float DeltaTime)
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
-	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS * 1.5f)
 	{
 		Player = nullptr;
 		ChangeState(EMonsterState::Idle);
@@ -909,7 +909,7 @@ void ULynelFSMComponent::UpdateFireAttack(float DeltaTime)
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
-	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS * 1.5f)
 	{
 		Player = nullptr;
 		ChangeState(EMonsterState::Idle);
@@ -988,7 +988,7 @@ void ULynelFSMComponent::UpdateRunningAttack(float DeltaTime)
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
-	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS * 1.5f)
 	{
 		Player = nullptr;
 		ChangeState(EMonsterState::Idle);
@@ -1061,7 +1061,7 @@ void ULynelFSMComponent::UpdateRodeo(float DeltaTime)
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
-	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS * 1.5f)
 	{
 		Player = nullptr;
 		ChangeState(EMonsterState::Idle);
@@ -1089,7 +1089,7 @@ void ULynelFSMComponent::UpdateStun(float DeltaTime)
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
-	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS * 1.5f)
 	{
 		Player = nullptr;
 		ChangeState(EMonsterState::Idle);
@@ -1119,7 +1119,7 @@ void ULynelFSMComponent::UpdateReadyToAttack(float DeltaTime)
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
-	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS * 1.5f)
 	{
 		Player = nullptr;
 		ChangeState(EMonsterState::Idle);
@@ -1237,7 +1237,7 @@ void ULynelFSMComponent::UpdateTemp(float DeltaTime)
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
 	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
-	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS * 1.5f)
 	{
 		Player = nullptr;
 		ChangeState(EMonsterState::Idle);

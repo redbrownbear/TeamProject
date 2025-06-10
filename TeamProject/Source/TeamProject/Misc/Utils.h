@@ -60,6 +60,7 @@ namespace ParticleEffectName
     static inline FName Hinox_HipdropShockWave = TEXT("Hinox_HipdropShockWave");
     static inline FName Lynel_Explosion = TEXT("Lynel_Explosion");
     static inline FName Lynel_Cry = TEXT("Lynel_Cry");
+    static inline FName Lynel_BeforeExplosion = TEXT("Lynel_BeforeExplosion");
 }
 
 namespace NiagaraEffectName
