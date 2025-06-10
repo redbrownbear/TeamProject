@@ -51,6 +51,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 		}
 		Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 		Camera->SetupAttachment(SpringArm);
+
+		SpringArm->bDoCollisionTest = false;
 	}
 
 	UCharacterMovementComponent* Movement = GetCharacterMovement();
