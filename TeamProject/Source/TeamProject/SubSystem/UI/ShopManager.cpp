@@ -3,7 +3,6 @@
 
 #include "SubSystem/UI/ShopManager.h"
 #include "SubSystem/PlayerManager.h"
-#include "UI/Shop/ShopScroll.h"
 
 UShopManager::UShopManager()
 {
@@ -20,7 +19,6 @@ void UShopManager::Initialize(FSubsystemCollectionBase& Collection)
 {
     check(ShopDataTable);
 
-    //�ʱ� �����͸�
     LoadShopData(ShopDataTable);
 }
 
@@ -40,15 +38,15 @@ void UShopManager::LoadShopData(UDataTable* DataTable)
         {
             Row->ItemData.UniqueID = FGuid::NewGuid().ToString();
 
-            if (TArray<FShopDataRow>* FoundRowsPtr = ShopRowMap.Find(Row->QuestCharacter))
+            if (TArray<FShopDataRow>* FoundRowsPtr = CurrentShopRowMap.Find(Row->QuestCharacter))
             {
                 FoundRowsPtr->Add(*Row);
             }
-            else // �������� ������ �� �迭�� ����� �߰�
+            else 
             {
                 TArray<FShopDataRow> NewArray;
                 NewArray.Add(*Row);
-                ShopRowMap.Add(Row->QuestCharacter, NewArray);
+                CurrentShopRowMap.Add(Row->QuestCharacter, NewArray);
             }
         }
         else
@@ -60,7 +58,7 @@ void UShopManager::LoadShopData(UDataTable* DataTable)
 
 TArray<FShopDataRow> UShopManager::GetShopData(EQuestCharacter QuestChar) const
 {
-    const TArray<FShopDataRow>* FoundRowsPtr = ShopRowMap.Find(QuestChar);
+    const TArray<FShopDataRow>* FoundRowsPtr = CurrentShopRowMap.Find(QuestChar);
     if (!FoundRowsPtr)
     {
         UE_LOG(LogTemp, Warning, TEXT("No shop data found for character: %s"), *UEnum::GetValueAsString(QuestChar));
@@ -70,7 +68,7 @@ TArray<FShopDataRow> UShopManager::GetShopData(EQuestCharacter QuestChar) const
     TArray<FShopDataRow> ConstRows;
     for (const FShopDataRow& Row : *FoundRowsPtr)
     {
-        ConstRows.Add(Row); // ��������� const ���·� ����
+        ConstRows.Add(Row); 
     }
 
     return ConstRows;
@@ -97,18 +95,17 @@ void UShopManager::ShowUI(EQuestCharacter QuestChar, bool IsBuy)
 
 void UShopManager::UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow)
 {
-    if (TArray<FShopDataRow>* ShopList = ShopRowMap.Find(QuestChar))
+    if (TArray<FShopDataRow>* ShopList = CurrentShopRowMap.Find(QuestChar))
     {
         for (int32 i = 0; i < ShopList->Num(); ++i)
         {
             if ((*ShopList)[i].ItemData.UniqueID == UpdateShopRow.ItemData.UniqueID)
             {
-                (*ShopList)[i] = UpdateShopRow;  // �� ����
+                (*ShopList)[i] = UpdateShopRow;  
                 break;
             }
         }
 
-        //�ӽ�
         UpdateItem(*ShopList);
     }
     else
@@ -127,6 +124,19 @@ bool UShopManager::CheckSoldout()
 {
     // ItemCount == 0 이면 매진 처리
     if (SelectedShopItem.ItemData.ItemCount != 0) return false;
+
+    return true;
+}
+
+bool UShopManager::CanIBuyIt()
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    int32 Rupee = PlayerManager->GetRupee();
+
+    if (Rupee < SelectedShopItem.ItemData.price)
+    {
+        return false;
+    }
 
     return true;
 }
@@ -152,19 +162,6 @@ void UShopManager::SubtractItemInventory()
     }
 }
 
-bool UShopManager::CanIBuyIt()
-{
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    int32 Rupee = PlayerManager->GetRupee();
-
-    if (Rupee < SelectedShopItem.ItemData.price)
-    {
-        return false;
-    }
-
-    return true;
-}
-
 void UShopManager::AddPlayerRupee()
 {
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
@@ -174,6 +171,7 @@ void UShopManager::AddPlayerRupee()
         Rupee += SelectedShopItem.ItemData.price;
 
         PlayerManager->SetRupee(Rupee);
+        OnRupeeChanged.Broadcast();
     }
 }
 
@@ -186,33 +184,12 @@ void UShopManager::SubtractPlayerRupee()
         Rupee -= SelectedShopItem.ItemData.price;
 
         PlayerManager->SetRupee(Rupee);
+        OnRupeeChanged.Broadcast();
     }
 }
 
-void UShopManager::AddShopItem()
+void UShopManager::SetSelectedItem(const FItemData& InShopData)
 {
-    SelectedShopItem.ItemData.ItemCount += 1;
-    int32 Index = BP_ShopScroll->GetItemDataIndex();
-    if (BP_ShopScroll->GetActiveSlots().IsValidIndex(Index))
-    {
-        BP_ShopScroll->GetActiveSlots()[Index]->SetItemData(SelectedShopItem.ItemData);
-    }
-
-    UpdateShopData(EQuestCharacter::Korok, SelectedShopItem);
-}
-
-void UShopManager::SubtractShopItem()
-{
-    if (SelectedShopItem.ItemData.ItemCount > 0)
-    {
-        SelectedShopItem.ItemData.ItemCount -= 1;
-        int32 Index = BP_ShopScroll->GetItemDataIndex();
-        if (BP_ShopScroll->GetActiveSlots().IsValidIndex(Index))
-        {
-            BP_ShopScroll->GetActiveSlots()[Index]->SetItemData(SelectedShopItem.ItemData);
-        }
-    }
-
-    UpdateShopData(EQuestCharacter::Korok, SelectedShopItem);
+    SelectedShopItem.ItemData = InShopData;
 }
 

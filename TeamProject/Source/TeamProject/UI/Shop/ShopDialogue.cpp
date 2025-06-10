@@ -92,6 +92,7 @@ void UShopDialogue::OnConfirm()
     UShop* ShopClass = UIManager->CachedShopClass;
     if (ShopClass)
     {
+        // buy
         if (ShopManager->IsBuy())
         {
             if (ShopManager->CheckSoldout())
@@ -108,7 +109,27 @@ void UShopDialogue::OnConfirm()
             {
                 ShopManager->SubtractPlayerRupee();
                 ShopManager->AddItemInventory();
-                ShopManager->SubtractShopItem();
+
+                const FItemData SelectedItemData = ShopManager->GetSelectedItem();
+                TArray<FShopDataRow> CurrentShopDataArray = ShopManager->GetShopData(PC_InGame->Npc->GetQuestCharacterType());
+                int iShopDataIndex = -1;
+                for (int32 i = 0; i < CurrentShopDataArray.Num(); ++i)
+                {
+                    if (CurrentShopDataArray[i].ItemData.Name == SelectedItemData.Name)
+                    {
+                        CurrentShopDataArray[i].ItemData.ItemCount--;
+                        iShopDataIndex = i;
+                        break;
+                    }
+                }
+                if (iShopDataIndex == -1)
+                {
+                    UE_LOG(LogTemp, Error, TEXT("ShopDialogue::OnConfirm() // No valid item in shop"));
+                    check(false);
+                }
+
+
+                ShopManager->UpdateShopData(PC_InGame->Npc->GetQuestCharacterType(), CurrentShopDataArray[iShopDataIndex]);
 
                 PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SuccessfulShopping);
             }
@@ -120,7 +141,27 @@ void UShopDialogue::OnConfirm()
 
                 ShopManager->AddPlayerRupee();
                 ShopManager->SubtractItemInventory();
-                ShopManager->AddShopItem();
+
+                const FItemData SelectedItemData = ShopManager->GetSelectedItem();
+                TArray<FShopDataRow> CurrentShopDataArray = ShopManager->GetShopData(PC_InGame->Npc->GetQuestCharacterType());
+                int iShopDataIndex = -1;
+                for (int32 i = 0; i < CurrentShopDataArray.Num(); ++i)
+                {
+                    if (CurrentShopDataArray[i].ItemData.Name == SelectedItemData.Name)
+                    {
+                        CurrentShopDataArray[i].ItemData.ItemCount++;
+                        iShopDataIndex = i;
+                        break;
+                    }
+                }
+                if (iShopDataIndex == -1)
+                {
+                    UE_LOG(LogTemp, Error, TEXT("ShopDialogue::OnConfirm() // No valid item in shop"));
+                    check(false);
+                }
+
+
+                ShopManager->UpdateShopData(PC_InGame->Npc->GetQuestCharacterType(), CurrentShopDataArray[iShopDataIndex]);
 
                 PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SuccessfulSale);
 

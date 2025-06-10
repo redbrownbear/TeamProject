@@ -21,7 +21,7 @@ UCLASS()
 class TEAMPROJECT_API UShop : public UBaseUI
 {
 	GENERATED_BODY()
-	
+
 public:
 	virtual void OnCreated() override;
 	virtual void ShowUI() override;
@@ -30,6 +30,8 @@ public:
 
 private:
 	void InitUI();
+
+	UFUNCTION()
 	void SetRupeeUI();
 
 private:

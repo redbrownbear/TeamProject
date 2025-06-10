@@ -81,6 +81,7 @@ void UShop::BindDelegates()
     if (ShopManager)
     {
         ShopManager->OnShopUpdated.AddDynamic(this, &UShop::RefreshShopList);
+        ShopManager->OnRupeeChanged.AddDynamic(this, &UShop::SetRupeeUI);
     }
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
@@ -107,6 +108,7 @@ void UShop::RemoveDelegates()
     if (ShopManager)
     {
         ShopManager->OnShopUpdated.RemoveDynamic(this, &UShop::RefreshShopList);
+        ShopManager->OnRupeeChanged.RemoveDynamic(this, &UShop::SetRupeeUI);
     }
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();

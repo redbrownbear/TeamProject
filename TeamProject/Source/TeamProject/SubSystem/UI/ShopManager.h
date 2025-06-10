@@ -10,6 +10,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShopUpdated, const TArray<FShopDataRow>&, ShopList);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRupeeChanged);
+
 /**
  * 
  */
@@ -41,13 +43,13 @@ public:
 	bool CheckSoldout();
 
 	UFUNCTION()
+	bool CanIBuyIt();
+
+	UFUNCTION()
 	void AddItemInventory();
 
 	UFUNCTION()
 	void SubtractItemInventory();
-
-	UFUNCTION()
-	bool CanIBuyIt();
 
 	UFUNCTION()
 	void AddPlayerRupee();
@@ -55,20 +57,15 @@ public:
 	UFUNCTION()
 	void SubtractPlayerRupee();
 
-	UFUNCTION()
-	void AddShopItem();
+	//UFUNCTION()
+	//void AddShopItem(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow);
 
-	UFUNCTION()
-	void SubtractShopItem();
+	//UFUNCTION()
+	//void SubtractShopItem(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow);
 
-//public:
-//	void SetShopDataRow(FShopDataRow InShopData) { SelectedShopItem = InShopData; }
-//
-//
-//	// --- ShopDataRow 복사본 데이터 전달 ---
-//	SelectedShopItem.ItemData = ItemData;
-//	SetShopDataRow(SelectedShopItem);
-
+public:
+	void SetSelectedItem(const FItemData& InShopData);
+	FItemData GetSelectedItem() const { return SelectedShopItem.ItemData; }
 
 private:
 	void SetIsBuy(bool IsBuy) { bIsBuy = IsBuy; }
@@ -79,11 +76,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnShopUpdated OnShopUpdated;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnRupeeChanged OnRupeeChanged;
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* ShopDataTable;
 
-	TMap<EQuestCharacter, TArray<FShopDataRow>> ShopRowMap;
+	TMap<EQuestCharacter, TArray<FShopDataRow>> CurrentShopRowMap;
 
 	bool bIsBuy = false;
 
