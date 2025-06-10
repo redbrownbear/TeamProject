@@ -37,9 +37,10 @@ void UAnimNotify_AL_Attack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequen
 			NiagaraEffect->SetData(NiagaraEffectName::AL_Attack);
 
 			FVector Location = Monster->GetActorLocation();
-			Location += Monster->GetActorForwardVector() * 100.f;
+			Location += Monster->GetActorForwardVector() * 150.f;
+			FVector ForwardVector = Monster->GetActorForwardVector();
 			NewTransform.SetLocation(Location);
-
+			NewTransform.SetRotation((ForwardVector * -1.f).Rotation().Quaternion());
 			NiagaraEffect->FinishSpawning(NewTransform);
 		}
 

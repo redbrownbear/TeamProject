@@ -115,6 +115,8 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		NiagaraEffectComponent->SetAsset(Data->EffectNiagaraSystem);
 		NiagaraEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		NiagaraEffectComponent->SetRelativeTransform(Data->Transform);
+		//NiagaraEffectComponent->SetRelativeLocation(Data->Transform.GetLocation());
+		//NiagaraEffectComponent->SetRelativeRotation(GetActorForwardVector().Rotation().Quaternion());
 		NiagaraEffectComponent->RegisterComponent();
 	}
 
@@ -127,6 +129,8 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		ParticleEffectComponent->SetTemplate(Data->EffectParticleSystem);
 		ParticleEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		ParticleEffectComponent->SetRelativeTransform(Data->Transform);
+		//ParticleEffectComponent->SetRelativeLocation(Data->Transform.GetLocation());
+		//ParticleEffectComponent->SetWorldRotation(GetActorForwardVector().Rotation().Quaternion());
 		ParticleEffectComponent->RegisterComponent();
 	}
 }
@@ -211,7 +215,12 @@ void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//ProjectileMovementComponent->Velocity = GetActorForwardVector() * ProjectileMovementComponent->MaxSpeed;
+	//FVector CurrentVelocity = ProjectileMovementComponent->Velocity;
+	//if (!CurrentVelocity.IsNearlyZero())
+	//{
+	//	FRotator NewRotation = UKismetMathLibrary::MakeRotFromX(CurrentVelocity);
+	//	SetActorRotation(NewRotation);
+	//}
 }
 
 FVector AProjectile::GetVelocity()
