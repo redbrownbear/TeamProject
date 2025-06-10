@@ -38,6 +38,8 @@ void UShopManager::LoadShopData(UDataTable* DataTable)
         FShopDataRow* Row = DataTable->FindRow<FShopDataRow>(RowName, "Populate ShopRow");
         if (Row)
         {
+            Row->ItemData.UniqueID = FGuid::NewGuid().ToString();
+
             if (TArray<FShopDataRow>* FoundRowsPtr = ShopRowMap.Find(Row->QuestCharacter))
             {
                 FoundRowsPtr->Add(*Row);

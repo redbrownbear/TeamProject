@@ -28,12 +28,6 @@ void UShopDialogue::InitUI()
     ExtraButton->SetVisibility(ESlateVisibility::Collapsed);
 
     ActionLay->SetVisibility(ESlateVisibility::Visible);
-
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->BindDialogueInput();
-    }
 }
 
 void UShopDialogue::SetBuy()

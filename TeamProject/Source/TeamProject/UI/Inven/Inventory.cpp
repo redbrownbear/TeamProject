@@ -14,7 +14,7 @@
 
 void UInventory::OnCreated()
 {
-    InitUI();
+
 }
 
 void UInventory::ShowUI()
@@ -24,8 +24,7 @@ void UInventory::ShowUI()
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     {
-
-        PC_InGame->ChangeInputContext(EInputContext::IC_Inventory);
+        PC_InGame->ChangeInputContext(EInputContext::IC_UI);
 
         FInputModeGameAndUI InputMode;
         InputMode.SetWidgetToFocus(TakeWidget());
@@ -35,6 +34,8 @@ void UInventory::ShowUI()
         PC_InGame->SetInputMode(InputMode);
     }
 
+    SetRupeeUI();
+    InitUI();
     BindDelegates();
 }
 
@@ -46,14 +47,6 @@ void UInventory::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 void UInventory::InitUI()
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->BindInventoryInput();
-    }
-
-    SetRupeeUI();
-
     check(BP_InvenScroll);
     check(BP_InvenEquip);
 }
