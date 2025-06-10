@@ -36,6 +36,39 @@ public:
 	//UI
 	void UpdateItem(const TArray<FShopDataRow>& ShopList);
 
+public:
+	UFUNCTION()
+	bool CheckSoldout();
+
+	UFUNCTION()
+	void AddItemInventory();
+
+	UFUNCTION()
+	void SubtractItemInventory();
+
+	UFUNCTION()
+	bool CanIBuyIt();
+
+	UFUNCTION()
+	void AddPlayerRupee();
+
+	UFUNCTION()
+	void SubtractPlayerRupee();
+
+	UFUNCTION()
+	void AddShopItem();
+
+	UFUNCTION()
+	void SubtractShopItem();
+
+//public:
+//	void SetShopDataRow(FShopDataRow InShopData) { SelectedShopItem = InShopData; }
+//
+//
+//	// --- ShopDataRow 복사본 데이터 전달 ---
+//	SelectedShopItem.ItemData = ItemData;
+//	SetShopDataRow(SelectedShopItem);
+
 
 private:
 	void SetIsBuy(bool IsBuy) { bIsBuy = IsBuy; }
@@ -53,4 +86,9 @@ private:
 	TMap<EQuestCharacter, TArray<FShopDataRow>> ShopRowMap;
 
 	bool bIsBuy = false;
+
+	FShopDataRow SelectedShopItem;
+
+	UPROPERTY(meta = (BindWidget))
+	class UShopScroll* BP_ShopScroll;
 };

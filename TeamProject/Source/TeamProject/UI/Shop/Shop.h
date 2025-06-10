@@ -27,34 +27,7 @@ public:
 	virtual void ShowUI() override;
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
-public:
-	UFUNCTION()
-	bool CheckSoldout();
 
-	UFUNCTION()
-	void AddItemInventory();
-
-	UFUNCTION()
-	void SubtractItemInventory();
-
-	UFUNCTION()
-	bool CanIBuyIt();
-
-	UFUNCTION()
-	void AddPlayerRupee();
-
-	UFUNCTION()
-	void SubtractPlayerRupee();
-
-	UFUNCTION()
-	void AddShopItem();
-
-	UFUNCTION()
-	void SubtractShopItem();
-
-public:
-	void SetShopDataRow(FShopDataRow InShopData) { SelectedShopItem = InShopData; }
-	
 private:
 	void InitUI();
 	void SetRupeeUI();
@@ -109,5 +82,4 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CoinText;
 
-	FShopDataRow SelectedShopItem;
 };

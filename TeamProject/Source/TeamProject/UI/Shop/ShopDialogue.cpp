@@ -100,21 +100,21 @@ void UShopDialogue::OnConfirm()
     {
         if (ShopManager->IsBuy())
         {
-            if (ShopClass->CheckSoldout())
+            if (ShopManager->CheckSoldout())
             {
                 PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SoldOut);
             }
 
-            else if (!ShopClass->CanIBuyIt())
+            else if (!ShopManager->CanIBuyIt())
             {
                 PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Cashless);
             }
 
-            if (EDialogType::Buy == PC_InGame->Npc->GetCurrentDialogueType())
+            else if (EDialogType::Buy == PC_InGame->Npc->GetCurrentDialogueType())
             {
-                ShopClass->SubtractPlayerRupee();
-                ShopClass->AddItemInventory();
-                ShopClass->SubtractShopItem();
+                ShopManager->SubtractPlayerRupee();
+                ShopManager->AddItemInventory();
+                ShopManager->SubtractShopItem();
 
                 PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SuccessfulShopping);
             }
@@ -124,9 +124,9 @@ void UShopDialogue::OnConfirm()
             if (EDialogType::Sell == PC_InGame->Npc->GetCurrentDialogueType())
             {
 
-                ShopClass->AddPlayerRupee();
-                ShopClass->SubtractItemInventory();
-                ShopClass->AddShopItem();
+                ShopManager->AddPlayerRupee();
+                ShopManager->SubtractItemInventory();
+                ShopManager->AddShopItem();
 
                 PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SuccessfulSale);
 

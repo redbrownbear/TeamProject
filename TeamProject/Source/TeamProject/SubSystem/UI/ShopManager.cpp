@@ -3,6 +3,7 @@
 
 #include "SubSystem/UI/ShopManager.h"
 #include "SubSystem/PlayerManager.h"
+#include "UI/Shop/ShopScroll.h"
 
 UShopManager::UShopManager()
 {
@@ -118,3 +119,98 @@ void UShopManager::UpdateItem(const TArray<FShopDataRow>& ShopList)
 {
     OnShopUpdated.Broadcast(ShopList);
 }
+
+
+bool UShopManager::CheckSoldout()
+{
+    // ItemCount == 0 이면 매진 처리
+    if (SelectedShopItem.ItemData.ItemCount != 0) return false;
+
+    return true;
+}
+
+void UShopManager::AddItemInventory()
+{
+    if (SelectedShopItem.ItemData.ItemCount != 0)
+    {
+        UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+        if (PlayerManager)
+        {
+            PlayerManager->SetInvenData(SelectedShopItem.ItemData);
+        }
+    }
+}
+
+void UShopManager::SubtractItemInventory()
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        PlayerManager->RemoveItemByUniqueID(SelectedShopItem.ItemData.UniqueID);
+    }
+}
+
+bool UShopManager::CanIBuyIt()
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    int32 Rupee = PlayerManager->GetRupee();
+
+    if (Rupee < SelectedShopItem.ItemData.price)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void UShopManager::AddPlayerRupee()
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        int32 Rupee = PlayerManager->GetRupee();
+        Rupee += SelectedShopItem.ItemData.price;
+
+        PlayerManager->SetRupee(Rupee);
+    }
+}
+
+void UShopManager::SubtractPlayerRupee()
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        int32 Rupee = PlayerManager->GetRupee();
+        Rupee -= SelectedShopItem.ItemData.price;
+
+        PlayerManager->SetRupee(Rupee);
+    }
+}
+
+void UShopManager::AddShopItem()
+{
+    SelectedShopItem.ItemData.ItemCount += 1;
+    int32 Index = BP_ShopScroll->GetItemDataIndex();
+    if (BP_ShopScroll->GetActiveSlots().IsValidIndex(Index))
+    {
+        BP_ShopScroll->GetActiveSlots()[Index]->SetItemData(SelectedShopItem.ItemData);
+    }
+
+    UpdateShopData(EQuestCharacter::Korok, SelectedShopItem);
+}
+
+void UShopManager::SubtractShopItem()
+{
+    if (SelectedShopItem.ItemData.ItemCount > 0)
+    {
+        SelectedShopItem.ItemData.ItemCount -= 1;
+        int32 Index = BP_ShopScroll->GetItemDataIndex();
+        if (BP_ShopScroll->GetActiveSlots().IsValidIndex(Index))
+        {
+            BP_ShopScroll->GetActiveSlots()[Index]->SetItemData(SelectedShopItem.ItemData);
+        }
+    }
+
+    UpdateShopData(EQuestCharacter::Korok, SelectedShopItem);
+}
+
