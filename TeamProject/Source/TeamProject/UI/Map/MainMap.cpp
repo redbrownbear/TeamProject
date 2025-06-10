@@ -11,7 +11,7 @@ const FVector2D UMainMap::MAP_MAX_WORLD = FVector2D(36350.f, -17850.f);
 
 void UMainMap::OnCreated()
 {
-    InitUI();
+
 }
 
 void UMainMap::ShowUI()
@@ -21,6 +21,8 @@ void UMainMap::ShowUI()
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     {
+        PC_InGame->ChangeInputContext(EInputContext::IC_UI);
+
         FInputModeGameAndUI InputMode;
         InputMode.SetWidgetToFocus(TakeWidget());
         InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
@@ -28,6 +30,8 @@ void UMainMap::ShowUI()
 
         PC_InGame->SetInputMode(InputMode);
     }
+
+    InitUI();
 }
 
 void UMainMap::HideUI(TSubclassOf<UBaseUI> UIClass)

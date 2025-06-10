@@ -18,8 +18,6 @@ void UBaseUI::ShowUI()
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     { 
-        PC_InGame->ChangeInputContext(EInputContext::IC_UI);
-
         AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
         if (HUD)
             HUD->SetMainHUDVisible(false);

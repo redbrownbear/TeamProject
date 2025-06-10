@@ -15,7 +15,7 @@
 
 void UNPCDialogue::OnCreated()
 {
-    InitUI();
+
 }
 
 void UNPCDialogue::ShowUI()
@@ -32,6 +32,8 @@ void UNPCDialogue::ShowUI()
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     {
+        PC_InGame->ChangeInputContext(EInputContext::IC_UI);
+
         FInputModeGameAndUI InputMode;
         InputMode.SetWidgetToFocus(TakeWidget());
         InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
@@ -40,6 +42,7 @@ void UNPCDialogue::ShowUI()
         PC_InGame->SetInputMode(InputMode);
     }
 
+    InitUI();
     BindDelegates();
 }
 

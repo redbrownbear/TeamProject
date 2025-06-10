@@ -104,8 +104,6 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Navigate,
 		ETriggerEvent::Started, this, &ThisClass::OnNavigate);
 
-
-
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LookMouse,
 		ETriggerEvent::Triggered, this, &ThisClass::OnLook);
 
@@ -127,8 +125,6 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Triggered, this, &ThisClass::RightClick);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_RightClick,
 		ETriggerEvent::Completed, this, &ThisClass::RightClickEnd);
-
-
 
 	// ------------ Weapon Swap -----------------
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_EquipSword,
@@ -172,7 +168,6 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotRight);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_CancelOnlyQuick,
 		ETriggerEvent::Completed, this, &ThisClass::OffQuickSlot);
-	
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_MapOpen,
 		ETriggerEvent::Started, this, &ThisClass::OnMapOpen);
@@ -1293,7 +1288,7 @@ void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)
 
 	if (UQuickSlotMain* QuickSlot = UIManager->FindUI<UQuickSlotMain>())
 	{
-		if (QuickSlot->IsVisible() )
+		if (QuickSlot->IsVisible())
 			QuickSlot->OnNavigate(InputActionValue);
 	}
 	if (UInventory* InvenUI = UIManager->FindUI<UInventory>())

@@ -11,9 +11,6 @@
 
 void UQuest::OnCreated()
 {
-    InitUI();
-    SetRupeeUI();
-
     InitializePool(50);
 }
 
@@ -24,6 +21,8 @@ void UQuest::ShowUI()
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     {
+        PC_InGame->ChangeInputContext(EInputContext::IC_UI);
+
         FInputModeGameAndUI InputMode;
         InputMode.SetWidgetToFocus(TakeWidget());
         InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
@@ -32,6 +31,8 @@ void UQuest::ShowUI()
         PC_InGame->SetInputMode(InputMode);
     }
 
+    InitUI();
+    SetRupeeUI();
     BindDelegates();
 }
 
@@ -43,7 +44,6 @@ void UQuest::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 void UQuest::InitUI()
 {
-
 }
 
 void UQuest::InitializePool(int32 PreloadCount)

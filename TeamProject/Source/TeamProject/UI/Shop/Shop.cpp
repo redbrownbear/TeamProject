@@ -17,9 +17,6 @@
 
 void UShop::OnCreated()
 {
-    InitUI();
-    SetRupeeUI();
-
     SetShopOpen();
 }
 
@@ -30,6 +27,8 @@ void UShop::ShowUI()
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     {
+        PC_InGame->ChangeInputContext(EInputContext::IC_UI);
+
         FInputModeGameAndUI InputMode;
         InputMode.SetWidgetToFocus(TakeWidget());
         InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
@@ -38,6 +37,8 @@ void UShop::ShowUI()
         PC_InGame->SetInputMode(InputMode);
     }
 
+    InitUI();
+    SetRupeeUI();
     BindDelegates();
 }
 
@@ -130,11 +131,6 @@ void UShop::SubtractItemInventory()
 
 void UShop::InitUI()
 {
-    //APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    //if (PC_InGame)
-    //{
-    //    PC_InGame->BindShopInput();
-    //}
 }
 
 void UShop::SetRupeeUI()
