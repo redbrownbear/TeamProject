@@ -25,7 +25,7 @@ public:
 	void RefreshUI(const FItemData& ItemData);
 
 public:
-	const FItemData& GetCurrentItemData() const { return CurrentItemData; }
+	//const FItemData& GetCurrentItemData() const { return CurrentItemData; }
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -42,6 +42,6 @@ private:
 	UTextBlock* InfoDescription;
 
 private:
-	UPROPERTY()
-	FItemData CurrentItemData;
+	/*UPROPERTY()
+	FItemData CurrentItemData;*/
 };

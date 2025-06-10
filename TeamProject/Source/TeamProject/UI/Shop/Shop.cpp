@@ -59,13 +59,13 @@ void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 bool UShop::CheckSoldout()
 { 
-    if (!BP_ShopDescription)
+    /*if (!BP_ShopDescription)
     {
         UE_LOG(LogTemp, Warning, TEXT("BP_ShopDescription is Null"));
-    }
+    }*/
 
-    FShopDataRow SelectedShopItem; 
-    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
+    //FShopDataRow SelectedShopItem;
+    //SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
 
     // ItemCount == 0 이면 매진 처리
     if (SelectedShopItem.ItemData.ItemCount != 0) return false;
@@ -75,8 +75,8 @@ bool UShop::CheckSoldout()
 
 void UShop::AddItemInventory()
 {    
-    FShopDataRow SelectedShopItem;
-    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
+    /*FShopDataRow SelectedShopItem;
+    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();*/
 
     if (SelectedShopItem.ItemData.ItemCount != 0)
     {
@@ -85,13 +85,13 @@ void UShop::AddItemInventory()
         {
             PlayerManager->SetInvenData(SelectedShopItem.ItemData);
         }
-    }
+    } 
 }
 
 void UShop::SubtractItemInventory()
 {   
-    FShopDataRow SelectedShopItem;
-    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
+    /*FShopDataRow SelectedShopItem;
+    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();*/
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     if (PlayerManager)
@@ -102,8 +102,8 @@ void UShop::SubtractItemInventory()
 
 bool UShop::CanIBuyIt()
 {
-    FShopDataRow SelectedShopItem;
-    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
+    /*FShopDataRow SelectedShopItem;
+    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();*/
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     int32 Rupee = PlayerManager->GetRupee();
@@ -118,8 +118,8 @@ bool UShop::CanIBuyIt()
 
 void UShop::AddPlayerRupee()
 {
-    FShopDataRow SelectedShopItem;
-    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
+    /*FShopDataRow SelectedShopItem;
+    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();*/
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     if (PlayerManager)
@@ -134,8 +134,8 @@ void UShop::AddPlayerRupee()
 
 void UShop::SubtractPlayerRupee()
 {
-    FShopDataRow SelectedShopItem;
-    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
+    /*FShopDataRow SelectedShopItem;
+    SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();*/
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     if (PlayerManager)
@@ -150,29 +150,27 @@ void UShop::SubtractPlayerRupee()
 
 void UShop::AddShopItem()
 {
-    FShopDataRow SelectedShopItem;
-
     UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
     if (ShopManager)
     {
-        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
-    }
+        //FShopDataRow SelectedShopItem;
+        //SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
 
-    TArray<UShopSlot*> ActiveSlots = BP_ShopScroll->GetActiveSlots();
-    int32 Index = BP_ShopScroll->GetItemDataIndex();
+        TArray<UShopSlot*> ActiveSlots = BP_ShopScroll->GetActiveSlots();
+        int32 Index = BP_ShopScroll->GetItemDataIndex();
 
-    if (Index != INDEX_NONE)
-    {
-        UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-        if (PlayerManager)
+        if (Index != INDEX_NONE)
         {
-            SelectedShopItem.ItemData.ItemCount += 1;
-            SelectedShopItem.InitialItemCount += 1;
-            ShopManager->UpdateShopData(EQuestCharacter::Korok, SelectedShopItem);
-
-            if (ActiveSlots.IsValidIndex(Index))
+            UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+            if (PlayerManager)
             {
-                ActiveSlots[Index]->SetItemData(SelectedShopItem.ItemData);
+                SelectedShopItem.ItemData.ItemCount += 1;
+                ShopManager->UpdateShopData(EQuestCharacter::Korok, SelectedShopItem);
+
+                if (ActiveSlots.IsValidIndex(Index))
+                {
+                    ActiveSlots[Index]->SetItemData(SelectedShopItem.ItemData);
+                }
             }
         }
     }
@@ -180,12 +178,11 @@ void UShop::AddShopItem()
 
 void UShop::SubtractShopItem()
 {
-    FShopDataRow SelectedShopItem;
-
     UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
     if (ShopManager)
     {
-        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();
+       /* FShopDataRow SelectedShopItem;
+        SelectedShopItem.ItemData = BP_ShopDescription->GetCurrentItemData();*/
 
         TArray<UShopSlot*> ActiveSlots = BP_ShopScroll->GetActiveSlots();
         int32 Index = BP_ShopScroll->GetItemDataIndex();
@@ -198,7 +195,6 @@ void UShop::SubtractShopItem()
                 if (PlayerManager)
                 {
                     SelectedShopItem.ItemData.ItemCount -= 1;
-                    SelectedShopItem.InitialItemCount -= 1;
                     ShopManager->UpdateShopData(EQuestCharacter::Korok, SelectedShopItem);
 
                     if (ActiveSlots.IsValidIndex(Index))
@@ -347,6 +343,8 @@ void UShop::OnCancel()
 {
     HideUI(UShop::StaticClass());
 
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Shop);
 }
 
 void UShop::OnNextDialogue(const FInputActionValue& InputActionValue)
@@ -363,6 +361,10 @@ void UShop::RefreshDescription(int32 CurrentIdx)
    const FItemData& ItemData = BP_ShopScroll->GetItemDataAtIndex(CurrentIdx);
 
     BP_ShopDescription->RefreshUI(ItemData);
+
+    // --- ShopDataRow 복사본 데이터 전달 ---
+    SelectedShopItem.ItemData = ItemData;
+    SetShopDataRow(SelectedShopItem);
 }
 
 void UShop::RefreshDescriptionSellItem(const FItemData& ItemData)

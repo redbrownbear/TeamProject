@@ -52,6 +52,9 @@ public:
 	UFUNCTION()
 	void SubtractShopItem();
 
+public:
+	void SetShopDataRow(FShopDataRow InShopData) { SelectedShopItem = InShopData; }
+	
 private:
 	void InitUI();
 	void SetRupeeUI();
@@ -105,4 +108,6 @@ private:
 private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CoinText;
+
+	FShopDataRow SelectedShopItem;
 };
