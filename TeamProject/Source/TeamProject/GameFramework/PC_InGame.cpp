@@ -1064,12 +1064,20 @@ void APC_InGame::InitIcePreview()
 
 		IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", bCenterIsSurface ? 0.0f : 1.0f);
 
-		IcePreviewActor->SetCanSpawn(bCenterIsSurface);
-		bCanSpawn = true;	
+		if (bCenterIsSurface)
+		{
+			IcePreviewActor->SetCanSpawn(bCenterIsSurface);
+			bCanSpawn = true;
 
-		// 위치 저장
-		LastHit = HitResult;
-		bIcePreviewPlaced = true; // 한 번만 배치
+			// 위치 저장
+			LastHit = HitResult;
+			bIcePreviewPlaced = true; // 한 번만 배치
+		}
+		else
+		{
+			IcePreviewActor->SetCanSpawn(bCenterIsSurface);
+			bCanSpawn = false;
+		}
 	}
 	else
 	{
