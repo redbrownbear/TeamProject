@@ -106,11 +106,11 @@ void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus 
 		{
 			if (!MonsterFSMComponent->IsToCatchWeapon())
 			{
-				if (MonsterFSMComponent->GetMonsterState() == EMonsterState::FindWeapon)
+				if (MonsterFSMComponent->GetCurrentState() == EMonsterState::FindWeapon)
 				{
 					MonsterFSMComponent->SetToCatchWeapon(WW);
 				}
-				else if (MonsterFSMComponent->GetMonsterState() == EMonsterState::Combat)
+				else if (MonsterFSMComponent->GetCurrentState() == EMonsterState::Combat)
 				{
 					MonsterFSMComponent->ChangeState(EMonsterState::FindWeapon);
 					MonsterFSMComponent->SetToCatchWeapon(WW);

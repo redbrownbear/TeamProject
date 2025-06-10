@@ -27,10 +27,12 @@ protected:
 	virtual void UpdatePatrol(float DeltaTime) override;
 	virtual void UpdateAlert(float DeltaTime) override;
 	virtual void UpdateSignal(float DeltaTime) override;
+	virtual void UpdateDamage(float DeltaTime) override;
 
 	virtual void UpdateCombat(float DeltaTime) override;
 	virtual void UpdateSuspicious(float DeltaTime) override;
 
+	virtual void UpdateRebound(float DeltaTime);
 	virtual void UpdateHappy(float DeltaTime);
 
 protected:
