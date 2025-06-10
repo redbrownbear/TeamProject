@@ -2,6 +2,7 @@
 
 
 #include "UI/Shop/ShopScroll.h"
+#include "SubSystem/UI/ShopManager.h"
 
 void UShopScroll::NativeConstruct()
 {
@@ -77,6 +78,13 @@ void UShopScroll::MoveSelection(FIntPoint Direction)
         CurrentIndex = NextIndex;
     }
 
+    FItemData Itemdata = ActiveSlots[CurrentIndex]->GetItemData();
+
+    if (UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>())
+    {
+        ShopManager->SetSelectedItem(Itemdata);
+    }
+
     OnShopHighlightChanged.Broadcast(CurrentIndex);
 }
 
@@ -93,6 +101,14 @@ void UShopScroll::SelectInit()
     CurrentIndex = 0;
 
     ActiveSlots[CurrentIndex]->SetSelected(true);
+
+    FItemData Itemdata = ActiveSlots[CurrentIndex]->GetItemData();
+
+    if (UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>())
+    {
+        ShopManager->SetSelectedItem(Itemdata);
+    }
+
     OnShopHighlightChanged.Broadcast(CurrentIndex);
 }
 

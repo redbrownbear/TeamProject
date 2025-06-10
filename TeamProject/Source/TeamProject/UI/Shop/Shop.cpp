@@ -56,79 +56,6 @@ void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 }
 
-void UShop::CheckSoldout()
-{ 
-    if (!BP_ShopDescription) return;
-
-
-    //FShopDataRow으로 처리해야 할 듯
-    FItemData SelectedItem = BP_ShopDescription->GetCurrentItemData();
-
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    if (PlayerManager)
-    {
-        const FString TargetID = SelectedItem.UniqueID;
-
-        FItemData InventoryItem = PlayerManager->GetItemByUniqueID(TargetID);
-
-        // ItemCount == 0 이면 매진 처리
-        if (InventoryItem.ItemCount != 0)
-            return;
-
-        APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-        if (PC_InGame && PC_InGame->Npc)
-        {
-            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SoldOut);
-        }
-    }
-}
-
-void UShop::AddItemInventory()
-{
-    FItemData SelectedItem;
-
-    if (BP_ShopDescription)
-    {
-        SelectedItem = BP_ShopDescription->GetCurrentItemData();        
-    }
-
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    if (PlayerManager)
-    {
-        PlayerManager->SetInvenData(SelectedItem);
-    }
-
-    //FShopDataRow으로 처리해야 할 듯
-    SelectedItem.ItemCount -= 1;
-
-    TArray<UShopSlot*> ActiveSlots = BP_ShopScroll->GetActiveSlots();
-    int32 Index = BP_ShopScroll->GetItemDataIndex();
-
-    if (ActiveSlots.IsValidIndex(Index))
-    {
-        ActiveSlots[Index]->SetItemData(SelectedItem);
-    }
-
-}
-
-void UShop::SubtractItemInventory()
-{
-    FItemData SelectedItem;
-
-    if (BP_ShopDescription)
-    {
-        SelectedItem = BP_ShopDescription->GetCurrentItemData();
-    }
-
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    if (PlayerManager)
-    {        
-        PlayerManager->RemoveItemByUniqueID(SelectedItem.UniqueID);
-    }
-
-    //@TODO FShopDataRow 데이터 갱신
-}
-
 void UShop::InitUI()
 {
 }
@@ -154,6 +81,7 @@ void UShop::BindDelegates()
     if (ShopManager)
     {
         ShopManager->OnShopUpdated.AddDynamic(this, &UShop::RefreshShopList);
+        ShopManager->OnRupeeChanged.AddDynamic(this, &UShop::SetRupeeUI);
     }
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
@@ -180,6 +108,7 @@ void UShop::RemoveDelegates()
     if (ShopManager)
     {
         ShopManager->OnShopUpdated.RemoveDynamic(this, &UShop::RefreshShopList);
+        ShopManager->OnRupeeChanged.RemoveDynamic(this, &UShop::SetRupeeUI);
     }
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
@@ -260,6 +189,8 @@ void UShop::OnCancel()
 {
     HideUI(UShop::StaticClass());
 
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Shop);
 }
 
 void UShop::OnNextDialogue(const FInputActionValue& InputActionValue)
