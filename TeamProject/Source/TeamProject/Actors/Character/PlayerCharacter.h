@@ -14,10 +14,12 @@
 #include "Components/WeaponChildActorComponent/WeaponChildActorComponent.h"
 #include "Components/StatusComponent/PlayerStatusComponent/PlayerStatusComponent.h"
 #include "Components/Character/WeaponManagerComponent.h"
+#include "Components/Character/PlayerMovementComponent.h"
 #include "Components/TimelineComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GenericTeamAgentInterface.h"
 #include "Misc/Utils.h"
+
 #include "PlayerCharacter.generated.h"
 class UPlayerManager;
 
@@ -60,6 +62,8 @@ public:
 	UPlayerStatusComponent* GetPlayerStatusComponent() { return StatusComponent; }
 	UWeaponManagerComponent* GetWeaponManagerComponent() { return WeaponManagerComponent; }
 	USpringArmComponent* GetSpringArm() { return SpringArm; }
+	EMove_State GetMoveState() { return Cast<UPlayerMovementComponent>(GetCharacterMovement())->GetMoveState(); }
+
 
 	
 	void SetBowStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetBowStaticMesh(InMesh); }

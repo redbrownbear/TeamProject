@@ -116,6 +116,13 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
 		ETriggerEvent::Completed, this, &ThisClass::CompletedDash);
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Step,
+		ETriggerEvent::Triggered, this, &ThisClass::StartedStep);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Step,
+		ETriggerEvent::Completed, this, &ThisClass::CompletedStep);
+
+	
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Crouch,
 		ETriggerEvent::Triggered, this, &ThisClass::OnCrouch);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Crouch,
@@ -354,6 +361,12 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		Movement->GlidingMove(ActionValue);
 		UE_LOG(LogTemp, Warning, TEXT("Gliding"));
 	}
+	// Step Move
+	else if (Movement->GetMoveState() == EMove_State::Step)
+	{
+
+		Movement->StepMove(ActionValue);
+	}
 	
 	// 노말 상태일 때의 캐릭터 무브
 	else
@@ -455,6 +468,28 @@ void APC_InGame::CompletedDash(const FInputActionValue& InputActionValue)
 		Movement->SetMoveState(EMove_State::Run); 
 		UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 		PlayerManager->SetStaminaUSe(false);
+	}
+}
+
+void APC_InGame::StartedStep(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+
+	if (Movement->GetMoveState() == EMove_State::Run)
+	{
+		Movement->SetMoveState(EMove_State::Step);
+	}
+}
+
+void APC_InGame::CompletedStep(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+
+	if (Movement->GetMoveState() == EMove_State::Step)
+	{
+		Movement->SetMoveState(EMove_State::Run);
 	}
 }
 
@@ -631,36 +666,48 @@ void APC_InGame::EquipSword(const FInputActionValue& InputActionValue)
 {
 	APawn* PlayerPawn = GetPawn();
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
-	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
-	EEquip_State m_State = WeaponManagerComponent->GetEquipState();
+	EMove_State mMove_State = PlayerCharacter->GetMoveState();
+	if (mMove_State == EMove_State::Run || mMove_State == EMove_State::Run)
+	{
+		UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
 
-	WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Sword);
+		WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Sword);
 
-	WeaponManagerComponent->TryEquipWeapon();
+		WeaponManagerComponent->TryEquipWeapon();
+	}
 }
 
 void APC_InGame::EquipShield(const FInputActionValue& InputActionValue)
 {
 	APawn* PlayerPawn = GetPawn();
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
-	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
-	EEquip_State m_State = WeaponManagerComponent->GetEquipState();
+	EMove_State mMove_State = PlayerCharacter->GetMoveState();
+	if (mMove_State == EMove_State::Run || mMove_State == EMove_State::Run)
+	{
+		UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
 
-	WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Shield);
+		WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Shield);
 
-	WeaponManagerComponent->TryEquipWeapon();
+		WeaponManagerComponent->TryEquipWeapon();
+	}
 }
 
 void APC_InGame::EquipBow(const FInputActionValue& InputActionValue)
 {
 	APawn* PlayerPawn = GetPawn();
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
-	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
-	EEquip_State m_State = WeaponManagerComponent->GetEquipState();
+	EMove_State mMove_State = PlayerCharacter->GetMoveState();
+	if (mMove_State == EMove_State::Run || mMove_State == EMove_State::Run)
+	{
+		UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
 
-	WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Bow);
+		WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Bow);
 
-	WeaponManagerComponent->TryEquipWeapon();
+		WeaponManagerComponent->TryEquipWeapon();
+	}
 }
 
 

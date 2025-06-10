@@ -10,6 +10,9 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/TimelineComponent.h"
+
+
+
 UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& ObjectInitializer)
 {
 
@@ -45,6 +48,17 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 		if (Asset.Object)
 		{
 			HitMontage = Asset.Object;
+		}
+	}
+
+	{
+		ConstructorHelpers::FObjectFinder<UStepMontageAsset> Asset{
+			TEXT("/Script/TeamProject.StepMontageAsset'/Game/Resources/Player/Armor/Animation/Step/StepAssets.StepAssets'")
+		};
+
+		if (Asset.Object)
+		{
+			StepMontageAsset = Asset.Object;
 		}
 	}
 	MaxWalkSpeedCrouched = PLAYER_MOVE_CROUCH;
@@ -387,8 +401,12 @@ void UPlayerMovementComponent::GlidingMove(FVector2D ActionValue)
 
 void UPlayerMovementComponent::StepMove(FVector2D ActionValue)
 {
+	if (IsFalling())
+	{
+		return;
+	}
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
-
+	
 	Prev_StepLocation = GetOwner()->GetActorLocation();
 	// Front, Back
 	if (ActionValue.X != 0)
@@ -398,10 +416,12 @@ void UPlayerMovementComponent::StepMove(FVector2D ActionValue)
 		if (ActionValue.X == 1)
 		{
 			StepDirection = GetOwner()->GetActorForwardVector();
+			Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance()->Montage_Play(StepMontageAsset->StepF);
 		}
 		else
 		{
 			StepDirection = -GetOwner()->GetActorForwardVector();
+			Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance()->Montage_Play(StepMontageAsset->StepB);
 		}
 	}
 	// Left, Right
@@ -410,13 +430,19 @@ void UPlayerMovementComponent::StepMove(FVector2D ActionValue)
 		if (ActionValue.Y == 1)
 		{
 			StepDirection = GetOwner()->GetActorRightVector();
+			Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance()->Montage_Play(StepMontageAsset->StepR);
 		}
 		else
 		{
 			StepDirection = -GetOwner()->GetActorRightVector();
+			Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance()->Montage_Play(StepMontageAsset->StepL);
 		}
 	}
+	Prev_Length = 0.f;
+	m_GravitySpeed = 0.f;
+	StepTimeLine->SetNewTime(0.f);
 	StepTimeLine->Play();
+	SetMovementMode(MOVE_None);
 }
 
 
@@ -452,10 +478,76 @@ void UPlayerMovementComponent::StepProgress(float Value)
 {
 	AActor* Player = GetOwner();
 	Player->GetActorForwardVector();
-	float Length = FMath::Lerp(0.f, 200.f, Value);
-	FVector AddLocation = StepDirection * Length;
-	FVector Result = Prev_StepLocation + AddLocation;
-	Player->SetActorLocation(Result);
+	float Length = FMath::Lerp(0.f, PLAYER_STEP_DISTANCE, Value);
+
+
+
+
+
+
+	FVector AddLocation = StepDirection * (Length - Prev_Length);
+	FVector NextLocation = Prev_StepLocation + AddLocation;
+
+	FVector NS_WCLocation = Prev_StepLocation + StepDirection * PLAYER_CAPSULE_RADIUS * 3;
+
+
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(Player);
+	FHitResult HitResult;
+	if (GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		NextLocation,
+		NS_WCLocation,
+		ECC_Visibility,
+		TraceParams
+	))
+	{
+		StepTimeLine->Stop();
+		return;
+	}
+
+	FVector Half_Location = NextLocation;
+	Half_Location.Z = NextLocation.Z - PLAYER_CAPSULE_HALF_HEIGHT / 2;
+	FVector Half_WCLocation = NS_WCLocation;
+	Half_WCLocation.Z -= PLAYER_CAPSULE_HALF_HEIGHT / 2;
+
+
+
+	FVector NS_GCLocation = NextLocation;
+	NS_GCLocation.Z -= PLAYER_CAPSULE_HALF_HEIGHT;
+	//땅에 걸렸을때
+	DrawDebugLine(GetWorld(), NextLocation,
+		NS_WCLocation, FColor::Red, false, 2.f);
+	if (GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		NextLocation,
+		NS_GCLocation,
+		ECC_Visibility,
+		TraceParams
+	))
+	{
+
+		FVector HitLocation = HitResult.Location;
+		HitLocation.Z += PLAYER_CAPSULE_HALF_HEIGHT;
+		FVector DVector = (HitLocation - Prev_StepLocation).GetSafeNormal();
+		UE_LOG(LogTemp, Warning, TEXT("DVector.Z : %f"), DVector.Z);
+		Player->SetActorLocation(HitLocation);
+		Prev_StepLocation = HitLocation;
+		m_GravitySpeed = 0.f;
+	}
+	//땅에 안 걸렸을 때,
+	else
+	{
+		m_GravitySpeed = m_GravitySpeed + GRAVITY_MODIFY_SPEED * GetWorld()->GetDeltaSeconds();
+		m_GravitySpeed = GRAVITY_MAX_SPEED < m_GravitySpeed ? GRAVITY_MAX_SPEED : m_GravitySpeed;
+
+		NextLocation.Z -= m_GravitySpeed * GetWorld()->GetDeltaSeconds();
+		Player->SetActorLocation(NextLocation);
+		Prev_StepLocation = NextLocation;
+	}
+
+	Prev_Length = Length;
+
 }
 
 

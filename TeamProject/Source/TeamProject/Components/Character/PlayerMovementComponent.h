@@ -7,9 +7,28 @@
 #include "Misc/Utils.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/TimelineComponent.h"
+#include "Engine/DataAsset.h"
 #include "PlayerMovementComponent.generated.h"
-
 class UTimelineComponent;
+
+
+
+UCLASS()
+class TEAMPROJECT_API UStepMontageAsset : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, category = "Step")
+	UAnimMontage* StepF;
+	UPROPERTY(EditAnywhere, category = "Step")
+	UAnimMontage* StepB;
+	UPROPERTY(EditAnywhere, category = "Step")
+	UAnimMontage* StepL;
+	UPROPERTY(EditAnywhere, category = "Step")
+	UAnimMontage* StepR;
+
+};
 
 /**
  *
@@ -60,6 +79,7 @@ public:
 private:
 	bool CanGlide();
 
+	UFUNCTION()
 	void StepProgress(float Value);
 
 private:
@@ -88,6 +108,11 @@ private:
 
 	FVector Prev_StepLocation;
 
+	UStepMontageAsset* StepMontageAsset;
+
+	float m_GravitySpeed = 0.f;
+
+	float Prev_Length;
 public:
 
 	bool bIsClimbing = false;
