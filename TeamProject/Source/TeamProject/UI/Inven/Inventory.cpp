@@ -92,14 +92,11 @@ void UInventory::OnNavigate(const FInputActionValue& InputActionValue)
 {
     const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
-    // Deadzone ����
     if (ActionValue.IsNearlyZero())
         return;
 
-    // ���� ���� ���� �ϳ��� �ؼ�
     if (FMath::Abs(ActionValue.X) > FMath::Abs(ActionValue.Y))
     {
-        // �¿�
         if (ActionValue.X > 0)
             BP_InvenScroll->MoveSelection(FIntPoint(1, 0));
         else
@@ -107,7 +104,6 @@ void UInventory::OnNavigate(const FInputActionValue& InputActionValue)
     }
     else
     {
-        // ����
         if (ActionValue.Y > 0)
             BP_InvenScroll->MoveSelection(FIntPoint(0, -1));
         else
@@ -141,13 +137,13 @@ void UInventory::OnCreateItemInWorld(const FInputActionValue& InputActionValue)
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     if (!PlayerManager || !WorldItemActorClass) return;
 
-    // ���õ� ������ ��� (��: �κ� UI���� ������ ������ ��)
+    if (BP_InvenScroll->IsEmptyItem())
+        return;
+
     const FItemData& SelectedItem = BP_InvenScroll->GetCurItemData();
 
-    // ���� ID ������� ���� �� ��ȯ
     FItemData DroppedItem = PlayerManager->RemoveItemByUniqueID(SelectedItem.UniqueID);
 
-    // ���忡 ���� ����
     UWorld* World = GetWorld();
     if (!World) return;
 

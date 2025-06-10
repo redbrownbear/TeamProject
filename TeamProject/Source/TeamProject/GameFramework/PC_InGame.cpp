@@ -625,6 +625,13 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 	{
 		TreasureBox->CloseUI();
 	}
+
+	if (OverlappedItem != nullptr)
+	{
+		OverlappedItem->PickUpItem();
+		OverlappedItem = nullptr;
+	}
+
 }
 
 void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
