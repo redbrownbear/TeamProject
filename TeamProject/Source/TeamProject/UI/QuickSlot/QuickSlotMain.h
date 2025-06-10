@@ -30,10 +30,20 @@ private:
 	void RemoveDelegate();
 
 	void InitializePool(int32 PreloadCount);
-	void RefreshFirstSlot(eEquipParts Parts);
 
 	UFUNCTION()
 	void RefreshItems(const TArray<FItemData>& ItemDataList);
+
+public:
+	UFUNCTION()
+	void OnNavigate(const FInputActionValue& InputActionValue);
+	UFUNCTION()
+	void OnCancel();
+	void RefreshFirstSlot(eEquipParts Parts);
+
+private:
+	void MoveSelection(FIntPoint Direction);
+	void EquipCrrentItem();
 
 private:
 	UPROPERTY()
@@ -42,7 +52,7 @@ private:
 	TArray<UQuickItemSlot*> PooledSlots;
 
 	int32 CurrentIndex = 0;
-	EItemCategory CurrentCategory = EItemCategory::IT_Weapon;
+	eEquipParts CurrentPart = eEquipParts::NONE;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

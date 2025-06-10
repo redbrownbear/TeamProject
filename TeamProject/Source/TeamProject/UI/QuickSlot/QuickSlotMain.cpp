@@ -15,20 +15,6 @@ void UQuickSlotMain::ShowUI()
 {
     Super::ShowUI();
 
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-
-        PC_InGame->ChangeInputContext(EInputContext::IC_Inventory);
-
-        FInputModeGameAndUI InputMode;
-        InputMode.SetWidgetToFocus(TakeWidget());
-        InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-        InputMode.SetHideCursorDuringCapture(false);
-
-        PC_InGame->SetInputMode(InputMode);
-    }
-
     BindDelegates();
 }
 
@@ -43,7 +29,7 @@ void UQuickSlotMain::InitUI()
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     {
-        PC_InGame->BindInventoryInput();
+        PC_InGame->BindDialogueInput();
     }
 }
 
@@ -77,10 +63,87 @@ void UQuickSlotMain::InitializePool(int32 PreloadCount)
 
 void UQuickSlotMain::RefreshFirstSlot(eEquipParts Parts)
 {
+    CurrentPart = Parts;
     if (InitSlot)
     {
         InitSlot->InitFirstSlot(Parts);
     }
+}
+
+void UQuickSlotMain::MoveSelection(FIntPoint Direction)
+{
+    if (ActiveSlots.Num() == 0) return;
+
+    const int32 MaxIndex = ActiveSlots.Num() -1;
+
+    int32 NextIndex = CurrentIndex;
+
+    if (Direction.X != 0) // 좌우
+    {
+        NextIndex += Direction.X;
+    }
+
+    NextIndex = FMath::Clamp(NextIndex, 0, MaxIndex);
+
+    if (NextIndex != CurrentIndex)
+    {
+        ActiveSlots[CurrentIndex]->SetSelected(false);
+        ActiveSlots[NextIndex]->SetSelected(true);
+        CurrentIndex = NextIndex;
+    }
+
+    FItemData Itemdata = ActiveSlots[CurrentIndex]->GetItemData();
+}
+
+void UQuickSlotMain::EquipCrrentItem()
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    check(PlayerManager);
+
+    if (ActiveSlots.IsEmpty())
+        return;
+
+    for (UQuickItemSlot* slot : ActiveSlots)
+    {
+        FItemData Item = PlayerManager->GetItemByUniqueID(slot->GetItemData().UniqueID);
+        if (PlayerManager->IsEquipPart(Item.GetParts()) && Item.UniqueID == slot->GetItemData().UniqueID)
+        {
+            slot->SetEquiped(true);
+        }
+        else
+        {
+            slot->SetEquiped(false);
+        }
+    }
+}
+
+void UQuickSlotMain::OnNavigate(const FInputActionValue& InputActionValue)
+{
+    const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+
+    // Deadzone 방지
+    if (ActionValue.IsNearlyZero())
+        return;
+
+    // 가장 강한 방향 하나만 해석
+    if (FMath::Abs(ActionValue.X) > FMath::Abs(ActionValue.Y))
+    {
+        // 좌우
+        if (ActionValue.X > 0)
+            MoveSelection(FIntPoint(1, 0));
+        else
+            MoveSelection(FIntPoint(-1, 0));
+    }
+}
+
+void UQuickSlotMain::OnCancel()
+{
+    if (!ActiveSlots.IsEmpty())
+    {
+        ActiveSlots[CurrentIndex]->SetEquipDate();
+    }
+        
+    HideUI(UQuickSlotMain::StaticClass());
 }
 
 void UQuickSlotMain::RefreshItems(const TArray<FItemData>& ItemDataList)
@@ -139,7 +202,7 @@ void UQuickSlotMain::RefreshItems(const TArray<FItemData>& ItemDataList)
 
     for (FItemData Item : Items)
     {
-        if (Item.eItemCategory != CurrentCategory)
+        if (Item.GetParts() != CurrentPart)
             continue;
 
         UQuickItemSlot* NewSlot = nullptr;
@@ -157,5 +220,11 @@ void UQuickSlotMain::RefreshItems(const TArray<FItemData>& ItemDataList)
         ActiveSlots.Add(NewSlot);
     }
 
-    RefreshFirstSlot(ItemDataList[0].GetParts());
+    if (ActiveSlots.IsEmpty())
+        return;
+
+    CurrentIndex = 0;
+
+    EquipCrrentItem();
+    ActiveSlots[CurrentIndex]->SetSelected(true);
 }

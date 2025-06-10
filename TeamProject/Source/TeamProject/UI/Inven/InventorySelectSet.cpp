@@ -46,13 +46,13 @@ void UInventorySelectSet::ShowButton(bool bIsShow, FItemData InItemData)
 		case EItemCategory::IT_Shield:
 		case EItemCategory::IT_Armor:
 		{
-			//TextUse->SetText(FText::FromString(TEXT("±¸¸Å")));
+			//TextUse->SetText(FText::FromString(TEXT("ï¿½ï¿½ï¿½ï¿½")));
 			break;
 		}
 		case EItemCategory::IT_Food:
 		case EItemCategory::IT_Material:
 		{
-			TextUse->SetText(FText::FromString(TEXT("»ç¿ë")));
+			TextUse->SetText(FText::FromString(TEXT("ï¿½ï¿½ï¿½")));
 			break;
 		}
 	}

@@ -91,4 +91,13 @@ protected:
     virtual void OnDie() override;
     virtual void OnDeadEnd() override;
 
+protected:
+    UMaterialInterface* MaterialInterface;
+    UMaterialInstanceDynamic* DynamicMaterialInstance;
+
+protected:
+    virtual UMaterialInterface* GetMaterialInterface() override;
+    virtual UMaterialInstanceDynamic* GetDynamicMaterialInstance() override;
+public:
+    void AddBaseColor(FVector InColor);
 };

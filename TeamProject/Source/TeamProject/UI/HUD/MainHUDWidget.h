@@ -12,6 +12,8 @@
 #include "Components/WrapBox.h"
 #include "Components/Progressbar.h"
 
+#include "UI/HUD/HUDMiniMap.h"
+
 #include "MainHUDWidget.generated.h"
 
 /**
@@ -73,6 +75,9 @@ public:
 
 	UPROPERTY(meta = (BindWIdget))
 	UWrapBox* HpWrapBox;
+
+private:
+	UHUDMiniMap* BP_MiniMap;
 
 public:
 	UTexture2D* HpFull;

@@ -4,7 +4,10 @@
 #include "UI/Map/MainMap.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PC_InGame.h"
+#include "Components/CanvasPanelSlot.h"
 
+const FVector2D UMainMap::MAP_MIN_WORLD = FVector2D(2850.f, -34510.f);
+const FVector2D UMainMap::MAP_MAX_WORLD = FVector2D(36350.f, -17850.f);
 
 void UMainMap::OnCreated()
 {
@@ -19,7 +22,7 @@ void UMainMap::ShowUI()
     if (PC_InGame)
     {
 
-        PC_InGame->ChangeInputContext(EInputContext::IC_Dialogue);
+        PC_InGame->ChangeInputContext(EInputContext::IC_Map);
 
         FInputModeGameAndUI InputMode;
         InputMode.SetWidgetToFocus(TakeWidget());
@@ -32,7 +35,7 @@ void UMainMap::ShowUI()
 
 void UMainMap::HideUI(TSubclassOf<UBaseUI> UIClass)
 {
-    Super::HideUI(UQuickSlotMain::StaticClass());
+    Super::HideUI(UMainMap::StaticClass());
 }
 
 void UMainMap::InitUI()
@@ -42,55 +45,63 @@ void UMainMap::InitUI()
     {
         PC_InGame->BindDialogueInput();
     }
+
+    ImageQuest->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UMainMap::SetMapData(const TArray<FMapTileInfo>& InTiles)
+FVector2D UMainMap::ConvertWorldToMapPosition(const FVector& WorldLocation, const FVector2D& CurrentPanelSize) const
 {
-    MapTiles = InTiles;
+    float NormalizedX = (WorldLocation.X - MAP_MIN_WORLD.X) / (MAP_MAX_WORLD.X - MAP_MIN_WORLD.X);
+    float NormalizedY = (WorldLocation.Y - MAP_MIN_WORLD.Y) / (MAP_MAX_WORLD.Y - MAP_MIN_WORLD.Y);
 
-    if (MapTiles.Num() == 0) return;
+    FVector2D MapPos;
+    MapPos.X = FMath::Clamp(NormalizedX, 0.f, 1.f) * CurrentPanelSize.X;
+    MapPos.Y = FMath::Clamp(NormalizedY, 0.f, 1.f) * CurrentPanelSize.Y;
 
-    MinWorld = FVector2D(MapTiles[0].WorldLocation.X, MapTiles[0].WorldLocation.Y);
-    MaxWorld = FVector2D(MapTiles[0].WorldLocation.X, MapTiles[0].WorldLocation.Y);
+    return MapPos;
+}
 
-    for (const auto& Tile : MapTiles)
-    {
-        MinWorld.X = FMath::Min(MinWorld.X, Tile.WorldLocation.X);
-        MinWorld.Y = FMath::Min(MinWorld.Y, Tile.WorldLocation.Y);
-        MaxWorld.X = FMath::Max(MaxWorld.X, Tile.WorldLocation.X);
-        MaxWorld.Y = FMath::Max(MaxWorld.Y, Tile.WorldLocation.Y);
-    }
+void UMainMap::SetPlayerData()
+{
+    
+}
+
+void UMainMap::OnCancel()
+{
+    HideUI(UMainMap::StaticClass());
 }
 
 int32 UMainMap::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
-    if (MapTiles.Num() == 0) return LayerId;
+    const APlayerController* PlayerController = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+    const APawn* PlayerPawn = PlayerController ? PlayerController->GetPawn() : nullptr;
 
-    FVector2D Size = AllottedGeometry.GetLocalSize();
+    if (!PlayerPawn)
+        return LayerId + 1;
+    
+    if (PlayerWorldPos == GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation())
+        return LayerId + 1;
 
-    for (const FMapTileInfo& Tile : MapTiles)
-    {
-        FVector2D NormalizedPos = {
-            (Tile.WorldLocation.X - MinWorld.X) / (MaxWorld.X - MinWorld.X),
-            (Tile.WorldLocation.Y - MinWorld.Y) / (MaxWorld.Y - MinWorld.Y)
-        };
+    FVector2D PanelSize = ImageMap->GetCachedGeometry().GetLocalSize();
 
-        FVector2D DrawPos = NormalizedPos * Size;
+    UCanvasPanelSlot* MapPanelSlot = Cast<UCanvasPanelSlot>(SizeBoxMap->Slot);
+    check(MapPanelSlot);
 
-        FLinearColor Color = Tile.bIsWalkable ? FLinearColor::White : FLinearColor::Gray;
-        Color *= FMath::Clamp(Tile.Height / 300.0f, 0.2f, 1.0f); // 높이에 따른 명암
+    UCanvasPanelSlot* PlayerPanelSlot = Cast<UCanvasPanelSlot>(ImagePlayer->Slot);
+    check(PlayerPanelSlot);
 
-        FVector2D SizeBox = FVector2D(2.0f, 2.0f); // 타일 크기
+    PlayerWorldPos = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
 
-        FSlateDrawElement::MakeBox(
-            OutDrawElements,
-            LayerId,
-            AllottedGeometry.ToPaintGeometry(DrawPos, SizeBox),
-            FCoreStyle::Get().GetBrush("WhiteBrush"),
-            ESlateDrawEffect::None,
-            Color
-        );
-    }
+    FVector2D MapPos = ConvertWorldToMapPosition(PlayerWorldPos, PanelSize);
 
+    PlayerPanelSlot->SetPosition(MapPos);
+
+    float Yaw = PlayerPawn->GetActorRotation().Yaw;
+
+    FWidgetTransform Transform;
+    Transform.Angle = Yaw + 90.0f;
+
+    ImagePlayer->SetRenderTransform(Transform);
+    
     return LayerId + 1;
 }

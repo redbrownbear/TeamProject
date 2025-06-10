@@ -3,6 +3,7 @@
 
 #include "SubSystem/PlayerManager.h"
 #include "SubSystem/UI/QuestManager.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 void UPlayerManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -57,8 +58,37 @@ void UPlayerManager::SetEquipData(const FItemData& ItemRow)
 
     // �� ������ �߰�
     EquipItemList.Add(ItemRow);
-
+    SetWeaponMesh(ItemRow.GetParts(), ItemRow.StaticMesh);
     UpDateInvenEquipUI(EquipItemList);
+}
+
+void UPlayerManager::SetWeaponMesh(eEquipParts Parts, UStaticMesh* _Mesh)
+{
+    APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+    switch (Parts)
+    {
+    case eEquipParts::NONE:
+        break;
+    case eEquipParts::HEAD:
+        break;
+    case eEquipParts::ARMOR:
+        break;
+    case eEquipParts::UNDER:
+        break;
+    case eEquipParts::RIGHT:
+        Player_C->SetSwordStaticMesh(_Mesh);
+        break;
+    case eEquipParts::LEFT:
+        Player_C->SetShieldStaticMesh(_Mesh);
+        break;
+    case eEquipParts::BOWRIGHT:
+        Player_C->SetBowStaticMesh(_Mesh);
+        break;
+    case eEquipParts::ARROWLEFT:
+        break;
+    default:
+        break;
+    }
 }
 
 void UPlayerManager::ShowEquipUI()
