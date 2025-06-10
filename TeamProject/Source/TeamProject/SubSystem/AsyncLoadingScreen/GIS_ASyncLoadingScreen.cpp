@@ -90,7 +90,7 @@ void UGIS_ASyncLoadingScreen::OpenLevelWithLoadingScreen(const TSoftObjectPtr<UW
 	FStreamableManager& Streamable = UAssetManager::GetStreamableManager();
 	Streamable.RequestAsyncLoad(Level.ToSoftObjectPath(), FStreamableDelegate::CreateLambda([this, Level]()
 		{
-			// ¿¹: 0.5ÃÊ µô·¹ÀÌ ÈÄ ¾À ÀüÈ¯
+			// ï¿½ï¿½: 0.5ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½È¯
 			GetWorld()->GetTimerManager().SetTimerForNextTick([this, Level]()
 				{
 					FTimerHandle TimerHandle;

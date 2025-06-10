@@ -133,13 +133,13 @@ void AWeaponSword::Attack()
     FVector ActorLocation = OwnerActor->GetActorLocation();
     FRotator ActorRotation = OwnerActor->GetActorRotation();
 
-    FRotator LeftRotator = FRotator(0.f, ActorRotation.Yaw - 15.f, 0.f);
-    FVector LeftVector = LeftRotator.RotateVector(FVector::ForwardVector) * 70.f + ActorLocation;
+    FRotator LeftRotator = FRotator(0.f, ActorRotation.Yaw - 20.f, 0.f);
+    FVector LeftVector = LeftRotator.RotateVector(FVector::ForwardVector) * 90.f + ActorLocation;
 
-    FRotator RightRotator = FRotator(0.f, ActorRotation.Yaw + 15.f, 0.f);
-    FVector RightVector = RightRotator.RotateVector(FVector::ForwardVector) * 70.f + ActorLocation;
+    FRotator RightRotator = FRotator(0.f, ActorRotation.Yaw + 20.f, 0.f);
+    FVector RightVector = RightRotator.RotateVector(FVector::ForwardVector) * 90.f + ActorLocation;
 
-    FVector HalfSize = FVector(10.f, 10.f, 10.f);
+    FVector HalfSize = FVector(20.f, 20.f, 10.f);
 
     TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
     ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1));

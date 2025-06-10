@@ -18,7 +18,12 @@ class ACampFire;
 class UAnimInstance;
 class USkeletalMeshComponent;
 
+class UMaterialInterface;
+class UMaterialInstanceDynamic;
+
 struct FMonsterTableRow;
+
+
 
 UINTERFACE()
 class UMonsterInterface : public UInterface
@@ -69,4 +74,10 @@ protected:
 public:
 	FName GetName() const;
 	float GetDamageFromWeapon();
+
+public:
+	virtual void AddBaseColor(FVector InColor) = 0;
+protected:
+	virtual UMaterialInterface* GetMaterialInterface() = 0;
+	virtual UMaterialInstanceDynamic* GetDynamicMaterialInstance() = 0;
 };

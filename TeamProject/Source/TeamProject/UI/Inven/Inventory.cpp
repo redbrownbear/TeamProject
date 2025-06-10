@@ -92,14 +92,14 @@ void UInventory::OnNavigate(const FInputActionValue& InputActionValue)
 {
     const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
-    // Deadzone ¹æÁö
+    // Deadzone ï¿½ï¿½ï¿½ï¿½
     if (ActionValue.IsNearlyZero())
         return;
 
-    // °¡Àå °­ÇÑ ¹æÇâ ÇÏ³ª¸¸ ÇØ¼®
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½Ø¼ï¿½
     if (FMath::Abs(ActionValue.X) > FMath::Abs(ActionValue.Y))
     {
-        // ÁÂ¿ì
+        // ï¿½Â¿ï¿½
         if (ActionValue.X > 0)
             BP_InvenScroll->MoveSelection(FIntPoint(1, 0));
         else
@@ -107,7 +107,7 @@ void UInventory::OnNavigate(const FInputActionValue& InputActionValue)
     }
     else
     {
-        // »óÇÏ
+        // ï¿½ï¿½ï¿½ï¿½
         if (ActionValue.Y > 0)
             BP_InvenScroll->MoveSelection(FIntPoint(0, -1));
         else
@@ -141,13 +141,13 @@ void UInventory::OnCreateItemInWorld(const FInputActionValue& InputActionValue)
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     if (!PlayerManager || !WorldItemActorClass) return;
 
-    // ¼±ÅÃµÈ ¾ÆÀÌÅÛ ¾ò±â (¿¹: ÀÎº¥ UI¿¡¼­ ¼±ÅÃÇÑ ¾ÆÀÌÅÛ µî)
+    // ï¿½ï¿½ï¿½Ãµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ (ï¿½ï¿½: ï¿½Îºï¿½ UIï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½)
     const FItemData& SelectedItem = BP_InvenScroll->GetCurItemData();
 
-    // °íÀ¯ ID ±â¹ÝÀ¸·Î Á¦°Å ¹× ¹ÝÈ¯
+    // ï¿½ï¿½ï¿½ï¿½ ID ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½È¯
     FItemData DroppedItem = PlayerManager->RemoveItemByUniqueID(SelectedItem.UniqueID);
 
-    // ¿ùµå¿¡ ¾×ÅÍ ½ºÆù
+    // ï¿½ï¿½ï¿½å¿¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     UWorld* World = GetWorld();
     if (!World) return;
 
@@ -185,12 +185,12 @@ void UInventory::OnCreateItemTest(const FInputActionValue& InputActionValue)
                 RandomItem.UniqueID = FGuid::NewGuid().ToString();
                 PlayerManager->SetInvenData(RandomItem);
 
-                // »ç¿ë ¿¹
-                UE_LOG(LogTemp, Log, TEXT("·£´ý Name: %s"), *RandomItem.Name);
+                // ï¿½ï¿½ï¿½ ï¿½ï¿½
+                UE_LOG(LogTemp, Log, TEXT("ï¿½ï¿½ï¿½ï¿½ Name: %s"), *RandomItem.Name);
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("¾ÆÀÌÅÛ µ¥ÀÌÅÍ°¡ ¾ø°Å³ª FoundRowsPtr°¡ nullÀÔ´Ï´Ù."));
+                UE_LOG(LogTemp, Warning, TEXT("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í°ï¿½ ï¿½ï¿½ï¿½Å³ï¿½ FoundRowsPtrï¿½ï¿½ nullï¿½Ô´Ï´ï¿½."));
             }
         }
     }

@@ -201,7 +201,7 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		CollisionComponent->SetSphereRadius(NpcData->CollisionSphereRadius);
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::NPC);
 		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
-		CollisionComponent->RegisterComponent();
+		//CollisionComponent->RegisterComponent();
 		CollisionComponent->SetCanEverAffectNavigation(false);
 	}
 

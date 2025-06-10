@@ -190,14 +190,14 @@ void UHinoxFSMComponent::UpdateIdle(float DeltaTime)
 
 	if (Player)
 	{
-		FTimerHandle TimerHandle;
-		EMonsterState TargetState = EMonsterState::Combat;
 
 		if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::SLEEP_END))
 		{
 			CharacterMonster->PlayMontage(EMonsterMontage::SLEEP_END);
 		}
 
+		FTimerHandle TimerHandle;
+		EMonsterState TargetState = EMonsterState::Combat;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, TargetState]()
 			{
 				ChangeState(TargetState);
