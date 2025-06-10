@@ -86,6 +86,7 @@
 #define PLAYER_GLIDE_ROTATE_SPEED													100.f
 
 #define PLAYER_STEP_DISTANCE														400.f
+#define PLAYER_BACKFLIP_SPEED														200.f
 #define GRAVITY_MODIFY_SPEED														980.f
 #define GRAVITY_MAX_SPEED															1200.f
 

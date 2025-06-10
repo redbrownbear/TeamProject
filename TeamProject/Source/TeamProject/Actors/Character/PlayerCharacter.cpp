@@ -16,6 +16,7 @@
 #include "UI/HUD/MainHUD.h"
 #include "Actors/Projectile/Arrow/Projectile_Arrow.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Animation/AnimInstance/PlayerAnimInstance.h"
 // Sets default values
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -199,9 +200,17 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(GetCharacterMovement());
-	Movement->SetGlideMode(false);
-	GetMesh()->GetAnimInstance()->Montage_Play(Movement->GetGlideUnEquipMontage());
-	
+
+	if (Movement->GetMoveState() == EMove_State::BackFlip)
+	{
+
+		UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+		AnimInst->bIsBackFlip = false;
+	}
+	if (Movement->GetMoveState() == EMove_State::Glide)
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(Movement->GetGlideUnEquipMontage());
+	}
 
 }
 

@@ -79,6 +79,8 @@ public:
 	UInputAction* IA_Crouch = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_Step = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
+	UInputAction* IA_BackFlip = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Input|CharacterMove")
 	UInputAction* IA_LeftClick = nullptr;
@@ -237,6 +239,7 @@ protected:
 	void StartedStep(const FInputActionValue& InputActionValue);
 	void CompletedStep(const FInputActionValue& InputActionValue);
 
+	void OnBackFlip(const FInputActionValue& InputActionValue);
 
 	void OnLook(const FInputActionValue& InputActionValue);
 	void Climb(const FInputActionValue& InputActionValue);

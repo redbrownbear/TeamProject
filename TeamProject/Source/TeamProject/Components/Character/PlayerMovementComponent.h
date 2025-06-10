@@ -75,6 +75,8 @@ public:
 
 	void Hited();
 
+	void BackFlip();
+
 
 private:
 	bool CanGlide();

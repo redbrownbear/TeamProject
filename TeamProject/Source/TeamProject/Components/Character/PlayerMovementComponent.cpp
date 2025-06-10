@@ -452,6 +452,24 @@ void UPlayerMovementComponent::Hited()
 	Owner_C->GetMesh()->GetAnimInstance()->Montage_Play(HitMontage);
 }
 
+void UPlayerMovementComponent::BackFlip()
+{
+
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
+	AnimInst->bIsBackFlip = true;
+
+	FVector ForwardVector = Player_C->GetActorForwardVector();
+
+	ForwardVector *= PLAYER_BACKFLIP_SPEED;
+	
+	Player_C->Jump();
+
+	Velocity.X = -ForwardVector.X;
+	Velocity.Y = -ForwardVector.Y;
+
+}
+
 bool UPlayerMovementComponent::CanGlide()
 {
 	AActor* Owner_C = GetOwner();
@@ -534,6 +552,7 @@ void UPlayerMovementComponent::StepProgress(float Value)
 		Player->SetActorLocation(HitLocation);
 		Prev_StepLocation = HitLocation;
 		m_GravitySpeed = 0.f;
+		Velocity.Z = m_GravitySpeed;
 	}
 	//땅에 안 걸렸을 때,
 	else
@@ -544,6 +563,7 @@ void UPlayerMovementComponent::StepProgress(float Value)
 		NextLocation.Z -= m_GravitySpeed * GetWorld()->GetDeltaSeconds();
 		Player->SetActorLocation(NextLocation);
 		Prev_StepLocation = NextLocation;
+		Velocity.Z = m_GravitySpeed;
 	}
 
 	Prev_Length = Length;

@@ -120,7 +120,8 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Triggered, this, &ThisClass::StartedStep);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Step,
 		ETriggerEvent::Completed, this, &ThisClass::CompletedStep);
-
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_BackFlip,
+		ETriggerEvent::Started, this, &ThisClass::OnBackFlip);
 	
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Crouch,
@@ -394,7 +395,6 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 			Stemina -= DeltaTime * STEMINA_USE_SPEED;
 			PlayerManager->SetPlayerStamina(Stemina);
-			UE_LOG(LogTemp, Warning, TEXT("Dash"));
 		}
 	}
 }
@@ -426,7 +426,6 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	PlayerManager->SetStaminaUSe(false);
 
-	UE_LOG(LogTemp, Warning, TEXT("ActionValue %f, %f"), ActionValue.X, ActionValue.Y);
 	P_Anim->ActionValue = ActionValue;
 }
 
@@ -491,6 +490,12 @@ void APC_InGame::CompletedStep(const FInputActionValue& InputActionValue)
 	{
 		Movement->SetMoveState(EMove_State::Run);
 	}
+}
+
+void APC_InGame::OnBackFlip(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement())->BackFlip();
 }
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
