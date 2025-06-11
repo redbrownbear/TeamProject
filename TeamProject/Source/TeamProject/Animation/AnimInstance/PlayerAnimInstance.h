@@ -37,6 +37,8 @@ public:
 	bool bIsCrouch = false;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsFalling = false;
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsBackFlip = false;
 
 	UPROPERTY(BlueprintReadOnly)
 	FVector2D ActionValue;

@@ -14,10 +14,12 @@
 #include "Components/WeaponChildActorComponent/WeaponChildActorComponent.h"
 #include "Components/StatusComponent/PlayerStatusComponent/PlayerStatusComponent.h"
 #include "Components/Character/WeaponManagerComponent.h"
+#include "Components/Character/PlayerMovementComponent.h"
 #include "Components/TimelineComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GenericTeamAgentInterface.h"
 #include "Misc/Utils.h"
+
 #include "PlayerCharacter.generated.h"
 class UPlayerManager;
 
@@ -60,14 +62,16 @@ public:
 	UPlayerStatusComponent* GetPlayerStatusComponent() { return StatusComponent; }
 	UWeaponManagerComponent* GetWeaponManagerComponent() { return WeaponManagerComponent; }
 	USpringArmComponent* GetSpringArm() { return SpringArm; }
+	EMove_State GetMoveState() { return Cast<UPlayerMovementComponent>(GetCharacterMovement())->GetMoveState(); }
+
 
 	
 	void SetBowStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetBowStaticMesh(InMesh); }
 	void SetSwordStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetSwordStaticMesh(InMesh); }
 	void SetShieldStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetShieldStaticMesh(InMesh); }
 
-	bool GetIsGuard() { return WeaponManagerComponent->GetIsGuard(); }
-
+	bool GetIsParry() { return WeaponManagerComponent->GetIsParry(); }
+	bool GetIsHoldingShield() { return WeaponManagerComponent->GetIsHoldingShield(); }
 
 	void Damaged(int32 Damage);
 

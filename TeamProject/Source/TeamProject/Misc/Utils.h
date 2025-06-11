@@ -438,6 +438,9 @@ enum class EMove_State
     Dash,
     Zoom,
     Crouch,
+    Step,
+    BackFlip,
+    Hit
 };
 
 UENUM()

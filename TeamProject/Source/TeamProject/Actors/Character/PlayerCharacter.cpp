@@ -16,6 +16,7 @@
 #include "UI/HUD/MainHUD.h"
 #include "Actors/Projectile/Arrow/Projectile_Arrow.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Animation/AnimInstance/PlayerAnimInstance.h"
 // Sets default values
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -199,9 +200,20 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(GetCharacterMovement());
-	Movement->SetGlideMode(false);
-	GetMesh()->GetAnimInstance()->Montage_Play(Movement->GetGlideUnEquipMontage());
-	
+
+	if (Movement->GetMoveState() == EMove_State::BackFlip)
+	{
+		UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
+		AnimInst->bIsBackFlip = false;
+		Movement->JumpZVelocity = PLAYER_NML_JUMP_HEIGHT;
+		Movement->SetMoveState(EMove_State::Run);
+	}
+	if (Movement->GetMoveState() == EMove_State::Glide)
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(Movement->GetGlideUnEquipMontage());
+		Movement->SetMoveState(EMove_State::Run);
+		Movement->SetGlideMode(false);
+	}
 
 }
 
@@ -211,7 +223,12 @@ void APlayerCharacter::Damaged(int32 Damage)
 {
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	const int32 CurrentHP = PlayerManager->GetHp();
-	
+	EMove_State Move_State = Cast<UPlayerMovementComponent>(GetCharacterMovement())->GetMoveState();
+	if (Move_State == EMove_State::BackFlip || Move_State == EMove_State::Step)
+	{
+		return;
+	}
+
 	if (CurrentHP != 0)
 	{
 		int32 AfterHP = CurrentHP - Damage;
@@ -220,7 +237,7 @@ void APlayerCharacter::Damaged(int32 Damage)
 		Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateHp();
 		UE_LOG(LogTemp, Warning, TEXT("%d"), AfterHP);
 
-		GetCharacterMovement()->SetMovementMode(MOVE_None);
+		Cast<UPlayerMovementComponent>(GetCharacterMovement())->SetMoveState(EMove_State::Hit);
 
 	}
 	
