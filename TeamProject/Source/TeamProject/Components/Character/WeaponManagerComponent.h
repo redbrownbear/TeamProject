@@ -57,10 +57,10 @@ public:
 
 	void SetCanSwordAttack();
 
-	bool GetIsGuard() { return bIsGuard; }
-	void SetIsGuard(bool bFlag) { bIsGuard = bFlag; }
+	bool GetIsParry() { return bIsGuard; }
+	void SetIsParry(bool bFlag) { bIsGuard = bFlag; }
 
-	bool GetIsShieldAlready();
+	bool GetIsHoldingShield();
 
 
 	EWeapon_Type GetUnEquipWeaponType() {

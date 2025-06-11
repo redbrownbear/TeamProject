@@ -375,7 +375,9 @@ void APC_InGame::JumpGlide(const FInputActionValue& InputActionValue)
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 	if (Movement->IsFalling())
 	{
-		Movement->SetGlideMode(true);
+		EMove_State MoveState = Movement->GetMoveState();
+		if (MoveState == EMove_State::Run||MoveState == EMove_State::Dash)
+			Movement->SetGlideMode(true);
 	}
 	else
 	{

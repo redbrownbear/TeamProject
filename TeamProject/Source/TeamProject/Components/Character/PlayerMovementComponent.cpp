@@ -88,6 +88,7 @@ void UPlayerMovementComponent::BeginPlay()
 
 	GetNavAgentPropertiesRef().bCanCrouch = true;
 
+	JumpZVelocity = PLAYER_NML_JUMP_HEIGHT;
 }
 
 bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
@@ -470,7 +471,7 @@ void UPlayerMovementComponent::BackFlip()
 	FVector ForwardVector = Player_C->GetActorForwardVector();
 
 	ForwardVector *= PLAYER_BACKFLIP_SPEED;
-	
+	JumpZVelocity = PLAYER_BACKFLIP_HEIGHT;
 	Player_C->Jump();
 
 	Velocity.X = -ForwardVector.X;

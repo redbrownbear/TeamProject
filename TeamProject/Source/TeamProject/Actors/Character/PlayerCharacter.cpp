@@ -203,9 +203,9 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 	if (Movement->GetMoveState() == EMove_State::BackFlip)
 	{
-
 		UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		AnimInst->bIsBackFlip = false;
+		Movement->JumpZVelocity = PLAYER_NML_JUMP_HEIGHT;
 		Movement->SetMoveState(EMove_State::Run);
 	}
 	if (Movement->GetMoveState() == EMove_State::Glide)
@@ -223,7 +223,8 @@ void APlayerCharacter::Damaged(int32 Damage)
 {
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	const int32 CurrentHP = PlayerManager->GetHp();
-	if (Cast<UPlayerMovementComponent>(GetCharacterMovement())->GetMoveState() == EMove_State::BackFlip)
+	EMove_State Move_State = Cast<UPlayerMovementComponent>(GetCharacterMovement())->GetMoveState();
+	if (Move_State == EMove_State::BackFlip || Move_State == EMove_State::Step)
 	{
 		return;
 	}

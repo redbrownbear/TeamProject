@@ -70,8 +70,8 @@ public:
 	void SetSwordStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetSwordStaticMesh(InMesh); }
 	void SetShieldStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetShieldStaticMesh(InMesh); }
 
-	bool GetIsGuard() { return WeaponManagerComponent->GetIsGuard(); }
-	bool GetIsShieldAlready() { return WeaponManagerComponent->GetIsShieldAlready(); }
+	bool GetIsParry() { return WeaponManagerComponent->GetIsParry(); }
+	bool GetIsHoldingShield() { return WeaponManagerComponent->GetIsHoldingShield(); }
 
 	void Damaged(int32 Damage);
 

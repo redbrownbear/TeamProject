@@ -177,11 +177,11 @@ void UWeaponManagerComponent::SetCanSwordAttack()
 	Cast<AWeaponSword>(Sword->GetChildActor())->SetCanAttack();
 }
 
-bool UWeaponManagerComponent::GetIsShieldAlready()
+bool UWeaponManagerComponent::GetIsHoldingShield()
 {
 	if (GetEquipState() == EEquip_State::Sword_Shield || GetEquipState() == EEquip_State::Shield)
 	{
-		return bRightClick;
+		return bCanShot;
 	}
 	return false;
 }
