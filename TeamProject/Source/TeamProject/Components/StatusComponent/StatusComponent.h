@@ -7,7 +7,7 @@
 #include "StatusComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHPChanged, float, CurrentHP, float, MaxHP);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDie);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDie);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TEAMPROJECT_API UStatusComponent : public UActorComponent
@@ -40,8 +40,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHPChanged OnHPChanged;
-	UPROPERTY(BlueprintAssignable)
-	FOnDie OnDie;
+	//UPROPERTY(BlueprintAssignable)
+	//FOnDie OnDie;
 	float GetCurrentHP() const { return HP; }
 	float GetMaxHP() const { return MaxHP; }
 	void SetMaxHP(float inHP);

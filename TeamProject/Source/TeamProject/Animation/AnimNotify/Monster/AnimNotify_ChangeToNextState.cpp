@@ -12,7 +12,7 @@ void UAnimNotify_ChangeToNextState::Notify(USkeletalMeshComponent* MeshComp, UAn
 		if (ULynelFSMComponent* FSMComponent = Cast<ULynelFSMComponent>(Monster->GetFSMComponent()))
 		{
 			const EMonsterState eNextState = FSMComponent->GetNextState();
-			const EMonsterState eCurrentState = FSMComponent->GetMonsterState();
+			const EMonsterState eCurrentState = FSMComponent->GetCurrentState();
 
 			if (eNextState != eCurrentState)
 			{

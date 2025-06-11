@@ -15,7 +15,7 @@
 
 void UNPCDialogue::OnCreated()
 {
-
+    InitUI();
 }
 
 void UNPCDialogue::ShowUI()
@@ -42,7 +42,6 @@ void UNPCDialogue::ShowUI()
         PC_InGame->SetInputMode(InputMode);
     }
 
-    InitUI();
     BindDelegates();
 }
 

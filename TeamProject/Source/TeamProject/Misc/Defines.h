@@ -47,11 +47,12 @@
 #define LYNEL_AWAY_FROM_LINK_OFFSET													1000.f
 
 #define HINOX_DAMAGE_EYE_MAX_TIME													5.f
-#define HINOX_NEAR_INSTANCE															300.f
+#define HINOX_NEAR_INSTANCE															400.f
 
 #define ASSASIN_LEADER_ATTACK_COOLTIME_MAX											3.f
 #define ASSASIN_LEADER_ATTACK_BIG_COOLTIME_MAX										6.f
 #define ASSASIN_LEADER_DISTANCE_MAX													600.f
+#define ASSASIN_LEADER_ATTACK_OFFSET												300.f
 
 #define ASSASIN_BOSS_BARRIER_MAX_TIME												3.f
 #define ASSASIN_BOSS_STONE_FIRST_MAX_TIME											5.f
