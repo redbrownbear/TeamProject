@@ -32,8 +32,13 @@ private:
 public:
     void SetPlayerData();
 
+public:
     UFUNCTION()
-    void OnCancel();
+    virtual void OnNavigate(const FInputActionValue& Value) override {}
+    UFUNCTION()
+    virtual void OnConfirm(const FInputActionValue& Value) override {}
+    UFUNCTION()
+    virtual void OnCancel(const FInputActionValue& Value) override;
 
 protected:
     virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect,

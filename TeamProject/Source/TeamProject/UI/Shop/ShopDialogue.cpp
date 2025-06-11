@@ -28,6 +28,8 @@ void UShopDialogue::InitUI()
     ExtraButton->SetVisibility(ESlateVisibility::Collapsed);
 
     ActionLay->SetVisibility(ESlateVisibility::Visible);
+
+    bIsSelect = false;
 }
 
 void UShopDialogue::SetBuy()
@@ -44,7 +46,9 @@ void UShopDialogue::SetBuy()
     InputMode.SetWidgetToFocus(TakeWidget());
 
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Buy);
+    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Buy);    
+
+    bIsSelect = true;
 }
 
 void UShopDialogue::SetSell()
@@ -57,10 +61,11 @@ void UShopDialogue::SetSell()
         ConfirmButton->SetVisibility(ESlateVisibility::Visible);
         CancelButton->SetVisibility(ESlateVisibility::Visible);
 
-        ActionLay->SetVisibility(ESlateVisibility::Hidden);
-
         ConfrimText->SetText(FText::FromString(TEXT("판매")));
         CancelText->SetText(FText::FromString(TEXT("취소")));
+
+        bIsSelect = true;
+        ActionLay->SetVisibility(ESlateVisibility::Hidden);
 
         APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
         PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
@@ -142,6 +147,7 @@ void UShopDialogue::OnConfirm()
                 ShopManager->AddPlayerRupee();
                 ShopManager->SubtractItemInventory();
 
+                //이거 뭘 원하는거임?ㅋㅋ
                 const FItemData SelectedItemData = ShopManager->GetSelectedItem();
                 TArray<FShopDataRow> CurrentShopDataArray = ShopManager->GetShopData(PC_InGame->Npc->GetQuestCharacterType());
                 int iShopDataIndex = -1;
@@ -158,6 +164,7 @@ void UShopDialogue::OnConfirm()
                 {
                     UE_LOG(LogTemp, Error, TEXT("ShopDialogue::OnConfirm() // No valid item in shop"));
                     check(false);
+                    return;
                 }
 
 
@@ -175,7 +182,6 @@ void UShopDialogue::OnConfirm()
     EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
 
     int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
-
     QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
     
     PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Shop);
@@ -184,8 +190,6 @@ void UShopDialogue::OnConfirm()
 void UShopDialogue::OnCancel()
 {
     InitUI();
-
-    //바인드 돌리기 
 
     UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
     check(QuestManager);

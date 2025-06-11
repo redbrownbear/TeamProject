@@ -24,6 +24,14 @@ public:
 	virtual void ShowUI() override;
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
+public:
+	UFUNCTION()
+	virtual void OnNavigate(const FInputActionValue& Value) override;
+	UFUNCTION()
+	virtual void OnConfirm(const FInputActionValue& Value) override {}
+	UFUNCTION()
+	virtual void OnCancel(const FInputActionValue& Value) override;
+
 private:
 	void InitUI();
 	void BindDelegates();
@@ -35,10 +43,6 @@ private:
 	void RefreshItems(const TArray<FItemData>& ItemDataList);
 
 public:
-	UFUNCTION()
-	void OnNavigate(const FInputActionValue& InputActionValue);
-	UFUNCTION()
-	void OnCancel();
 	void RefreshFirstSlot(eEquipParts Parts);
 
 private:

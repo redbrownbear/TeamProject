@@ -15,12 +15,18 @@ void UBaseUI::ShowUI()
 {
     PauseAllPausableActors(true);
 
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
     if (PC_InGame)
     { 
         AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
         if (HUD)
             HUD->SetMainHUDVisible(false);
+    }
+
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+    if (UIManager)
+    {
+        UIManager->PushUI(this);
     }
 }
 
@@ -29,9 +35,19 @@ void UBaseUI::HideUI(TSubclassOf<UBaseUI> UIClass)
     if (!IsInViewport())
         return;
 
+    UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+    if (UIManager)
+    {
+        UIManager->HideUI(UIClass);
+        UIManager->PopUI(this);
+
+        if (UIManager->IsAnyUI())
+            return;
+    }
+
     PauseAllPausableActors(false);
 
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
     if (PC_InGame)
     {
         PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
@@ -39,12 +55,6 @@ void UBaseUI::HideUI(TSubclassOf<UBaseUI> UIClass)
         AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD());
         if (HUD)
             HUD->SetMainHUDVisible(true);
-    }
-
-    UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-    if (UIManager)
-    {
-        UIManager->HideUI(UIClass);
     }
 }
 

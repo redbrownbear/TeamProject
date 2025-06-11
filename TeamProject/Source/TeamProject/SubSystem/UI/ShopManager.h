@@ -32,10 +32,7 @@ public:
 public:
 	void ShowUI(EQuestCharacter QuestChar, bool IsBuy);
 
-	//������
 	void UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow);
-
-	//UI
 	void UpdateItem(const TArray<FShopDataRow>& ShopList);
 
 public:
@@ -56,12 +53,6 @@ public:
 
 	UFUNCTION()
 	void SubtractPlayerRupee();
-
-	//UFUNCTION()
-	//void AddShopItem(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow);
-
-	//UFUNCTION()
-	//void SubtractShopItem(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow);
 
 public:
 	void SetSelectedItem(const FItemData& InShopData);

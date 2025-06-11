@@ -77,9 +77,9 @@ void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 void UNPCDialogue::InitUI()
 {
-    ConfirmButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnConfirm);
+    ConfirmButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnConfirmClick);
     ExtraButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnSell);
-    CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancel);
+    CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancelClick);
 
 }
 
@@ -107,7 +107,7 @@ void UNPCDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 {
 }
 
-void UNPCDialogue::OnConfirm()
+void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
 {
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     PC_InGame->Npc->SetIsConfirmed(true);
@@ -160,32 +160,21 @@ void UNPCDialogue::OnConfirm()
         if (UIManager && ShopManager && QuestDialougeManager && ConverSationManager)
         {
             UIManager->ShowUI(UShop::StaticClass());
-            //ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter, true);
-            ShopManager->ShowUI(QuestChar, true);
-            
+            ShopManager->ShowUI(QuestChar, true);      
             QuestDialougeManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
 
+            UShop* ShopUI = UIManager->FindUI<UShop>();
+            if (ShopUI)
+            {
+                ShopUI->SetDialogueData(QuestChar, DialogueID);
+            }
+
             bool IsShopping = PC_InGame->Npc->GetShopping();
-            //bool IsBuying = PC_InGame->Npc->GetBuy();
 
             if (DialogueDataRow.bIsEndConversation && !IsShopping)
             {
                 PC_InGame->Npc->SetShopping(true);
-                // Create 상품 리스트 UI: 이후 항목 클릭했을 때 산다/만다 대화 나오게
-                // 결정에 따라 SetBuy()에 인자 넣어주기
             }
-            /*else if (DialogueDataRow.bIsEndConversation && IsShopping && IsBuying)
-            {
-                // 구매 했을 경우
-                PC_InGame->Npc->SetBuy(true);
-                PC_InGame->Npc->SetShopping(false);
-            }
-            else if (DialogueDataRow.bIsEndConversation && IsShopping && !IsBuying)
-            {
-                // 구매 안 할 경우
-                PC_InGame->Npc->SetBuy(false);
-                PC_InGame->Npc->SetShopping(false);
-            }*/
             else
             {
                 PC_InGame->Npc->SetShopping(false);
@@ -194,9 +183,47 @@ void UNPCDialogue::OnConfirm()
     }
 }
 
+void UNPCDialogue::OnCancel(const FInputActionValue& InputActionValue)
+{
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    check(PC_InGame);
+
+    if (CurQuestChar == EQuestCharacter::Furiko)
+    {
+        switch (PC_InGame->Npc->GetCurrentDialogueType())
+        {
+        case EDialogType::Quest:
+            PC_InGame->Npc->SetDoQuest(false);
+            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
+            break;
+        default:
+            break;
+        }
+
+        //if (DialogueDataRow.bIsEndConversation && IsQuest)
+        //{
+        //    PC_InGame->Npc->SetDoQuest(false);
+        //    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
+        //}
+        //else
+        //{
+        //    PC_InGame->Npc->SetDoQuest(false);
+        //    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
+        //}
+    }
+
+    if (PC_InGame->Npc->GetCurrentDialogueType() == EDialogType::Shop)
+    {
+        PC_InGame->Npc->SetIsConfirmed(false);
+
+    }
+
+    HideUI(UNPCDialogue::StaticClass());
+}
+
 void UNPCDialogue::OnSell()
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));   
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     check(PC_InGame);
 
     UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
@@ -238,42 +265,14 @@ void UNPCDialogue::OnSell()
     }
 }
 
-void UNPCDialogue::OnCancel()
+void UNPCDialogue::OnConfirmClick()
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    check(PC_InGame);
+	OnConfirm(FInputActionValue());
+}
 
-    if (CurQuestChar == EQuestCharacter::Furiko)
-    {
-        switch (PC_InGame->Npc->GetCurrentDialogueType())
-        {
-        case EDialogType::Quest:
-            PC_InGame->Npc->SetDoQuest(false);
-            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
-            break;
-        default:
-            break;
-        }
-
-        //if (DialogueDataRow.bIsEndConversation && IsQuest)
-        //{
-        //    PC_InGame->Npc->SetDoQuest(false);
-        //    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
-        //}
-        //else
-        //{
-        //    PC_InGame->Npc->SetDoQuest(false);
-        //    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
-        //}
-    }
-
-    if (PC_InGame->Npc->GetCurrentDialogueType() == EDialogType::Shop)
-    {
-        PC_InGame->Npc->SetIsConfirmed(false);
-
-    }
-
-    HideUI(UNPCDialogue::StaticClass());
+void UNPCDialogue::OnCancelClick()
+{
+	OnCancel(FInputActionValue());
 }
 
 void UNPCDialogue::OnNextDialogue(const FInputActionValue& InputActionValue)
