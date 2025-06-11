@@ -9,6 +9,7 @@
 #include "EngineUtils.h"
 
 #include "SubSystem/UI/UIManager.h"
+#include "SubSystem/TimeManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "SubSystem/UI/ShopManager.h"
 #include "UI/HUD/MainHUD.h"
@@ -184,7 +185,10 @@ void APC_InGame::SetupInputComponent()
 void APC_InGame::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
+	if (UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>())
+	{
+		TimeManager->Tick(DeltaSeconds);
+	}
 }
 
 void APC_InGame::ChangeInputContext(EInputContext NewContext)

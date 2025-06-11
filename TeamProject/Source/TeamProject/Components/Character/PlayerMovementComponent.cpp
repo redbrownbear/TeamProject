@@ -10,6 +10,7 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/TimelineComponent.h"
+#include "SubSystem/TimeManager.h"
 
 
 
@@ -89,6 +90,9 @@ void UPlayerMovementComponent::BeginPlay()
 	GetNavAgentPropertiesRef().bCanCrouch = true;
 
 	JumpZVelocity = PLAYER_NML_JUMP_HEIGHT;
+	UTimeManagerSubsystem* TimeManager = GetOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+
+	TimeManager->OnTimeScaleUpdated.AddDynamic(this, &ThisClass::TimeScaleChanged);
 }
 
 bool UPlayerMovementComponent::ClimbingLineTrace(FHitResult& HitResult)
@@ -475,7 +479,17 @@ void UPlayerMovementComponent::BackFlip()
 
 	Velocity.X = -ForwardVector.X;
 	Velocity.Y = -ForwardVector.Y;
+	UTimeManagerSubsystem* TimeManager = GetOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	if (TimeManager)
+	{
+		TimeManager->SetTimeScale(0.5f);
+	}
+}
 
+void UPlayerMovementComponent::TimeScaleChanged(float _Scale)
+{
+	Velocity *= _Scale;
+	GravityScale *= _Scale;
 }
 
 bool UPlayerMovementComponent::CanGlide()

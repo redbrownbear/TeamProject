@@ -77,6 +77,8 @@ public:
 
 	void BackFlip();
 
+	UFUNCTION()
+	void TimeScaleChanged(float _Scale);
 
 private:
 	bool CanGlide();
