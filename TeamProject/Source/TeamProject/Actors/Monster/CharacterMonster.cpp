@@ -166,6 +166,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		FVector RelativeLocation = MonsterData->MeshTransform.GetLocation();
 		RelativeLocation += FVector(0.0, 0.0, -MonsterData->CapsuleHalfHeight);
 		MeshComp->SetRelativeLocation(RelativeLocation);
+		MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 
