@@ -296,12 +296,12 @@ void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 		check(false);
 		break;
 	}
-
+	
 	if (TempAnimMontage && !AnimInstance->Montage_IsPlaying(TempAnimMontage))
 	{
 		if (bIsLoop)
 		{
-			AnimInstance->Montage_Play(TempAnimMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+			AnimInstance->Montage_Play(TempAnimMontage, TempAnimMontage->RateScale, EMontagePlayReturnType::MontageLength, 0.0f, true);
 		}
 		else
 		{
