@@ -71,7 +71,7 @@ public:
 	void SetShieldStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetShieldStaticMesh(InMesh); }
 
 	bool GetIsGuard() { return WeaponManagerComponent->GetIsGuard(); }
-
+	bool GetIsShieldAlready() { return WeaponManagerComponent->GetIsShieldAlready(); }
 
 	void Damaged(int32 Damage);
 
