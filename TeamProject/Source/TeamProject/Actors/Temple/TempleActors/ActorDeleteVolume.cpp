@@ -11,11 +11,6 @@ void AActorDeleteVolume::BeginPlay()
 
 void AActorDeleteVolume::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 {
-	/*if (ATempleActor* Actor = Cast<ATempleActor>(OtherActor))
-	{
-		Actor->Destroy();
-	}*/
-
 	if (ATempleActor* Actor = Cast<ATempleActor>(OtherActor))
 	{
 		if (Actor->IsActive())

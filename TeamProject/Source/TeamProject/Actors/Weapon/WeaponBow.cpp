@@ -208,7 +208,7 @@ void AWeaponBow::FireArrow()
     // 스폰 파라미터
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    SpawnParams.Owner = this;
+    SpawnParams.Owner = Player_C;
 
     // 화살 액터 스폰
     AProjectile_Arrow* Arrow = GetWorld()->SpawnActor<AProjectile_Arrow>(
@@ -217,13 +217,15 @@ void AWeaponBow::FireArrow()
         SpawnRotation,
         SpawnParams
     );
-    if (Player_C->GetIsFire())
+    /*if (Player_C->GetIsFire())
     {
         Arrow->SetData(TEXT("Player_FireArrow"), TEXT("ToMonster"));
     }
     else {
         Arrow->SetData(TEXT("Player_Arrow"), TEXT("ToMonster"));
-    }
+    }*/
+
+    Arrow->SetData(TEXT("Player_Arrow"), TEXT("ToMonster"));
 
     Player_C->SetArrowFire(false);
 

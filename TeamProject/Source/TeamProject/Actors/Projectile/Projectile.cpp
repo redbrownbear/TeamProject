@@ -23,9 +23,10 @@
 #include "Actors/Item/WorldWeapon.h"
 #include "Actors/Effect/ParticleEffect.h"
 #include "Actors/Character/PlayerCharacter.h"
-#include "SubSystem/PlayerManager.h"
-
 #include "Actors/Effect/NiagaraEffect.h"
+#include "Actors/Object/TorchStand.h"
+
+#include "SubSystem/PlayerManager.h"
 
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
@@ -141,14 +142,15 @@ void AProjectile::BeginPlay()
 void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!IsValid(this)) { return; }
-
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(OtherActor);
 	if (Player_C)
 	{
 		
 		Player_C->Damaged(GetDamage());
 	}
-	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert))
+	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert)
+		&& !OtherActor->IsA<ATorchStand>()
+		)
 	{
 		Destroy();
 	}

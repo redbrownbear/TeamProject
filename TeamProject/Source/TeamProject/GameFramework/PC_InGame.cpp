@@ -446,37 +446,7 @@ void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
 	WeaponManagerComponent->LeftClickAction();
 
 	// ------- Destroy IcePilla ---------	
-	// 화면 중앙 기준 라인트레이스
-	FVector Start;
-	FRotator Rot;
-	GetPlayerViewPoint(Start, Rot);
-
-	FVector End = Start + Rot.Vector() * TraceDistance;
-
-	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(GetPawn());
-
-	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
-
-	if (bHit)
-	{
-		// 생성된 아이스 필러가 있으면 Destroy
-		AActor* HitActor = HitResult.GetActor();
-		if (IsValid(HitActor))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
-
-			if (AIcePillar* IcePillar = Cast<AIcePillar>(HitActor))
-			{
-				IcePillar->Destroy();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Hit actor is not an IcePillar"));
-			}
-		}
-	}
+	DestroyIcePillar();
 }
 
 void APC_InGame::RightClick(const FInputActionValue& InputActionValue)
@@ -804,9 +774,37 @@ void APC_InGame::SpawnIcePillar()
 
 void APC_InGame::DestroyIcePillar()
 {
-	if (!IcePillarActor) return;
+	// 화면 중앙 기준 라인트레이스
+	FVector Start;
+	FRotator Rot;
+	GetPlayerViewPoint(Start, Rot);
 
-	IcePillarActor->Destroy();
+	FVector End = Start + Rot.Vector() * TraceDistance;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetPawn());
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	if (bHit)
+	{
+		// 생성된 아이스 필러가 있으면 Destroy
+		AActor* HitActor = HitResult.GetActor();
+		if (IsValid(HitActor))
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
+
+			if (AIcePillar* IcePillar = Cast<AIcePillar>(HitActor))
+			{
+				IcePillar->Destroy();
+			}
+			else
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("Hit actor is not an IcePillar"));
+			}
+		}
+	}
 }
 
 void APC_InGame::OnQuickSlotLeft(const FInputActionValue& InputActionValue)
