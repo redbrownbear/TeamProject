@@ -64,22 +64,22 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 	MaxWalkSpeedCrouched = PLAYER_MOVE_CROUCH;
 	MaxWalkSpeed = PLAYER_MOVE_NML;
 
-	StepTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("StepTimeLine"));
+	//StepTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("StepTimeLine"));
 
-	if (!StepCurve)
-	{
-		static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveAsset(TEXT("/Script/Engine.CurveFloat'/Game/Resources/Player/Step/StepTimeLine.StepTimeLine'")); // 예시 경로
-		if (CurveAsset.Succeeded())
-		{
-			StepCurve = CurveAsset.Object;
-		}
-	}
-	if (StepCurve)
-	{
-		InterpFunction.BindUFunction(this, FName("StepProgress"));
-		StepTimeLine->AddInterpFloat(StepCurve, InterpFunction);
+	//if (!StepCurve)
+	//{
+	//	static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveAsset(TEXT("/Script/Engine.CurveFloat'/Game/Resources/Player/Step/StepTimeLine.StepTimeLine'")); // 예시 경로
+	//	if (CurveAsset.Succeeded())
+	//	{
+	//		StepCurve = CurveAsset.Object;
+	//	}
+	//}
+	//if (StepCurve)
+	//{
+	//	InterpFunction.BindUFunction(this, FName("StepProgress"));
+	//	StepTimeLine->AddInterpFloat(StepCurve, InterpFunction);
 
-	}
+	//}
 }
 
 void UPlayerMovementComponent::BeginPlay()
@@ -412,7 +412,6 @@ void UPlayerMovementComponent::StepMove(FVector2D ActionValue)
 	}
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 	
-	Prev_StepLocation = GetOwner()->GetActorLocation();
 	// Front, Back
 	if (ActionValue.X != 0)
 	{
@@ -420,13 +419,11 @@ void UPlayerMovementComponent::StepMove(FVector2D ActionValue)
 
 		if (ActionValue.X == 1)
 		{
-			StepDirection = GetOwner()->GetActorForwardVector();
-			Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance()->Montage_Play(StepMontageAsset->StepF);
+			return;
 		}
 		else
 		{
-			StepDirection = -GetOwner()->GetActorForwardVector();
-			Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance()->Montage_Play(StepMontageAsset->StepB);
+			BackFlip();
 		}
 	}
 	// Left, Right
@@ -436,19 +433,21 @@ void UPlayerMovementComponent::StepMove(FVector2D ActionValue)
 		{
 			StepDirection = GetOwner()->GetActorRightVector();
 			Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance()->Montage_Play(StepMontageAsset->StepR);
+
 		}
 		else
 		{
 			StepDirection = -GetOwner()->GetActorRightVector();
 			Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance()->Montage_Play(StepMontageAsset->StepL);
 		}
+		Player_C->Jump();
+		Velocity = StepDirection * PLAYER_STEP_DISTANCE;
 	}
-	Prev_Length = 0.f;
-	m_GravitySpeed = 0.f;
+	//Prev_Length = 0.f;
+	//m_GravitySpeed = 0.f;
 	//StepTimeLine->SetNewTime(0.f);
 	//StepTimeLine->Play();
-	Player_C->Jump();
-	Velocity = StepDirection * PLAYER_STEP_DISTANCE;
+
 
 }
 
@@ -501,83 +500,83 @@ bool UPlayerMovementComponent::CanGlide()
 
 }
 
-void UPlayerMovementComponent::StepProgress(float Value)
-{
-	AActor* Player = GetOwner();
-	Player->GetActorForwardVector();
-	float Length = FMath::Lerp(0.f, PLAYER_STEP_DISTANCE, Value);
-
-
-
-
-
-
-	FVector AddLocation = StepDirection * (Length - Prev_Length);
-	FVector NextLocation = Prev_StepLocation + AddLocation;
-
-	FVector NS_WCLocation = Prev_StepLocation + StepDirection * PLAYER_CAPSULE_RADIUS * 3;
-
-
-	FCollisionQueryParams TraceParams;
-	TraceParams.AddIgnoredActor(Player);
-	FHitResult HitResult;
-	if (GetWorld()->LineTraceSingleByChannel(
-		HitResult,
-		NextLocation,
-		NS_WCLocation,
-		ECC_Visibility,
-		TraceParams
-	))
-	{
-		StepTimeLine->Stop();
-		return;
-	}
-
-	FVector Half_Location = NextLocation;
-	Half_Location.Z = NextLocation.Z - PLAYER_CAPSULE_HALF_HEIGHT / 2;
-	FVector Half_WCLocation = NS_WCLocation;
-	Half_WCLocation.Z -= PLAYER_CAPSULE_HALF_HEIGHT / 2;
-
-
-
-	FVector NS_GCLocation = NextLocation;
-	NS_GCLocation.Z -= PLAYER_CAPSULE_HALF_HEIGHT;
-	//땅에 걸렸을때
-	DrawDebugLine(GetWorld(), NextLocation,
-		NS_WCLocation, FColor::Red, false, 2.f);
-	if (GetWorld()->LineTraceSingleByChannel(
-		HitResult,
-		NextLocation,
-		NS_GCLocation,
-		ECC_Visibility,
-		TraceParams
-	))
-	{
-
-		FVector HitLocation = HitResult.Location;
-		HitLocation.Z += PLAYER_CAPSULE_HALF_HEIGHT;
-		FVector DVector = (HitLocation - Prev_StepLocation).GetSafeNormal();
-		UE_LOG(LogTemp, Warning, TEXT("DVector.Z : %f"), DVector.Z);
-		Player->SetActorLocation(HitLocation);
-		Prev_StepLocation = HitLocation;
-		m_GravitySpeed = 0.f;
-		Velocity.Z = m_GravitySpeed;
-	}
-	//땅에 안 걸렸을 때,
-	else
-	{
-		m_GravitySpeed = m_GravitySpeed + GRAVITY_MODIFY_SPEED * GetWorld()->GetDeltaSeconds();
-		m_GravitySpeed = GRAVITY_MAX_SPEED < m_GravitySpeed ? GRAVITY_MAX_SPEED : m_GravitySpeed;
-
-		NextLocation.Z -= m_GravitySpeed * GetWorld()->GetDeltaSeconds();
-		Player->SetActorLocation(NextLocation);
-		Prev_StepLocation = NextLocation;
-		Velocity.Z = m_GravitySpeed;
-	}
-
-	Prev_Length = Length;
-
-}
+//void UPlayerMovementComponent::StepProgress(float Value)
+//{
+//	AActor* Player = GetOwner();
+//	Player->GetActorForwardVector();
+//	float Length = FMath::Lerp(0.f, PLAYER_STEP_DISTANCE, Value);
+//
+//
+//
+//
+//
+//
+//	FVector AddLocation = StepDirection * (Length - Prev_Length);
+//	FVector NextLocation = Prev_StepLocation + AddLocation;
+//
+//	FVector NS_WCLocation = Prev_StepLocation + StepDirection * PLAYER_CAPSULE_RADIUS * 3;
+//
+//
+//	FCollisionQueryParams TraceParams;
+//	TraceParams.AddIgnoredActor(Player);
+//	FHitResult HitResult;
+//	if (GetWorld()->LineTraceSingleByChannel(
+//		HitResult,
+//		NextLocation,
+//		NS_WCLocation,
+//		ECC_Visibility,
+//		TraceParams
+//	))
+//	{
+//		StepTimeLine->Stop();
+//		return;
+//	}
+//
+//	FVector Half_Location = NextLocation;
+//	Half_Location.Z = NextLocation.Z - PLAYER_CAPSULE_HALF_HEIGHT / 2;
+//	FVector Half_WCLocation = NS_WCLocation;
+//	Half_WCLocation.Z -= PLAYER_CAPSULE_HALF_HEIGHT / 2;
+//
+//
+//
+//	FVector NS_GCLocation = NextLocation;
+//	NS_GCLocation.Z -= PLAYER_CAPSULE_HALF_HEIGHT;
+//	//땅에 걸렸을때
+//	DrawDebugLine(GetWorld(), NextLocation,
+//		NS_WCLocation, FColor::Red, false, 2.f);
+//	if (GetWorld()->LineTraceSingleByChannel(
+//		HitResult,
+//		NextLocation,
+//		NS_GCLocation,
+//		ECC_Visibility,
+//		TraceParams
+//	))
+//	{
+//
+//		FVector HitLocation = HitResult.Location;
+//		HitLocation.Z += PLAYER_CAPSULE_HALF_HEIGHT;
+//		FVector DVector = (HitLocation - Prev_StepLocation).GetSafeNormal();
+//		UE_LOG(LogTemp, Warning, TEXT("DVector.Z : %f"), DVector.Z);
+//		Player->SetActorLocation(HitLocation);
+//		Prev_StepLocation = HitLocation;
+//		m_GravitySpeed = 0.f;
+//		Velocity.Z = m_GravitySpeed;
+//	}
+//	//땅에 안 걸렸을 때,
+//	else
+//	{
+//		m_GravitySpeed = m_GravitySpeed + GRAVITY_MODIFY_SPEED * GetWorld()->GetDeltaSeconds();
+//		m_GravitySpeed = GRAVITY_MAX_SPEED < m_GravitySpeed ? GRAVITY_MAX_SPEED : m_GravitySpeed;
+//
+//		NextLocation.Z -= m_GravitySpeed * GetWorld()->GetDeltaSeconds();
+//		Player->SetActorLocation(NextLocation);
+//		Prev_StepLocation = NextLocation;
+//		Velocity.Z = m_GravitySpeed;
+//	}
+//
+//	Prev_Length = Length;
+//
+//}
 
 
 

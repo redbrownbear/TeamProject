@@ -118,8 +118,6 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Triggered, this, &ThisClass::StartedStep);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Step,
 		ETriggerEvent::Completed, this, &ThisClass::CompletedStep);
-	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_BackFlip,
-		ETriggerEvent::Started, this, &ThisClass::OnBackFlip);
 	
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Crouch,
@@ -416,8 +414,8 @@ void APC_InGame::StartedStep(const FInputActionValue& InputActionValue)
 {
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
-
-	if (Movement->GetMoveState() == EMove_State::Run)
+	const EMove_State MoveState = Movement->GetMoveState();
+	if (MoveState == EMove_State::Run || MoveState == EMove_State::Dash)
 	{
 		Movement->SetMoveState(EMove_State::Step);
 		Movement->JumpZVelocity = PLAYER_STEP_JUMP_HEIGHT;
@@ -436,11 +434,7 @@ void APC_InGame::CompletedStep(const FInputActionValue& InputActionValue)
 	}
 }
 
-void APC_InGame::OnBackFlip(const FInputActionValue& InputActionValue)
-{
-	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
-	Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement())->BackFlip();
-}
+
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 {
