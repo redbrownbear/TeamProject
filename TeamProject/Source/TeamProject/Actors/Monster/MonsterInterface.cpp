@@ -988,6 +988,7 @@ void IMonsterInterface::OnDeadEnd()
 	FMonsterTableRow* MonsterData = GetMonsterData();
 	UObject* Object = Cast<UObject>(this);
 
+
 	const FDataTableRowHandle ParticleEffectDataTable = MonsterData->ParticleEffectTableRowHandle;
 	if (AActor* Actor = Cast<AActor>(Object))
 	{
@@ -1021,7 +1022,6 @@ void IMonsterInterface::OnDeadEnd()
 			NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
 			Effect->FinishSpawning(NewTransform);
 		}
-		Actor->Destroy();
 	}
 }
 

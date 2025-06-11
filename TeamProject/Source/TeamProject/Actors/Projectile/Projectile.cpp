@@ -149,7 +149,52 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(OtherActor);
 	if (Player_C)
 	{
-		Player_C->Damaged(GetDamage());
+		if (Player_C->GetIsGuard())
+		{
+			if (DataTableRowHandle.RowName == ProjectileName::Monster_Attack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelAttack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack)
+			{
+				if (GetOwner()->IsA<APawnMonster>())
+				{
+					APawnMonster* PawnMonster = Cast<APawnMonster>(GetOwner());
+					if (UMonsterFSMComponent* MonsterFSMComponent = PawnMonster->GetFSMComponent())
+					{
+						MonsterFSMComponent->ChangeState(EMonsterState::Stun);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Error, TEXT("AProjectile::OnBeginOverlap // No FSMComponent"));
+					}
+				}
+				else if (GetOwner()->IsA<ACharacterMonster>())
+				{
+					ACharacterMonster* CharacterMonster = Cast<ACharacterMonster>(GetOwner());
+					if (UMonsterFSMComponent* MonsterFSMComponent = CharacterMonster->GetFSMComponent())
+					{
+						MonsterFSMComponent->ChangeState(EMonsterState::Stun);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Error, TEXT("AProjectile::OnBeginOverlap // No FSMComponent"));
+						check(false);
+					}
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("AProjectile::OnBeginOverlap // Unexpected MonsterType"));
+					check(false);
+				}
+			}
+			else
+			{
+				Player_C->Damaged(GetDamage());
+			}
+		}
+		else
+		{
+			Player_C->Damaged(GetDamage());
+		}
 		Destroy();
 		return;
 	}
@@ -253,16 +298,25 @@ float AProjectile::GetDamage()
 		}
 		else if (APawnMonster* PM = Cast<APawnMonster>(GetOwner()))
 		{
-			if (const AWorldWeapon* WW = PM->GetFSMComponent()->GetCurrentWeapon())
+			if (UMonsterFSMComponent* MonsterFSMComponent = PM->GetFSMComponent())
 			{
-				float fDamage = WW->GetDamage();
-				return fDamage;
+				if (const AWorldWeapon* WW = MonsterFSMComponent->GetCurrentWeapon())
+				{
+					float fDamage = WW->GetDamage();
+					return fDamage;
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No WorldWeapon"));
+					return 1.f;
+				}
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No WorldWeapon"));
+				UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No MonsterFSMComponent"));
 				return 1.f;
 			}
+
 		}
 		else
 		{

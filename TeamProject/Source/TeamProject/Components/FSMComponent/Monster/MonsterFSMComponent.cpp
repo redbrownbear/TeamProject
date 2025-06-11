@@ -170,10 +170,17 @@ void UMonsterFSMComponent::DropWeapons()
 	if (MeleeWeapon)
 	{
 		MeleeWeapon->DetachFromMonster();
+		MeleeWeapon = nullptr;
 	}
 	if (BowWeapon)
 	{ 
 		BowWeapon->DetachFromMonster();
+		BowWeapon = nullptr;
+	}
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->DetachFromMonster();
+		CurrentWeapon = nullptr;
 	}
 }
 
@@ -250,6 +257,9 @@ void UMonsterFSMComponent::HandleState(float DeltaTime)
 		break;
 	case EMonsterState::Damage:
 		UpdateDamage(DeltaTime);
+		break;
+	case EMonsterState::Stun:
+		UpdateStun(DeltaTime);
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("UMonsterFSMComponent::HandleState // Unexpected MonsterState"));
@@ -883,26 +893,15 @@ void UMonsterFSMComponent::UpdateDying(float DeltaTime)
 
 	if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DEAD))
 	{
-		if (MeleeWeapon)
-		{
-			MeleeWeapon->DetachFromMonster();
-		}
-		if (BowWeapon)
-		{
-			BowWeapon->DetachFromMonster();
-		}
+		DropWeapons();
+
+		CharacterMonster->OnDeadEnd();
 		CharacterMonster->Destroy();
 	}
 	else if (PawnMonster && !PawnMonster->IsPlayingMontage(EMonsterMontage::DEAD))
 	{
-		if (MeleeWeapon)
-		{
-			MeleeWeapon->DetachFromMonster();
-		}
-		if (BowWeapon)
-		{
-			BowWeapon->DetachFromMonster();
-		}
+		DropWeapons();
+		PawnMonster->OnDeadEnd();
 		PawnMonster->Destroy();
 	}
 }

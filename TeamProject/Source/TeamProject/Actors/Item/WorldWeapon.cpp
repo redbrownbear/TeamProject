@@ -337,6 +337,7 @@ void AWorldWeapon::AttachToMonster(IMonsterInterface* Monster, FName SocketName)
 
 		// if PhyscisSimulates activated, AttachToComponent will fail
 		CollisionComponent->SetSimulatePhysics(false);
+		CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		// Offset Changed to fix outlook
 		StaticMeshComponent->SetRelativeLocation(FVector::Zero());
 		const bool bSucceeded = this->AttachToComponent(
@@ -380,7 +381,9 @@ void AWorldWeapon::DetachFromMonster()
 		UE_LOG(LogTemp, Log, TEXT("AWorldWeapon: CollisionComponent is valid and registered after DetachFromActor."));
 	}
 
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	CollisionComponent->SetSimulatePhysics(true);
+
 	UE_LOG(LogTemp, Log, TEXT("AWorldWeapon: Physics simulation enabled."));
 
 	CollisionComponent->WakeRigidBody();

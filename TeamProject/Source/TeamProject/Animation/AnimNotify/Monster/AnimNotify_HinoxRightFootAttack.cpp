@@ -18,7 +18,7 @@ void UAnimNotify_HinoxRightFootAttack::Notify(USkeletalMeshComponent* MeshComp, 
 		UWorld* World = MeshComp->GetWorld();
 		{
 			AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
-				FTransform::Identity, nullptr, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+				FTransform::Identity, Monster, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 			FTransform NewTransform;
 			Projectile->SetData(ProjectileName::Monster_HinoxAttack, CollisionProfileName::ToPlayer);

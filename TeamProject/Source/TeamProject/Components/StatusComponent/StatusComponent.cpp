@@ -39,7 +39,7 @@ float UStatusComponent::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 	if (HP == 0.f)
 	{
 		bDie = true;
-		OnDie.Broadcast();
+		//OnDie.Broadcast();
 		NewDamage = 0.f;
 	}
 

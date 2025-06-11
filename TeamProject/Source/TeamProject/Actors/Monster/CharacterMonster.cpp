@@ -60,8 +60,6 @@ void ACharacterMonster::BeginPlay()
 	}
 	SetData(DataTableRowHandle);
 
-	StatusComponent->OnDie.AddDynamic(this, &ACharacterMonster::OnDie);
-
 	if (!(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
 	{
 		if (UWorld* World = GetWorld())
