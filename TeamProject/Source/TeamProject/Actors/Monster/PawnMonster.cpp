@@ -62,7 +62,7 @@ void APawnMonster::BeginPlay()
 		FSMComponent->BindHitEvent();
 	}
 
-	StatusComponent->OnDie.AddDynamic(this, &ThisClass::OnDie);
+	//StatusComponent->OnDie.AddDynamic(this, &ThisClass::OnDie);
 }
 
 // Called every frame

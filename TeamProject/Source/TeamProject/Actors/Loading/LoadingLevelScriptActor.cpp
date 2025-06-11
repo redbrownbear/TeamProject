@@ -16,7 +16,7 @@ void ALoadingLevelScriptActor::BeginPlay()
 
 	if (UGIS_ASyncLoadingScreen* LoadingSystem = GetGameInstance()->GetSubsystem<UGIS_ASyncLoadingScreen>())
 	{
-		// ¨é Subsystem¿¡¼­ ÀúÀåµÈ ¸ñÀûÁö¸¦ °¡Á®¿Í¼­ BeginLoading
+		// ï¿½ï¿½ Subsystemï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ BeginLoading
 		LoadingSystem->BeginLoading(LoadingSystem->GetPendingLevelName());
 	}
 }

@@ -86,8 +86,7 @@ public:
     virtual void SetSpeedWalk() override;
     virtual void SetSpeedRun() override;
 
-protected:
-    UFUNCTION()
+public:
     virtual void OnDie() override;
     virtual void OnDeadEnd() override;
 

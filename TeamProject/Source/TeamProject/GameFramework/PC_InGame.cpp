@@ -114,6 +114,12 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Dash,
 		ETriggerEvent::Completed, this, &ThisClass::CompletedDash);
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Step,
+		ETriggerEvent::Triggered, this, &ThisClass::StartedStep);
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Step,
+		ETriggerEvent::Completed, this, &ThisClass::CompletedStep);
+	
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Crouch,
 		ETriggerEvent::Triggered, this, &ThisClass::OnCrouch);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Crouch,
@@ -239,6 +245,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		UE_LOG(LogTemp, Warning, TEXT("MoveNone"));
 		return;
 	}
+	EMove_State MoveState = Movement->GetMoveState();
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
@@ -247,7 +254,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
 	// 클라이밍 상태일 때의 캐릭터 무브
-	if (Movement->GetMoveState()==EMove_State::Climb)
+	if (MoveState ==EMove_State::Climb)
 	{
 		if (Movement->GetClimbMode() == EClimb_State::Land)
 		{
@@ -279,7 +286,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	
 	
 	// Glide Move
-	else if (Movement->GetMoveState()==EMove_State::Glide)
+	else if (MoveState ==EMove_State::Glide)
 	{
 		
 
@@ -288,9 +295,20 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		Movement->GlidingMove(ActionValue);
 		UE_LOG(LogTemp, Warning, TEXT("Gliding"));
 	}
+	// Step Move
+	else if (Movement->GetMoveState() == EMove_State::Step)
+	{
+
+		Movement->StepMove(ActionValue);
+	}
 	
 	// 노말 상태일 때의 캐릭터 무브
-	else
+	else if(MoveState == EMove_State::Run
+		|| MoveState == EMove_State::Dash
+		|| MoveState == EMove_State::Crouch
+		|| MoveState == EMove_State::Zoom
+		
+		)
 	{
 		P_Anim->ActionValue = ActionValue;
 
@@ -315,7 +333,6 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 			Stemina -= DeltaTime * STEMINA_USE_SPEED;
 			PlayerManager->SetPlayerStamina(Stemina);
-			UE_LOG(LogTemp, Warning, TEXT("Dash"));
 		}
 	}
 }
@@ -347,7 +364,6 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	PlayerManager->SetStaminaUSe(false);
 
-	UE_LOG(LogTemp, Warning, TEXT("ActionValue %f, %f"), ActionValue.X, ActionValue.Y);
 	P_Anim->ActionValue = ActionValue;
 }
 
@@ -357,7 +373,9 @@ void APC_InGame::JumpGlide(const FInputActionValue& InputActionValue)
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 	if (Movement->IsFalling())
 	{
-		Movement->SetGlideMode(true);
+		EMove_State MoveState = Movement->GetMoveState();
+		if (MoveState == EMove_State::Run||MoveState == EMove_State::Dash)
+			Movement->SetGlideMode(true);
 	}
 	else
 	{
@@ -391,6 +409,32 @@ void APC_InGame::CompletedDash(const FInputActionValue& InputActionValue)
 		PlayerManager->SetStaminaUSe(false);
 	}
 }
+
+void APC_InGame::StartedStep(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+	const EMove_State MoveState = Movement->GetMoveState();
+	if (MoveState == EMove_State::Run || MoveState == EMove_State::Dash)
+	{
+		Movement->SetMoveState(EMove_State::Step);
+		Movement->JumpZVelocity = PLAYER_STEP_JUMP_HEIGHT;
+	}
+}
+
+void APC_InGame::CompletedStep(const FInputActionValue& InputActionValue)
+{
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
+
+	if (Movement->GetMoveState() == EMove_State::Step)
+	{
+		Movement->SetMoveState(EMove_State::Run);
+		Movement->JumpZVelocity = PLAYER_NML_JUMP_HEIGHT;
+	}
+}
+
+
 
 void APC_InGame::OnLook(const FInputActionValue& InputActionValue)
 {
@@ -535,36 +579,48 @@ void APC_InGame::EquipSword(const FInputActionValue& InputActionValue)
 {
 	APawn* PlayerPawn = GetPawn();
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
-	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
-	EEquip_State m_State = WeaponManagerComponent->GetEquipState();
+	EMove_State mMove_State = PlayerCharacter->GetMoveState();
+	if (mMove_State == EMove_State::Run || mMove_State == EMove_State::Run)
+	{
+		UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
 
-	WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Sword);
+		WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Sword);
 
-	WeaponManagerComponent->TryEquipWeapon();
+		WeaponManagerComponent->TryEquipWeapon();
+	}
 }
 
 void APC_InGame::EquipShield(const FInputActionValue& InputActionValue)
 {
 	APawn* PlayerPawn = GetPawn();
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
-	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
-	EEquip_State m_State = WeaponManagerComponent->GetEquipState();
+	EMove_State mMove_State = PlayerCharacter->GetMoveState();
+	if (mMove_State == EMove_State::Run || mMove_State == EMove_State::Run)
+	{
+		UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
 
-	WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Shield);
+		WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Shield);
 
-	WeaponManagerComponent->TryEquipWeapon();
+		WeaponManagerComponent->TryEquipWeapon();
+	}
 }
 
 void APC_InGame::EquipBow(const FInputActionValue& InputActionValue)
 {
 	APawn* PlayerPawn = GetPawn();
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);
-	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
-	EEquip_State m_State = WeaponManagerComponent->GetEquipState();
+	EMove_State mMove_State = PlayerCharacter->GetMoveState();
+	if (mMove_State == EMove_State::Run || mMove_State == EMove_State::Run)
+	{
+		UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
 
-	WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Bow);
+		WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::Bow);
 
-	WeaponManagerComponent->TryEquipWeapon();
+		WeaponManagerComponent->TryEquipWeapon();
+	}
 }
 
 

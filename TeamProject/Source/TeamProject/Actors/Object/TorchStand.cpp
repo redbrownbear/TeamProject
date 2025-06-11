@@ -129,7 +129,6 @@ void ATorchStand::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
                 if (WeaponManager->GetCanShot())
                 {
                     Player_C->SetArrowFire(true);
-                    Arrow->SetData(TEXT("Player_FireArrow"), TEXT("ToMonster"));
                 }
             }
         }

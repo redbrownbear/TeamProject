@@ -28,7 +28,7 @@ float UStatusComponent::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 	float NewDamage = Damage;
 
 	// Ex. NewDamage -= Armor;
-	NewDamage = FMath::Clamp(NewDamage, 0.f, NewDamage);
+	//NewDamage = FMath::Clamp(NewDamage, 0.f, NewDamage);
 
 	HP -= NewDamage;
 	HP = FMath::Clamp(HP, 0.f, HP);
@@ -39,7 +39,7 @@ float UStatusComponent::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 	if (HP == 0.f)
 	{
 		bDie = true;
-		OnDie.Broadcast();
+		//OnDie.Broadcast();
 		NewDamage = 0.f;
 	}
 

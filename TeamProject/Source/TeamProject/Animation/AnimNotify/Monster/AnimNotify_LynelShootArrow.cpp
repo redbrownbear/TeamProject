@@ -15,7 +15,7 @@ void UAnimNotify_LynelShootArrow::Notify(USkeletalMeshComponent* MeshComp, UAnim
 		UWorld* World = MeshComp->GetWorld();
 
 		AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
-			FTransform::Identity, nullptr, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+			FTransform::Identity, Monster, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 		FTransform NewTransform;
 		Projectile->SetData(ProjectileName::Monster_LynelArrow, CollisionProfileName::ToPlayer);

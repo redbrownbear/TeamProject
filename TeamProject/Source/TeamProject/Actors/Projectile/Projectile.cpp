@@ -116,6 +116,8 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		NiagaraEffectComponent->SetAsset(Data->EffectNiagaraSystem);
 		NiagaraEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		NiagaraEffectComponent->SetRelativeTransform(Data->Transform);
+		//NiagaraEffectComponent->SetRelativeLocation(Data->Transform.GetLocation());
+		//NiagaraEffectComponent->SetRelativeRotation(GetActorForwardVector().Rotation().Quaternion());
 		NiagaraEffectComponent->RegisterComponent();
 	}
 
@@ -128,6 +130,8 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		ParticleEffectComponent->SetTemplate(Data->EffectParticleSystem);
 		ParticleEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		ParticleEffectComponent->SetRelativeTransform(Data->Transform);
+		//ParticleEffectComponent->SetRelativeLocation(Data->Transform.GetLocation());
+		//ParticleEffectComponent->SetWorldRotation(GetActorForwardVector().Rotation().Quaternion());
 		ParticleEffectComponent->RegisterComponent();
 	}
 }
@@ -145,21 +149,100 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(OtherActor);
 	if (Player_C)
 	{
-		
-		Player_C->Damaged(GetDamage());
+		if (Player_C->GetIsParry())
+		{
+			if (DataTableRowHandle.RowName == ProjectileName::Monster_Attack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelAttack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack)
+			{
+				if (GetOwner()->IsA<APawnMonster>())
+				{
+					APawnMonster* PawnMonster = Cast<APawnMonster>(GetOwner());
+					if (UMonsterFSMComponent* MonsterFSMComponent = PawnMonster->GetFSMComponent())
+					{
+						MonsterFSMComponent->ChangeState(EMonsterState::Stun);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Error, TEXT("AProjectile::OnBeginOverlap // No FSMComponent"));
+					}
+				}
+				else if (GetOwner()->IsA<ACharacterMonster>())
+				{
+					ACharacterMonster* CharacterMonster = Cast<ACharacterMonster>(GetOwner());
+					if (UMonsterFSMComponent* MonsterFSMComponent = CharacterMonster->GetFSMComponent())
+					{
+						MonsterFSMComponent->ChangeState(EMonsterState::Stun);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Error, TEXT("AProjectile::OnBeginOverlap // No FSMComponent"));
+						check(false);
+					}
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("AProjectile::OnBeginOverlap // Unexpected MonsterType"));
+					check(false);
+				}
+			}
+			// Undefendable attack
+			else
+			{
+				Player_C->Damaged(GetDamage());
+			}
+		}
+
+
+		if (Player_C->GetIsHoldingShield())
+		{
+			if (DataTableRowHandle.RowName == ProjectileName::Monster_Attack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelAttack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_Arrow
+				)
+			{
+				// Do not take damage;
+			}
+			else
+			{
+				Player_C->Damaged(GetDamage());
+			}
+		}
+		else
+		{
+			Player_C->Damaged(GetDamage());
+		}
+		Destroy();
+		return;
 	}
+
+	if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
+		|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig
+		|| DataTableRowHandle.RowName == ProjectileName::Monster_HinoxStone)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			AParticleEffect* ParticleEffect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+			FTransform NewTransform;
+			ParticleEffect->SetData(ParticleEffectName::Hinox_AttackShockWave);
+
+			const FVector Location = GetActorLocation();
+			NewTransform.SetLocation(Location);
+
+			ParticleEffect->FinishSpawning(NewTransform);
+		}
+	}
+
+
 	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert)
 		&& !OtherActor->IsA<ATorchStand>()
 		)
 	{
 		Destroy();
 	}
-
-	//if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
-	//	|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig)
-	//{
-	//	Destroy();
-	//}
 
 
 }
@@ -193,7 +276,12 @@ void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//ProjectileMovementComponent->Velocity = GetActorForwardVector() * ProjectileMovementComponent->MaxSpeed;
+	//FVector CurrentVelocity = ProjectileMovementComponent->Velocity;
+	//if (!CurrentVelocity.IsNearlyZero())
+	//{
+	//	FRotator NewRotation = UKismetMathLibrary::MakeRotFromX(CurrentVelocity);
+	//	SetActorRotation(NewRotation);
+	//}
 }
 
 FVector AProjectile::GetVelocity()
@@ -226,16 +314,25 @@ float AProjectile::GetDamage()
 		}
 		else if (APawnMonster* PM = Cast<APawnMonster>(GetOwner()))
 		{
-			if (const AWorldWeapon* WW = PM->GetFSMComponent()->GetCurrentWeapon())
+			if (UMonsterFSMComponent* MonsterFSMComponent = PM->GetFSMComponent())
 			{
-				float fDamage = WW->GetDamage();
-				return fDamage;
+				if (const AWorldWeapon* WW = MonsterFSMComponent->GetCurrentWeapon())
+				{
+					float fDamage = WW->GetDamage();
+					return fDamage;
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No WorldWeapon"));
+					return 1.f;
+				}
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No WorldWeapon"));
+				UE_LOG(LogTemp, Warning, TEXT("AProjectile::GetDamage // No MonsterFSMComponent"));
 				return 1.f;
 			}
+
 		}
 		else
 		{

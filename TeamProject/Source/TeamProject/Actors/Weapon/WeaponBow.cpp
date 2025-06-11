@@ -94,6 +94,7 @@ void AWeaponBow::BeginPlay()
 {
     Super::BeginPlay();
 
+    
 
 }
 
@@ -217,15 +218,15 @@ void AWeaponBow::FireArrow()
         SpawnRotation,
         SpawnParams
     );
-    /*if (Player_C->GetIsFire())
+    if (Player_C->GetIsFire())
     {
         Arrow->SetData(TEXT("Player_FireArrow"), TEXT("ToMonster"));
     }
     else {
         Arrow->SetData(TEXT("Player_Arrow"), TEXT("ToMonster"));
-    }*/
+    }
 
-    Arrow->SetData(TEXT("Player_Arrow"), TEXT("ToMonster"));
+    //Arrow->SetData(TEXT("Player_Arrow"), TEXT("ToMonster"));
 
     Player_C->SetArrowFire(false);
 
