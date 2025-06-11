@@ -56,6 +56,12 @@ void AMainHUD::ShowBossHpUI(bool bIsShow, float Hp, float MaxHp, FString Name)
         MainWidgetInstance->ShowBossHP(bIsShow, Hp, MaxHp, Name);
 }
 
+void AMainHUD::ShowQuestOn(bool bIsComplete, FString Name)
+{
+    if (MainWidgetInstance)
+        MainWidgetInstance->ShowQuestOn(bIsComplete, Name);
+}
+
 void AMainHUD::UpdateHp()
 {
     if (MainWidgetInstance)

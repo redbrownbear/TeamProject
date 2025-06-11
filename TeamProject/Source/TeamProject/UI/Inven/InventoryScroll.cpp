@@ -179,9 +179,8 @@ void UInventoryScroll::SetSort(EItemCategory Type)
     {
         if ((Item.eItemCategory == EItemCategory::IT_Arrow && Item.bIsArrow) || Item.eItemCategory == EItemCategory::IT_Material)
         {
-            // 이미 동일한 ItemCode가 있는지 확인
             FItemData* Found = Items.FindByPredicate([&](const FItemData& Other) {
-                return Other.UniqueID == Item.UniqueID;
+                return Other.Name == Item.Name;
                 });
 
             if (Found)

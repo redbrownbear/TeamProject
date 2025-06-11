@@ -5,6 +5,9 @@
 
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "SubSystem/UI/ShopManager.h"
+#include "SubSystem/UI/QuestManager.h"
+#include "SubSystem/PlayerManager.h"
+
 #include "SubSystem/UI/UIManager.h"
 
 #include "GameFramework/PC_InGame.h"
@@ -12,7 +15,7 @@
 
 void UNPCDialogue::OnCreated()
 {
-    InitUI();
+
 }
 
 void UNPCDialogue::ShowUI()
@@ -29,8 +32,7 @@ void UNPCDialogue::ShowUI()
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
     {
-
-        PC_InGame->ChangeInputContext(EInputContext::IC_Dialogue);
+        PC_InGame->ChangeInputContext(EInputContext::IC_UI);
 
         FInputModeGameAndUI InputMode;
         InputMode.SetWidgetToFocus(TakeWidget());
@@ -40,6 +42,7 @@ void UNPCDialogue::ShowUI()
         PC_InGame->SetInputMode(InputMode);
     }
 
+    InitUI();
     BindDelegates();
 }
 
@@ -79,11 +82,6 @@ void UNPCDialogue::InitUI()
     ExtraButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnSell);
     CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancel);
 
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->BindDialogueInput();
-    }
 }
 
 void UNPCDialogue::BindDelegates()
@@ -115,6 +113,15 @@ void UNPCDialogue::OnConfirm()
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     PC_InGame->Npc->SetIsConfirmed(true);
 
+    UPlayerManager* PlayerManager = GetWorld()->GetGameInstance()->GetSubsystem<UPlayerManager>();
+    check(PlayerManager);
+
+    UQuestManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestManager>();
+    check(QuestManager);
+
+    UQuestDialogueManager* QuestDialougeManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestDialougeManager);
+
     HideUI(UNPCDialogue::StaticClass());
 
     if (CurQuestChar == EQuestCharacter::Furiko)
@@ -125,6 +132,8 @@ void UNPCDialogue::OnConfirm()
         {
             PC_InGame->Npc->SetDoQuest(true);
             PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Quest);
+
+            PlayerManager->SetQuestData(QuestManager->GetQuestDataByNum(CurQuestNum));
         }
         else
         {
@@ -144,21 +153,18 @@ void UNPCDialogue::OnConfirm()
         UShopManager* ShopManager = GetWorld()->GetGameInstance()->GetSubsystem<UShopManager>();
         check(ShopManager);
 
-        UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
-        check(QuestManager);
-
         UConversationManagerComponent* ConverSationManager = Cast<UConversationManagerComponent>(PC_InGame->Npc->GetComponentByClass(UConversationManagerComponent::StaticClass()));
         check(ConverSationManager);
 
         int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
 
-        if (UIManager && ShopManager && QuestManager && ConverSationManager)
+        if (UIManager && ShopManager && QuestDialougeManager && ConverSationManager)
         {
             UIManager->ShowUI(UShop::StaticClass());
             //ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter, true);
             ShopManager->ShowUI(QuestChar, true);
             
-            QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);            
+            QuestDialougeManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
 
             bool IsShopping = PC_InGame->Npc->GetShopping();
             //bool IsBuying = PC_InGame->Npc->GetBuy();
@@ -223,7 +229,7 @@ void UNPCDialogue::OnSell()
 
             QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
         }
-        PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
+        //PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
     }
     else
     {
@@ -281,6 +287,8 @@ void UNPCDialogue::RefreshDialogue(const FNPCDialogueTableRow& QuestData)
     DialogueDataRow = QuestData;
     NextDialogueID = QuestData.NextDialogueID;
     CurQuestChar = QuestData.QuestCharacter;
+	CurQuestNum = QuestData.QuestNum;
+
 
     if (!DialogueDataRow.DialogueString.IsEmpty())
     {

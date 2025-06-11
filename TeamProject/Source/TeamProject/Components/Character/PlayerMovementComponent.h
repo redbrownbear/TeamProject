@@ -5,10 +5,33 @@
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Misc/Utils.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/TimelineComponent.h"
+#include "Engine/DataAsset.h"
 #include "PlayerMovementComponent.generated.h"
+class UTimelineComponent;
+
+
+
+UCLASS()
+class TEAMPROJECT_API UStepMontageAsset : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, category = "Step")
+	UAnimMontage* StepF;
+	UPROPERTY(EditAnywhere, category = "Step")
+	UAnimMontage* StepB;
+	UPROPERTY(EditAnywhere, category = "Step")
+	UAnimMontage* StepL;
+	UPROPERTY(EditAnywhere, category = "Step")
+	UAnimMontage* StepR;
+
+};
 
 /**
- * 
+ *
  */
 UCLASS()
 class TEAMPROJECT_API UPlayerMovementComponent : public UCharacterMovementComponent
@@ -18,7 +41,7 @@ public:
 	UPlayerMovementComponent(const FObjectInitializer& ObjectInitializer);
 	virtual void BeginPlay() override;
 
-	
+
 	EClimb_State GetClimbMode() { return Climb_State; }
 	UAnimMontage* GetGlideUnEquipMontage() { return GlideUnEquip; }
 
@@ -26,8 +49,8 @@ public:
 	bool ClimbingLineTrace(FHitResult& HitResult);
 	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
 
-	
-	void SetMovementClimb() { MovementMode=MOVE_Flying; bIsClimbing = true; }
+
+	void SetMovementClimb() { MovementMode = MOVE_Flying; bIsClimbing = true; }
 	bool IsClimbing() { return bIsClimbing; }
 
 	bool TrySetMoveClimb(FVector2D ActionValue);
@@ -43,6 +66,8 @@ public:
 
 	void GlidingMove(FVector2D ActionValue);
 
+	void StepMove(FVector2D ActionValue);
+
 	void SetMoveState(EMove_State _State) { Move_State = _State; }
 	EMove_State GetMoveState() { return Move_State; }
 
@@ -50,10 +75,14 @@ public:
 
 	void Hited();
 
+	void BackFlip();
+
 
 private:
 	bool CanGlide();
 
+	/*UFUNCTION()*/
+	/*void StepProgress(float Value);*/
 
 private:
 
@@ -68,8 +97,25 @@ private:
 	UPROPERTY()
 	EMove_State Move_State = EMove_State::Run;
 
-public:
+	//UPROPERTY()
+	//TObjectPtr<UTimelineComponent> StepTimeLine;
 
+	//FOnTimelineFloat InterpFunction{};
+
+	//UPROPERTY()
+	//UCurveFloat* StepCurve;
+
+
+	FVector StepDirection;
+
+	//FVector Prev_StepLocation;
+
+	UStepMontageAsset* StepMontageAsset;
+
+	//float m_GravitySpeed = 0.f;
+
+	//float Prev_Length;
+public:
 
 	bool bIsClimbing = false;
 	bool bIsGliding = false;

@@ -264,6 +264,7 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	}
 
 	CurrentDialogueType = NpcData->DialogType;
+	QuestNpc = NpcData->QuestCharacter;
 }
 
 void ANpc::PlayMontage(ENpcMontage _InEnum, bool bIsLoop)

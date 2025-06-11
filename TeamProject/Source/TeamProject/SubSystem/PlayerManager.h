@@ -77,6 +77,8 @@ public:
 	FItemData GetItemByUniqueID(const FString& UniqueItemID);
 	FItemData RemoveItemByUniqueID(FString UniqueID);
 
+	int32 GetItemCountByName(const FString& ItemName);
+
 	void ShowQuickSlot();
 
 private:

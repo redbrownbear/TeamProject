@@ -3,6 +3,7 @@
 
 #include "SubSystem/PlayerManager.h"
 #include "SubSystem/UI/QuestManager.h"
+#include "UI/HUD/MainHUD.h"
 #include "Actors/Character/PlayerCharacter.h"
 
 void UPlayerManager::Initialize(FSubsystemCollectionBase& Collection)
@@ -12,21 +13,24 @@ void UPlayerManager::Initialize(FSubsystemCollectionBase& Collection)
 
 void UPlayerManager::SetQuestData(FQuestDataRow QuestRow)
 {
-    //�ӽ��ӽ�!!!!!!
     UQuestManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestManager>();
     check(QuestManager);
 
-    QuestList = QuestManager->GetQuestData();
+    for (FQuestDataRow Data : QuestList)
+    {
+        if (Data.QuestNum == QuestRow.QuestNum)
+        {
+            return;
+        }
+    }
 
-    //for (FQuestDataRow Data : QuestArr)
-    //{
-    //    if (Data.QuestNum == QuestRow.QuestNum)
-    //    {
-    //        return;
-    //    }
-    //}
+    AMainHUD* MainHUD = Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+    if (MainHUD)
+    {
+        MainHUD->ShowQuestOn(QuestRow.bIsComplete, QuestRow.QuestTitle);
+    }
 
-    //QuestArr.Add(QuestRow);
+    QuestList.Add(QuestRow);
 }
 
 void UPlayerManager::ShowQuestUI()
@@ -50,13 +54,11 @@ void UPlayerManager::SetEquipData(const FItemData& ItemRow)
 {
     eEquipParts NewParts = ItemRow.GetParts();
 
-    // ���� ���� ������ ����
     EquipItemList.RemoveAll([&](const FItemData& Item)
         {
             return Item.GetParts() == NewParts;
         });
 
-    // �� ������ �߰�
     EquipItemList.Add(ItemRow);
     SetWeaponMesh(ItemRow.GetParts(), ItemRow.StaticMesh);
     UpDateInvenEquipUI(EquipItemList);
@@ -151,12 +153,27 @@ FItemData UPlayerManager::RemoveItemByUniqueID(FString UniqueID)
         {
             FItemData Removed = ItemInvenList[i];
             ItemInvenList.RemoveAt(i);
-            UpDateInvenUI(ItemInvenList); // UI ����ȭ
+            UpDateInvenUI(ItemInvenList);
             return Removed;
         }
     }
 
     return FItemData();
+}
+
+int32 UPlayerManager::GetItemCountByName(const FString& ItemName)
+{
+    int32 Count = 0;
+
+    for (int32 i = 0; i < ItemInvenList.Num(); ++i)
+    {
+        if (ItemInvenList[i].Name == ItemName)
+        {
+            Count++;
+        }
+    }
+
+    return Count;
 }
 
 void UPlayerManager::ShowQuickSlot()
@@ -171,7 +188,7 @@ void UPlayerManager::UpDateInvenUI(const FItemData& ItemData)
 
 void UPlayerManager::UpDateInvenUI(const TArray<FItemData>& ItemRows)
 {
-    OnInventoryAllUpdated.Broadcast(ItemRows); // UI���� �˸�
+    OnInventoryAllUpdated.Broadcast(ItemRows);
 }
 
 void UPlayerManager::UpDateInvenEquipUI(const TArray<FItemData>& ItemList)
@@ -194,13 +211,13 @@ void UPlayerManager::InitStatus()
     status.Damage = 0.0f;
     status.Armor = 0.0f;
 
-    status.Runspeed = 100.f;            //�˾Ƽ� ���ϼ�~
-    status.LevelName;                   //�ʱⰪ�� ���?�Ұ���?
-    status.PlayerTransform;             //��������!
-    status.PreviousLoction;             //�˾Ƽ� ����
-    status.StaminaRegenSpeed = 4.0f;    //�˾Ƽ�
+    status.Runspeed = 100.f;        
+    status.LevelName;               
+    status.PlayerTransform;         
+    status.PreviousLoction;         
+    status.StaminaRegenSpeed = 4.0f;
 
-    status.Rupee = 0;
+    status.Rupee = 99999;
 
     PlayerStatus = status;
 }
@@ -212,11 +229,9 @@ void UPlayerManager::SetPlayerStamina(float InStamina)
 
 void UPlayerManager::TickStamina(float DeltaTime)
 {
-    //���׹̳� ������̸�?�� �þ
     if (PlayerStatus.bIsUseStamina)
         return;
 
-    // �̹� �ִ��?�� �þ
     if (PlayerStatus.Stamina >= PlayerStatus.MaxStamina)
         return;
 

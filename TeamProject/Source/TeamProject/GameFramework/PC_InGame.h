@@ -21,13 +21,7 @@ enum class EInputContext
 {
 	IC_Start,
 	IC_InGame,
-	IC_Inventory,
-	IC_Dialogue,
-	IC_Shop,
-	IC_Quest,
-	IC_Popup,
-	IC_Map,
-	//필요하면 추가해서 사용합니다.
+	IC_UI,
 
 	IC_End,
 };
@@ -44,19 +38,8 @@ public:
 
 	//Inventory
 	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
-	UInputMappingContext* IMC_Inventory = nullptr;
+	UInputMappingContext* IMC_UI = nullptr;
 
-	//Dialogue
-	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
-	UInputMappingContext* IMC_Dialogue = nullptr;
-
-	//Shop
-	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
-	UInputMappingContext* IMC_Shop = nullptr;
-
-	//Quest
-	UPROPERTY(EditAnywhere, Category = "Input|InputMappingContext")
-	UInputMappingContext* IMC_Quest = nullptr;
 
 	//Player
 public:
@@ -107,7 +90,19 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_Quest = nullptr;
 
-	//Inven
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_QuickSlotLeft = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_QuickSlotRight = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_CancelOnlyQuick = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_MapOpen = nullptr;
+
+	//UI
 public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_InvenNavigate = nullptr;
@@ -120,19 +115,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_InvenAddItem = nullptr;
 
-	//Dialogue
-public:
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_DialogueNavigate = nullptr;
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_DialogueConfirm = nullptr;
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_DialogueCancel = nullptr;
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_DialogueNext = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_CancelOnlyQuick = nullptr;
 
 
 	//Supernatural
@@ -150,25 +134,9 @@ public:
 	UInputAction* IA_ControlDistance = nullptr;
 
 
-	//QuickSlot
-public:
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_QuickSlotLeft = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_QuickSlotRight = nullptr;
-
-	//Map
-public:
-	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
-	UInputAction* IA_MapOpen = nullptr;
-
-
 	void CheckValid() const
 	{
 		check(IMC_InGame);
-		check(IMC_Inventory);
-		check(IMC_Dialogue);
 		check(IA_Move);
 		check(IA_Navigate);
 		check(IA_LookMouse);
@@ -185,9 +153,6 @@ public:
 		check(IA_InvenCancel);
 		check(IA_InvenAddItem);
 		check(IA_DropItem);
-		check(IA_DialogueNavigate);
-		check(IA_DialogueConfirm);
-		check(IA_DialogueCancel);
 		check(IA_DialogueNext);
 		check(IA_CancelOnlyQuick);
 		check(IA_IceMaker);	
@@ -220,10 +185,7 @@ public:
 
 public:
 	void ChangeInputContext(EInputContext NewContext);
-	void BindInventoryInput();
-	void BindDialogueInput();
-	void BindShopInput();
-	void BindQuestInput();
+	void BindUI();
 
 protected:
 	// ---------- Move Mode ------------------------------
@@ -234,6 +196,10 @@ protected:
 	void StartedDash(const FInputActionValue& InputActionValue);
 	void CompletedDash(const FInputActionValue& InputActionValue);
 
+	void StartedStep(const FInputActionValue& InputActionValue);
+	void CompletedStep(const FInputActionValue& InputActionValue);
+
+	void OnBackFlip(const FInputActionValue& InputActionValue);
 
 	void OnLook(const FInputActionValue& InputActionValue);
 	void Climb(const FInputActionValue& InputActionValue);
@@ -268,6 +234,11 @@ protected:
 	// Magnesis
 	void ShowMetalActorPreview(const FInputActionValue& InputActionValue);
 
+	void OnQuickSlotLeft(const FInputActionValue& InputActionValue);
+	void OnQuickSlotRight(const FInputActionValue& InputActionValue);
+	void OffQuickSlot(const FInputActionValue& InputActionValue);
+	void OnMapOpen(const FInputActionValue& InputActionValue);
+
 	//UI
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	void OnConfirm(const FInputActionValue& InputActionValue);
@@ -277,14 +248,7 @@ protected:
 	void DropItem(const FInputActionValue& InputActionValue);
 
 	void OnCreateItemTest(const FInputActionValue& InputActionValue);
-	//UI
 
-	void OnQuickSlotLeft(const FInputActionValue& InputActionValue);
-	void OnQuickSlotRight(const FInputActionValue& InputActionValue);
-
-	void OffQuickSlot(const FInputActionValue& InputActionValue);
-
-	void OnMapOpen(const FInputActionValue& InputActionValue);
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
 

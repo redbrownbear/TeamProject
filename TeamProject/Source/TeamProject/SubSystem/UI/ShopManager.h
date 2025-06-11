@@ -10,6 +10,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShopUpdated, const TArray<FShopDataRow>&, ShopList);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRupeeChanged);
+
 /**
  * 
  */
@@ -36,6 +38,34 @@ public:
 	//UI
 	void UpdateItem(const TArray<FShopDataRow>& ShopList);
 
+public:
+	UFUNCTION()
+	bool CheckSoldout();
+
+	UFUNCTION()
+	bool CanIBuyIt();
+
+	UFUNCTION()
+	void AddItemInventory();
+
+	UFUNCTION()
+	void SubtractItemInventory();
+
+	UFUNCTION()
+	void AddPlayerRupee();
+
+	UFUNCTION()
+	void SubtractPlayerRupee();
+
+	//UFUNCTION()
+	//void AddShopItem(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow);
+
+	//UFUNCTION()
+	//void SubtractShopItem(EQuestCharacter QuestChar, const FShopDataRow UpdateShopRow);
+
+public:
+	void SetSelectedItem(const FItemData& InShopData);
+	FItemData GetSelectedItem() const { return SelectedShopItem.ItemData; }
 
 private:
 	void SetIsBuy(bool IsBuy) { bIsBuy = IsBuy; }
@@ -46,11 +76,19 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnShopUpdated OnShopUpdated;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnRupeeChanged OnRupeeChanged;
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	UDataTable* ShopDataTable;
 
-	TMap<EQuestCharacter, TArray<FShopDataRow>> ShopRowMap;
+	TMap<EQuestCharacter, TArray<FShopDataRow>> CurrentShopRowMap;
 
 	bool bIsBuy = false;
+
+	FShopDataRow SelectedShopItem;
+
+	UPROPERTY(meta = (BindWidget))
+	class UShopScroll* BP_ShopScroll;
 };

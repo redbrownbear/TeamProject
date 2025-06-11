@@ -9,6 +9,8 @@
 #include "Data/ItemDataRow.h"
 #include "SubSystem/UI/UIManager.h"
 
+#include "Misc/Utils.h"
+
 // Sets default values
 ATreasureBox::ATreasureBox()
 {
@@ -30,9 +32,8 @@ void ATreasureBox::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	CollisionComponent->SetCollisionObjectType(ECC_WorldDynamic);
-	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
-	CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	CollisionComponent->SetCollisionProfileName(CollisionProfileName::ToPlayer);
+
 	CollisionComponent->SetGenerateOverlapEvents(true);
 
 	SkeletalMeshComponent->SetCollisionObjectType(ECC_WorldStatic);

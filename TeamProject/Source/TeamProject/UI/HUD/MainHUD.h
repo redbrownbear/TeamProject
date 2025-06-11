@@ -30,6 +30,8 @@ public:
 
     void ShowBossHpUI(bool bIsShow, float Hp, float MaxHp, FString Name);
 
+    void ShowQuestOn(bool bIsComplete, FString Name);
+
     void UpdateHp();
 
 protected:

@@ -108,6 +108,11 @@ void UMainHUDWidget::ShowBossHP(bool bIsShow, float Hp, float MaxHp, FString Nam
 	}
 }
 
+void UMainHUDWidget::ShowQuestOn(bool bIsComplete, FString Name)
+{
+	QuestOn->ShowQuestUI(bIsComplete, Name);
+}
+
 void UMainHUDWidget::UpdateHP()
 {
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
