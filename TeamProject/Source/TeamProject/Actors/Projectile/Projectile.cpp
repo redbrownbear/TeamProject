@@ -149,7 +149,7 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(OtherActor);
 	if (Player_C)
 	{
-		if (Player_C->GetIsGuard())
+		if (Player_C->GetIsParry())
 		{
 			if (DataTableRowHandle.RowName == ProjectileName::Monster_Attack
 				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelAttack
@@ -185,6 +185,24 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 					UE_LOG(LogTemp, Error, TEXT("AProjectile::OnBeginOverlap // Unexpected MonsterType"));
 					check(false);
 				}
+			}
+			// Undefendable attack
+			else
+			{
+				Player_C->Damaged(GetDamage());
+			}
+		}
+
+
+		if (Player_C->GetIsHoldingShield())
+		{
+			if (DataTableRowHandle.RowName == ProjectileName::Monster_Attack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelAttack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_Arrow
+				)
+			{
+				// Do not take damage;
 			}
 			else
 			{

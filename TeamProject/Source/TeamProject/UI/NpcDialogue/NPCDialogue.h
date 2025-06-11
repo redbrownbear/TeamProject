@@ -30,7 +30,7 @@ private:
 	void BindDelegates();
 	void RemoveDelegates();
 
-public: //ë°”ì¸?©ì„ ?„í•´ ?¼ë¸”ë¦?„ ??
+public: //ë°”ì¸?ï¿½ì„ ?ï¿½í•´ ?ï¿½ë¸”ï¿½?ï¿½ï¿½??
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	UFUNCTION()
@@ -58,7 +58,7 @@ private:
 	EQuestCharacter CurQuestChar;
 	int32 NextDialogueID;
 
-	//ÇÑ±ÛÀÚ¾¿ º¸ÀÌ´Â ±â´ÉÀ» À§ÇÑ º¯¼ö
+	//ï¿½Ñ±ï¿½ï¿½Ú¾ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	FString FullText;
 	int32 CurrentCharIndex = 0;
 	FTimerHandle TypingTimerHandle;

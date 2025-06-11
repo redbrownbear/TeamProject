@@ -79,7 +79,6 @@ void ACharacterMonster::BeginPlay()
 				MeleeWeapon->SetActorScale3D(Scale);
 				MeleeWeapon->AttachToMonster(this, Monster_SocketName::Pod_Melee);
 				MeleeWeapon->FinishSpawning(FTransform::Identity);
-
 				FSMComponent->SetMeleeWeapon(MeleeWeapon);
 				FSMComponent->SheathMeleeWeapon();
 			}

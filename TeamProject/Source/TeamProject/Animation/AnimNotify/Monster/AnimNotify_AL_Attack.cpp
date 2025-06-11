@@ -24,7 +24,8 @@ void UAnimNotify_AL_Attack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequen
 
 			//const USkeletalMeshComponent* Mesh = Monster->GetMonsterMesh();
 			//const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Toe_L);
-			const FVector Location = Monster->GetActorLocation();
+			FVector Location = Monster->GetActorLocation();
+			Location += Monster->GetActorForwardVector() * 150.f;
 			NewTransform.SetLocation(Location);
 
 			Projectile->FinishSpawning(NewTransform);
