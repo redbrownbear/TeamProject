@@ -478,6 +478,7 @@ void APC_InGame::StartedStep(const FInputActionValue& InputActionValue)
 	if (Movement->GetMoveState() == EMove_State::Run)
 	{
 		Movement->SetMoveState(EMove_State::Step);
+		Movement->JumpZVelocity = PLAYER_STEP_JUMP_HEIGHT;
 	}
 }
 
@@ -489,6 +490,7 @@ void APC_InGame::CompletedStep(const FInputActionValue& InputActionValue)
 	if (Movement->GetMoveState() == EMove_State::Step)
 	{
 		Movement->SetMoveState(EMove_State::Run);
+		Movement->JumpZVelocity = PLAYER_NML_JUMP_HEIGHT;
 	}
 }
 

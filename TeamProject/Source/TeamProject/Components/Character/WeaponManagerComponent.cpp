@@ -117,7 +117,7 @@ void UWeaponManagerComponent::BeginPlay()
 		switch (Data.eItemCategory)
 		{
 		case EItemCategory::IT_Weapon:
-		{
+		
 			switch (Data.eWeaponKind)
 			{
 			case EWeaponKind::None:
@@ -137,7 +137,7 @@ void UWeaponManagerComponent::BeginPlay()
 			default:
 				break;
 			}
-		}
+			break;
 		case EItemCategory::IT_Shield:
 			SetShieldStaticMesh(Data.StaticMesh);
 		}
@@ -175,6 +175,15 @@ void UWeaponManagerComponent::SetShieldStaticMesh(UStaticMesh* InMesh)
 void UWeaponManagerComponent::SetCanSwordAttack()
 {
 	Cast<AWeaponSword>(Sword->GetChildActor())->SetCanAttack();
+}
+
+bool UWeaponManagerComponent::GetIsShieldAlready()
+{
+	if (GetEquipState() == EEquip_State::Sword_Shield || GetEquipState() == EEquip_State::Shield)
+	{
+		return bRightClick;
+	}
+	return false;
 }
 
 void UWeaponManagerComponent::TryEquipWeapon()

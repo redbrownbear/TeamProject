@@ -206,6 +206,7 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 		UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		AnimInst->bIsBackFlip = false;
+		Movement->SetMoveState(EMove_State::Run);
 	}
 	if (Movement->GetMoveState() == EMove_State::Glide)
 	{

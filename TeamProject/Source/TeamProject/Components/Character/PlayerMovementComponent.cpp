@@ -405,6 +405,10 @@ void UPlayerMovementComponent::StepMove(FVector2D ActionValue)
 	{
 		return;
 	}
+	if (Velocity != FVector::ZeroVector)
+	{
+		return;
+	}
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 	
 	Prev_StepLocation = GetOwner()->GetActorLocation();
@@ -440,9 +444,11 @@ void UPlayerMovementComponent::StepMove(FVector2D ActionValue)
 	}
 	Prev_Length = 0.f;
 	m_GravitySpeed = 0.f;
-	StepTimeLine->SetNewTime(0.f);
-	StepTimeLine->Play();
-	SetMovementMode(MOVE_None);
+	//StepTimeLine->SetNewTime(0.f);
+	//StepTimeLine->Play();
+	Player_C->Jump();
+	Velocity = StepDirection * PLAYER_STEP_DISTANCE;
+
 }
 
 
@@ -458,6 +464,8 @@ void UPlayerMovementComponent::BackFlip()
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 	AnimInst->bIsBackFlip = true;
+
+	SetMoveState(EMove_State::BackFlip);
 
 	FVector ForwardVector = Player_C->GetActorForwardVector();
 

@@ -60,6 +60,9 @@ public:
 	bool GetIsGuard() { return bIsGuard; }
 	void SetIsGuard(bool bFlag) { bIsGuard = bFlag; }
 
+	bool GetIsShieldAlready();
+
+
 	EWeapon_Type GetUnEquipWeaponType() {
 		EWeapon_Type _Type;
 		UnEquipWeapons.Dequeue(_Type);
