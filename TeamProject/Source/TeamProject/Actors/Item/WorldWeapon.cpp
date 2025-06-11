@@ -32,10 +32,10 @@ AWorldWeapon::AWorldWeapon()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->AttachToComponent(DefaultSceneRoot, FAttachmentTransformRules::KeepRelativeTransform);
 
-	//static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Script/PhysicsCore.PhysicalMaterial'/Game/Resources/Item/PhysicsMaterial/PM_WorldWeapon.PM_WorldWeapon'"));
-	//PhysicalMaterial = PhysMaterial.Object;
+	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Script/PhysicsCore.PhysicalMaterial'/Game/Resources/Item/PhysicsMaterial/PM_WorldWeapon.PM_WorldWeapon'"));
+	PhysicalMaterial = PhysMaterial.Object;
 
-	//StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
+	StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
 }
 
 void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
@@ -177,7 +177,6 @@ void AWorldWeapon::SetDataWithData(const FItemData& InItemData)
 		CollisionComponent->SetWorldTransform(WorldTransform);
 		SetRootComponent(CollisionComponent);
 
-		DefaultSceneRoot->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
 		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
@@ -203,12 +202,14 @@ void AWorldWeapon::SetDataWithData(const FItemData& InItemData)
 		CollisionComponent->BodyInstance.bUseCCD = true;
 		CollisionComponent->SetEnableGravity(true);
 		CollisionComponent->SetSimulatePhysics(true);
+		CollisionComponent->SetMassOverrideInKg(NAME_None, 100.0f);
 
 		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
 	}
 	if (InItemData.StaticMesh)
 	{
-		StaticMeshComponent->SetWorldScale3D(InItemData.Transform.GetScale3D());
+		StaticMeshComponent->SetStaticMesh(InItemData.StaticMesh);
+		StaticMeshComponent->SetRelativeTransform(InItemData.Transform);
 		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}

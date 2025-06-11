@@ -52,13 +52,13 @@ public:
 public:
 	FQuestDataRow GetItemDataAtIndex(int32 Index) const;
 
-public: //바인딩을 위해 퍼블릭선언
+public:
 	UFUNCTION()
-	void OnNavigate(const FInputActionValue& InputActionValue);
+	virtual void OnNavigate(const FInputActionValue& Value) override;
 	UFUNCTION()
-	void OnConfirm();
+	virtual void OnConfirm(const FInputActionValue& Value) override;
 	UFUNCTION()
-	void OnCancel();
+	virtual void OnCancel(const FInputActionValue& Value) override;
 
 //public:
 //	UPROPERTY(BlueprintAssignable)

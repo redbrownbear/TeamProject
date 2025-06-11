@@ -7,6 +7,8 @@
 #include "SubSystem/UI/InventoryManager.h"
 #include "SubSystem/PlayerManager.h"
 
+#include "UI/Popup/PopupCountSelect.h"
+
 #include "Components/CanvasPanelSlot.h"
 
 #include "GameFramework/PC_InGame.h"
@@ -14,7 +16,7 @@
 
 void UInventory::OnCreated()
 {
-
+    InitUI();
 }
 
 void UInventory::ShowUI()
@@ -35,7 +37,6 @@ void UInventory::ShowUI()
     }
 
     SetRupeeUI();
-    InitUI();
     BindDelegates();
 }
 
@@ -60,6 +61,7 @@ void UInventory::BindDelegates()
         PlayerManager->OnInventoryAllUpdated.AddDynamic(this, &UInventory::RefreshAllInventory);
 
         PlayerManager->OnInvenEquipItemAllUpdated.AddDynamic(this, &UInventory::RefreshEquip);
+		PlayerManager->OnInventoryRemoveUpdated .AddDynamic(this, &UInventory::CreateItemInWorld);
     }
 
     BP_InvenScroll->OnInventoryDescriptionUpdated.AddDynamic(this, &UInventory::RefreshDescription);
@@ -74,6 +76,7 @@ void UInventory::RemoveDelegate()
         PlayerManager->OnInventoryAllUpdated.RemoveDynamic(this, &UInventory::RefreshAllInventory);
 
         PlayerManager->OnInvenEquipItemAllUpdated.RemoveDynamic(this, &UInventory::RefreshEquip);
+        PlayerManager->OnInventoryRemoveUpdated.RemoveDynamic(this, &UInventory::CreateItemInWorld);
     }
 
     BP_InvenScroll->OnInventoryDescriptionUpdated.RemoveDynamic(this, &UInventory::RefreshDescription);
@@ -140,27 +143,25 @@ void UInventory::OnCreateItemInWorld(const FInputActionValue& InputActionValue)
     if (BP_InvenScroll->IsEmptyItem())
         return;
 
+
     const FItemData& SelectedItem = BP_InvenScroll->GetCurItemData();
 
-    FItemData DroppedItem = PlayerManager->RemoveItemByUniqueID(SelectedItem.UniqueID);
-
-    UWorld* World = GetWorld();
-    if (!World) return;
-
-    APlayerController* PC = GetWorld()->GetFirstPlayerController();
-    if (!PC) return;
-
-    APawn* Pawn = PC->GetPawn();
-    if (!Pawn) return;
-
-    FVector SpawnLocation = Pawn->GetActorLocation() + Pawn->GetActorForwardVector() * 100.f + FVector(0, 0, 50.f);
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.Owner = Pawn;
-
-    AWorldWeapon* SpawnedActor = World->SpawnActor<AWorldWeapon>(WorldItemActorClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
-    if (SpawnedActor)
+    if (SelectedItem.GetParts() == eEquipParts::ARROWLEFT || SelectedItem.eItemCategory == EItemCategory::IT_Food || SelectedItem.eItemCategory == EItemCategory::IT_Material)
     {
-        SpawnedActor->SetDataWithData(DroppedItem);
+        UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+        if (UIManager)
+        {
+            UIManager->ShowUI(UPopupCountSelect::StaticClass());
+        }
+        UPopupCountSelect* PopupCountUI = UIManager->FindUI<UPopupCountSelect>();
+        if (PopupCountUI)
+        {
+            PopupCountUI->SetUI(SelectedItem);
+        }
+    }
+    else
+    {
+        CreateItemInWorld();
     }
 }
 
@@ -181,12 +182,11 @@ void UInventory::OnCreateItemTest(const FInputActionValue& InputActionValue)
                 RandomItem.UniqueID = FGuid::NewGuid().ToString();
                 PlayerManager->SetInvenData(RandomItem);
 
-                // ��� ��
-                UE_LOG(LogTemp, Log, TEXT("���� Name: %s"), *RandomItem.Name);
+                UE_LOG(LogTemp, Log, TEXT("Name: %s"), *RandomItem.Name);
             }
             else
             {
-                UE_LOG(LogTemp, Warning, TEXT("������ �����Ͱ� ���ų� FoundRowsPtr�� null�Դϴ�."));
+                UE_LOG(LogTemp, Warning, TEXT("Num() <= 0"));
             }
         }
     }
@@ -212,4 +212,44 @@ void UInventory::RefreshEquip(const TArray<FItemData>& ItemDataMap)
 {
     BP_InvenEquip->SetEquipMakeData(ItemDataMap);
     BP_InvenScroll->EquipCurrentItem();
+}
+
+void UInventory::CreateItemInWorld(const FItemData& ItemData)
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (!PlayerManager || !WorldItemActorClass) return;
+
+    if (BP_InvenScroll->IsEmptyItem())
+        return;
+
+    FItemData SelectedItem = ItemData;
+    FItemData DroppedItem = PlayerManager->RemoveItemByUniqueID(SelectedItem.UniqueID);
+
+    UWorld* World = GetWorld();
+    if (!World) return;
+
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (!PC) return;
+
+    APawn* Pawn = PC->GetPawn();
+    if (!Pawn) return;
+
+    FVector SpawnLocation = Pawn->GetActorLocation() + Pawn->GetActorForwardVector() * 100.f + FVector(0, 0, 50.f);
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = Pawn;
+ 
+    AWorldWeapon* SpawnedActor = World->SpawnActor<AWorldWeapon>(WorldItemActorClass, SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+    if (SpawnedActor)
+    {
+        SpawnedActor->SetDataWithData(DroppedItem);
+    }  
+}
+
+void UInventory::CreateItemInWorld()
+{
+    if (BP_InvenScroll->IsEmptyItem())
+        return;
+
+    const FItemData& SelectedItem = BP_InvenScroll->GetCurItemData();
+    CreateItemInWorld(SelectedItem);
 }

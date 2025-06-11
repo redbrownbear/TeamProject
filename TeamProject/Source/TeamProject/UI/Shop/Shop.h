@@ -29,6 +29,17 @@ public:
 
 public:
 	UFUNCTION()
+	virtual void OnNavigate(const FInputActionValue& Value) override;
+	UFUNCTION()
+	virtual void OnConfirm(const FInputActionValue& Value) override;
+	UFUNCTION()
+	virtual void OnCancel(const FInputActionValue& Value) override;
+
+public:
+	void SetDialogueData(EQuestCharacter InQuestChar, int32 InDialogueID);
+
+public:
+	UFUNCTION()
 	void CheckSoldout();
 
 	UFUNCTION()
@@ -46,22 +57,13 @@ private:
 	void RemoveDelegates();
 
 private:
-	//��ȭ ���� ���� ����
 	void SetShopOpen();
-
-	//��ǰ ����� ����?
 	void SetItemBuy();
 
 	UFUNCTION()
 	void RefreshAllInventory(const TArray<FItemData>& ItemDataList);
 
-public: //���ε��� ���� �ۺ������
-	UFUNCTION()
-	void OnNavigate(const FInputActionValue& InputActionValue);
-	UFUNCTION()
-	void OnConfirm();
-	UFUNCTION()
-	void OnCancel();
+public:
 	UFUNCTION()
 	void OnNextDialogue(const FInputActionValue& InputActionValue);
 
@@ -92,4 +94,8 @@ private:
 private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CoinText;
+
+private:
+	EQuestCharacter QuestChar;
+	int32 DialogueID;
 };

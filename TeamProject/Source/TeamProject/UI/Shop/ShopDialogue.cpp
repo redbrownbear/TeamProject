@@ -28,6 +28,8 @@ void UShopDialogue::InitUI()
     ExtraButton->SetVisibility(ESlateVisibility::Collapsed);
 
     ActionLay->SetVisibility(ESlateVisibility::Visible);
+
+    bIsSelect = false;
 }
 
 void UShopDialogue::SetBuy()
@@ -42,6 +44,8 @@ void UShopDialogue::SetBuy()
 
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Buy);    
+
+    bIsSelect = true;
 }
 
 void UShopDialogue::SetSell()
@@ -53,6 +57,8 @@ void UShopDialogue::SetSell()
 
     ConfrimText->SetText(FText::FromString(TEXT("판매")));
     CancelText->SetText(FText::FromString(TEXT("취소")));
+
+    bIsSelect = true;
 }
 
 void UShopDialogue::OnNavigate(const FInputActionValue& InputActionValue)

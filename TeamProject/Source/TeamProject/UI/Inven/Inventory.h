@@ -38,10 +38,14 @@ private:
 	void SetRupeeUI();
 
 public: //바인딩을 위해 퍼블릭선언
+public:
 	UFUNCTION()
-	void OnNavigate(const FInputActionValue& InputActionValue);
-	void OnConfirm(const FInputActionValue& InputActionValue);
-	void OnCancel(const FInputActionValue& InputActionValue);
+	virtual void OnNavigate(const FInputActionValue& Value) override;
+	UFUNCTION()
+	virtual void OnConfirm(const FInputActionValue& Value) override;
+	UFUNCTION()
+	virtual void OnCancel(const FInputActionValue& Value) override;
+
 	void OnCreateItemInWorld(const FInputActionValue& InputActionValue);
 
 	void OnCreateItemTest(const FInputActionValue& InputActionValue);
@@ -55,6 +59,10 @@ private:
 	void RefreshDescription(const FItemData& ItemData);
 	UFUNCTION()
 	void RefreshEquip(const TArray<FItemData>& ItemDataMap);
+
+	UFUNCTION()
+	void CreateItemInWorld(const FItemData& ItemData);
+	void CreateItemInWorld();
 
 
 private:

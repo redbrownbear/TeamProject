@@ -907,7 +907,7 @@ void APC_InGame::OffQuickSlot(const FInputActionValue& InputActionValue)
 	{
 		UQuickSlotMain* QuickSlotUI = UIManager->FindUI<UQuickSlotMain>();
 		if (QuickSlotUI)
-			QuickSlotUI->OnCancel();
+			QuickSlotUI->OnCancel(InputActionValue);
 	}
 }
 
@@ -1293,31 +1293,16 @@ void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	if (UQuickSlotMain* QuickSlot = UIManager->FindUI<UQuickSlotMain>())
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
 	{
-		if (QuickSlot->IsVisible())
-			QuickSlot->OnNavigate(InputActionValue);
+		if (IInputReceivableUI* InputUI = Cast<IInputReceivableUI>(TopUI))
+		{
+			if (TopUI->IsVisible())
+			{
+				InputUI->OnNavigate(InputActionValue);
+			}
+		}
 	}
-	if (UInventory* InvenUI = UIManager->FindUI<UInventory>())
-	{
-		if (InvenUI->IsVisible())
-			InvenUI->OnNavigate(InputActionValue);
-	}
-	if (UShop* ShopUI = UIManager->FindUI<UShop>())
-	{
-		if (ShopUI->IsVisible())
-			ShopUI->OnNavigate(InputActionValue);
-	}
-	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
-	{
-		if (DialogUI->IsVisible())
-			DialogUI->OnNavigate(InputActionValue);
-	}
-	if (UQuest* QuestUI = UIManager->FindUI<UQuest>())
-	{
-		if (QuestUI->IsVisible())
-			QuestUI->OnNavigate(InputActionValue);
-	}	
 }
 
 void APC_InGame::OnConfirm(const FInputActionValue& InputActionValue)
@@ -1325,25 +1310,15 @@ void APC_InGame::OnConfirm(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	if (UInventory* InvenUI = UIManager->FindUI<UInventory>())
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
 	{
-		if (InvenUI->IsVisible())
-			InvenUI->OnConfirm(InputActionValue);
-	}
-	if (UShop* ShopUI = UIManager->FindUI<UShop>())
-	{
-		if (ShopUI->IsVisible())
-			ShopUI->OnConfirm();
-	}
-	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
-	{
-		if (DialogUI->IsVisible())
-			DialogUI->OnConfirm();
-	}
-	if (UQuest* QuestUI = UIManager->FindUI<UQuest>())
-	{
-		if (QuestUI->IsVisible())
-			QuestUI->OnConfirm();
+		if (IInputReceivableUI* InputUI = Cast<IInputReceivableUI>(TopUI))
+		{
+			if (TopUI->IsVisible())
+			{
+				InputUI->OnConfirm(InputActionValue);
+			}
+		}
 	}
 }
 
@@ -1352,35 +1327,15 @@ void APC_InGame::OnCancel(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	if (UInventory* InvenUI = UIManager->FindUI<UInventory>())
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
 	{
-		if (InvenUI->IsVisible())
-			InvenUI->OnCancel(InputActionValue);
-	}
-	if (UShop* ShopUI = UIManager->FindUI<UShop>())
-	{
-		if (ShopUI->IsVisible())
-			ShopUI->OnCancel();
-	}
-	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
-	{
-		if (DialogUI->IsVisible())
-			DialogUI->OnCancel();
-	}
-	if (UQuest* QuestUI = UIManager->FindUI<UQuest>())
-	{
-		if (QuestUI->IsVisible())
-			QuestUI->OnCancel();
-	}
-	if (UPopupGetItem* PopupUI = UIManager->FindUI<UPopupGetItem>())
-	{
-		if (PopupUI->IsVisible())
-			PopupUI->OnCancel();
-	}
-	if (UMainMap* MainMapUI = UIManager->FindUI<UMainMap>())
-	{
-		if (MainMapUI->IsVisible())
-			MainMapUI->OnCancel();
+		if (IInputReceivableUI* InputUI = Cast<IInputReceivableUI>(TopUI))
+		{
+			if (TopUI->IsVisible())
+			{
+				InputUI->OnCancel(InputActionValue);
+			}
+		}
 	}
 }
 
@@ -1389,10 +1344,12 @@ void APC_InGame::OnNextDialogue(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
 	{
-		if (DialogUI->IsVisible())
+		UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>();
+		if (DialogUI->IsVisible() && TopUI == DialogUI)
 			DialogUI->OnNextDialogue(InputActionValue);
+		
 	}
 }
 
@@ -1401,9 +1358,12 @@ void APC_InGame::DropItem(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	UInventory* InvenUI = UIManager->FindUI<UInventory>();;
-	if (InvenUI->IsVisible())
-		InvenUI->OnCreateItemInWorld(InputActionValue);
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
+	{
+		UInventory* InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI->IsVisible() && TopUI == InvenUI)
+			InvenUI->OnCreateItemInWorld(InputActionValue);
+	}
 }
 
 void APC_InGame::OnCreateItemTest(const FInputActionValue& InputActionValue)
@@ -1411,8 +1371,11 @@ void APC_InGame::OnCreateItemTest(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	UInventory* InvenUI = UIManager->FindUI<UInventory>();
-	if (InvenUI->IsVisible())
-		InvenUI->OnCreateItemTest(InputActionValue);
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
+	{
+		UInventory* InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI->IsVisible() && TopUI == InvenUI)
+			InvenUI->OnCreateItemTest(InputActionValue);		
+	}
 }
 

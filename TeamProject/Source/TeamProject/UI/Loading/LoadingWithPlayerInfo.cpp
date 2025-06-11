@@ -29,8 +29,8 @@ void ULoadingWithPlayerInfo::InitUI()
 
         TextRupeeCount->SetText(FText::FromString(FString::FromInt(PlayerStatus.Rupee)));
 
-        //TextTip->SetText((FText::FromString("팁 이거 어케 할까? 테이블 만들까?")));
-        //TextTipDescription->SetText((FText::FromString("1")));
+        TextTip->SetText(FText::FromString(TEXT("테스트")));
+        TextTipDescription->SetText(FText::FromString(TEXT("테스트")));
 
         DrawHeart();
         DrawStamina();
