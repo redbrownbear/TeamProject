@@ -102,6 +102,7 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 		StaticMeshComponent->SetStaticMesh(ItemTableRow->StaticMesh);
 		StaticMeshComponent->SetRelativeTransform(ItemTableRow->Transform);
 		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
@@ -161,6 +162,7 @@ void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHa
 		//StaticMeshComponent->SetWorldScale3D(ItemTableRow->Transform.GetScale3D());
 		StaticMeshComponent->SetRelativeTransform(ItemTableRow->Transform);
 		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
@@ -217,6 +219,7 @@ void AWorldWeapon::SetDataWithData(const FItemData& InItemData)
 		StaticMeshComponent->SetStaticMesh(InItemData.StaticMesh);
 		StaticMeshComponent->SetWorldScale3D(FVector(45.0f, 45.0f, 45.0f));
 		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 	ItemTableRow = &InItemData;
