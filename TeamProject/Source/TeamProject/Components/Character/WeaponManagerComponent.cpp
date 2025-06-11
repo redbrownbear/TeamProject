@@ -7,6 +7,7 @@
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "UI/HUD/MainHUD.h"
+#include "SubSystem/PlayerManager.h"
 // Sets default values for this component's properties
 UWeaponManagerComponent::UWeaponManagerComponent()
 {
@@ -108,7 +109,40 @@ void UWeaponManagerComponent::BeginPlay()
 	Bow->GetChildActor()->SetOwner(GetOwner());
 	Glider->SetVisibility(false);
 	// ...
-	
+	UPlayerManager* PlayerManager = GetOwner()->GetGameInstance()->GetSubsystem<UPlayerManager>();
+	TArray<FItemData> EquipData = PlayerManager->GetAllEquipData();
+
+	for (auto& Data : EquipData)
+	{
+		switch (Data.eItemCategory)
+		{
+		case EItemCategory::IT_Weapon:
+		{
+			switch (Data.eWeaponKind)
+			{
+			case EWeaponKind::None:
+				break;
+			case EWeaponKind::SWORD:
+				SetSwordStaticMesh(Data.StaticMesh);
+				break;
+			case EWeaponKind::SPEAR:
+				break;
+			case EWeaponKind::LSWORD:
+				break;
+			case EWeaponKind::BOW:
+				SetBowStaticMesh(Data.StaticMesh);
+				break;
+			case EWeaponKind::END:
+				break;
+			default:
+				break;
+			}
+		}
+		case EItemCategory::IT_Shield:
+			SetShieldStaticMesh(Data.StaticMesh);
+		}
+	}
+
 }
 
 
