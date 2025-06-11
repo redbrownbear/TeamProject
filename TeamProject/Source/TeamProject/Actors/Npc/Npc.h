@@ -76,7 +76,7 @@ public:
 
 	bool GetBuy() { return bBuy; }
 
-	EQuestCharacter GetNpc() const { return QuestNpc; }
+	EQuestCharacter GetQuestCharacterType() const { return QuestNpc; }
 
 public:
 	void SetStrollPath(AStrollPath* InPath) { StrollPath = InPath; }

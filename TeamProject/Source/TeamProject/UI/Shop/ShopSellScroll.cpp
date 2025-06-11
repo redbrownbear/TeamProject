@@ -4,6 +4,7 @@
 #include "UI/Shop/ShopSellScroll.h"
 
 #include "SubSystem/PlayerManager.h"
+#include "SubSystem/UI/ShopManager.h"
 
 void UShopSellScroll::NativeConstruct()
 {
@@ -93,6 +94,12 @@ void UShopSellScroll::MoveSelection(FIntPoint Direction)
     }
 
     FItemData Itemdata = ActiveSlots[CurrentIndex]->GetItemData();
+
+    if (UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>())
+    {
+        ShopManager->SetSelectedItem(Itemdata);
+    }
+
     OnShopDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
 }
 
@@ -110,6 +117,12 @@ void UShopSellScroll::InitSelectItem()
     ActiveSlots[CurrentIndex]->SetSelected(true);
 
     FItemData Itemdata = ActiveSlots[CurrentIndex]->GetItemData();
+
+    if (UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>())
+    {
+        ShopManager->SetSelectedItem(Itemdata);
+    }
+
     OnShopDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
 }
 

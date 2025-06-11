@@ -49,6 +49,7 @@ namespace ProjectileName
     static inline FName Monster_AB_KogaStoneBig = TEXT("Monster_AB_KogaStoneBig");
 
     static inline FName Player_Arrow = TEXT("Player_Arrow");
+    static inline FName Player_FireArrow = TEXT("Player_FireArrow");
 }
 
 namespace ParticleEffectName
@@ -438,7 +439,8 @@ enum class EMove_State
     Zoom,
     Crouch,
     Step,
-    BackFlip
+    BackFlip,
+    Hit
 };
 
 UENUM()

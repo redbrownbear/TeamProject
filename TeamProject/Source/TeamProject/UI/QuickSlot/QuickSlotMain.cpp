@@ -26,11 +26,7 @@ void UQuickSlotMain::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 void UQuickSlotMain::InitUI()
 {
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    if (PC_InGame)
-    {
-        PC_InGame->BindDialogueInput();
-    }
+
 }
 
 void UQuickSlotMain::BindDelegates()

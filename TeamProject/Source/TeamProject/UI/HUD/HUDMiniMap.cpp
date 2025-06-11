@@ -18,7 +18,15 @@ void UHUDMiniMap::NativeConstruct()
 
     PanelSlot->SetPosition(CanvasSize * 0.5f);
 
-    UpdateCanTick();
+    FString MapName = GetWorld()->GetMapName();
+    if (MapName.Contains(TEXT("GameMap")))
+    {
+        SetVisibility(ESlateVisibility::Visible);
+        UpdateCanTick();
+    }
+    else   
+        SetVisibility(ESlateVisibility::Hidden);
+       
 }
 
 void UHUDMiniMap::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

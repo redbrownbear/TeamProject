@@ -124,6 +124,7 @@ protected:
 	virtual void UpdateAimingBow(float DeltaTime);
 	virtual void UpdateDying(float DeltaTime);
 	virtual void UpdateDamage(float DeltaTime);
+	virtual void UpdateStun(float DeltaTime);
 
 protected:
 	void MoveToLocation(const FVector& InLocation);

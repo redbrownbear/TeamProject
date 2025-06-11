@@ -104,8 +104,6 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Navigate,
 		ETriggerEvent::Started, this, &ThisClass::OnNavigate);
 
-
-
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_LookMouse,
 		ETriggerEvent::Triggered, this, &ThisClass::OnLook);
 
@@ -135,8 +133,6 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Triggered, this, &ThisClass::RightClick);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_RightClick,
 		ETriggerEvent::Completed, this, &ThisClass::RightClickEnd);
-
-
 
 	// ------------ Weapon Swap -----------------
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_EquipSword,
@@ -180,10 +176,11 @@ void APC_InGame::SetupInputComponent()
 		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotRight);
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_CancelOnlyQuick,
 		ETriggerEvent::Completed, this, &ThisClass::OffQuickSlot);
-	
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_MapOpen,
 		ETriggerEvent::Started, this, &ThisClass::OnMapOpen);
+
+	BindUI();
 }
 
 void APC_InGame::Tick(float DeltaSeconds)
@@ -209,46 +206,17 @@ void APC_InGame::ChangeInputContext(EInputContext NewContext)
 		bShowMouseCursor = false;
 		break;
 
-	case EInputContext::IC_Inventory:
-		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Inventory, 1);
+	case EInputContext::IC_UI:
+		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_UI, 1);
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;
 		break;
-
-	case EInputContext::IC_Dialogue:
-		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 2);
-		SetInputMode(FInputModeUIOnly());
-		bShowMouseCursor = true;
-		break;
-
-	case EInputContext::IC_Shop:
-		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Shop, 3);
-		SetInputMode(FInputModeUIOnly());
-		bShowMouseCursor = true;
-		break;
-
-	case EInputContext::IC_Quest:
-		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Quest, 4);
-		SetInputMode(FInputModeUIOnly());
-		bShowMouseCursor = true;
-		break;
-	case EInputContext::IC_Popup:
-		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 5);
-		SetInputMode(FInputModeUIOnly());
-		bShowMouseCursor = true;
-		break;
-	case EInputContext::IC_Map:
-		Subsystem->AddMappingContext(PC_InGameDataAsset->IMC_Dialogue, 7);
-		SetInputMode(FInputModeUIOnly());
-		bShowMouseCursor = true;
-		break;
-
 	}
 
 	CurrentInputContext = NewContext;
 }
 
-void APC_InGame::BindInventoryInput()
+void APC_InGame::BindUI()
 {
 	// 인풋 바인딩
 	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
@@ -258,43 +226,9 @@ void APC_InGame::BindInventoryInput()
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenCancel, ETriggerEvent::Started, this, &APC_InGame::OnCancel);
 		EIC->BindAction(PC_InGameDataAsset->IA_DropItem, ETriggerEvent::Started, this, &APC_InGame::DropItem);
 
+		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, this, &APC_InGame::OnNextDialogue);
+
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started, this, &APC_InGame::OnCreateItemTest);
-	}
-}
-
-void APC_InGame::BindDialogueInput()
-{
-	// 인풋 바인딩
-	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
-	{
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, this, &APC_InGame::OnNavigate);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, this, &APC_InGame::OnConfirm);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, this, &APC_InGame::OnCancel);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, this, &APC_InGame::OnNextDialogue);
-	}
-}
-
-void APC_InGame::BindShopInput()
-{
-	// 인풋 바인딩
-	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
-	{
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, this, &APC_InGame::OnNavigate);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, this, &APC_InGame::OnConfirm);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, this, &APC_InGame::OnCancel);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, this, &APC_InGame::OnNextDialogue);
-	}
-}
-
-void APC_InGame::BindQuestInput()
-{
-	// 인풋 바인딩
-	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
-	{
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNavigate, ETriggerEvent::Started, this, &APC_InGame::OnNavigate);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueConfirm, ETriggerEvent::Started, this, &APC_InGame::OnConfirm);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueCancel, ETriggerEvent::Started, this, &APC_InGame::OnCancel);
-		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, this, &APC_InGame::OnNextDialogue);
 	}
 }
 
@@ -313,6 +247,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		UE_LOG(LogTemp, Warning, TEXT("MoveNone"));
 		return;
 	}
+	EMove_State MoveState = Movement->GetMoveState();
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
@@ -321,7 +256,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
 	// 클라이밍 상태일 때의 캐릭터 무브
-	if (Movement->GetMoveState()==EMove_State::Climb)
+	if (MoveState ==EMove_State::Climb)
 	{
 		if (Movement->GetClimbMode() == EClimb_State::Land)
 		{
@@ -353,7 +288,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	
 	
 	// Glide Move
-	else if (Movement->GetMoveState()==EMove_State::Glide)
+	else if (MoveState ==EMove_State::Glide)
 	{
 		
 
@@ -370,7 +305,12 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	}
 	
 	// 노말 상태일 때의 캐릭터 무브
-	else
+	else if(MoveState == EMove_State::Run
+		|| MoveState == EMove_State::Dash
+		|| MoveState == EMove_State::Crouch
+		|| MoveState == EMove_State::Zoom
+		
+		)
 	{
 		P_Anim->ActionValue = ActionValue;
 
@@ -1026,6 +966,10 @@ void APC_InGame::OffQuickSlot(const FInputActionValue& InputActionValue)
 
 void APC_InGame::OnMapOpen(const FInputActionValue& InputActionValue)
 {
+	FString MapName = GetWorld()->GetMapName();
+	if (!MapName.Contains(TEXT("GameMap")))
+		return;
+	
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	if (UIManager)
 	{
@@ -1118,12 +1062,20 @@ void APC_InGame::InitIcePreview()
 
 		IcePreviewActor->GetMaterialInstance()->SetScalarParameterValue("Color", bCenterIsSurface ? 0.0f : 1.0f);
 
-		IcePreviewActor->SetCanSpawn(bCenterIsSurface);
-		bCanSpawn = true;	
+		if (bCenterIsSurface)
+		{
+			IcePreviewActor->SetCanSpawn(bCenterIsSurface);
+			bCanSpawn = true;
 
-		// 위치 저장
-		LastHit = HitResult;
-		bIcePreviewPlaced = true; // 한 번만 배치
+			// 위치 저장
+			LastHit = HitResult;
+			bIcePreviewPlaced = true; // 한 번만 배치
+		}
+		else
+		{
+			IcePreviewActor->SetCanSpawn(bCenterIsSurface);
+			bCanSpawn = false;
+		}
 	}
 	else
 	{
@@ -1402,46 +1354,31 @@ void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	UInventory* InvenUI = nullptr;
-	UShop* ShopUI = nullptr;
-	UNPCDialogue* DialogUI = nullptr;
-	UQuest* QuestUI = nullptr;
-
 	if (UQuickSlotMain* QuickSlot = UIManager->FindUI<UQuickSlotMain>())
 	{
 		if (QuickSlot->IsVisible())
-		{
 			QuickSlot->OnNavigate(InputActionValue);
-		}
 	}
-
-	switch (CurrentInputContext)
+	if (UInventory* InvenUI = UIManager->FindUI<UInventory>())
 	{
-	case EInputContext::IC_Inventory:
-		InvenUI = UIManager->FindUI<UInventory>();
-		if (InvenUI)	
+		if (InvenUI->IsVisible())
 			InvenUI->OnNavigate(InputActionValue);
-		
-		break;
-	case EInputContext::IC_Shop:
-		ShopUI = UIManager->FindUI<UShop>();
-		if (ShopUI)		
-			ShopUI->OnNavigate(InputActionValue);
-		
-		break;
-	case EInputContext::IC_Dialogue:
-		DialogUI = UIManager->FindUI<UNPCDialogue>();
-		if (DialogUI)
-			DialogUI->OnNavigate(InputActionValue);
-		
-		break;
-	case EInputContext::IC_Quest:
-		QuestUI = UIManager->FindUI<UQuest>();
-		if (QuestUI)
-			QuestUI->OnNavigate(InputActionValue);
-		
-		break;
 	}
+	if (UShop* ShopUI = UIManager->FindUI<UShop>())
+	{
+		if (ShopUI->IsVisible())
+			ShopUI->OnNavigate(InputActionValue);
+	}
+	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
+	{
+		if (DialogUI->IsVisible())
+			DialogUI->OnNavigate(InputActionValue);
+	}
+	if (UQuest* QuestUI = UIManager->FindUI<UQuest>())
+	{
+		if (QuestUI->IsVisible())
+			QuestUI->OnNavigate(InputActionValue);
+	}	
 }
 
 void APC_InGame::OnConfirm(const FInputActionValue& InputActionValue)
@@ -1449,37 +1386,25 @@ void APC_InGame::OnConfirm(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	UInventory* InvenUI = nullptr;
-	UShop* ShopUI = nullptr;
-	UNPCDialogue* DialogUI = nullptr;
-	UQuest* QuestUI = nullptr;
-
-	switch (CurrentInputContext)
+	if (UInventory* InvenUI = UIManager->FindUI<UInventory>())
 	{
-	case EInputContext::IC_Inventory:
-		 InvenUI = UIManager->FindUI<UInventory>();
-		if (InvenUI)
+		if (InvenUI->IsVisible())
 			InvenUI->OnConfirm(InputActionValue);
-		
-		break;
-	case EInputContext::IC_Shop:
-		 ShopUI = UIManager->FindUI<UShop>();
-		if (ShopUI)
+	}
+	if (UShop* ShopUI = UIManager->FindUI<UShop>())
+	{
+		if (ShopUI->IsVisible())
 			ShopUI->OnConfirm();
-		
-		break;
-	case EInputContext::IC_Dialogue:
-		 DialogUI = UIManager->FindUI<UNPCDialogue>();
-		if (DialogUI)
+	}
+	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
+	{
+		if (DialogUI->IsVisible())
 			DialogUI->OnConfirm();
-
-		break;
-	case EInputContext::IC_Quest:
-		QuestUI = UIManager->FindUI<UQuest>();
-		if (QuestUI)
+	}
+	if (UQuest* QuestUI = UIManager->FindUI<UQuest>())
+	{
+		if (QuestUI->IsVisible())
 			QuestUI->OnConfirm();
-
-		break;
 	}
 }
 
@@ -1488,53 +1413,35 @@ void APC_InGame::OnCancel(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	UInventory* InvenUI = nullptr;
-	UShop* ShopUI = nullptr;
-	UNPCDialogue* DialogUI = nullptr;
-	UQuest* QuestUI = nullptr;
-	UPopupGetItem* PopupUI = nullptr;
-	UMainMap* MainMapUI = nullptr;
-
-	switch (CurrentInputContext)
+	if (UInventory* InvenUI = UIManager->FindUI<UInventory>())
 	{
-	case EInputContext::IC_Inventory:
-		InvenUI = UIManager->FindUI<UInventory>();
-		if (InvenUI)	
+		if (InvenUI->IsVisible())
 			InvenUI->OnCancel(InputActionValue);
-		
-		break;
-	case EInputContext::IC_Shop:
-		ShopUI = UIManager->FindUI<UShop>();
-		if (ShopUI)	
+	}
+	if (UShop* ShopUI = UIManager->FindUI<UShop>())
+	{
+		if (ShopUI->IsVisible())
 			ShopUI->OnCancel();
-		
-		break;
-	case EInputContext::IC_Dialogue:
-		DialogUI = UIManager->FindUI<UNPCDialogue>();
-		if (DialogUI)	
+	}
+	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
+	{
+		if (DialogUI->IsVisible())
 			DialogUI->OnCancel();
-		
-		break;
-
-	case EInputContext::IC_Quest:
-		QuestUI = UIManager->FindUI<UQuest>();
-		if (QuestUI)
+	}
+	if (UQuest* QuestUI = UIManager->FindUI<UQuest>())
+	{
+		if (QuestUI->IsVisible())
 			QuestUI->OnCancel();
-
-		break;
-
-	case EInputContext::IC_Popup:
-		PopupUI = UIManager->FindUI<UPopupGetItem>();
-		if (PopupUI)
+	}
+	if (UPopupGetItem* PopupUI = UIManager->FindUI<UPopupGetItem>())
+	{
+		if (PopupUI->IsVisible())
 			PopupUI->OnCancel();
-		break;
-
-	case EInputContext::IC_Map:
-		MainMapUI = UIManager->FindUI<UMainMap>();
-		if (MainMapUI)
+	}
+	if (UMainMap* MainMapUI = UIManager->FindUI<UMainMap>())
+	{
+		if (MainMapUI->IsVisible())
 			MainMapUI->OnCancel();
-
-		break;
 	}
 }
 
@@ -1543,20 +1450,10 @@ void APC_InGame::OnNextDialogue(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	UNPCDialogue* DialogUI = nullptr;
-
-	switch (CurrentInputContext)
+	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
 	{
-	case EInputContext::IC_Inventory:
-		break;
-	case EInputContext::IC_Shop:
-		break;
-	case EInputContext::IC_Dialogue:
-		DialogUI = UIManager->FindUI<UNPCDialogue>();
-		if (DialogUI && DialogUI->IsVisible())	
+		if (DialogUI->IsVisible())
 			DialogUI->OnNextDialogue(InputActionValue);
-		
-		break;
 	}
 }
 
@@ -1566,7 +1463,7 @@ void APC_InGame::DropItem(const FInputActionValue& InputActionValue)
 	check(UIManager);
 
 	UInventory* InvenUI = UIManager->FindUI<UInventory>();;
-	if (InvenUI)
+	if (InvenUI->IsVisible())
 		InvenUI->OnCreateItemInWorld(InputActionValue);
 }
 
@@ -1575,20 +1472,8 @@ void APC_InGame::OnCreateItemTest(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	UInventory* InvenUI = nullptr;
-
-	switch (CurrentInputContext)
-	{
-	case EInputContext::IC_Inventory:
-		InvenUI = UIManager->FindUI<UInventory>();
-		if (InvenUI)	
-			InvenUI->OnCreateItemTest(InputActionValue);
-		
-		break;
-	case EInputContext::IC_Shop:
-		break;
-	case EInputContext::IC_Dialogue:
-		break;
-	}
+	UInventory* InvenUI = UIManager->FindUI<UInventory>();
+	if (InvenUI->IsVisible())
+		InvenUI->OnCreateItemTest(InputActionValue);
 }
 

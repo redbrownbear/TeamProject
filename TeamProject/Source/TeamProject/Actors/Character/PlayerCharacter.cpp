@@ -211,6 +211,8 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 	if (Movement->GetMoveState() == EMove_State::Glide)
 	{
 		GetMesh()->GetAnimInstance()->Montage_Play(Movement->GetGlideUnEquipMontage());
+		Movement->SetMoveState(EMove_State::Run);
+		Movement->SetGlideMode(false);
 	}
 
 }
@@ -221,7 +223,11 @@ void APlayerCharacter::Damaged(int32 Damage)
 {
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	const int32 CurrentHP = PlayerManager->GetHp();
-	
+	if (Cast<UPlayerMovementComponent>(GetCharacterMovement())->GetMoveState() == EMove_State::BackFlip)
+	{
+		return;
+	}
+
 	if (CurrentHP != 0)
 	{
 		int32 AfterHP = CurrentHP - Damage;
@@ -230,7 +236,7 @@ void APlayerCharacter::Damaged(int32 Damage)
 		Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateHp();
 		UE_LOG(LogTemp, Warning, TEXT("%d"), AfterHP);
 
-		GetCharacterMovement()->SetMovementMode(MOVE_None);
+		Cast<UPlayerMovementComponent>(GetCharacterMovement())->SetMoveState(EMove_State::Hit);
 
 	}
 	

@@ -21,24 +21,17 @@ UCLASS()
 class TEAMPROJECT_API UShop : public UBaseUI
 {
 	GENERATED_BODY()
-	
+
 public:
 	virtual void OnCreated() override;
 	virtual void ShowUI() override;
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
-public:
-	UFUNCTION()
-	void CheckSoldout();
-
-	UFUNCTION()
-	void AddItemInventory();
-
-	UFUNCTION()
-	void SubtractItemInventory();
 
 private:
 	void InitUI();
+
+	UFUNCTION()
 	void SetRupeeUI();
 
 private:
@@ -46,16 +39,14 @@ private:
 	void RemoveDelegates();
 
 private:
-	//��ȭ ���� ���� ����
 	void SetShopOpen();
 
-	//��ǰ ����� ����?
 	void SetItemBuy();
 
 	UFUNCTION()
 	void RefreshAllInventory(const TArray<FItemData>& ItemDataList);
 
-public: //���ε��� ���� �ۺ������
+public: 
 	UFUNCTION()
 	void OnNavigate(const FInputActionValue& InputActionValue);
 	UFUNCTION()
@@ -92,4 +83,5 @@ private:
 private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CoinText;
+
 };

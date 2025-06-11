@@ -7,7 +7,7 @@
 
 void UPopupGetItem::OnCreated()
 {
-	InitUI();
+
 }
 
 void UPopupGetItem::ShowUI()
@@ -17,7 +17,7 @@ void UPopupGetItem::ShowUI()
 	APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
 	if (PC_InGame)
 	{
-		PC_InGame->ChangeInputContext(EInputContext::IC_Popup);
+		PC_InGame->ChangeInputContext(EInputContext::IC_UI);
 
 		FInputModeGameAndUI InputMode;
 		InputMode.SetWidgetToFocus(TakeWidget());
@@ -26,6 +26,8 @@ void UPopupGetItem::ShowUI()
 
 		PC_InGame->SetInputMode(InputMode);
 	}
+
+	InitUI();
 }
 
 void UPopupGetItem::HideUI(TSubclassOf<UBaseUI> UIClass)
@@ -35,11 +37,7 @@ void UPopupGetItem::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 void UPopupGetItem::InitUI()
 {
-	APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-	if (PC_InGame)
-	{
-		PC_InGame->BindDialogueInput();
-	}
+
 }
 
 void UPopupGetItem::ShowData(FItemData ItemData)

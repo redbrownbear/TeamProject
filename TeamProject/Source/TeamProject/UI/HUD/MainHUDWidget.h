@@ -13,6 +13,7 @@
 #include "Components/Progressbar.h"
 
 #include "UI/HUD/HUDMiniMap.h"
+#include "UI/HUD/HUDQuestOn.h"
 
 #include "MainHUDWidget.generated.h"
 
@@ -40,6 +41,8 @@ public:
 	void ShowAbilityAimUI(bool bIsShow);
 
 	void ShowBossHP(bool bIsShow, float Hp, float MaxHp, FString Name);
+
+	void ShowQuestOn(bool bIsComplete, FString Name);
 
 public:
 	void UpdateHP();
@@ -77,7 +80,10 @@ public:
 	UWrapBox* HpWrapBox;
 
 private:
-	UHUDMiniMap* BP_MiniMap;
+	UHUDMiniMap* MiniMap;
+
+	UPROPERTY(meta = (BindWIdget))
+	UHUDQuestOn* QuestOn;
 
 public:
 	UTexture2D* HpFull;

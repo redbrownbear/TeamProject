@@ -55,7 +55,7 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 	{
 		EObjectFlags SubobjectFlags = GetMaskedFlags(RF_PropagateToSubObjects) | RF_DefaultSubObject;
 		CollisionComponent = NewObject<UShapeComponent>(this, ItemTableRow->CollisionClass, TEXT("CollisionComponent"), SubobjectFlags);
-		CollisionComponent->RegisterComponent();
+		//CollisionComponent->RegisterComponent();
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
@@ -117,7 +117,7 @@ void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHa
 	{
 		EObjectFlags SubobjectFlags = GetMaskedFlags(RF_PropagateToSubObjects) | RF_DefaultSubObject;
 		CollisionComponent = NewObject<UShapeComponent>(this, ItemTableRow->CollisionClass, TEXT("CollisionComponent"), SubobjectFlags);
-		CollisionComponent->RegisterComponent();
+		//CollisionComponent->RegisterComponent();
 		SetRootComponent(CollisionComponent);
 		//DefaultSceneRoot->SetRelativeTransform(FTransform::Identity);
 		DefaultSceneRoot->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -173,7 +173,7 @@ void AWorldWeapon::SetDataWithData(const FItemData& InItemData)
 		FTransform WorldTransform = GetActorTransform();
 
 		CollisionComponent = NewObject<UShapeComponent>(this, InItemData.CollisionClass, TEXT("CollisionComponent"));
-		CollisionComponent->RegisterComponent();
+		//CollisionComponent->RegisterComponent();
 		CollisionComponent->SetWorldTransform(WorldTransform);
 		SetRootComponent(CollisionComponent);
 

@@ -18,6 +18,9 @@ class USphereComponent;
 class APatrolPath;
 class ACampFire;
 class UDefaultCameraShakeBase;
+class UMaterialInterface;
+class UMaterialInstanceDynamic;
+
 
 struct FMonsterTableRow;
 
@@ -105,4 +108,14 @@ public:
 
 public:
 	UDefaultCameraShakeBase* GetDefaultCameraShakeBase() const { return DefaultCameraShakeBase; }
+
+protected:
+    UMaterialInterface* MaterialInterface;
+    UMaterialInstanceDynamic* DynamicMaterialInstance;
+
+protected:
+    virtual UMaterialInterface* GetMaterialInterface() override;
+    virtual UMaterialInstanceDynamic* GetDynamicMaterialInstance() override;
+public:
+    virtual void AddBaseColor(FVector InColor);
 };

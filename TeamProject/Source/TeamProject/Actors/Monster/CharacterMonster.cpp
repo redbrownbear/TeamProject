@@ -61,87 +61,6 @@ void ACharacterMonster::BeginPlay()
 	SetData(DataTableRowHandle);
 
 	StatusComponent->OnDie.AddDynamic(this, &ACharacterMonster::OnDie);
-}
-
-// Called every frame
-void ACharacterMonster::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-
-}
-
-// Called to bind functionality to input
-void ACharacterMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
-UAnimInstance* ACharacterMonster::GetAnimInstance() const
-{
-	return GetMonsterMesh()->GetAnimInstance();
-}
-
-UMonsterFSMComponent* ACharacterMonster::GetFSMComponent() const
-{
-	if (AMonsterAIController* MonsterAIController = Cast<AMonsterAIController>(GetController()))
-	{
-		if (UMonsterFSMComponent* MonsterFSMComponent = Cast<UMonsterFSMComponent>(MonsterAIController->GetComponentByClass(UMonsterFSMComponent::StaticClass())))
-		{
-			return MonsterFSMComponent;
-		}
-	}
-
-	return nullptr;
-}
-
-void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
-{
-	DataTableRowHandle = InDataTableRowHandle;
-	if (DataTableRowHandle.IsNull()) { return; }
-	FMonsterTableRow* Data = DataTableRowHandle.GetRow<FMonsterTableRow>(DataTableRowHandle.RowName.ToString());
-	if (!Data) { return; }
-	MonsterData = Data;
-
-	// 캡슐 컴포넌트 설정 (이미 ACharacter에 의해 생성되고 등록된 상태)
-	UCapsuleComponent* CapsuleComp = GetComponentByClass<UCapsuleComponent>();
-	if (CapsuleComp)
-	{
-		//CapsuleComp->SetSphereRadius(MonsterData->CollisionSphereRadius); // SetCapsuleHalfHeight와 충돌 가능성 있음
-		CapsuleComp->SetCollisionProfileName(CollisionProfileName::Monster);
-		CapsuleComp->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
-		CapsuleComp->SetCapsuleHalfHeight(MonsterData->CapsuleHalfHeight);
-		CapsuleComp->SetCapsuleRadius(MonsterData->CapsuleRadius);
-	}
-
-	// 스켈레탈 메쉬 컴포넌트 설정 (이미 ACharacter에 의해 생성되고 등록된 상태)
-	USkeletalMeshComponent* MeshComp = GetMesh(); // GetMesh()는 ACharacter의 USkeletalMeshComponent를 반환합니다.
-	if (MeshComp) // MeshComp가 유효한지 확인
-	{
-		MeshComp->SetSkeletalMesh(MonsterData->SkeletalMesh);
-		MeshComp->SetAnimClass(MonsterData->AnimClass);
-		MeshComp->SetRelativeScale3D(MonsterData->MeshTransform.GetScale3D());
-		FVector RelativeLocation = MonsterData->MeshTransform.GetLocation();
-		RelativeLocation += FVector(0.0, 0.0, -MonsterData->CapsuleHalfHeight);
-		MeshComp->SetRelativeLocation(RelativeLocation);
-	}
-
-
-	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
-	if (MovementComp) // MovementComp가 유효한지 확인
-	{
-		MovementComp->MaxWalkSpeed = MonsterData->WalkMovementMaxSpeed;
-	}
-
-	AIControllerClass = MonsterData->AIControllerClass;
-
-	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
-	{
-		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
-	}
-
-	StatusComponent->SetMaxHP(MonsterData->MaxHP);
 
 	if (!(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
 	{
@@ -189,12 +108,90 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 			}
 		}
 	}
+}
+
+// Called every frame
+void ACharacterMonster::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+
+}
+
+// Called to bind functionality to input
+void ACharacterMonster::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+}
+
+UAnimInstance* ACharacterMonster::GetAnimInstance() const
+{
+	return GetMonsterMesh()->GetAnimInstance();
+}
+
+UMonsterFSMComponent* ACharacterMonster::GetFSMComponent() const
+{
+	if (AMonsterAIController* MonsterAIController = Cast<AMonsterAIController>(GetController()))
+	{
+		if (UMonsterFSMComponent* MonsterFSMComponent = Cast<UMonsterFSMComponent>(MonsterAIController->GetComponentByClass(UMonsterFSMComponent::StaticClass())))
+		{
+			return MonsterFSMComponent;
+		}
+	}
+
+	return nullptr;
+}
+
+void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
+{
+	DataTableRowHandle = InDataTableRowHandle;
+	if (DataTableRowHandle.IsNull()) { return; }
+	FMonsterTableRow* Data = DataTableRowHandle.GetRow<FMonsterTableRow>(DataTableRowHandle.RowName.ToString());
+	if (!Data) { return; }
+	MonsterData = Data;
+
+	UCapsuleComponent* CapsuleComp = GetComponentByClass<UCapsuleComponent>();
+	if (CapsuleComp)
+	{
+		CapsuleComp->SetCollisionProfileName(CollisionProfileName::Monster);
+		CapsuleComp->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+		CapsuleComp->SetCapsuleHalfHeight(MonsterData->CapsuleHalfHeight);
+		CapsuleComp->SetCapsuleRadius(MonsterData->CapsuleRadius);
+	}
+
+	USkeletalMeshComponent* MeshComp = GetMesh(); // GetMesh() returns ACharacter's USkeletalMeshComponent.
+	if (MeshComp) // Make sure MeshComp is Valid
+	{
+		MeshComp->SetSkeletalMesh(MonsterData->SkeletalMesh);
+		MeshComp->SetAnimClass(MonsterData->AnimClass);
+		MeshComp->SetRelativeScale3D(MonsterData->MeshTransform.GetScale3D());
+		FVector RelativeLocation = MonsterData->MeshTransform.GetLocation();
+		RelativeLocation += FVector(0.0, 0.0, -MonsterData->CapsuleHalfHeight);
+		MeshComp->SetRelativeLocation(RelativeLocation);
+	}
+
+
+	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
+	if (MovementComp) // MovementComp가 유효한지 확인
+	{
+		MovementComp->MaxWalkSpeed = MonsterData->WalkMovementMaxSpeed;
+	}
+
+	AIControllerClass = MonsterData->AIControllerClass;
+
+	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
+	{
+		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
+	}
+
+	StatusComponent->SetMaxHP(MonsterData->MaxHP);
 
 	for (USphereComponent* ExistingCollider : AdditionalColliders)
 	{
-		if (ExistingCollider && ExistingCollider->IsValidLowLevelFast()) // 유효성 확인
+		if (ExistingCollider && ExistingCollider->IsValidLowLevelFast()) 
 		{
-			ExistingCollider->DestroyComponent(); // 컴포넌트 파괴
+			ExistingCollider->DestroyComponent(); 
 		}
 	}
 	AdditionalColliders.Empty(); // 배열 비우기
@@ -341,6 +338,94 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	{
 		DefaultCameraShakeBase = NewObject<UDefaultCameraShakeBase>(this, UDefaultCameraShakeBase::StaticClass(), TEXT("DefaultCameraShakeBase"));
 	}
+
+	//USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
+
+	//if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+	//{
+	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(4);
+	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+	//	SkeletalMeshComponent->SetMaterial(4, DynamicMaterialInstance);
+	//}
+	//else if (DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
+	//{
+	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(1);
+	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+	//	SkeletalMeshComponent->SetMaterial(1, DynamicMaterialInstance);
+	//}
+	//else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinLeader"))
+	//{
+	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(0);
+	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+	//	SkeletalMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+	//}
+	//else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinBoss"))
+	//{
+	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(1);
+	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+	//	SkeletalMeshComponent->SetMaterial(1, DynamicMaterialInstance);
+	//}
+
+	int32 MaterialSlotIndex = -1;
+	if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+	{
+		MaterialSlotIndex = 4;
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("Moriblin_TreasureBox"))
+	{
+		MaterialSlotIndex = 1;
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinLeader"))
+	{
+		MaterialSlotIndex = 0;
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinBoss"))
+	{
+		MaterialSlotIndex = 1;
+	}
+
+	USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
+
+	if (MaterialSlotIndex != -1)
+	{
+		UMaterialInterface* CurrentMaterialOnMesh = SkeletalMeshComponent->GetMaterial(MaterialSlotIndex);
+
+		if (!CurrentMaterialOnMesh)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SetData: No material found at slot %d. Cannot proceed with DynamicMaterialInstance setup."), MaterialSlotIndex);
+			DynamicMaterialInstance = nullptr; // 기존 포인터도 혹시 모르니 null로
+			return;
+		}
+
+		DynamicMaterialInstance = Cast<UMaterialInstanceDynamic>(CurrentMaterialOnMesh);
+
+		if (!DynamicMaterialInstance)
+		{
+			DynamicMaterialInstance = UMaterialInstanceDynamic::Create(CurrentMaterialOnMesh, this);
+
+			if (DynamicMaterialInstance)
+			{
+				SkeletalMeshComponent->SetMaterial(MaterialSlotIndex, DynamicMaterialInstance);
+				UE_LOG(LogTemp, Log, TEXT("SetData: Created and assigned new DynamicMaterialInstance (%s) to slot %d"), *DynamicMaterialInstance->GetName(), MaterialSlotIndex);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("SetData: Failed to create DynamicMaterialInstance using parent %s!"), *CurrentMaterialOnMesh->GetName());
+				DynamicMaterialInstance = nullptr;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("SetData: Re-using existing DynamicMaterialInstance (%s) at slot %d"), *DynamicMaterialInstance->GetName(), MaterialSlotIndex);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("SetData: No specific material slot handling for %s."), *DataTableRowHandle.RowName.ToString());
+		DynamicMaterialInstance = nullptr;
+	}
+
+	AddBaseColor(FVector(0.0, 0.0, 0.0));
 }
 void ACharacterMonster::PostDuplicate(EDuplicateMode::Type DuplicateMode)
 {
@@ -404,7 +489,9 @@ void ACharacterMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 				}
 			}
 		}
-		else if (ProjectileName::Player_Arrow == Projectile->GetProjectileName())
+		else if (ProjectileName::Player_Arrow == Projectile->GetProjectileName()
+			|| ProjectileName::Player_FireArrow == Projectile->GetProjectileName()
+			)
 		{
 			// float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser
 			FDamageEvent DamageEvent;
@@ -413,8 +500,9 @@ void ACharacterMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 			{
 				if (AController* PlayerController = World->GetFirstPlayerController())
 				{
-					if (AActor* Player = PlayerController->GetPawn())
+					if (APlayerCharacter* Player = Cast<APlayerCharacter>(PlayerController->GetPawn()))
 					{
+						GetFSMComponent()->SetPlayer(Player);
 						IMonsterInterface::TakeDamage(Projectile->GetDamage(), DamageEvent, PlayerController, Player);
 					}
 				}
@@ -493,4 +581,22 @@ void ACharacterMonster::OnDeadEnd()
 {
 	// it would call by AnimNotify 
 	IMonsterInterface::OnDeadEnd();
+}
+
+UMaterialInterface* ACharacterMonster::GetMaterialInterface()
+{
+	return MaterialInterface;
+}
+
+UMaterialInstanceDynamic* ACharacterMonster::GetDynamicMaterialInstance()
+{
+	return DynamicMaterialInstance;
+}
+
+void ACharacterMonster::AddBaseColor(FVector InColor)
+{
+	if (DynamicMaterialInstance)
+	{
+		DynamicMaterialInstance->SetVectorParameterValue(TEXT("AddColor"), InColor);
+	}
 }

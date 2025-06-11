@@ -201,7 +201,7 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		CollisionComponent->SetSphereRadius(NpcData->CollisionSphereRadius);
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::NPC);
 		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
-		CollisionComponent->RegisterComponent();
+		//CollisionComponent->RegisterComponent();
 		CollisionComponent->SetCanEverAffectNavigation(false);
 	}
 
@@ -264,6 +264,7 @@ void ANpc::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	}
 
 	CurrentDialogueType = NpcData->DialogType;
+	QuestNpc = NpcData->QuestCharacter;
 }
 
 void ANpc::PlayMontage(ENpcMontage _InEnum, bool bIsLoop)

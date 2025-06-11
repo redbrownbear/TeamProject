@@ -56,3 +56,16 @@ TArray<FQuestDataRow> UQuestManager::GetQuestData() const
 
     return QuestArr;
 }
+
+FQuestDataRow UQuestManager::GetQuestDataByNum(int32 QuestNum) const
+{
+	 for (const FQuestDataRow& Row : QuestArr)
+	 {
+	     if (Row.QuestNum == QuestNum)
+	     {
+	         return Row;
+	     }
+	 }
+
+	return FQuestDataRow();
+}
