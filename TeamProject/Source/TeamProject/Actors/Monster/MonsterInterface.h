@@ -61,7 +61,7 @@ public:
 public:
 	virtual void TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, int32 iOption = 0);
 
-protected:
+public:
 	virtual void OnDie();
 	virtual void OnDeadEnd();
 

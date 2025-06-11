@@ -7,12 +7,16 @@
 #include "Actors/Projectile/Projectile.h"
 #include "Actors/Effect/NiagaraEffect.h"
 #include "Actors/Effect/ParticleEffect.h"
+#include "Actors/Monster/CharacterMonster.h"
 
 
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "Components/FSMComponent/Monster/HinoxFSMComponent.h"
 #include "Components/FSMComponent/Monster/LynelFSMComponent.h"
+#include "Components/FSMComponent/Monster/AssasinBossFSMComponent.h"
+#include "Components/FSMComponent/Monster/AssasinLeaderFSMComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
+
 
 #include "Data/MonsterTableRow.h"
 #include "Data/ItemDataRow.h"
@@ -303,6 +307,10 @@ void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 		{
 			AnimInstance->Montage_Play(TempAnimMontage);
 		}
+	}
+	else if (TempAnimMontage == MonsterData->REBOUND)
+	{
+		AnimInstance->Montage_Play(TempAnimMontage);
 	}
 	else
 	{
@@ -863,19 +871,23 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 {
 	if (FMath::IsNearlyZero(Damage)) return;
 
+	AActor* ThisActor = Cast<AActor>(this);
 
 	UMonsterStatusComponent * UMonsterStatusComponent = GetStatusComponent();
-	const float fDamage = UMonsterStatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	float fDamage = UMonsterStatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 	{
 		if (fDamage > 0.f)
 		{
-			if (Cast<AActor>(this) == DamageCauser)
+			// for UAssasinBossFSMComponent
+			if (Cast<AActor>(this) == DamageCauser && FSMComponent->IsA<UAssasinBossFSMComponent>())
 			{
 				FSMComponent->ChangeState(EMonsterState::Stun);
 			}
+			// Normal Situation
 			else
 			{
+				// check if it is a head shot
 				if (iOption)
 				{
 					if (FSMComponent->IsA<UHinoxFSMComponent>())
@@ -889,9 +901,59 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 				}
 				else
 				{
-					FSMComponent->ChangeState(EMonsterState::Damage);
-				}
+					if (FSMComponent->IsA<UAssasinLeaderFSMComponent>())
+					{
+						if (FSMComponent->GetCurrentState() == EMonsterState::Patrol)
+						{
+							FVector PlayerLook = DamageCauser->GetActorForwardVector();
+							FVector MonsterLook = ThisActor->GetActorForwardVector();
+							PlayerLook.Z = 0.f;
+							MonsterLook.Z = 0.f;
+							PlayerLook.Normalize();
+							MonsterLook.Normalize();
+							float Dot = FVector::DotProduct(PlayerLook, MonsterLook);
 
+							FSMComponent->ChangeState(EMonsterState::Damage);
+
+							if (Dot > 0.8)
+							{
+								FTimerHandle TimerHandle;
+								ThisActor->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, FSMComponent]()
+									{
+										FSMComponent->ChangeState(EMonsterState::Dead);
+									}, 0.2f, false);
+							}
+						}
+						// Combat
+						else
+						{
+							if (ACharacterMonster* CharacterMonster = Cast<ACharacterMonster>(ThisActor))
+							{
+								if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::REBOUND)
+									&& CharacterMonster->IsPlayingMontage())
+								{
+
+									FSMComponent->ChangeState(EMonsterState::Damage);
+								}
+								else
+								{
+									// Recover Damage as AssasinLeader Defended attack
+									fDamage += UMonsterStatusComponent->TakeDamage(-Damage, DamageEvent, EventInstigator, DamageCauser);
+									FSMComponent->ChangeState(EMonsterState::Rebound);
+								}
+							}
+							else
+							{
+								UE_LOG(LogTemp, Error, TEXT("MonsterInterface::TakeDamage // No CharacterMonster"));
+								check(false);
+							}
+						}
+					}
+					else
+					{
+						FSMComponent->ChangeState(EMonsterState::Damage);
+					}
+				}
 			}
 		}
 		else if (FMath::IsNearlyZero(fDamage))
@@ -900,12 +962,14 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 		}
 	}
 
-	AddBaseColor(FVector(1.f, -0.3f, -0.3f));
+	if (!FMath::IsNearlyZero(fDamage))
+	{
+		AddBaseColor(FVector(1.f, -0.3f, -0.3f));
+	}
 
 	FVector ZeroVector = FVector::Zero();
 	FTimerHandle TimerHandle;
 
-	AActor* ThisActor = Cast<AActor>(this);
 
 	ThisActor->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, ZeroVector]()
 		{
@@ -923,6 +987,7 @@ void IMonsterInterface::OnDeadEnd()
 {
 	FMonsterTableRow* MonsterData = GetMonsterData();
 	UObject* Object = Cast<UObject>(this);
+
 
 	const FDataTableRowHandle ParticleEffectDataTable = MonsterData->ParticleEffectTableRowHandle;
 	if (AActor* Actor = Cast<AActor>(Object))
@@ -957,7 +1022,6 @@ void IMonsterInterface::OnDeadEnd()
 			NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
 			Effect->FinishSpawning(NewTransform);
 		}
-		Actor->Destroy();
 	}
 }
 

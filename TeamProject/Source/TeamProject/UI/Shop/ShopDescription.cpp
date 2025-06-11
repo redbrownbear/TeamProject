@@ -22,5 +22,5 @@ void UShopDescription::RefreshUI(const FItemData& ItemData)
 
 	CountText->SetText(FText::FromString(FString::FromInt(PlayerManager->GetItemCountByName(ItemData.Name))));
 
-	CurrentItemData = ItemData; // 인벤토리에 데이터 전달하기 위한 함수
+	//CurrentItemData = ItemData; // 인벤토리에 데이터 전달하기 위한 함수
 }

@@ -21,7 +21,7 @@ UCLASS()
 class TEAMPROJECT_API UShop : public UBaseUI
 {
 	GENERATED_BODY()
-	
+
 public:
 	virtual void OnCreated() override;
 	virtual void ShowUI() override;
@@ -38,18 +38,11 @@ public:
 public:
 	void SetDialogueData(EQuestCharacter InQuestChar, int32 InDialogueID);
 
-public:
-	UFUNCTION()
-	void CheckSoldout();
-
-	UFUNCTION()
-	void AddItemInventory();
-
-	UFUNCTION()
-	void SubtractItemInventory();
 
 private:
 	void InitUI();
+
+	UFUNCTION()
 	void SetRupeeUI();
 
 private:

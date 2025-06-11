@@ -30,7 +30,8 @@ private:
 	void BindDelegates();
 	void RemoveDelegates();
 
-public:
+
+public: 
 	UFUNCTION()
 	virtual void OnNavigate(const FInputActionValue& Value) override;
 	UFUNCTION()
@@ -62,7 +63,6 @@ private:
 	EQuestCharacter CurQuestChar;
 	int32 NextDialogueID;
 
-	//한글자씩 보이는 기능을 위한 변수
 	FString FullText;
 	int32 CurrentCharIndex = 0;
 	FTimerHandle TypingTimerHandle;

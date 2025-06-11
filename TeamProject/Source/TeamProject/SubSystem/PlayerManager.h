@@ -90,9 +90,7 @@ private:
 	void UpDateInvenUI(const TArray<FItemData>& ItemList);
 
 	void UpDateInvenEquipUI(const TArray<FItemData>& ItemList);
-
 	void UpDataQuickSlot(const TArray<FItemData>& ItemList);
-
 	void UpDataRemoveItemInInven(const FItemData& ItemRow);
 
 public:

@@ -47,11 +47,12 @@
 #define LYNEL_AWAY_FROM_LINK_OFFSET													1000.f
 
 #define HINOX_DAMAGE_EYE_MAX_TIME													5.f
-#define HINOX_NEAR_INSTANCE															300.f
+#define HINOX_NEAR_INSTANCE															400.f
 
 #define ASSASIN_LEADER_ATTACK_COOLTIME_MAX											3.f
 #define ASSASIN_LEADER_ATTACK_BIG_COOLTIME_MAX										6.f
 #define ASSASIN_LEADER_DISTANCE_MAX													600.f
+#define ASSASIN_LEADER_ATTACK_OFFSET												300.f
 
 #define ASSASIN_BOSS_BARRIER_MAX_TIME												3.f
 #define ASSASIN_BOSS_STONE_FIRST_MAX_TIME											5.f
@@ -84,6 +85,16 @@
 #define PLAYER_GLIDE_MIN_SPEED														100.f
 #define PLAYER_GLIDE_MODIFY_SPEED													600.f
 #define PLAYER_GLIDE_ROTATE_SPEED													100.f
+
+
+
+#define PLAYER_STEP_DISTANCE														400.f
+#define PLAYER_STEP_JUMP_HEIGHT														300.f
+#define PLAYER_NML_JUMP_HEIGHT														300.f	
+#define PLAYER_BACKFLIP_SPEED														200.f
+#define PLAYER_BACKFLIP_HEIGHT														300.f
+#define GRAVITY_MODIFY_SPEED														980.f
+#define GRAVITY_MAX_SPEED															1200.f
 
 #define ICEPILLAR_MAXSPEED														    300.f
 #define ICEPILLAR_MAXHEIGT															300.F

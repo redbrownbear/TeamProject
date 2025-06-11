@@ -47,8 +47,17 @@ void UAssasinLeaderFSMComponent::HandleState(float DeltaTime)
 	case EMonsterState::Happy:
 		UpdateHappy(DeltaTime);
 		break;
+	case EMonsterState::Damage:
+		UpdateDamage(DeltaTime);
+		break;
 	case EMonsterState::Dead:
 		UpdateDying(DeltaTime);
+		break;
+	case EMonsterState::Rebound:
+		UpdateRebound(DeltaTime);
+		break;
+	case EMonsterState::Stun:
+		UpdateStun(DeltaTime);
 		break;
 	case EMonsterState::End:
 	default:
@@ -90,6 +99,10 @@ void UAssasinLeaderFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::Happy:
 		break;
+	case EMonsterState::Stun:
+		break;
+	case EMonsterState::Dead:
+		break;
 	}
 
 	switch (NewState)
@@ -107,24 +120,24 @@ void UAssasinLeaderFSMComponent::ChangeState(EMonsterState NewState)
 		CharacterMonster->PlayMontage(EMonsterMontage::SIGNAL_START);
 		break;
 	case EMonsterState::Combat:
-		CharacterMonster->PlayMontage(EMonsterMontage::DRAW_LSWORD);
+		if (!CurrentWeapon)
+		{
+			CharacterMonster->PlayMontage(EMonsterMontage::DRAW_LSWORD);
+		}
 		break;
 	case EMonsterState::Happy:
 		break;
 	case EMonsterState::Damage:
-		if (eCurrentState != EMonsterState::Combat
-			&& !CharacterMonster->IsPlayingMontage(EMonsterMontage::FIND)
-			&& !CharacterMonster->IsPlayingMontage(EMonsterMontage::SIGNAL_START)
-			&& !CharacterMonster->IsPlayingMontage(EMonsterMontage::SIGNAL_END)
-			)
-		{
-			ChangeState(EMonsterState::Alert);
-			return;
-		}
-		else
-		{
-			return;
-		}
+		CharacterMonster->PlayMontage(EMonsterMontage::DAMAGE);
+		break;
+	case EMonsterState::Rebound:
+		CharacterMonster->PlayMontage(EMonsterMontage::REBOUND);
+		break;
+	case EMonsterState::Stun:
+		CharacterMonster->PlayMontage(EMonsterMontage::STUN_START);
+		break;
+	case EMonsterState::Dead:
+		CharacterMonster->PlayMontage(EMonsterMontage::DEAD);
 		break;
 	}
 
@@ -158,7 +171,14 @@ void UAssasinLeaderFSMComponent::UpdatePatrol(float DeltaTime)
 		return;
 	}
 
-	MoveToLocation(Location);
+	if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::SEARCH))
+	{
+		MoveToLocation(Location);
+	}
+	else
+	{
+		StopMove();
+	}
 
 	// 다음 PatrolIndex 구하기
 	const bool bIsNear = FVector::PointsAreNear(CharacterMonster->GetActorLocation(), Location, MONSTER_DEFAULT_NEAR_DISTANCE);
@@ -166,6 +186,7 @@ void UAssasinLeaderFSMComponent::UpdatePatrol(float DeltaTime)
 	if (bIsNear)
 	{
 		CharacterMonster->PlayMontage(EMonsterMontage::SEARCH);
+		StopMove();
 
 		if (bUp)
 		{
@@ -220,6 +241,43 @@ void UAssasinLeaderFSMComponent::UpdateSignal(float DeltaTime)
 	}
 }
 
+void UAssasinLeaderFSMComponent::UpdateDamage(float DeltaTime)
+{
+	this->StopMove();
+
+	if (!Player)
+	{
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+	const FVector PlayerLocation = Player->GetActorLocation();
+
+
+	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 20.f);
+
+	if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::DAMAGE))
+	{
+		ChangeState(EMonsterState::Combat);
+	}
+
+}
+
+void UAssasinLeaderFSMComponent::UpdateStun(float DeltaTime)
+{
+	if (!Player)
+	{
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
+	this->StopMove();
+
+	if (!CharacterMonster->IsPlayingMontage())
+	{
+		ChangeState(EMonsterState::Combat);
+	}
+}
+
 void UAssasinLeaderFSMComponent::UpdateCombat(float DeltaTime)
 {
 	if (!Player)
@@ -230,6 +288,15 @@ void UAssasinLeaderFSMComponent::UpdateCombat(float DeltaTime)
 
 	const FVector PlayerLocation = Player->GetActorLocation();
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	// Assasin Leader will never forgive to chase Link
+	//const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	//if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	//{
+	//	Player = nullptr;
+	//	ChangeState(EMonsterState::Idle);
+	//	return;
+	//}
 
 	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 10.f);
 
@@ -263,12 +330,31 @@ void UAssasinLeaderFSMComponent::UpdateCombat(float DeltaTime)
 	}
 	else
 	{
-		const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
 	}
 }
 
 
 
+
+void UAssasinLeaderFSMComponent::UpdateRebound(float DeltaTime)
+{
+	this->StopMove();
+
+	if (!Player)
+	{
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+	const FVector PlayerLocation = Player->GetActorLocation();
+
+
+	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 20.f);
+
+	if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::REBOUND))
+	{
+		ChangeState(EMonsterState::Combat);
+	}
+}
 
 void UAssasinLeaderFSMComponent::UpdateHappy(float DeltaTime)
 {

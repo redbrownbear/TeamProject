@@ -41,7 +41,7 @@ void AKogaStone::Tick(float DeltaTime)
 		{
 			if (UAssasinBossFSMComponent* FSMComponent = Cast<UAssasinBossFSMComponent>(CharacterMonster->GetFSMComponent()))
 			{
-				if (EMonsterState::Damage == FSMComponent->GetMonsterState())
+				if (EMonsterState::Damage == FSMComponent->GetCurrentState())
 				{
 					UE_LOG(LogTemp, Warning, TEXT("KogaStone // SetFallTrue"));
 					SetFallTrue();

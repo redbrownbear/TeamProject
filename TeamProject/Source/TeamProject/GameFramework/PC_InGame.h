@@ -198,6 +198,10 @@ protected:
 	void StartedDash(const FInputActionValue& InputActionValue);
 	void CompletedDash(const FInputActionValue& InputActionValue);
 
+	void StartedStep(const FInputActionValue& InputActionValue);
+	void CompletedStep(const FInputActionValue& InputActionValue);
+
+	void OnBackFlip(const FInputActionValue& InputActionValue);
 
 	void OnLook(const FInputActionValue& InputActionValue);
 	void Climb(const FInputActionValue& InputActionValue);

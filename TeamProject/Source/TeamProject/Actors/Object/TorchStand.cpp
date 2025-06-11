@@ -99,6 +99,7 @@ void ATorchStand::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
             }
         }
     }
+
     
   /*  else
     {

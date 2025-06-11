@@ -92,7 +92,7 @@ AWeaponShield::AWeaponShield()
 void AWeaponShield::SetGuard()
 {
     UWeaponManagerComponent* WeaponManagerComponent = Cast<APlayerCharacter>(GetOwner())->GetWeaponManagerComponent();
-    WeaponManagerComponent->SetIsGuard(true);
+    WeaponManagerComponent->SetIsParry(true);
 }
 
 void AWeaponShield::LeftClickAction()

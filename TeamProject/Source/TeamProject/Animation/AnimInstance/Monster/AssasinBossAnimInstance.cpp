@@ -40,7 +40,7 @@ void UAssasinBossAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		FSMComponent = Cast<UAssasinBossFSMComponent>(Monster->GetFSMComponent());
 	}
 	if (!FSMComponent) return;
-	const EMonsterState eMonsterState = FSMComponent->GetMonsterState();
+	const EMonsterState eMonsterState = FSMComponent->GetCurrentState();
 
 
 	bIsIdle = false;

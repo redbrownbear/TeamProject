@@ -41,7 +41,7 @@ void UHinoxAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (!FSMComponent) return;
 
-	const EMonsterState eMonsterState = FSMComponent->GetMonsterState();
+	const EMonsterState eMonsterState = FSMComponent->GetCurrentState();
 
 	bIsIdle = false;
 	bIsDamageEye = false;

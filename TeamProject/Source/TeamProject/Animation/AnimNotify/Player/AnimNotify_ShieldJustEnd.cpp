@@ -16,6 +16,6 @@ void UAnimNotify_ShieldJustEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 
 		Player_C->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 
-		Player_C->GetWeaponManagerComponent()->SetIsGuard(false);
+		Player_C->GetWeaponManagerComponent()->SetIsParry(false);
 	}
 }
