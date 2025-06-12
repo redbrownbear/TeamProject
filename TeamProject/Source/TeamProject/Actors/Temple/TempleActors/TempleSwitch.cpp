@@ -1,7 +1,9 @@
 #include "Actors/Temple/TempleActors/TempleSwitch.h"
-#include "Components/SphereComponent.h"
 #include "TempleActor.h"
-#include "LockedGate.h"
+
+#include "Components/SphereComponent.h"
+
+#include "SubSystem/Puzzle/TempleSwitchManager.h"
 
 #include "Data/TempleActorTableRow.h"
 
@@ -40,13 +42,12 @@ void ATempleSwitch::BeginPlay()
 
 void ATempleSwitch::UnlockGate()
 {
-	if (LockedGate)
+	UTempleSwitchManager* TempleSwitchManager = GetGameInstance()->GetSubsystem<UTempleSwitchManager>();
+
+	if (TempleSwitchManager)
 	{
-		LockedGate->OpenGateSequence();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("LockedGate is null!"));
+		TempleSwitchManager->NotifyOverlapTempleBall();
+		bIsOpenedGate = true;
 	}
 }
 
@@ -63,7 +64,6 @@ void ATempleSwitch::OnBeginOverlapWithBall(UPrimitiveComponent* OverlappedCompon
 	if (Data->ActorName.Equals(TEXT("Key_Ball")))
 	{
 		UnlockGate(); 
-		bIsOpenedGate = true;
 	}
 }
 

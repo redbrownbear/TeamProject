@@ -21,6 +21,8 @@ protected:
 
 public:
 	void OpenGate();
+
+	UFUNCTION()
 	void OpenGateSequence();
 
 protected:

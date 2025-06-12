@@ -161,7 +161,7 @@ void APlayerCharacter::BeginPlay()
 	);
 
 
-	ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
+	ChargedArrow->SetData(TEXT("Player_Charged_Arrow_Fire"), TEXT("NoCollision"));
 	ChargedArrow->SetNiagaraVisibility(false);
 	ChargedArrow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 	ChargedArrow->SetLifeSpan(0.f);

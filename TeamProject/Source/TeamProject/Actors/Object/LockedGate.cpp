@@ -1,4 +1,7 @@
-#include "Actors/Temple/TempleActors/LockedGate.h"
+#include "Actors/Object/LockedGate.h"
+#include "SubSystem/Puzzle/TorchManager.h"
+#include "SubSystem/Puzzle/TempleSwitchManager.h"
+
 #include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
@@ -24,6 +27,20 @@ void ALockedGate::BeginPlay()
 		StaticMeshComponent->SetCollisionObjectType(ECC_WorldStatic);
 		StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
 	}		
+
+	UTorchManager* TorchManager = GetGameInstance()->GetSubsystem<UTorchManager>();
+	if (TorchManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TorchManager found, adding dynamic delegate"));
+		TorchManager->OnAllTorchesLit.AddDynamic(this, &ALockedGate::OpenGateSequence);
+	}
+
+	UTempleSwitchManager* TempleSwitchManager = GetGameInstance()->GetSubsystem<UTempleSwitchManager>();
+	if (TempleSwitchManager)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TempleSwitchManager found, adding dynamic delegate"));
+		TempleSwitchManager->OnOverlapTempleBall.AddDynamic(this, &ALockedGate::OpenGateSequence);
+	}
 }
 
 void ALockedGate::OpenGate()
@@ -33,6 +50,7 @@ void ALockedGate::OpenGate()
 	ElapsedTime = 0.f;
 
 	GetWorldTimerManager().SetTimer(GateMoveTimer, this, &ALockedGate::MoveGateTick, 0.01f, true);
+
 }
 
 void ALockedGate::ClearDungeon()

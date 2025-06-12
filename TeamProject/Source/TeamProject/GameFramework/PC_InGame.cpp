@@ -1082,20 +1082,13 @@ bool APC_InGame::IsSurfaceActor(AActor* Actor) const
 {
 	if (!Actor) return false;
 
-	if (Actor->IsA<AFlowSurface>())
-	{
-		return true;
-	}
+#if WITH_EDITOR
+	FString ActorName = Actor->GetActorLabel();
+#else
+	FString ActorName = Actor->GetName();
+#endif
 
-	return false;
-
-//#if WITH_EDITOR
-//	FString ActorName = Actor->GetActorLabel();
-//#else
-//	FString ActorName = Actor->GetName();
-//#endif
-//
-//	return ActorName.StartsWith(TEXT("Surface"));
+	return ActorName.StartsWith(TEXT("Surface"));
 }
 	
 
