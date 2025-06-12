@@ -27,5 +27,11 @@ protected:
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 	UPROPERTY()
 	TObjectPtr<UNiagaraComponent> NiagaraComponent;
+	UPROPERTY(EditAnywhere)
+	FGuid CampFireGuid;
+
+private:
+	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 };
