@@ -187,6 +187,23 @@ void UAssasinBossFSMComponent::ChangeState(EMonsterState NewState)
 
 		break;
 	case EMonsterState::Damage:
+		if (PrevState == EMonsterState::Stun)
+		{
+			if (UWorld* World = CharacterMonster->GetWorld())
+			{
+				if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+				{
+					if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+					{
+						if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+						{
+							HUD->ShowBossHpUI(false, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+						}
+					}
+				}
+			}
+			return;
+		}
 		DamageElapsedTime = 0.f;
 		CharacterMonster->StopAnimMontage();
 
