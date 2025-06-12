@@ -71,6 +71,7 @@ protected:
 
 public:
     virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+    virtual void SetData(const FName& MonsterName);
 
 protected:
     UFUNCTION()

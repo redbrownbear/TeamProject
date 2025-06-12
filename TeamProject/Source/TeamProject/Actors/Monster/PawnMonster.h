@@ -64,7 +64,8 @@ protected:
     virtual void OnConstruction(const FTransform& Transform);
 
 public:
-    virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+    virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle) override;
+    virtual void SetData(const FName& MonsterName) override;
 
 protected:
     UFUNCTION()

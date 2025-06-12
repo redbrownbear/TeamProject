@@ -40,6 +40,7 @@ public:
 
 public:
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle) = 0;
+	virtual void SetData(const FName& MonsterName) = 0;
 protected:
 	virtual FMonsterTableRow* GetMonsterData() const = 0;
 
