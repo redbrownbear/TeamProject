@@ -25,6 +25,7 @@ protected:
 public:
 	void SetItemData(const FItemData& Item);
 	void SetSelected(bool bIsSelected);
+	void SetSoldOut();
 
 public:
 	const FItemData& GetItemData() const { return ItemData; }

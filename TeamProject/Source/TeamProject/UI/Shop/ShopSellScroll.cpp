@@ -69,16 +69,16 @@ void UShopSellScroll::MoveSelection(FIntPoint Direction)
 {
     if (ActiveSlots.Num() == 0) return;
 
-    const int32 NumPerRow = 5; // WrapBox 기준 가정
+    const int32 NumPerRow = 5;
     const int32 MaxIndex = ActiveSlots.Num() - 1;
 
     int32 NextIndex = CurrentIndex;
 
-    if (Direction.X != 0) // 좌우
+    if (Direction.X != 0)
     {
         NextIndex += Direction.X;
     }
-    else if (Direction.Y != 0) // 상하
+    else if (Direction.Y != 0)
     {
         NextIndex += Direction.Y * NumPerRow;
     }
@@ -100,7 +100,7 @@ void UShopSellScroll::MoveSelection(FIntPoint Direction)
         ShopManager->SetSelectedItem(Itemdata);
     }
 
-    OnShopDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
+    OnShopDescriptionUpdated.Broadcast(Itemdata);
 }
 
 void UShopSellScroll::InitSelectItem()
@@ -123,7 +123,7 @@ void UShopSellScroll::InitSelectItem()
         ShopManager->SetSelectedItem(Itemdata);
     }
 
-    OnShopDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
+    OnShopDescriptionUpdated.Broadcast(Itemdata);
 }
 
 void UShopSellScroll::SetSort(EItemCategory Type)

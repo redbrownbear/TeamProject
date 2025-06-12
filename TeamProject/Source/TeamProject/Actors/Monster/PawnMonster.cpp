@@ -23,6 +23,8 @@
 
 #include "Engine/DamageEvents.h"
 
+#include "UI/UIComponent/MonsterHP.h"
+
 
 // Sets default values
 APawnMonster::APawnMonster()
@@ -45,6 +47,18 @@ APawnMonster::APawnMonster()
 	SkeletalMeshComponent->SetWorldRotation(NewRotator.Quaternion());
 
 	StatusComponent = CreateDefaultSubobject<UMonsterStatusComponent>(TEXT("StatusComponent"));
+
+	HPBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBarWidget"));
+	HPBarWidget->SetupAttachment(RootComponent);
+
+	HPBarWidget->SetWidgetSpace(EWidgetSpace::World);
+	HPBarWidget->SetDrawAtDesiredSize(true);
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> HPWidgetClassFinder(TEXT("/Game/Blueprint/UI/WidgetComponent/BP_MonsterHp"));
+	if (HPWidgetClassFinder.Succeeded())
+	{
+		HPBarWidgetClass = HPWidgetClassFinder.Class;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -63,6 +77,12 @@ void APawnMonster::BeginPlay()
 	}
 
 	//StatusComponent->OnDie.AddDynamic(this, &ThisClass::OnDie);
+
+	if (HPBarWidgetClass)
+	{
+		HPBarWidget->SetWidgetClass(HPBarWidgetClass);
+		HPBarWidget->InitWidget();
+	}
 }
 
 // Called every frame
@@ -72,6 +92,17 @@ void APawnMonster::Tick(float DeltaTime)
 
 	const float Speed = UKismetMathLibrary::VSizeXY(MovementComponent->Velocity);
 
+	if (HPBarWidget)
+	{
+		if (APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0))
+		{
+			FVector CameraLocation = CameraManager->GetCameraLocation();
+			FVector ToCamera = CameraLocation - HPBarWidget->GetComponentLocation();
+
+			FRotator LookAtRotation = FRotationMatrix::MakeFromX(ToCamera).Rotator();
+			HPBarWidget->SetWorldRotation(LookAtRotation);
+		}
+	}
 }
 
 UMonsterFSMComponent* APawnMonster::GetFSMComponent() const
@@ -119,7 +150,7 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	}
 
 
-
+	HPBarWidget->SetRelativeLocation(FVector(0.f, 0.f, (MonsterData->CollisionSphereRadius - 10.0f) * 4.0f));
 
 	MovementComponent->MaxSpeed = MonsterData->WalkMovementMaxSpeed;
 
@@ -130,9 +161,7 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
 	}
 
-
 	StatusComponent->SetMaxHP(MonsterData->MaxHP);
-
 
 	if (!(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
 	{
@@ -369,5 +398,21 @@ void APawnMonster::AddBaseColor(FVector InColor)
 	if (DynamicMaterialInstance)
 	{
 		DynamicMaterialInstance->SetVectorParameterValue(TEXT("AddColor"), InColor);
+	}
+}
+
+void APawnMonster::ShowHpUI(float CurHp, float MaxHp)
+{
+	if (!HPBarWidget)
+		return;
+
+	UUserWidget* Widget = HPBarWidget->GetUserWidgetObject();
+	if (!Widget)
+		return;
+
+	UMonsterHP* HPWidget = Cast<UMonsterHP>(Widget);
+	if (HPWidget)
+	{
+		HPWidget->ShowUI(CurHp, MaxHp);
 	}
 }

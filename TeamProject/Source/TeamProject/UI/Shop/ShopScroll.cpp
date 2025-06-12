@@ -44,8 +44,11 @@ void UShopScroll::UpdateSlots(const TArray<FShopDataRow>& ShopList)
         }
 
         FItemData Item = ShopItem.ItemData;
-
         NewSlot->SetItemData(Item);
+
+        if(Item.ItemCount <=0)
+			NewSlot->SetSoldOut();
+
         ItemVerticalBox->AddChildToVerticalBox(NewSlot);
         ActiveSlots.Add(NewSlot);
     }
@@ -61,9 +64,7 @@ void UShopScroll::MoveSelection(FIntPoint Direction)
 
     int32 NextIndex = CurrentIndex;
 
-    //�¿� ����
-
-    if (Direction.Y != 0) // ����
+    if (Direction.Y != 0)
     {
         NextIndex += Direction.Y;
     }
