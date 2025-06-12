@@ -103,7 +103,7 @@ public:
     
     bool IsAnyUI() { return !UIStack.IsEmpty(); }
 
-public:
+private:
     UPROPERTY()
     TMap<TSubclassOf<UBaseUI>, UBaseUI*> CachedUIs;
 

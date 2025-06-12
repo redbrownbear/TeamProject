@@ -315,6 +315,7 @@ enum class EItemCategory : int8
     IT_Armor,
     IT_Material,
     IT_Food,
+    IT_END,
 };
 
 UENUM()

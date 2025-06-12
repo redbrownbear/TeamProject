@@ -2,7 +2,12 @@
 
 
 #include "UI/Shop/ShopScroll.h"
+#include "GameFramework/PC_InGame.h"
+#include "Kismet/GameplayStatics.h"
+#include "Actors/Npc/Npc.h"
+
 #include "SubSystem/UI/ShopManager.h"
+
 
 void UShopScroll::NativeConstruct()
 {
@@ -111,6 +116,51 @@ void UShopScroll::SelectInit()
     }
 
     OnShopHighlightChanged.Broadcast(CurrentIndex);
+}
+
+void UShopScroll::ItemBuy()
+{
+    FItemData CurItemData = GetItemDataAtIndex(CurrentIndex);
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	check(PlayerManager);
+
+	UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
+	check(ShopManager);
+
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    check(PC_InGame);
+
+    if (CurItemData.ItemCount <= 0)
+    {
+        PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SoldOut);
+        return;
+    }
+
+    if (CurItemData.price > PlayerManager->GetRupee())
+    {
+        PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Cashless);
+        return;
+    }
+
+	int32 Rupee = PlayerManager->GetRupee() - CurItemData.price;
+    PlayerManager->SetRupee(Rupee);
+	PlayerManager->SetInvenData(CurItemData);
+
+    TArray<FShopDataRow> CurrentShopDataArray = ShopManager->GetShopData(PC_InGame->Npc->GetQuestCharacterType());
+    int iShopDataIndex = -1;
+    for (int32 i = 0; i < CurrentShopDataArray.Num(); ++i)
+    {
+        if (CurrentShopDataArray[i].ItemData.ItemCode == CurItemData.ItemCode)
+        {
+            CurrentShopDataArray[i].ItemData.ItemCount--;
+            iShopDataIndex = i;
+            break;
+        }
+    }
+    ShopManager->UpdateShopData(PC_InGame->Npc->GetQuestCharacterType(), CurrentShopDataArray[iShopDataIndex]);
+
+    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SuccessfulShopping);   
 }
 
 FItemData UShopScroll::GetItemDataAtIndex(int32 Index) const

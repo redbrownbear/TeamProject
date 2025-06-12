@@ -46,6 +46,7 @@ private:
 
 public:
 	bool IsSelectItem() {return bIsSelect;}
+	UOverlay* GetActionOverLay() { return ActionLay; }
 
 private:
 	UPROPERTY(meta = (BindWidget))

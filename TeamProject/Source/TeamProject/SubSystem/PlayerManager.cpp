@@ -167,13 +167,13 @@ FItemData UPlayerManager::RemoveItemByUniqueID(FString UniqueID)
     return FItemData();
 }
 
-int32 UPlayerManager::GetItemCountByName(const FString& ItemName)
+int32 UPlayerManager::GetItemCountByItemCode(const FString& ItemCode)
 {
     int32 Count = 0;
 
     for (int32 i = 0; i < ItemInvenList.Num(); ++i)
     {
-        if (ItemInvenList[i].Name == ItemName)
+        if (ItemInvenList[i].Name == ItemCode)
         {
             Count++;
         }

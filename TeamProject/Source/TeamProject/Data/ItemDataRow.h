@@ -36,6 +36,9 @@ public:
     FString Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	FString ItemCode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	FString UniqueID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")

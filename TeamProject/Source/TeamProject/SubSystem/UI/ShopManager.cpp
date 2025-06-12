@@ -76,8 +76,6 @@ TArray<FShopDataRow> UShopManager::GetShopData(EQuestCharacter QuestChar) const
 
 void UShopManager::ShowUI(EQuestCharacter QuestChar, bool IsBuy)
 {
-    SetIsBuy(IsBuy);
-
     if (IsBuy)
     {
         TArray<FShopDataRow> ShopList = GetShopData(QuestChar);
@@ -111,90 +109,15 @@ void UShopManager::UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow 
         if (!bFound)
         {
             ShopList->Add(UpdateShopRow);
-            //UpdatedShopData.Add(UpdateShopRow);
-            UE_LOG(LogTemp, Log, TEXT("New item added to shop: %s"), *UpdateShopRow.ItemData.Name);
         }
 
         UpdateItem(*ShopList);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("No shop data found for character: %s"), *UEnum::GetValueAsString(QuestChar));
     }
 }
 
 void UShopManager::UpdateItem(const TArray<FShopDataRow>& ShopList)
 {
     OnShopUpdated.Broadcast(ShopList);
-}
-
-
-bool UShopManager::CheckSoldout()
-{
-    // ItemCount == 0 이면 매진 처리
-    if (SelectedShopItem.ItemData.ItemCount != 0) return false;
-
-    return true;
-}
-
-bool UShopManager::CanIBuyIt()
-{
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    int32 Rupee = PlayerManager->GetRupee();
-
-    if (Rupee < SelectedShopItem.ItemData.price)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-void UShopManager::AddItemInventory()
-{
-    if (SelectedShopItem.ItemData.ItemCount != 0)
-    {
-        UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-        if (PlayerManager)
-        {
-            PlayerManager->SetInvenData(SelectedShopItem.ItemData);
-        }
-    }
-}
-
-void UShopManager::SubtractItemInventory()
-{
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    if (PlayerManager)
-    {
-        PlayerManager->RemoveItemByUniqueID(SelectedShopItem.ItemData.UniqueID);
-    }
-}
-
-void UShopManager::AddPlayerRupee()
-{
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    if (PlayerManager)
-    {
-        int32 Rupee = PlayerManager->GetRupee();
-        Rupee += SelectedShopItem.ItemData.price;
-
-        PlayerManager->SetRupee(Rupee);
-        OnRupeeChanged.Broadcast();
-    }
-}
-
-void UShopManager::SubtractPlayerRupee()
-{
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    if (PlayerManager)
-    {
-        int32 Rupee = PlayerManager->GetRupee();
-        Rupee -= SelectedShopItem.ItemData.price;
-
-        PlayerManager->SetRupee(Rupee);
-        OnRupeeChanged.Broadcast();
-    }
 }
 
 void UShopManager::SetSelectedItem(const FItemData& InShopData)

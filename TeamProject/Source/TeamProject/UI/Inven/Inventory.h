@@ -50,6 +50,9 @@ public:
 
 	void OnCreateItemTest(const FInputActionValue& InputActionValue);
 
+	void OnCategoryLeft(const FInputActionValue& InputActionValue);
+	void OnCategoryRight(const FInputActionValue& InputActionValue);
+
 private:
 	UFUNCTION()
 	void RefreshInventory(const FItemData& ItemData);

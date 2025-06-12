@@ -219,6 +219,9 @@ void APC_InGame::BindUI()
 		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, this, &APC_InGame::OnNextDialogue);
 
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started, this, &APC_InGame::OnCreateItemTest);
+
+		EIC->BindAction(PC_InGameDataAsset->IA_CategoryLeft, ETriggerEvent::Started, this, &APC_InGame::OnCategoryLeft);
+		EIC->BindAction(PC_InGameDataAsset->IA_CategoryRight, ETriggerEvent::Started, this, &APC_InGame::OnCategoryRight);
 	}
 }
 
@@ -1444,6 +1447,40 @@ void APC_InGame::OnCreateItemTest(const FInputActionValue& InputActionValue)
 		UInventory* InvenUI = UIManager->FindUI<UInventory>();
 		if (InvenUI->IsVisible() && TopUI == InvenUI)
 			InvenUI->OnCreateItemTest(InputActionValue);		
+	}
+}
+
+void APC_InGame::OnCategoryLeft(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
+	{
+		UInventory* InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI->IsVisible() && TopUI == InvenUI)
+			InvenUI->OnCategoryLeft(InputActionValue);
+
+		UShop* ShopUI = UIManager->FindUI<UShop>();
+		if (ShopUI->IsVisible() && TopUI == ShopUI)
+			ShopUI->OnCategoryLeft(InputActionValue);
+	}
+}
+
+void APC_InGame::OnCategoryRight(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
+	{
+		UInventory* InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI->IsVisible() && TopUI == InvenUI)
+			InvenUI->OnCategoryRight(InputActionValue);
+
+		UShop* ShopUI = UIManager->FindUI<UShop>();
+		if (ShopUI->IsVisible() && TopUI == ShopUI)
+			ShopUI->OnCategoryRight(InputActionValue);
 	}
 }
 
