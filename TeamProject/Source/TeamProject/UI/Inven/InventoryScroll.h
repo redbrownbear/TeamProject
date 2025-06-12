@@ -42,6 +42,8 @@ public:
 	void UnEquipCurrentItem();
 
 	const FItemData& GetCurItemData()& { return ActiveSlots[CurrentIndex]->GetItemData(); }
+	bool IsEmptyItem() { return ActiveSlots.IsEmpty(); }
+
 	FVector2D GetItemListLocation();
 
 private:
@@ -49,7 +51,6 @@ private:
 
 	void InitCategory();
 
-	//������ �ӱݰ� �������ε�...
 	UFUNCTION()
 	void OnWeaponCheckChanged(bool bIsChecked)		{ SelectCategory(EItemCategory::IT_Weapon, bIsChecked); }
 	UFUNCTION()

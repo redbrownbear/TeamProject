@@ -14,6 +14,8 @@
 #include "UI/Popup/PopupGetItem.h"
 #include "UI/QuickSlot/QuickSlotMain.h"
 
+#include "Actors/Item/WorldWeapon.h"
+
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
 
@@ -310,6 +312,9 @@ protected:
 	UFUNCTION()
 	void ScanMetalActorInView();
 
+public:
+	void SetOverlappedItem(AWorldWeapon* Item) { OverlappedItem = Item; }
+
 protected:
 	// ------------ Ice Maker ---------------
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
@@ -359,4 +364,7 @@ private:
 
 	FHitResult LastHit;
 	bool bHitResult = false;
+
+private:
+	AWorldWeapon* OverlappedItem = nullptr;
 };

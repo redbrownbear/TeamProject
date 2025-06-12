@@ -53,7 +53,6 @@ void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
 
     RemoveDelegates();
     Super::HideUI(UShop::StaticClass());
-
 }
 
 void UShop::InitUI()
@@ -157,37 +156,72 @@ void UShop::OnNavigate(const FInputActionValue& InputActionValue)
 {
     const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
-    // Deadzone ����
     if (ActionValue.IsNearlyZero())
         return;
 
-    // ���� ���� ���� �ϳ��� �ؼ�
+    if (BP_ShopDialogue->IsSelectItem())
+        return;
+
     if (FMath::Abs(ActionValue.X) > FMath::Abs(ActionValue.Y))
     {
-        // �¿�
         if (ActionValue.X > 0)
+        {
             BP_ShopScroll->MoveSelection(FIntPoint(1, 0));
+            BP_ShopSellScroll->MoveSelection(FIntPoint(1, 0));
+        }
+           
         else
+        {
             BP_ShopScroll->MoveSelection(FIntPoint(-1, 0));
+            BP_ShopSellScroll->MoveSelection(FIntPoint(-1, 0));
+        }
+           
     }
     else
     {
-        // ����
         if (ActionValue.Y > 0)
+        {
             BP_ShopScroll->MoveSelection(FIntPoint(0, -1));
+            BP_ShopSellScroll->MoveSelection(FIntPoint(0, -1));
+        }      
         else
+        {
             BP_ShopScroll->MoveSelection(FIntPoint(0, 1));
+            BP_ShopSellScroll->MoveSelection(FIntPoint(0, 1));
+        }
+            
     }
 }
 
-void UShop::OnConfirm()
+void UShop::OnConfirm(const FInputActionValue& InputActionValue)
 {
     SetItemBuy();
 }
 
-void UShop::OnCancel()
+void UShop::OnCancel(const FInputActionValue& InputActionValue)
 {
     HideUI(UShop::StaticClass());
+
+    UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
+    check(UIManager);
+
+    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+
+    if (UIManager && QuestManager)
+    {
+        if (QuestManager->IsConversation())
+            return;
+
+        UIManager->ShowUI(UNPCDialogue::StaticClass());
+        QuestManager->ShowDialogue(QuestChar, DialogueID);
+    }
+}
+
+void UShop::SetDialogueData(EQuestCharacter InQuestChar, int32 InDialogueID)
+{
+    QuestChar = InQuestChar;
+    DialogueID = InDialogueID;
 
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Shop);

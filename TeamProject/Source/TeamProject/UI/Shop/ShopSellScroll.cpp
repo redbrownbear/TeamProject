@@ -150,7 +150,7 @@ void UShopSellScroll::SetSort(EItemCategory Type)
         {
             // 이미 동일한 ItemCode가 있는지 확인
             FItemData* Found = Items.FindByPredicate([&](const FItemData& Other) {
-                return Other.UniqueID == Item.UniqueID;
+                return Other.Name == Item.Name;
                 });
 
             if (Found)

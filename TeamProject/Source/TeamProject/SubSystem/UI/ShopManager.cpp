@@ -42,7 +42,7 @@ void UShopManager::LoadShopData(UDataTable* DataTable)
             {
                 FoundRowsPtr->Add(*Row);
             }
-            else 
+            else
             {
                 TArray<FShopDataRow> NewArray;
                 NewArray.Add(*Row);
@@ -68,7 +68,7 @@ TArray<FShopDataRow> UShopManager::GetShopData(EQuestCharacter QuestChar) const
     TArray<FShopDataRow> ConstRows;
     for (const FShopDataRow& Row : *FoundRowsPtr)
     {
-        ConstRows.Add(Row); 
+        ConstRows.Add(Row);
     }
 
     return ConstRows;

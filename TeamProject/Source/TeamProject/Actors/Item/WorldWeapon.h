@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Misc/Utils.h"
+#include "Data/ItemDataRow.h"
 #include "WorldWeapon.generated.h"
 
 struct FItemData;
@@ -39,8 +40,15 @@ protected:
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 	//UFUNCTION()
 	//virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+public:
+	void PickUpItem();
 
 
 public:	
@@ -63,8 +71,12 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, meta = (RowType = "ItemData"))
 	FDataTableRowHandle DataTableRowHandle;
+	
 	const UDataTable* ItemDataTable;
 	const FItemData* ItemTableRow;
+
+	UPROPERTY()
+	FItemData ItemDataCopy;
 
 public:
 	FName GetWorldWeaponName() const;

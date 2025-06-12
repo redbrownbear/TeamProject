@@ -16,8 +16,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestUpdated, const TArray<FQuest
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryAllUpdated, const TArray<FItemData>&, ItemData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, const FItemData&, ItemData);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryRemoveUpdated, const FItemData&, ItemData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInvenEquipItemAllUpdated, const TArray<FItemData>&, ItemData);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuickSlotUpdated, const TArray<FItemData>&, ItemData);
 
 struct sPlayerStatus
@@ -67,18 +67,22 @@ public:
 	void ShowInvenUI();
 	const TArray<FItemData>& GetAllItemData() const { return ItemInvenList; }
 
-	UFUNCTION()
-	void SetEquipData(const FItemData& ItemRow);
 	void SetWeaponMesh(eEquipParts Parts, UStaticMesh* _Mesh);
 	void ShowEquipUI();
-	const TArray<FItemData>& GetAllEquipData() const { return EquipItemList; }
 
 	bool IsEquipPart(eEquipParts Parts);
+	const TArray<FItemData>& GetAllEquipData() const { return EquipItemList; }
 	FItemData GetItemByUniqueID(const FString& UniqueItemID);
-	FItemData RemoveItemByUniqueID(FString UniqueID);
-
 	int32 GetItemCountByName(const FString& ItemName);
 
+	FItemData RemoveItemByUniqueID(FString UniqueID);
+
+	UFUNCTION()
+	void SetInvenRemoveData(const FItemData& ItemRow);
+	UFUNCTION()
+	void SetEquipData(const FItemData& ItemRow);
+
+public:
 	void ShowQuickSlot();
 
 private:
@@ -86,8 +90,8 @@ private:
 	void UpDateInvenUI(const TArray<FItemData>& ItemList);
 
 	void UpDateInvenEquipUI(const TArray<FItemData>& ItemList);
-
 	void UpDataQuickSlot(const TArray<FItemData>& ItemList);
+	void UpDataRemoveItemInInven(const FItemData& ItemRow);
 
 public:
 	void InitStatus();
@@ -122,6 +126,8 @@ public:
 	FOnInventoryUpdated OnInventoryUpdated;
 	UPROPERTY(BlueprintAssignable)
 	FOnInventoryAllUpdated OnInventoryAllUpdated;
+	UPROPERTY(BlueprintAssignable)
+	FOnInventoryRemoveUpdated OnInventoryRemoveUpdated;
 	UPROPERTY(BlueprintAssignable)
 	FOnInvenEquipItemAllUpdated OnInvenEquipItemAllUpdated;
 	UPROPERTY(BlueprintAssignable)
