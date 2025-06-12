@@ -1225,7 +1225,7 @@ void APC_InGame::CheckMetalActor()
 //			return;
 //		}
 
-		if (HitActor->IsA<AMetalActor>())
+		if (!HitActor->IsA<AMetalActor>())
 		{
 			bCanControlMetal = false;
 			return;
@@ -1247,8 +1247,8 @@ void APC_InGame::StartMagnetGrab()
 	if (IsHoldingObject()) return;
 
 	//FHitResult HitResult;
-	if (TraceForMetal(LastHit))
-	{
+	/*if (TraceForMetal(LastHit))
+	{*/
 		if (UPrimitiveComponent* HitComp = LastHit.GetComponent())
 		{
 			if (HitComp->IsSimulatingPhysics())
@@ -1269,7 +1269,7 @@ void APC_InGame::StartMagnetGrab()
 				GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &APC_InGame::MoveGrabbedObject, 0.01f, true);
 			}
 		}
-	}
+	/*}*/
 }
 
 void APC_InGame::StopMagnetGrab()
