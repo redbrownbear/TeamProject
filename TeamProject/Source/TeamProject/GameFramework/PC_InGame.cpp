@@ -28,6 +28,7 @@
 
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Actors/Object/MetalActor.h"
+#include "Actors/Temple/Surface/FlowSurface.h"
 
 APC_InGame::APC_InGame()
 {
@@ -64,15 +65,6 @@ void APC_InGame::BeginPlay()
 		if (IcePreviewActor)
 		{
 			IcePreviewActor->SetActorEnableCollision(false);
-		}
-	}
-
-	if (MetalActorClass && !MetalActor)
-	{
-		MetalActor = GetWorld()->SpawnActor<AMetalActor>(MetalActorClass);
-		if (MetalActor)
-		{
-			MetalActor->SetActorEnableCollision(false);
 		}
 	}
 
@@ -1090,14 +1082,22 @@ bool APC_InGame::IsSurfaceActor(AActor* Actor) const
 {
 	if (!Actor) return false;
 
-#if WITH_EDITOR
-	FString ActorName = Actor->GetActorLabel();
-#else
-	FString ActorName = Actor->GetName();
-#endif
+	if (Actor->IsA<AFlowSurface>())
+	{
+		return true;
+	}
 
-	return ActorName.StartsWith(TEXT("Surface"));
+	return false;
+
+//#if WITH_EDITOR
+//	FString ActorName = Actor->GetActorLabel();
+//#else
+//	FString ActorName = Actor->GetName();
+//#endif
+//
+//	return ActorName.StartsWith(TEXT("Surface"));
 }
+	
 
 AActor* APC_InGame::FindVisibleActorOnScreen(FHitResult& OutHit)
 {
@@ -1220,13 +1220,19 @@ void APC_InGame::CheckMetalActor()
 		AActor* HitActor = HitResult.GetActor();
 		if (!HitActor) return;
 
-#if WITH_EDITOR
-		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
-#else
-		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
-#endif
+//#if WITH_EDITOR
+//		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
+//#else
+//		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
+//#endif
+//
+//		if (!ActorName.StartsWith(TEXT("Metal")))
+//		{
+//			bCanControlMetal = false;
+//			return;
+//		}
 
-		if (!ActorName.StartsWith(TEXT("Metal")))
+		if (HitActor->IsA<AMetalActor>())
 		{
 			bCanControlMetal = false;
 			return;

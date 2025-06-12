@@ -23,6 +23,7 @@ public:
 	void StartConversation(ANpc* Npc, APlayerCharacter* Player);
 	void EndConversation();
 	int32 GetDialogueID(UDataTable* DialogueTable, EQuestCharacter Character, EDialogType DialogType);
+	UDataTable* GetNpcDialogueTable() { return NpcDialogueTable; }
 
 protected:
 	virtual void BeginPlay() override;
