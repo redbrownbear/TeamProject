@@ -452,9 +452,14 @@ void UPlayerMovementComponent::StepMove(FVector2D ActionValue)
 			StepDirection *= -1;
 			Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance()->Montage_Play(StepMontageAsset->StepL);
 		}
+		
+		JumpZVelocity = PLAYER_STEP_JUMP_HEIGHT;
+		
 		Player_C->Jump();
+		SetMoveState(EMove_State::Steping);
 		Velocity = StepDirection * PLAYER_STEP_DISTANCE;
 	}
+
 	StepTimeLine->SetNewTime(0.f);
 	StepTimeLine->Play();
 }
@@ -474,6 +479,10 @@ void UPlayerMovementComponent::BackFlip()
 	{
 		return;
 	}
+	if (Player_C->JumpCurrentCount != 0)
+	{
+		return;
+	}
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 	AnimInst->bIsBackFlip = true;
 
@@ -484,28 +493,38 @@ void UPlayerMovementComponent::BackFlip()
 	Rotate.Roll = 0.f;
 
 	SetMoveState(EMove_State::BackFlip);
-
+	
 	FVector ForwardVector = Rotate.Vector();
 
-	ForwardVector *= PLAYER_BACKFLIP_SPEED;
-	JumpZVelocity = PLAYER_BACKFLIP_HEIGHT;
-	Player_C->Jump();
-
+	FVector BackFlipVelocity = -ForwardVector.GetSafeNormal() * PLAYER_BACKFLIP_SPEED;
+	BackFlipVelocity.Z = PLAYER_BACKFLIP_HEIGHT;
+	Player_C->LaunchCharacter(BackFlipVelocity, true, true);
+	
 	Velocity.X = -ForwardVector.X;
 	Velocity.Y = -ForwardVector.Y;
 }
 
 void UPlayerMovementComponent::TimeScaleChanged(float _Scale)
 {
-	Velocity *= _Scale;
-	GravityScale *= _Scale;
+	// 물리 궤적을 동일하게 유지
+	GravityScale *= FMath::Square(_Scale);
+
 	UAnimInstance* AnimInst = Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance();
+
 
 	UAnimMontage* PlayingMontage = AnimInst->GetCurrentActiveMontage();
 	if (PlayingMontage)
 	{
 		AnimInst->Montage_SetPlayRate(PlayingMontage, _Scale);
 	}
+	UWorld* World = GetOwner() ? GetOwner()->GetWorld() : nullptr;
+
+	World->GetTimerManager().SetTimer(
+		ApplyVelocityTimerHandle,
+		FTimerDelegate::CreateUObject(this, &ThisClass::ApplyVelocityAfterTimeScale, _Scale),
+		0.001f,
+		false
+	);
 }
 
 bool UPlayerMovementComponent::CanGlide()
@@ -560,3 +579,13 @@ void UPlayerMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 }
 
 
+void UPlayerMovementComponent::ApplyVelocityAfterTimeScale(float _Scale)
+{
+	FVector& VelocityRef = Velocity;
+
+	VelocityRef.Z *= _Scale;
+	VelocityRef.X *= FMath::Square(_Scale);
+	VelocityRef.Y *= FMath::Square(_Scale);
+
+
+}

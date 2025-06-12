@@ -439,6 +439,7 @@ enum class EMove_State
     Zoom,
     Crouch,
     Step,
+    Steping,
     BackFlip,
     Hit
 };

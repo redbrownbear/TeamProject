@@ -86,6 +86,7 @@ private:
 	UFUNCTION()
 	void StepProgress(float Value);
 
+	void ApplyVelocityAfterTimeScale(float _Scale);
 private:
 
 	UPROPERTY()
@@ -115,7 +116,7 @@ private:
 	UStepMontageAsset* StepMontageAsset;
 
 	//float m_GravitySpeed = 0.f;
-
+	FTimerHandle ApplyVelocityTimerHandle;
 	//float Prev_Length;
 public:
 

@@ -246,7 +246,6 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 	if (Movement->MovementMode == MOVE_None)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MoveNone"));
 		return;
 	}
 	EMove_State MoveState = Movement->GetMoveState();
@@ -422,7 +421,6 @@ void APC_InGame::StartedStep(const FInputActionValue& InputActionValue)
 	if (MoveState == EMove_State::Run || MoveState == EMove_State::Dash)
 	{
 		Movement->SetMoveState(EMove_State::Step);
-		Movement->JumpZVelocity = PLAYER_STEP_JUMP_HEIGHT;
 	}
 }
 
@@ -430,8 +428,8 @@ void APC_InGame::CompletedStep(const FInputActionValue& InputActionValue)
 {
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
-
-	if (Movement->GetMoveState() == EMove_State::Step)
+	EMove_State Move_State = Movement->GetMoveState();
+	if (Move_State == EMove_State::Step)
 	{
 		Movement->SetMoveState(EMove_State::Run);
 		Movement->JumpZVelocity = PLAYER_NML_JUMP_HEIGHT;
@@ -599,7 +597,7 @@ void APC_InGame::OnCrouch(const FInputActionValue& InputActionValue)
 	ACharacter* ControlledCharacter = Cast<ACharacter>(GetPawn());
 	if (ControlledCharacter->GetMovementComponent()->IsFalling()) { return; }
 	ControlledCharacter->Crouch();
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *ControlledCharacter->GetCharacterMovement()->GetMovementName());
+	
 }
 
 void APC_InGame::OnUnCrouch(const FInputActionValue& InputActionValue)

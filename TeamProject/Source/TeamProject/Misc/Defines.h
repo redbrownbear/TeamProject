@@ -85,8 +85,8 @@
 #define PLAYER_GLIDE_MODIFY_SPEED													600.f
 #define PLAYER_GLIDE_ROTATE_SPEED													100.f
 
-#define TIME_JUST																	4.f
-#define TIMESCALE_JUST																0.5f
+#define TIME_JUST																	2.f
+#define TIMESCALE_JUST																0.3f
 #define TIMESCALE_NML																1.f
 
 #define PLAYER_STEP_DISTANCE														400.f
