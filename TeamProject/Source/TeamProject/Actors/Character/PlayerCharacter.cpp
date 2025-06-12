@@ -13,6 +13,7 @@
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "SubSystem/PlayerManager.h"
+#include "SubSystem/TimeManager.h"
 #include "UI/HUD/MainHUD.h"
 #include "Actors/Projectile/Arrow/Projectile_Arrow.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -200,13 +201,16 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(GetCharacterMovement());
-
-	if (Movement->GetMoveState() == EMove_State::BackFlip)
+	EMove_State Move_State = Movement->GetMoveState();
+	if (Move_State == EMove_State::BackFlip || Move_State == EMove_State::Step)
 	{
 		UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		AnimInst->bIsBackFlip = false;
 		Movement->JumpZVelocity = PLAYER_NML_JUMP_HEIGHT;
 		Movement->SetMoveState(EMove_State::Run);
+		Movement->GravityScale = 1.f;
+
+
 	}
 	if (Movement->GetMoveState() == EMove_State::Glide)
 	{
@@ -226,6 +230,9 @@ void APlayerCharacter::Damaged(int32 Damage)
 	EMove_State Move_State = Cast<UPlayerMovementComponent>(GetCharacterMovement())->GetMoveState();
 	if (Move_State == EMove_State::BackFlip || Move_State == EMove_State::Step)
 	{
+		UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+		TimeManager->SetTimeScale(TIMESCALE_JUST);
+		TimeManager->SetJust();
 		return;
 	}
 

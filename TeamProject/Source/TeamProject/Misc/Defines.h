@@ -85,13 +85,15 @@
 #define PLAYER_GLIDE_MODIFY_SPEED													600.f
 #define PLAYER_GLIDE_ROTATE_SPEED													100.f
 
-
+#define TIME_JUST																	4.f
+#define TIMESCALE_JUST																0.5f
+#define TIMESCALE_NML																1.f
 
 #define PLAYER_STEP_DISTANCE														400.f
 #define PLAYER_STEP_JUMP_HEIGHT														300.f
-#define PLAYER_NML_JUMP_HEIGHT														300.f	
+#define PLAYER_NML_JUMP_HEIGHT														400.f	
 #define PLAYER_BACKFLIP_SPEED														200.f
-#define PLAYER_BACKFLIP_HEIGHT														300.f
+#define PLAYER_BACKFLIP_HEIGHT														400.F
 #define GRAVITY_MODIFY_SPEED														980.f
 #define GRAVITY_MAX_SPEED															1200.f
 

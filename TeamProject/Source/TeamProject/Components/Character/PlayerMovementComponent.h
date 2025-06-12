@@ -83,8 +83,8 @@ public:
 private:
 	bool CanGlide();
 
-	/*UFUNCTION()*/
-	/*void StepProgress(float Value);*/
+	UFUNCTION()
+	void StepProgress(float Value);
 
 private:
 
@@ -99,13 +99,13 @@ private:
 	UPROPERTY()
 	EMove_State Move_State = EMove_State::Run;
 
-	//UPROPERTY()
-	//TObjectPtr<UTimelineComponent> StepTimeLine;
+	UPROPERTY()
+	TObjectPtr<UTimelineComponent> StepTimeLine;
 
-	//FOnTimelineFloat InterpFunction{};
+	FOnTimelineFloat InterpFunction{};
 
-	//UPROPERTY()
-	//UCurveFloat* StepCurve;
+	UPROPERTY()
+	UCurveFloat* StepCurve;
 
 
 	FVector StepDirection;

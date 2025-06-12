@@ -28,11 +28,11 @@ void UTimeManagerSubsystem::Tick(float DeltaTime)
     if (bIsJust) 
     {
         mJustTime += DeltaTime;
-        if (JustTime <= mJustTime)
+        if (TIME_JUST <= mJustTime)
         {
             mJustTime = 0.f;
             bIsJust = false;
-            SetTimeScale(1.f);
+            SetTimeScale(TIMESCALE_NML);
         }
     }
 }

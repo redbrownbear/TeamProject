@@ -65,22 +65,22 @@ UPlayerMovementComponent::UPlayerMovementComponent(const FObjectInitializer& Obj
 	MaxWalkSpeedCrouched = PLAYER_MOVE_CROUCH;
 	MaxWalkSpeed = PLAYER_MOVE_NML;
 
-	//StepTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("StepTimeLine"));
+	StepTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("StepTimeLine"));
 
-	//if (!StepCurve)
-	//{
-	//	static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveAsset(TEXT("/Script/Engine.CurveFloat'/Game/Resources/Player/Step/StepTimeLine.StepTimeLine'")); // 예시 경로
-	//	if (CurveAsset.Succeeded())
-	//	{
-	//		StepCurve = CurveAsset.Object;
-	//	}
-	//}
-	//if (StepCurve)
-	//{
-	//	InterpFunction.BindUFunction(this, FName("StepProgress"));
-	//	StepTimeLine->AddInterpFloat(StepCurve, InterpFunction);
+	if (!StepCurve)
+	{
+		static ConstructorHelpers::FObjectFinder<UCurveFloat> CurveAsset(TEXT("/Script/Engine.CurveFloat'/Game/Resources/Player/Step/StepTimeLine.StepTimeLine'")); // 예시 경로
+		if (CurveAsset.Succeeded())
+		{
+			StepCurve = CurveAsset.Object;
+		}
+	}
+	if (StepCurve)
+	{
+		InterpFunction.BindUFunction(this, FName("StepProgress"));
+		StepTimeLine->AddInterpFloat(StepCurve, InterpFunction);
 
-	//}
+	}
 }
 
 void UPlayerMovementComponent::BeginPlay()
@@ -433,26 +433,30 @@ void UPlayerMovementComponent::StepMove(FVector2D ActionValue)
 	// Left, Right
 	else if (ActionValue.Y != 0)
 	{
+		APlayerController* Controller = GetWorld()->GetFirstPlayerController();
+		FRotator ControllRotate = Controller->GetControlRotation();
+
+		ControllRotate.Pitch = 0.f;
+		ControllRotate.Roll = 0.f;
+
+		StepDirection = FRotationMatrix(ControllRotate).GetUnitAxis(EAxis::Y);
 		if (ActionValue.Y == 1)
 		{
-			StepDirection = GetOwner()->GetActorRightVector();
+			
+			
 			Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance()->Montage_Play(StepMontageAsset->StepR);
 
 		}
 		else
 		{
-			StepDirection = -GetOwner()->GetActorRightVector();
+			StepDirection *= -1;
 			Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance()->Montage_Play(StepMontageAsset->StepL);
 		}
 		Player_C->Jump();
 		Velocity = StepDirection * PLAYER_STEP_DISTANCE;
 	}
-	//Prev_Length = 0.f;
-	//m_GravitySpeed = 0.f;
-	//StepTimeLine->SetNewTime(0.f);
-	//StepTimeLine->Play();
-
-
+	StepTimeLine->SetNewTime(0.f);
+	StepTimeLine->Play();
 }
 
 
@@ -464,14 +468,24 @@ void UPlayerMovementComponent::Hited()
 
 void UPlayerMovementComponent::BackFlip()
 {
-
+	
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetOwner());
+	if(MovementMode == MOVE_None)
+	{
+		return;
+	}
 	UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(Player_C->GetMesh()->GetAnimInstance());
 	AnimInst->bIsBackFlip = true;
 
+	APlayerController* Controller = Cast <APlayerController>( Player_C->GetController());
+
+	FRotator Rotate = Controller->GetControlRotation();
+	Rotate.Pitch = 0.f;
+	Rotate.Roll = 0.f;
+
 	SetMoveState(EMove_State::BackFlip);
 
-	FVector ForwardVector = Player_C->GetActorForwardVector();
+	FVector ForwardVector = Rotate.Vector();
 
 	ForwardVector *= PLAYER_BACKFLIP_SPEED;
 	JumpZVelocity = PLAYER_BACKFLIP_HEIGHT;
@@ -479,17 +493,19 @@ void UPlayerMovementComponent::BackFlip()
 
 	Velocity.X = -ForwardVector.X;
 	Velocity.Y = -ForwardVector.Y;
-	UTimeManagerSubsystem* TimeManager = GetOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
-	if (TimeManager)
-	{
-		TimeManager->SetTimeScale(0.5f);
-	}
 }
 
 void UPlayerMovementComponent::TimeScaleChanged(float _Scale)
 {
 	Velocity *= _Scale;
 	GravityScale *= _Scale;
+	UAnimInstance* AnimInst = Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance();
+
+	UAnimMontage* PlayingMontage = AnimInst->GetCurrentActiveMontage();
+	if (PlayingMontage)
+	{
+		AnimInst->Montage_SetPlayRate(PlayingMontage, _Scale);
+	}
 }
 
 bool UPlayerMovementComponent::CanGlide()
@@ -514,83 +530,25 @@ bool UPlayerMovementComponent::CanGlide()
 
 }
 
-//void UPlayerMovementComponent::StepProgress(float Value)
-//{
-//	AActor* Player = GetOwner();
-//	Player->GetActorForwardVector();
-//	float Length = FMath::Lerp(0.f, PLAYER_STEP_DISTANCE, Value);
-//
-//
-//
-//
-//
-//
-//	FVector AddLocation = StepDirection * (Length - Prev_Length);
-//	FVector NextLocation = Prev_StepLocation + AddLocation;
-//
-//	FVector NS_WCLocation = Prev_StepLocation + StepDirection * PLAYER_CAPSULE_RADIUS * 3;
-//
-//
-//	FCollisionQueryParams TraceParams;
-//	TraceParams.AddIgnoredActor(Player);
-//	FHitResult HitResult;
-//	if (GetWorld()->LineTraceSingleByChannel(
-//		HitResult,
-//		NextLocation,
-//		NS_WCLocation,
-//		ECC_Visibility,
-//		TraceParams
-//	))
-//	{
-//		StepTimeLine->Stop();
-//		return;
-//	}
-//
-//	FVector Half_Location = NextLocation;
-//	Half_Location.Z = NextLocation.Z - PLAYER_CAPSULE_HALF_HEIGHT / 2;
-//	FVector Half_WCLocation = NS_WCLocation;
-//	Half_WCLocation.Z -= PLAYER_CAPSULE_HALF_HEIGHT / 2;
-//
-//
-//
-//	FVector NS_GCLocation = NextLocation;
-//	NS_GCLocation.Z -= PLAYER_CAPSULE_HALF_HEIGHT;
-//	//땅에 걸렸을때
-//	DrawDebugLine(GetWorld(), NextLocation,
-//		NS_WCLocation, FColor::Red, false, 2.f);
-//	if (GetWorld()->LineTraceSingleByChannel(
-//		HitResult,
-//		NextLocation,
-//		NS_GCLocation,
-//		ECC_Visibility,
-//		TraceParams
-//	))
-//	{
-//
-//		FVector HitLocation = HitResult.Location;
-//		HitLocation.Z += PLAYER_CAPSULE_HALF_HEIGHT;
-//		FVector DVector = (HitLocation - Prev_StepLocation).GetSafeNormal();
-//		UE_LOG(LogTemp, Warning, TEXT("DVector.Z : %f"), DVector.Z);
-//		Player->SetActorLocation(HitLocation);
-//		Prev_StepLocation = HitLocation;
-//		m_GravitySpeed = 0.f;
-//		Velocity.Z = m_GravitySpeed;
-//	}
-//	//땅에 안 걸렸을 때,
-//	else
-//	{
-//		m_GravitySpeed = m_GravitySpeed + GRAVITY_MODIFY_SPEED * GetWorld()->GetDeltaSeconds();
-//		m_GravitySpeed = GRAVITY_MAX_SPEED < m_GravitySpeed ? GRAVITY_MAX_SPEED : m_GravitySpeed;
-//
-//		NextLocation.Z -= m_GravitySpeed * GetWorld()->GetDeltaSeconds();
-//		Player->SetActorLocation(NextLocation);
-//		Prev_StepLocation = NextLocation;
-//		Velocity.Z = m_GravitySpeed;
-//	}
-//
-//	Prev_Length = Length;
-//
-//}
+void UPlayerMovementComponent::StepProgress(float Value)
+{
+	AActor* Player = GetOwner();
+	FRotator mRotation = Player->GetActorRotation();
+	AController* Controller = Player->GetInstigatorController();
+	FRotator WantedRotation = Controller->GetControlRotation();
+
+	// 회전차이 계산 (가장 짧은 방향 고려)
+	float ShortestDeltaYaw = FMath::FindDeltaAngleDegrees(mRotation.Yaw, WantedRotation.Yaw);
+
+	// 보간 후 Yaw 계산
+	float ModifiedYaw = mRotation.Yaw + (ShortestDeltaYaw * Value);
+
+	// 최종 회전 적용
+	mRotation.Yaw = ModifiedYaw;
+	Player->SetActorRotation(mRotation);
+
+
+}
 
 
 

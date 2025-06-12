@@ -28,18 +28,17 @@ public:
     float GetCustomDeltaTime() const;
 
     void SetTimeScale(float NewScale);  // 시간 배속 설정
-
+    void SetJust() { bIsJust = true; }
 public:
 
     UPROPERTY(BlueprintAssignable)
-    FOnTimeScaleUpdated OnTimeScaleUpdated;
+    FOnTimeScaleUpdated OnTimeScaleUpdated;  // BroadCast ,When Time Scale Changed
 
 private:
     float TimeScale = 1.0f;
     bool bTimePaused = false;
     float CustomDeltaTime = 0.0f;
 
-    float JustTime = 2.0f;
     float mJustTime = 0.f;
 
     bool bIsJust = false;
