@@ -6,6 +6,7 @@
 #include "Actors/Projectile/Projectile.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Item/WorldWeapon.h"
+#include "Actors/Object/ProjectileMetalActor.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
@@ -494,6 +495,20 @@ void ACharacterMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 					{
 						IMonsterInterface::TakeDamage(Projectile->GetDamage(), DamageEvent, GetController(), this);
 					}
+				}
+			}
+		}
+	}
+	else if (AProjectileMetalActor* ProjectileMetalActor = Cast<AProjectileMetalActor>(OtherActor))
+	{
+		FDamageEvent DamageEvent;
+		if (UWorld* World = GetWorld())
+		{
+			if (AController* PlayerController = World->GetFirstPlayerController())
+			{
+				if (AActor* Player = Controller->GetPawn())
+				{
+					IMonsterInterface::TakeDamage(ProjectileMetalActor->GetDamage(), DamageEvent, GetController(), this);
 				}
 			}
 		}

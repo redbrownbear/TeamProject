@@ -64,6 +64,7 @@
 #define KOGASTONE_WAIT_TIME_MAX														5.f
 #define KOGASTONE_ORBIT_RADIUS														250.f
 #define KOGASTONE_ROTATE_SPEED														180.f
+#define KOGASTONE_SPEED																500.f
 
 
 #define NPC_AISENSECONFIG_SIGHT_SIGHTRADIUS											1000.f

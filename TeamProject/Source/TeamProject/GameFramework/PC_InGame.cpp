@@ -28,6 +28,8 @@
 
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Actors/Object/MetalActor.h"
+#include "Actors/Object/ProjectileMetalActor.h"
+
 
 APC_InGame::APC_InGame()
 {
@@ -1215,13 +1217,19 @@ void APC_InGame::CheckMetalActor()
 		AActor* HitActor = HitResult.GetActor();
 		if (!HitActor) return;
 
-#if WITH_EDITOR
-		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
-#else
-		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
-#endif
+//#if WITH_EDITOR
+//		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
+//#else
+//		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
+//#endif
+//
+//		if (!ActorName.StartsWith(TEXT("Metal")))
+//		{
+//			bCanControlMetal = false;
+//			return;
+//		}
 
-		if (!ActorName.StartsWith(TEXT("Metal")))
+		if (!HitActor->IsA<AMetalActor>())
 		{
 			bCanControlMetal = false;
 			return;
@@ -1231,6 +1239,11 @@ void APC_InGame::CheckMetalActor()
 
 		// LastHit 업데이트
 		LastHit = HitResult;
+
+		if (AProjectileMetalActor* ProjectileMetalActor = Cast<AProjectileMetalActor>(HitActor))
+		{
+			ProjectileMetalActor->SetGrabbed(true);
+		}
 	}
 	else
 	{
@@ -1243,8 +1256,8 @@ void APC_InGame::StartMagnetGrab()
 	if (IsHoldingObject()) return;
 
 	//FHitResult HitResult;
-	if (TraceForMetal(LastHit))
-	{
+	//if (TraceForMetal(LastHit))
+	//{
 		if (UPrimitiveComponent* HitComp = LastHit.GetComponent())
 		{
 			if (HitComp->IsSimulatingPhysics())
@@ -1265,7 +1278,7 @@ void APC_InGame::StartMagnetGrab()
 				GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &APC_InGame::MoveGrabbedObject, 0.01f, true);
 			}
 		}
-	}
+	//}
 }
 
 void APC_InGame::StopMagnetGrab()
@@ -1291,7 +1304,9 @@ bool APC_InGame::TraceForMetal(FHitResult& OutHit)
 
 	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_PhysicsBody, Params);
 
-	if (bHit && OutHit.GetActor()->IsA(MetalActorClass))
+	AActor* HitActor = OutHit.GetActor();
+
+	if (bHit && HitActor && HitActor->IsA(MetalActorClass))
 	{
 		return true;
 	}
