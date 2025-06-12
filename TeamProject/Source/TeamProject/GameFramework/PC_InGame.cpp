@@ -28,6 +28,7 @@
 
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Actors/Object/MetalActor.h"
+#include "Actors/Temple/Surface/FlowSurface.h"
 
 APC_InGame::APC_InGame()
 {
@@ -64,15 +65,6 @@ void APC_InGame::BeginPlay()
 		if (IcePreviewActor)
 		{
 			IcePreviewActor->SetActorEnableCollision(false);
-		}
-	}
-
-	if (MetalActorClass && !MetalActor)
-	{
-		MetalActor = GetWorld()->SpawnActor<AMetalActor>(MetalActorClass);
-		if (MetalActor)
-		{
-			MetalActor->SetActorEnableCollision(false);
 		}
 	}
 
@@ -490,37 +482,7 @@ void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
 	WeaponManagerComponent->LeftClickAction();
 
 	// ------- Destroy IcePilla ---------	
-	// 화면 중앙 기준 라인트레이스
-	FVector Start;
-	FRotator Rot;
-	GetPlayerViewPoint(Start, Rot);
-
-	FVector End = Start + Rot.Vector() * TraceDistance;
-
-	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(GetPawn());
-
-	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
-
-	if (bHit)
-	{
-		// 생성된 아이스 필러가 있으면 Destroy
-		AActor* HitActor = HitResult.GetActor();
-		if (IsValid(HitActor))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
-
-			if (AIcePillar* IcePillar = Cast<AIcePillar>(HitActor))
-			{
-				IcePillar->Destroy();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Hit actor is not an IcePillar"));
-			}
-		}
-	}
+	DestroyIcePillar();
 }
 
 void APC_InGame::RightClick(const FInputActionValue& InputActionValue)
@@ -867,9 +829,37 @@ void APC_InGame::SpawnIcePillar()
 
 void APC_InGame::DestroyIcePillar()
 {
-	if (!IcePillarActor) return;
+	// 화면 중앙 기준 라인트레이스
+	FVector Start;
+	FRotator Rot;
+	GetPlayerViewPoint(Start, Rot);
 
-	IcePillarActor->Destroy();
+	FVector End = Start + Rot.Vector() * TraceDistance;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetPawn());
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	if (bHit)
+	{
+		// 생성된 아이스 필러가 있으면 Destroy
+		AActor* HitActor = HitResult.GetActor();
+		if (IsValid(HitActor))
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
+
+			if (AIcePillar* IcePillar = Cast<AIcePillar>(HitActor))
+			{
+				IcePillar->Destroy();
+			}
+			else
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("Hit actor is not an IcePillar"));
+			}
+		}
+	}
 }
 
 void APC_InGame::OnQuickSlotLeft(const FInputActionValue& InputActionValue)
@@ -1092,14 +1082,22 @@ bool APC_InGame::IsSurfaceActor(AActor* Actor) const
 {
 	if (!Actor) return false;
 
-#if WITH_EDITOR
-	FString ActorName = Actor->GetActorLabel();
-#else
-	FString ActorName = Actor->GetName();
-#endif
+	if (Actor->IsA<AFlowSurface>())
+	{
+		return true;
+	}
 
-	return ActorName.StartsWith(TEXT("Surface"));
+	return false;
+
+//#if WITH_EDITOR
+//	FString ActorName = Actor->GetActorLabel();
+//#else
+//	FString ActorName = Actor->GetName();
+//#endif
+//
+//	return ActorName.StartsWith(TEXT("Surface"));
 }
+	
 
 AActor* APC_InGame::FindVisibleActorOnScreen(FHitResult& OutHit)
 {
@@ -1222,13 +1220,19 @@ void APC_InGame::CheckMetalActor()
 		AActor* HitActor = HitResult.GetActor();
 		if (!HitActor) return;
 
-#if WITH_EDITOR
-		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
-#else
-		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
-#endif
+//#if WITH_EDITOR
+//		FString ActorName = HitActor->GetActorLabel(); // Editor에서 Item Label 사용
+//#else
+//		FString ActorName = HitActor->GetName(); // 게임 런타임에서는 fallback
+//#endif
+//
+//		if (!ActorName.StartsWith(TEXT("Metal")))
+//		{
+//			bCanControlMetal = false;
+//			return;
+//		}
 
-		if (!ActorName.StartsWith(TEXT("Metal")))
+		if (HitActor->IsA<AMetalActor>())
 		{
 			bCanControlMetal = false;
 			return;

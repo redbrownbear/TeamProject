@@ -97,13 +97,22 @@ void UShopManager::UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow 
 {
     if (TArray<FShopDataRow>* ShopList = CurrentShopRowMap.Find(QuestChar))
     {
+        bool bFound = false;
         for (int32 i = 0; i < ShopList->Num(); ++i)
         {
             if ((*ShopList)[i].ItemData.UniqueID == UpdateShopRow.ItemData.UniqueID)
             {
                 (*ShopList)[i] = UpdateShopRow;  
+                bFound = true;
                 break;
             }
+        }
+
+        if (!bFound)
+        {
+            ShopList->Add(UpdateShopRow);
+            //UpdatedShopData.Add(UpdateShopRow);
+            UE_LOG(LogTemp, Log, TEXT("New item added to shop: %s"), *UpdateShopRow.ItemData.Name);
         }
 
         UpdateItem(*ShopList);

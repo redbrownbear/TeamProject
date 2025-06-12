@@ -80,6 +80,9 @@ private:
 
 	FShopDataRow SelectedShopItem;
 
+	UPROPERTY()
+	TArray<FShopDataRow> UpdatedShopData;
+
 	UPROPERTY(meta = (BindWidget))
 	class UShopScroll* BP_ShopScroll;
 };

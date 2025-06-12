@@ -38,6 +38,13 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
+	 
+	void SetTorchStandFire(bool _bool);
 
+	void SetNiagaraVisibility(bool bFlag);
 
+	bool GetTorchStandFire() { return bTorchOnFire; }
+
+private:
+	bool bTorchOnFire = false;
 };

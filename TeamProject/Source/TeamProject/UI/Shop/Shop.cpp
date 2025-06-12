@@ -208,13 +208,24 @@ void UShop::OnCancel(const FInputActionValue& InputActionValue)
     UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
     check(QuestManager);
 
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    check(PC_InGame);
+
+    UConversationManagerComponent* ConversationManager = Cast<UConversationManagerComponent>(PC_InGame->Npc->GetComponentByClass(UConversationManagerComponent::StaticClass()));
+    check(ConversationManager);
+
+    EQuestCharacter QuestCharacter = PC_InGame->Npc->GetData()->QuestCharacter;
+    EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
+
+    DialogueID = ConversationManager->GetDialogueID(ConversationManager->GetNpcDialogueTable(), QuestCharacter, DialogType);
+
     if (UIManager && QuestManager)
     {
         if (QuestManager->IsConversation())
             return;
 
         UIManager->ShowUI(UNPCDialogue::StaticClass());
-        QuestManager->ShowDialogue(QuestChar, DialogueID);
+        QuestManager->ShowDialogue(QuestCharacter, DialogueID);
     }
 }
 

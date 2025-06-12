@@ -147,9 +147,11 @@ void UShopDialogue::OnConfirm()
                 ShopManager->AddPlayerRupee();
                 ShopManager->SubtractItemInventory();
 
-                //이거 뭘 원하는거임?ㅋㅋ
+                // 상점에 아이템 카운트 증가
+                //const FItemData SelectedItemData = ShopManager->GetSelectedItem();
                 const FItemData SelectedItemData = ShopManager->GetSelectedItem();
                 TArray<FShopDataRow> CurrentShopDataArray = ShopManager->GetShopData(PC_InGame->Npc->GetQuestCharacterType());
+                FShopDataRow ShopDataRow;
                 int iShopDataIndex = -1;
                 for (int32 i = 0; i < CurrentShopDataArray.Num(); ++i)
                 {
@@ -157,18 +159,29 @@ void UShopDialogue::OnConfirm()
                     {
                         CurrentShopDataArray[i].ItemData.ItemCount++;
                         iShopDataIndex = i;
+                        ShopManager->UpdateShopData(PC_InGame->Npc->GetQuestCharacterType(), CurrentShopDataArray[iShopDataIndex]);
                         break;
                     }
                 }
-                if (iShopDataIndex == -1)
+                if (iShopDataIndex == -1) 
                 {
-                    UE_LOG(LogTemp, Error, TEXT("ShopDialogue::OnConfirm() // No valid item in shop"));
-                    check(false);
-                    return;
+                    ShopDataRow.QuestCharacter = PC_InGame->Npc->GetQuestCharacterType();
+                    ShopDataRow.ItemData = SelectedItemData;
+                    ShopDataRow.InitialItemCount = 1;
+                    //ShopDataRow.ItemData.ItemCount++;
+                    CurrentShopDataArray.Add(ShopDataRow);
+
+                    UE_LOG(LogTemp, Log, TEXT("CurrentShopDataArray: %d"), CurrentShopDataArray.Num());
+
+                    ShopManager->UpdateShopData(PC_InGame->Npc->GetQuestCharacterType(), ShopDataRow);
+
+                    //UE_LOG(LogTemp, Error, TEXT("ShopDialogue::OnConfirm() // No valid item in shop"));
+                    //check(false);
+                    //return;
                 }
 
 
-                ShopManager->UpdateShopData(PC_InGame->Npc->GetQuestCharacterType(), CurrentShopDataArray[iShopDataIndex]);
+                //ShopManager->UpdateShopData(PC_InGame->Npc->GetQuestCharacterType(), CurrentShopDataArray[iShopDataIndex]);
 
                 PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SuccessfulSale);
 
