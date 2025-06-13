@@ -28,6 +28,8 @@
 
 #include "Engine/DamageEvents.h"
 
+#include "UI/UIComponent/MonsterHP.h"
+
 
 // Sets default values
 ACharacterMonster::ACharacterMonster()
@@ -42,6 +44,18 @@ ACharacterMonster::ACharacterMonster()
 	RootComponent = CapsuleComp;
 
 	StatusComponent = CreateDefaultSubobject<UMonsterStatusComponent>(TEXT("StatusComponent"));
+
+	HPBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBarWidget"));
+	HPBarWidget->SetupAttachment(RootComponent);
+
+	HPBarWidget->SetWidgetSpace(EWidgetSpace::World);
+	HPBarWidget->SetDrawAtDesiredSize(true);
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> HPWidgetClassFinder(TEXT("/Game/Blueprint/UI/WidgetComponent/BP_MonsterHp"));
+	if (HPWidgetClassFinder.Succeeded())
+	{
+		HPBarWidgetClass = HPWidgetClassFinder.Class;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -59,8 +73,6 @@ void ACharacterMonster::BeginPlay()
 		FSMComponent->BindHitEvent();
 	}
 	SetData(DataTableRowHandle);
-
-	StatusComponent->OnDie.AddDynamic(this, &ACharacterMonster::OnDie);
 
 	if (!(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
 	{
@@ -81,7 +93,6 @@ void ACharacterMonster::BeginPlay()
 				MeleeWeapon->SetActorScale3D(Scale);
 				MeleeWeapon->AttachToMonster(this, Monster_SocketName::Pod_Melee);
 				MeleeWeapon->FinishSpawning(FTransform::Identity);
-
 				FSMComponent->SetMeleeWeapon(MeleeWeapon);
 				FSMComponent->SheathMeleeWeapon();
 			}
@@ -108,6 +119,12 @@ void ACharacterMonster::BeginPlay()
 			}
 		}
 	}
+
+	if (HPBarWidgetClass)
+	{
+		HPBarWidget->SetWidgetClass(HPBarWidgetClass);
+		HPBarWidget->InitWidget();
+	}
 }
 
 // Called every frame
@@ -115,7 +132,17 @@ void ACharacterMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (HPBarWidget)
+	{
+		if (APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0))
+		{
+			FVector CameraLocation = CameraManager->GetCameraLocation();
+			FVector ToCamera = CameraLocation - HPBarWidget->GetComponentLocation();
 
+			FRotator LookAtRotation = FRotationMatrix::MakeFromX(ToCamera).Rotator();
+			HPBarWidget->SetWorldRotation(LookAtRotation);
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -186,6 +213,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	}
 
 	StatusComponent->SetMaxHP(MonsterData->MaxHP);
+	HPBarWidget->SetRelativeLocation(FVector(0.f, 0.f, (MonsterData->CollisionSphereRadius - 10.0f) * 4.0f));
 
 	for (USphereComponent* ExistingCollider : AdditionalColliders)
 	{
@@ -339,32 +367,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		DefaultCameraShakeBase = NewObject<UDefaultCameraShakeBase>(this, UDefaultCameraShakeBase::StaticClass(), TEXT("DefaultCameraShakeBase"));
 	}
 
-	//USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
 
-	//if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
-	//{
-	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(4);
-	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
-	//	SkeletalMeshComponent->SetMaterial(4, DynamicMaterialInstance);
-	//}
-	//else if (DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
-	//{
-	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(1);
-	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
-	//	SkeletalMeshComponent->SetMaterial(1, DynamicMaterialInstance);
-	//}
-	//else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinLeader"))
-	//{
-	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(0);
-	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
-	//	SkeletalMeshComponent->SetMaterial(0, DynamicMaterialInstance);
-	//}
-	//else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinBoss"))
-	//{
-	//	MaterialInterface = SkeletalMeshComponent->GetMaterial(1);
-	//	DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
-	//	SkeletalMeshComponent->SetMaterial(1, DynamicMaterialInstance);
-	//}
 
 	int32 MaterialSlotIndex = -1;
 	if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
@@ -598,5 +601,29 @@ void ACharacterMonster::AddBaseColor(FVector InColor)
 	if (DynamicMaterialInstance)
 	{
 		DynamicMaterialInstance->SetVectorParameterValue(TEXT("AddColor"), InColor);
+	}
+}
+
+FString ACharacterMonster::GetMonsterName()
+{
+	if (DataTableRowHandle.IsNull()) 
+		return TEXT("Unknown");
+
+	return DataTableRowHandle.RowName.ToString();
+}
+
+void ACharacterMonster::ShowHpUI(float CurHp, float MaxHp)
+{
+	if (!HPBarWidget)
+		return;
+
+	UUserWidget* Widget = HPBarWidget->GetUserWidgetObject();
+	if (!Widget)
+		return;
+
+	UMonsterHP* HPWidget = Cast<UMonsterHP>(Widget);
+	if (HPWidget)
+	{
+		HPWidget->ShowUI(CurHp, MaxHp);
 	}
 }

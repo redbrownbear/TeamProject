@@ -58,7 +58,7 @@ void ATempleActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	TempleActorData = Data;
 	if (CollisionComponent && TempleActorData)
 	{
-		CollisionComponent->SetRelativeTransform(TempleActorData->CollisionTransform);
+		//CollisionComponent->SetRelativeTransform(TempleActorData->CollisionTransform);
 		CollisionComponent->SetCollisionProfileName(TempleActorData->CollisionProfileName);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->SetSimulatePhysics(true);

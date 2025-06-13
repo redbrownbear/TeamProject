@@ -87,7 +87,7 @@ void ATreasureBox::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedCompo
 
 	if (bCanTakeItem)
 	{
-		bCanOpenBox = true;
+		bCanOpenBox = true; 
 		GetParticleEffect();
 	}
 }

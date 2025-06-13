@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Misc/Utils.h"
 #include "Actors/Monster/MonsterInterface.h"
+#include "Components/WidgetComponent.h"
 #include "CharacterMonster.generated.h"
 
 
@@ -94,10 +95,8 @@ public:
     virtual void SetSpeedRun() override;
 
 
-protected:
-    UFUNCTION()
+public:
     virtual void OnDie() override;
-    UFUNCTION()
     virtual void OnDeadEnd() override;
 
 protected:
@@ -118,4 +117,16 @@ protected:
     virtual UMaterialInstanceDynamic* GetDynamicMaterialInstance() override;
 public:
     virtual void AddBaseColor(FVector InColor);
+
+public:
+    FString GetMonsterName();
+
+private:
+    UPROPERTY(VisibleAnywhere, Category = "UI")
+    UWidgetComponent* HPBarWidget;
+
+    TSubclassOf<UUserWidget> HPBarWidgetClass;
+
+public:
+    void ShowHpUI(float CurHp, float MaxHp);
 };

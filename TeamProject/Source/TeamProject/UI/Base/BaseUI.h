@@ -4,21 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/Base/InputReceivableUI.h"
+
 #include "BaseUI.generated.h"
 
 /**
  *
  */
 UCLASS()
-class TEAMPROJECT_API UBaseUI : public UUserWidget
+class TEAMPROJECT_API UBaseUI : public UUserWidget, public IInputReceivableUI
 {
 	GENERATED_BODY()
 
 
 public:
 	virtual void OnCreated();
-	virtual void ShowUI();	//명시적 초기화
+	virtual void ShowUI();
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass);
+
+public:
+	virtual void OnNavigate(const FInputActionValue& Value) override {}
+	virtual void OnConfirm(const FInputActionValue& Value) override {}
+	virtual void OnCancel(const FInputActionValue& Value) override {}
 
 	void PauseAllPausableActors(bool bPause);
 };

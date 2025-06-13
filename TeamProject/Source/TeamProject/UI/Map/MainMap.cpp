@@ -61,7 +61,7 @@ void UMainMap::SetPlayerData()
     
 }
 
-void UMainMap::OnCancel()
+void UMainMap::OnCancel(const FInputActionValue& Value)
 {
     HideUI(UMainMap::StaticClass());
 }

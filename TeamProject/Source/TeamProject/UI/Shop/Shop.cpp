@@ -17,6 +17,12 @@
 
 void UShop::OnCreated()
 {
+    bIsBuyScroll = false;
+    CurrentDisplayedCoin = 0;
+    TargetCoin = 0;
+    CoinStep = 1;
+    UpdateInterval = 0.01f;
+
     SetShopOpen();
 }
 
@@ -37,8 +43,14 @@ void UShop::ShowUI()
         PC_InGame->SetInputMode(InputMode);
     }
 
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        CurrentDisplayedCoin = PlayerManager->GetRupee();
+        CoinText->SetText(FText::FromString(FString::FromInt(CurrentDisplayedCoin)));
+    }
+
     InitUI();
-    SetRupeeUI();
     BindDelegates();
 }
 
@@ -53,7 +65,6 @@ void UShop::HideUI(TSubclassOf<UBaseUI> UIClass)
 
     RemoveDelegates();
     Super::HideUI(UShop::StaticClass());
-
 }
 
 void UShop::InitUI()
@@ -65,8 +76,41 @@ void UShop::SetRupeeUI()
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     if (PlayerManager)
     {
-        CoinText->SetText(FText::FromString(FString::FromInt(PlayerManager->GetRupee())));
+        StartCoinEffect(PlayerManager->GetRupee());
     }
+}
+
+void UShop::StartCoinEffect(int32 FinalCoinValue)
+{
+    FString Text = CoinText->GetText().ToString();
+    CurrentDisplayedCoin = FCString::Atoi(*Text); // ÇöÀç Ç¥½ÃµÈ °ª ±âÁØÀ¸·Î ½ÃÀÛ
+
+    TargetCoin = FinalCoinValue;
+
+    int32 Difference = FMath::Abs(TargetCoin - CurrentDisplayedCoin);
+    CoinStep = FMath::Clamp(Difference / 30, 1, 50); // Â÷ÀÌ¿¡ µû¶ó Á¶Àý
+
+    GetWorld()->GetTimerManager().SetTimer(CoinUpdateTimerHandle, this, &UShop::UpdateCoinEffect, UpdateInterval, true);
+}
+
+void UShop::UpdateCoinEffect()
+{
+    if (CurrentDisplayedCoin == TargetCoin)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(CoinUpdateTimerHandle);
+        return;
+    }
+
+    if (CurrentDisplayedCoin < TargetCoin)
+    {
+        CurrentDisplayedCoin = FMath::Min(CurrentDisplayedCoin + CoinStep, TargetCoin);
+    }
+    else
+    {
+        CurrentDisplayedCoin = FMath::Max(CurrentDisplayedCoin - CoinStep, TargetCoin);
+    }
+
+    CoinText->SetText(FText::FromString(FString::FromInt(CurrentDisplayedCoin)));
 }
 
 void UShop::BindDelegates()
@@ -81,7 +125,6 @@ void UShop::BindDelegates()
     if (ShopManager)
     {
         ShopManager->OnShopUpdated.AddDynamic(this, &UShop::RefreshShopList);
-        ShopManager->OnRupeeChanged.AddDynamic(this, &UShop::SetRupeeUI);
     }
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
@@ -108,7 +151,6 @@ void UShop::RemoveDelegates()
     if (ShopManager)
     {
         ShopManager->OnShopUpdated.RemoveDynamic(this, &UShop::RefreshShopList);
-        ShopManager->OnRupeeChanged.RemoveDynamic(this, &UShop::SetRupeeUI);
     }
 
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
@@ -132,13 +174,13 @@ void UShop::SetShopOpen()
 
 void UShop::SetItemBuy()
 {
-    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
-    check(ShopManager);
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    check(PC_InGame);
 
-    if(ShopManager->IsBuy())
+    if (bIsBuyScroll == true)
         BP_ShopDialogue->SetBuy();
 
-    else
+    if(bIsBuyScroll == false)
         BP_ShopDialogue->SetSell();
 
 }
@@ -157,40 +199,137 @@ void UShop::OnNavigate(const FInputActionValue& InputActionValue)
 {
     const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
-    // Deadzone ï¿½ï¿½ï¿½ï¿½
     if (ActionValue.IsNearlyZero())
         return;
 
-    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½Ø¼ï¿½
+    if (BP_ShopDialogue->IsSelectItem())
+        return;
+
     if (FMath::Abs(ActionValue.X) > FMath::Abs(ActionValue.Y))
     {
-        // ï¿½Â¿ï¿½
         if (ActionValue.X > 0)
-            BP_ShopScroll->MoveSelection(FIntPoint(1, 0));
+        {
+            if(BP_ShopScroll->IsVisible())
+                BP_ShopScroll->MoveSelection(FIntPoint(1, 0));
+            
+            if (BP_ShopSellScroll->IsVisible())
+                BP_ShopSellScroll->MoveSelection(FIntPoint(1, 0));
+        }
+           
         else
-            BP_ShopScroll->MoveSelection(FIntPoint(-1, 0));
+        {
+            if (BP_ShopScroll->IsVisible())
+                BP_ShopScroll->MoveSelection(FIntPoint(-1, 0));
+            if (BP_ShopSellScroll->IsVisible())
+                BP_ShopSellScroll->MoveSelection(FIntPoint(-1, 0));
+        }
+           
     }
     else
     {
-        // ï¿½ï¿½ï¿½ï¿½
         if (ActionValue.Y > 0)
-            BP_ShopScroll->MoveSelection(FIntPoint(0, -1));
+        {
+            if (BP_ShopScroll->IsVisible())
+                BP_ShopScroll->MoveSelection(FIntPoint(0, -1));
+            if (BP_ShopSellScroll->IsVisible())
+                BP_ShopSellScroll->MoveSelection(FIntPoint(0, -1));
+        }      
         else
-            BP_ShopScroll->MoveSelection(FIntPoint(0, 1));
+        {
+            if (BP_ShopScroll->IsVisible())
+                BP_ShopScroll->MoveSelection(FIntPoint(0, 1));
+            if (BP_ShopSellScroll->IsVisible())
+                BP_ShopSellScroll->MoveSelection(FIntPoint(0, 1));
+        }
+            
     }
 }
 
-void UShop::OnConfirm()
+void UShop::OnConfirm(const FInputActionValue& InputActionValue)
 {
+    if (BP_ShopDialogue->GetActionOverLay()->IsVisible() == false)
+        return;
+
     SetItemBuy();
 }
 
-void UShop::OnCancel()
+void UShop::OnCancel(const FInputActionValue& InputActionValue)
 {
+    if (BP_ShopDialogue->GetActionOverLay()->IsVisible() == false)
+    {
+        BP_ShopDialogue->OnCancel();
+        return;
+    }
+
     HideUI(UShop::StaticClass());
 
+    UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
+    check(UIManager);
+
+    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    check(PC_InGame);
+
+    UConversationManagerComponent* ConversationManager = Cast<UConversationManagerComponent>(PC_InGame->Npc->GetComponentByClass(UConversationManagerComponent::StaticClass()));
+    check(ConversationManager);
+
     PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Shop);
+
+    EQuestCharacter QuestCharacter = PC_InGame->Npc->GetData()->QuestCharacter;
+    EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
+
+    DialogueID = ConversationManager->GetDialogueID(ConversationManager->GetNpcDialogueTable(), QuestCharacter, DialogType);
+
+    if (UIManager && QuestManager)
+    {
+        if (QuestManager->IsConversation())
+            return;
+
+        UIManager->ShowUI(UNPCDialogue::StaticClass());
+        QuestManager->ShowDialogue(QuestCharacter, DialogueID);
+    }
+}
+
+void UShop::OnCategoryLeft(const FInputActionValue& InputActionValue)
+{
+    BP_ShopSellScroll->MoveCategory(true);
+}
+
+void UShop::OnCategoryRight(const FInputActionValue& InputActionValue)
+{
+    BP_ShopSellScroll->MoveCategory(false);
+}
+
+void UShop::SetDialogueData(EQuestCharacter InQuestChar, int32 InDialogueID)
+{
+    QuestChar = InQuestChar;
+    DialogueID = InDialogueID;
+
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+}
+
+void UShop::OnBuy()
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        CurrentDisplayedCoin = PlayerManager->GetRupee();
+    }
+
+    BP_ShopScroll->ItemBuy();
+}
+
+void UShop::OnSell()
+{
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    if (PlayerManager)
+    {
+        CurrentDisplayedCoin = PlayerManager->GetRupee();
+    }
+
+	BP_ShopSellScroll->ItemSell();
 }
 
 void UShop::OnNextDialogue(const FInputActionValue& InputActionValue)
@@ -217,6 +356,10 @@ void UShop::RefreshDescriptionSellItem(const FItemData& ItemData)
 void UShop::RefreshShopList(const TArray<FShopDataRow>& ShopList)
 {
     SetShopOpen();
+    SetRupeeUI();
+
+    if (bIsBuyScroll == false)
+        return;
 
     BP_ShopSellScroll->SetVisibility(ESlateVisibility::Hidden);
 

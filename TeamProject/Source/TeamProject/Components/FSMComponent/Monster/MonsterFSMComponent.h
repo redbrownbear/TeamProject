@@ -89,7 +89,7 @@ protected:
 	EMonsterGroupType		eGroupType;
 
 public:
-	EMonsterState GetMonsterState() const { return eCurrentState; }
+	EMonsterState GetCurrentState() const { return eCurrentState; }
 	EMonsterGroupType GetMonsterGroupType() const { return eGroupType; }
 
 	void SetMonsterState(EMonsterState NewState) { eCurrentState = NewState; }	

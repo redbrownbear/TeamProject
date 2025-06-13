@@ -17,14 +17,15 @@ void UAnimNotify_AL_Attack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequen
 
 		{
 			AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
-				FTransform::Identity, nullptr, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+				FTransform::Identity, Monster, Monster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 			FTransform NewTransform;
 			Projectile->SetData(ProjectileName::Monster_AL_Attack, CollisionProfileName::ToPlayer);
 
 			//const USkeletalMeshComponent* Mesh = Monster->GetMonsterMesh();
 			//const FVector Location = Mesh->GetSocketLocation(Monster_SocketName::Toe_L);
-			const FVector Location = Monster->GetActorLocation();
+			FVector Location = Monster->GetActorLocation();
+			Location += Monster->GetActorForwardVector() * 150.f;
 			NewTransform.SetLocation(Location);
 
 			Projectile->FinishSpawning(NewTransform);
@@ -37,9 +38,10 @@ void UAnimNotify_AL_Attack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequen
 			NiagaraEffect->SetData(NiagaraEffectName::AL_Attack);
 
 			FVector Location = Monster->GetActorLocation();
-			Location += Monster->GetActorForwardVector() * 100.f;
+			Location += Monster->GetActorForwardVector() * 150.f;
+			FVector ForwardVector = Monster->GetActorForwardVector();
 			NewTransform.SetLocation(Location);
-
+			NewTransform.SetRotation((ForwardVector * -1.f).Rotation().Quaternion());
 			NiagaraEffect->FinishSpawning(NewTransform);
 		}
 

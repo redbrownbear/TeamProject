@@ -42,7 +42,7 @@ void UShopManager::LoadShopData(UDataTable* DataTable)
             {
                 FoundRowsPtr->Add(*Row);
             }
-            else 
+            else
             {
                 TArray<FShopDataRow> NewArray;
                 NewArray.Add(*Row);
@@ -68,7 +68,7 @@ TArray<FShopDataRow> UShopManager::GetShopData(EQuestCharacter QuestChar) const
     TArray<FShopDataRow> ConstRows;
     for (const FShopDataRow& Row : *FoundRowsPtr)
     {
-        ConstRows.Add(Row); 
+        ConstRows.Add(Row);
     }
 
     return ConstRows;
@@ -76,8 +76,6 @@ TArray<FShopDataRow> UShopManager::GetShopData(EQuestCharacter QuestChar) const
 
 void UShopManager::ShowUI(EQuestCharacter QuestChar, bool IsBuy)
 {
-    SetIsBuy(IsBuy);
-
     if (IsBuy)
     {
         TArray<FShopDataRow> ShopList = GetShopData(QuestChar);
@@ -97,95 +95,29 @@ void UShopManager::UpdateShopData(EQuestCharacter QuestChar, const FShopDataRow 
 {
     if (TArray<FShopDataRow>* ShopList = CurrentShopRowMap.Find(QuestChar))
     {
+        bool bFound = false;
         for (int32 i = 0; i < ShopList->Num(); ++i)
         {
             if ((*ShopList)[i].ItemData.UniqueID == UpdateShopRow.ItemData.UniqueID)
             {
                 (*ShopList)[i] = UpdateShopRow;  
+                bFound = true;
                 break;
             }
         }
 
+        if (!bFound)
+        {
+            ShopList->Add(UpdateShopRow);
+        }
+
         UpdateItem(*ShopList);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("No shop data found for character: %s"), *UEnum::GetValueAsString(QuestChar));
     }
 }
 
 void UShopManager::UpdateItem(const TArray<FShopDataRow>& ShopList)
 {
     OnShopUpdated.Broadcast(ShopList);
-}
-
-
-bool UShopManager::CheckSoldout()
-{
-    // ItemCount == 0 이면 매진 처리
-    if (SelectedShopItem.ItemData.ItemCount != 0) return false;
-
-    return true;
-}
-
-bool UShopManager::CanIBuyIt()
-{
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    int32 Rupee = PlayerManager->GetRupee();
-
-    if (Rupee < SelectedShopItem.ItemData.price)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-void UShopManager::AddItemInventory()
-{
-    if (SelectedShopItem.ItemData.ItemCount != 0)
-    {
-        UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-        if (PlayerManager)
-        {
-            PlayerManager->SetInvenData(SelectedShopItem.ItemData);
-        }
-    }
-}
-
-void UShopManager::SubtractItemInventory()
-{
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    if (PlayerManager)
-    {
-        PlayerManager->RemoveItemByUniqueID(SelectedShopItem.ItemData.UniqueID);
-    }
-}
-
-void UShopManager::AddPlayerRupee()
-{
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    if (PlayerManager)
-    {
-        int32 Rupee = PlayerManager->GetRupee();
-        Rupee += SelectedShopItem.ItemData.price;
-
-        PlayerManager->SetRupee(Rupee);
-        OnRupeeChanged.Broadcast();
-    }
-}
-
-void UShopManager::SubtractPlayerRupee()
-{
-    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
-    if (PlayerManager)
-    {
-        int32 Rupee = PlayerManager->GetRupee();
-        Rupee -= SelectedShopItem.ItemData.price;
-
-        PlayerManager->SetRupee(Rupee);
-        OnRupeeChanged.Broadcast();
-    }
 }
 
 void UShopManager::SetSelectedItem(const FItemData& InShopData)

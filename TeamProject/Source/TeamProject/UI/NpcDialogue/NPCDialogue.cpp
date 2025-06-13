@@ -15,7 +15,7 @@
 
 void UNPCDialogue::OnCreated()
 {
-
+    InitUI();
 }
 
 void UNPCDialogue::ShowUI()
@@ -42,7 +42,12 @@ void UNPCDialogue::ShowUI()
         PC_InGame->SetInputMode(InputMode);
     }
 
-    InitUI();
+    if (ButtonList.IsValidIndex(0) && ButtonList[0])
+    {
+        CurrentButtonIndex = 0;
+        FocusButton(CurrentButtonIndex);
+    }
+
     BindDelegates();
 }
 
@@ -78,10 +83,16 @@ void UNPCDialogue::HideUI(TSubclassOf<UBaseUI> UIClass)
 
 void UNPCDialogue::InitUI()
 {
-    ConfirmButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnConfirm);
+    ConfirmButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnConfirmClick);
     ExtraButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnSell);
-    CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancel);
+    CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancelClick);
 
+    ButtonList.Add(ConfirmButton);
+    ButtonList.Add(ExtraButton);
+    ButtonList.Add(CancelButton);
+
+
+    bIsFocusable = true;
 }
 
 void UNPCDialogue::BindDelegates()
@@ -104,11 +115,37 @@ void UNPCDialogue::RemoveDelegates()
     }
 }
 
-void UNPCDialogue::OnNavigate(const FInputActionValue& InputActionValue)
+void UNPCDialogue::FocusButton(int32 Index)
 {
+    if (!ButtonList.IsValidIndex(Index)) return;
+
+    ButtonList[Index]->SetFocus();
+    ButtonList[Index]->OnHovered.Broadcast();
 }
 
-void UNPCDialogue::OnConfirm()
+void UNPCDialogue::OnNavigate(const FInputActionValue& InputActionValue)
+{
+    const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+
+    if (ActionValue.IsNearlyZero())
+        return;
+
+    if (FMath::Abs(ActionValue.X) < FMath::Abs(ActionValue.Y))
+    {
+        if (ActionValue.Y > 0)
+        {
+            CurrentButtonIndex = (CurrentButtonIndex - 1 + ButtonList.Num()) % ButtonList.Num();
+        }
+        else
+        {
+            CurrentButtonIndex = (CurrentButtonIndex + 1 + ButtonList.Num()) % ButtonList.Num();
+        } 
+    }
+
+    FocusButton(CurrentButtonIndex);
+}
+
+void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
 {
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     PC_InGame->Npc->SetIsConfirmed(true);
@@ -160,33 +197,23 @@ void UNPCDialogue::OnConfirm()
 
         if (UIManager && ShopManager && QuestDialougeManager && ConverSationManager)
         {
-            UIManager->ShowUI(UShop::StaticClass());
-            //ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter, true);
-            ShopManager->ShowUI(QuestChar, true);
-            
-            QuestDialougeManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
+            UShop* ShopUI = UIManager->FindUI<UShop>();
+            if (ShopUI)
+            {
+                ShopUI->SetIsBuyScroll(true);
+                ShopUI->SetDialogueData(QuestChar, DialogueID);
+            }
 
+            UIManager->ShowUI(UShop::StaticClass());
+            ShopManager->ShowUI(QuestChar, true);      
+            QuestDialougeManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
+            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Buy);
             bool IsShopping = PC_InGame->Npc->GetShopping();
-            //bool IsBuying = PC_InGame->Npc->GetBuy();
 
             if (DialogueDataRow.bIsEndConversation && !IsShopping)
             {
                 PC_InGame->Npc->SetShopping(true);
-                // Create 상품 리스트 UI: 이후 항목 클릭했을 때 산다/만다 대화 나오게
-                // 결정에 따라 SetBuy()에 인자 넣어주기
             }
-            /*else if (DialogueDataRow.bIsEndConversation && IsShopping && IsBuying)
-            {
-                // 구매 했을 경우
-                PC_InGame->Npc->SetBuy(true);
-                PC_InGame->Npc->SetShopping(false);
-            }
-            else if (DialogueDataRow.bIsEndConversation && IsShopping && !IsBuying)
-            {
-                // 구매 안 할 경우
-                PC_InGame->Npc->SetBuy(false);
-                PC_InGame->Npc->SetShopping(false);
-            }*/
             else
             {
                 PC_InGame->Npc->SetShopping(false);
@@ -195,51 +222,7 @@ void UNPCDialogue::OnConfirm()
     }
 }
 
-void UNPCDialogue::OnSell()
-{
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));   
-    check(PC_InGame);
-
-    UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
-    check(UIManager);
-
-    UShopManager* ShopManager = GetWorld()->GetGameInstance()->GetSubsystem<UShopManager>();
-    check(ShopManager);
-
-    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
-    check(QuestManager);
-
-    UConversationManagerComponent* ConverSationManager = Cast<UConversationManagerComponent>(PC_InGame->Npc->GetComponentByClass(UConversationManagerComponent::StaticClass()));
-    check(ConverSationManager);
-
-    EQuestCharacter QuestChar = PC_InGame->Npc->GetData()->QuestCharacter;
-    EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
-
-    if (DialogType == EDialogType::Shop)
-    {
-        PC_InGame->Npc->SetIsConfirmed(true);
-        HideUI(UNPCDialogue::StaticClass());
-
-        int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
-
-        if (UIManager && ShopManager && QuestManager)
-        {
-            UIManager->ShowUI(UShop::StaticClass());
-            ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter, false);
-
-            QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
-        }
-        //PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
-    }
-    else
-    {
-        PC_InGame->Npc->SetIsConfirmed(false);
-
-        HideUI(UNPCDialogue::StaticClass());
-    }
-}
-
-void UNPCDialogue::OnCancel()
+void UNPCDialogue::OnCancel(const FInputActionValue& InputActionValue)
 {
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     check(PC_InGame);
@@ -275,6 +258,66 @@ void UNPCDialogue::OnCancel()
     }
 
     HideUI(UNPCDialogue::StaticClass());
+}
+
+void UNPCDialogue::OnSell()
+{
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    check(PC_InGame);
+
+    UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
+    check(UIManager);
+
+    UShopManager* ShopManager = GetWorld()->GetGameInstance()->GetSubsystem<UShopManager>();
+    check(ShopManager);
+
+    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
+
+    UConversationManagerComponent* ConverSationManager = Cast<UConversationManagerComponent>(PC_InGame->Npc->GetComponentByClass(UConversationManagerComponent::StaticClass()));
+    check(ConverSationManager);
+
+    EQuestCharacter QuestChar = PC_InGame->Npc->GetData()->QuestCharacter;
+    EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
+
+    if (DialogType == EDialogType::Shop)
+    {
+        PC_InGame->Npc->SetIsConfirmed(true);
+        HideUI(UNPCDialogue::StaticClass());
+
+        int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
+
+        if (UIManager && ShopManager && QuestManager)
+        {
+            UShop* ShopUI = UIManager->FindUI<UShop>();
+            if (ShopUI)
+            {
+                ShopUI->SetIsBuyScroll(false);
+                ShopUI->SetDialogueData(QuestChar, DialogueID);
+            }
+
+            UIManager->ShowUI(UShop::StaticClass());
+            ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter, false);
+            QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
+            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
+        }
+    }
+    else
+    {
+        PC_InGame->Npc->SetIsConfirmed(false);
+
+        HideUI(UNPCDialogue::StaticClass());
+    }
+}
+
+void UNPCDialogue::OnConfirmClick()
+{
+	OnConfirm(FInputActionValue());
+}
+
+void UNPCDialogue::OnCancelClick()
+{
+	OnCancel(FInputActionValue());
 }
 
 void UNPCDialogue::OnNextDialogue(const FInputActionValue& InputActionValue)

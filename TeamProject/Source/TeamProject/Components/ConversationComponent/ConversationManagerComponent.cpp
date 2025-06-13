@@ -28,8 +28,6 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 	CurrentNpc = Npc;
 	CurrentPlayer = Player;
 
-	//LockCharacters(Npc, Player);
-
 	UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
@@ -56,33 +54,6 @@ void UConversationManagerComponent::StartConversation(ANpc* Npc, APlayerCharacte
 		DialogueID = GetDialogueID(NpcDialogueTable, QuestCharacter, DialogType);
 
 		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, DialogueID);
-		
-		//로직 수정 해야함
-		//임시 수정해놓음 -> EQuestCharDialogue::Furiko_Found 이런 하드코딩 지양하길 바라 ㅠㅠ
-		// UIManager->ShowUI(UNPCDialogue::StaticClass());
-		// bool IsQuest = Npc->GetDoQuest();
-		//if (!DialogueDataRow.bIsEndConversation && IsQuest)
-		//{
-		//	QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko_Found));
-		//	//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_FURIKO_FIND);
-		//}
-		//else
-		//{
-		//	if (DialogType == EDialogType::Shop)
-		//	{
-		//		if (Npc->GetBuy() && !Npc->GetShopping())
-		//		{
-		//			QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store_Buy));
-		//		}
-		//		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Store));
-		//		//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_STORE);			
-		//	}
-		//	else
-		//	{
-		//		QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, static_cast<int32>(EQuestCharDialogue::Furiko));
-		//		//QuestManager->ShowDialogue(CurrentNpc->GetData()->QuestCharacter, QUESTCHARDIALOGUE_FURIKO);
-		//	}
-		//}
 	}
 }
 

@@ -5,6 +5,7 @@
 #include "SubSystem/UI/QuestManager.h"
 #include "UI/HUD/MainHUD.h"
 #include "Actors/Character/PlayerCharacter.h"
+#include "Actors/Item/WorldWeapon.h"
 
 void UPlayerManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -43,6 +44,11 @@ void UPlayerManager::SetInvenData(FItemData ItemRow)
     ItemInvenList.Add(ItemRow);
 
     UpDateInvenUI(ItemRow);
+}
+
+void UPlayerManager::SetInvenRemoveData(const FItemData& ItemRow)
+{
+    UpDataRemoveItemInInven(ItemRow);
 }
 
 void UPlayerManager::ShowInvenUI()
@@ -161,13 +167,13 @@ FItemData UPlayerManager::RemoveItemByUniqueID(FString UniqueID)
     return FItemData();
 }
 
-int32 UPlayerManager::GetItemCountByName(const FString& ItemName)
+int32 UPlayerManager::GetItemCountByItemCode(const FString& ItemCode)
 {
     int32 Count = 0;
 
     for (int32 i = 0; i < ItemInvenList.Num(); ++i)
     {
-        if (ItemInvenList[i].Name == ItemName)
+        if (ItemInvenList[i].Name == ItemCode)
         {
             Count++;
         }
@@ -199,6 +205,11 @@ void UPlayerManager::UpDateInvenEquipUI(const TArray<FItemData>& ItemList)
 void UPlayerManager::UpDataQuickSlot(const TArray<FItemData>& ItemList)
 {
     OnQuickSlotUpdated.Broadcast(ItemList);
+}
+
+void UPlayerManager::UpDataRemoveItemInInven(const FItemData& ItemRow)
+{
+	OnInventoryRemoveUpdated.Broadcast(ItemRow);
 }
 
 void UPlayerManager::InitStatus()

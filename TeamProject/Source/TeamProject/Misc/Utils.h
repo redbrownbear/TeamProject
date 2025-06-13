@@ -59,6 +59,8 @@ namespace ParticleEffectName
     static inline FName Hinox_AttackShockWave = TEXT("Hinox_AttackShockWave");
     static inline FName Hinox_HipdropShockWave = TEXT("Hinox_HipdropShockWave");
     static inline FName Lynel_Explosion = TEXT("Lynel_Explosion");
+    static inline FName Lynel_Cry = TEXT("Lynel_Cry");
+    static inline FName Lynel_BeforeExplosion = TEXT("Lynel_BeforeExplosion");
 }
 
 namespace NiagaraEffectName
@@ -313,6 +315,7 @@ enum class EItemCategory : int8
     IT_Armor,
     IT_Material,
     IT_Food,
+    IT_END,
 };
 
 UENUM()

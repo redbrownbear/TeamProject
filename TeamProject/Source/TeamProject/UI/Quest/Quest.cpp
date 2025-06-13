@@ -200,11 +200,11 @@ void UQuest::OnNavigate(const FInputActionValue& InputActionValue)
     }
 }
 
-void UQuest::OnConfirm()
+void UQuest::OnConfirm(const FInputActionValue& InputActionValue)
 {
 }
 
-void UQuest::OnCancel()
+void UQuest::OnCancel(const FInputActionValue& InputActionValue)
 {
     HideUI(UQuest::StaticClass());
 }

@@ -193,8 +193,8 @@ void UAdvancedFloatingPawnMovement::TickComponent(float DeltaTime, ELevelTick Ti
 		return;
 	}
 
-	//Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	// Super::TickComponent를 아래로 옮겨놔서 그 부모의 TickComponent를 호출
+	// 1. 먼저 부모 클래스의 TickComponent를 호출하여 입력에 따른 Velocity를 계산합니다.
+	//    이 시점에서 Velocity는 플레이어/AI의 입력에 의해 갱신됩니다.
 	UPawnMovementComponent::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (!PawnOwner || !UpdatedComponent)
@@ -202,74 +202,81 @@ void UAdvancedFloatingPawnMovement::TickComponent(float DeltaTime, ELevelTick Ti
 		return;
 	}
 
-	AActor* TempActor = GetOwner();
-	ANpc* Npc = Cast<ANpc>(TempActor);
-	if (Npc)
-	{
-		int a = 0;
-	}
+	// AController* Controller = PawnOwner->GetController(); // 컨트롤러 체크는 필요에 따라 계속 유지
 
-
+	// 2. 컨트롤러가 로컬 컨트롤러일 때만 이동 및 중력 로직을 적용합니다.
+	//    (보통 PawnOwner->IsLocallyControlled()를 사용합니다.)
+	if (PawnOwner->IsLocallyControlled()) // 또는 Controller && Controller->IsLocalController()
 	{
-		const AController* Controller = PawnOwner->GetController();
-		if (Controller && Controller->IsLocalController())
+		// 3. AI Move To 에서 Velocity가 커지는 이슈 처리 (이전 로직 유지)
+		if (IsExceedingMaxSpeed(MaxSpeed) == true)
 		{
-			// AI Move To 에서 Velocity가 커지는 이슈가 있어서 속도 제한
-			// See: UPathFollowingComponent::FollowPathSegment
-			if (IsExceedingMaxSpeed(MaxSpeed) == true)
-			{
-				Velocity = Velocity.GetUnsafeNormal() * MaxSpeed;
-			}
-
-			static const FVector GravityDirection = FVector::UpVector;
-			static const FVector Gravity = -GravityDirection * 980.0;
-			if (CheckFalling(DeltaTime))
-			{
-				Velocity = NewFallVelocity(Velocity, Gravity, FallingDeltaTime);
-			}
-			else if (!Velocity.IsNearlyZero())
-			{
-				// 통상의 경우 미세 중력을 적용해서 공중으로 뜨지 않도록 처리
-				Velocity = NewFallVelocity(Velocity, Gravity, DeltaTime * 5.f);
-			}
-
-			LimitWorldBounds();
-			bPositionCorrected = false;
-
-			// Move actor
-			FVector Delta = Velocity * DeltaTime;
-
-			if (!Delta.IsNearlyZero(1e-6f))
-			{
-				const FVector OldLocation = UpdatedComponent->GetComponentLocation();
-				const FQuat Rotation = UpdatedComponent->GetComponentQuat();
-
-				FHitResult Hit(1.f);
-				SafeMoveUpdatedComponent(Delta, Rotation, true, Hit);
-
-				if (Hit.IsValidBlockingHit())
-				{
-					HandleImpact(Hit, DeltaTime, Delta);
-					// Try to slide the remaining distance along the surface.
-					SlideAlongSurface(Delta, 1.f - Hit.Time, Hit.Normal, Hit, true);
-				}
-
-				// Update velocity
-				// We don't want position changes to vastly reverse our direction (which can happen due to penetration fixups etc)
-				if (!bPositionCorrected)
-				{
-					const FVector NewLocation = UpdatedComponent->GetComponentLocation();
-					Velocity = ((NewLocation - OldLocation) / DeltaTime);
-				}
-			}
-
-			AccelerationAdvance = Velocity.GetSafeNormal();
-
-			PhysicsRotation(DeltaTime);
-
-			// Finalize
-			UpdateComponentVelocity();
+			Velocity = Velocity.GetUnsafeNormal() * MaxSpeed;
 		}
-	}
 
+		static const FVector GravityDirection = FVector::UpVector;
+		static const FVector Gravity = -GravityDirection * 980.0;
+
+		// 4. 낙하 상태를 체크하고 중력을 적용합니다.
+		if (CheckFalling(DeltaTime))
+		{
+			// 낙하 중일 때는 계속 중력 가속도를 적용합니다.
+			Velocity = NewFallVelocity(Velocity, Gravity, FallingDeltaTime);
+		}
+		else // 땅에 닿아 있을 때
+		{
+			// 움직임 입력이 없는 경우에만 Velocity를 0으로 설정하여 잔여 움직임을 제거합니다.
+			// Small_Number보다 작은 경우 멈춘 것으로 간주합니다.
+			if (Velocity.SizeSquared() < KINDA_SMALL_NUMBER) // 또는 Velocity.IsNearlyZero(SMALL_NUMBER)
+			{
+				Velocity = FVector::ZeroVector;
+			}
+			else
+			{
+				// 땅에 닿아 있고 움직임 입력이 있는 경우, 미세 중력을 적용하지 않습니다.
+				// 만약 여전히 '떠오르는' 문제가 있다면, 아주 미세한 중력만 적용하도록 조건을 추가할 수 있습니다.
+				// 예를 들어, Z축 속도가 양수이고 매우 작을 때만 중력을 적용하는 등.
+				// 현재 코드에서 미세 중력은 IsFalling() == false && !Velocity.IsNearlyZero() 일 때 적용되었는데
+				// 땅에 닿아있다면, Velocity가 완전히 0이 아닌 이상 기본적으로 중력을 적용할 필요가 없습니다.
+				// 이 부분을 제거하거나 매우 신중하게 적용해야 합니다.
+				// Velocity = NewFallVelocity(Velocity, Gravity, DeltaTime * 5.f); // 이 줄을 제거하거나 조건부로 변경 고려
+			}
+		}
+
+		LimitWorldBounds();
+		bPositionCorrected = false;
+
+		// 5. 계산된 Velocity를 사용하여 액터를 이동합니다.
+		FVector Delta = Velocity * DeltaTime;
+
+		if (!Delta.IsNearlyZero(1e-6f))
+		{
+			const FVector OldLocation = UpdatedComponent->GetComponentLocation();
+			const FQuat Rotation = UpdatedComponent->GetComponentQuat();
+
+			FHitResult Hit(1.f);
+			SafeMoveUpdatedComponent(Delta, Rotation, true, Hit);
+
+			if (Hit.IsValidBlockingHit())
+			{
+				HandleImpact(Hit, DeltaTime, Delta);
+				SlideAlongSurface(Delta, 1.f - Hit.Time, Hit.Normal, Hit, true);
+			}
+
+			if (!bPositionCorrected)
+			{
+				const FVector NewLocation = UpdatedComponent->GetComponentLocation();
+				Velocity = ((NewLocation - OldLocation) / DeltaTime);
+			}
+		}
+
+		// 6. 회전 처리를 위한 AccelerationAdvance 갱신
+		AccelerationAdvance = Velocity.GetSafeNormal(); // Velocity가 0이 아니면 정상적인 방향 벡터를 가집니다.
+
+		// 7. 회전 처리
+		PhysicsRotation(DeltaTime);
+
+		// 8. 최종 Velocity 업데이트
+		UpdateComponentVelocity();
+	}
 }

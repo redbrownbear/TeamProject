@@ -36,6 +36,9 @@ public:
 	void SelectInit();
 
 public:
+	void ItemBuy();
+
+public:
 	FItemData GetItemDataAtIndex (int32 Index) const;
 	int32 GetItemDataIndex() { return CurrentIndex; }
 	TArray<UShopSlot*> GetActiveSlots() { return ActiveSlots; }

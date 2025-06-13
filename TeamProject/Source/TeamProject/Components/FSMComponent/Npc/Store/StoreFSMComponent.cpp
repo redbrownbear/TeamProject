@@ -27,8 +27,8 @@ void UStoreFSMComponent::UpdateTalk(float DeltaTime)
 
 	if (!Player)
 	{
-		//수정필요
-		Owner->SetNpc(EQuestCharacter::None);
+		// 추후 상점 추가할 시 FSM을 따로 추가하거나, 아님 다른 분기를 위한 뭔가를 추가해야 할 듯
+		Owner->SetNpc(EQuestCharacter::Korok); 
 	}
 
 	if (Owner->GetConversationManager()->GetEndTalked())

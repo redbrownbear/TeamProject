@@ -37,7 +37,7 @@ void ATempleActorSpawner::BeginPlay()
 		);
 	}
 
-	DrawDebugBox(
+	/*DrawDebugBox(
 		GetWorld(),
 		GetActorLocation(),       
 		SpawnAreaExtent,          
@@ -47,7 +47,7 @@ void ATempleActorSpawner::BeginPlay()
 		10.f,                     
 		0,                        
 		2.0f                      
-	);
+	);*/
 }
 
 void ATempleActorSpawner::OnTriggerEnter(AActor* OverlappedActor, AActor* OtherActor)
