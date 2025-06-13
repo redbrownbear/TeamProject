@@ -54,7 +54,7 @@ void UGameOverUI::HideUI(TSubclassOf<UBaseUI> UIClass)
 	if (LoadingScreenSubsystem)
 	{
 		TSoftObjectPtr<UWorld> GameMap = TSoftObjectPtr<UWorld>(FSoftObjectPath(TEXT("/Game/Level/TitleMap.TitleMap")));
-		LoadingScreenSubsystem->OpenLevelWithLoadingScreenGameOVer(GameMap);
+		LoadingScreenSubsystem->OpenLevelWithLoadingScreenGameOver(GameMap);
 	}
 }
 
