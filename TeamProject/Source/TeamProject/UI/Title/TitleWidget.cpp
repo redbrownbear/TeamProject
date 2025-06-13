@@ -13,13 +13,18 @@ void UTitleWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	check(NewGame);
+    Continue->SetVisibility(ESlateVisibility::Hidden);
+    ImgContinue->SetVisibility(ESlateVisibility::Hidden);
+    ImgNewGame->SetVisibility(ESlateVisibility::Hidden);
+    ImgExit->SetVisibility(ESlateVisibility::Hidden);
 
-	NewGame->OnClicked.AddDynamic(this, &UTitleWidget::OnStartClicked);
+    if (bHasInitialized == false)
+    {
+        NewGame->OnClicked.AddDynamic(this, &UTitleWidget::OnStartClicked);
+        bHasInitialized = true;
+    }
 
-	ImgContinue->SetVisibility(ESlateVisibility::Visible);
-	ImgNewGame->SetVisibility(ESlateVisibility::Hidden);
-	ImgExit->SetVisibility(ESlateVisibility::Hidden);
+    check(NewGame);
 }
 
 void UTitleWidget::OnStartClicked()

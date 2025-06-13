@@ -7,7 +7,12 @@
 void UQuickItemSlot::NativeConstruct()
 {
 	SetIsFocusable(true);
-    LoadIconTexture();
+
+    if (bHasInitialized == false)
+    {
+        LoadIconTexture();
+        bHasInitialized = true;
+    }
 
     HighlightBg->SetVisibility(ESlateVisibility::Collapsed);
 	EquipedBg->SetVisibility(ESlateVisibility::Collapsed);

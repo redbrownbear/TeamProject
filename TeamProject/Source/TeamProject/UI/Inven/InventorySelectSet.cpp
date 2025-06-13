@@ -9,8 +9,13 @@ void UInventorySelectSet::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	ButtonUse->OnClicked.AddDynamic(this, &UInventorySelectSet::UseItme);
-	ButtonCancel->OnClicked.AddDynamic(this, &UInventorySelectSet::Cancel);
+	if (bHasInitialized == false)
+	{
+		ButtonUse->OnClicked.AddDynamic(this, &UInventorySelectSet::UseItme);
+		ButtonCancel->OnClicked.AddDynamic(this, &UInventorySelectSet::Cancel);
+
+		bHasInitialized = true;
+	}
 
 	SetVisibility(ESlateVisibility::Collapsed);
 }

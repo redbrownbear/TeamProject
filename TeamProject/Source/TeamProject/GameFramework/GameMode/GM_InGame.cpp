@@ -17,14 +17,13 @@ void AGM_InGame::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
-	//�÷��̾ ��ȯ�Ҷ� ���ʿ��� �����ص� Transform���� �־��ָ� �ȴ�.
-	//FTransform SavedTransform;
-	//RestartPlayerAtTransform(NewPlayer, SavedTransform);
-
 	UGIS_ASyncLoadingScreen * LoadingManager = GetGameInstance()->GetSubsystem<UGIS_ASyncLoadingScreen>();
 	if (LoadingManager)
+	{
 		LoadingManager->SetLoadingUI(LoadingWidgetClass);
-	
+		LoadingManager->SetLoadingUI(LoadingWidgetToTitleClass);
+
+	}
 
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	if (UIManager)
