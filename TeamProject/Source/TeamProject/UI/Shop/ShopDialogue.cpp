@@ -7,6 +7,7 @@
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "SubSystem/UI/ShopManager.h"
 #include "SubSystem/PlayerManager.h"
+#include "Misc/TextUtil.h"
 
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
 
@@ -39,8 +40,8 @@ void UShopDialogue::SetBuy()
 
     ActionLay->SetVisibility(ESlateVisibility::Hidden);
 
-    ConfrimText->SetText(FText::FromString(TEXT("구매")));
-    CancelText->SetText(FText::FromString(TEXT("취소")));
+    ConfrimText->SetText(FText::FromString(TextU(1001)));
+    CancelText->SetText(FText::FromString(TextU(1003)));
 
     FInputModeGameAndUI InputMode;
     InputMode.SetWidgetToFocus(TakeWidget());
@@ -60,8 +61,8 @@ void UShopDialogue::SetSell()
         ConfirmButton->SetVisibility(ESlateVisibility::Visible);
         CancelButton->SetVisibility(ESlateVisibility::Visible);
 
-        ConfrimText->SetText(FText::FromString(TEXT("판매")));
-        CancelText->SetText(FText::FromString(TEXT("취소")));
+        ConfrimText->SetText(FText::FromString(TextU(1003)));
+        CancelText->SetText(FText::FromString(TextU(1001)));
 
         bIsSelect = true;
         ActionLay->SetVisibility(ESlateVisibility::Hidden);
