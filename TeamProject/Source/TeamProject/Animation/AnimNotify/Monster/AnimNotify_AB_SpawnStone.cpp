@@ -5,6 +5,7 @@
 #include "Actors/Monster/CharacterMonster.h"
 #include "Components/FSMComponent/Monster/AssasinBossFSMComponent.h"
 #include "Actors/Projectile/KogaStone.h"
+#include "Actors/Object/ProjectileMetalActor.h"
 
 void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
@@ -77,20 +78,33 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 				break;
 			case EAssasinBossPhase::PHASE_3:
 			{
-				AKogaStone* KogaStone = World->SpawnActorDeferred<AKogaStone>(AKogaStone::StaticClass(),
+				//AKogaStone* KogaStone = World->SpawnActorDeferred<AKogaStone>(AKogaStone::StaticClass(),
+				//	FTransform::Identity, CharacterMonster, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+
+				//FTransform NewTransform;
+				//KogaStone->SetData(ProjectileName::Monster_AB_KogaStoneBig, CollisionProfileName::ToPlayerMonster);
+
+				//const FVector Location = CharacterMonster->GetActorLocation();
+				//const FVector TargetLocation = Location + FVector(0.0, 0.0, 1.0) * KOGASTONE_ORBIT_RADIUS;
+
+				//NewTransform.SetLocation(TargetLocation);
+				//KogaStone->SetKogaStoneKind(EKogaStoneKind::THIRD);
+
+				//KogaStone->FinishSpawning(NewTransform);
+
+				AProjectileMetalActor* ProjectileMetalActor = World->SpawnActorDeferred<AProjectileMetalActor>(AProjectileMetalActor::StaticClass(),
 					FTransform::Identity, CharacterMonster, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 
 				FTransform NewTransform;
-				KogaStone->SetData(ProjectileName::Monster_AB_KogaStoneBig, CollisionProfileName::ToPlayerMonster);
+				ProjectileMetalActor->SetData(ProjectileName::Monster_AB_KogaStoneBig);
 
 				const FVector Location = CharacterMonster->GetActorLocation();
-				const FVector TargetLocation = Location + FVector(0.0, 0.0, 1.0) * KOGASTONE_ORBIT_RADIUS;
+				const FVector TargetLocation = Location + FVector(0.0, 0.0, 1.0) * KOGASTONE_ORBIT_RADIUS * 1.5f;
 
 				NewTransform.SetLocation(TargetLocation);
-				KogaStone->SetKogaStoneKind(EKogaStoneKind::THIRD);
-
-				KogaStone->FinishSpawning(NewTransform);
+				ProjectileMetalActor->FinishSpawning(NewTransform);
 			}
 				break;
 			case EAssasinBossPhase::END:

@@ -57,6 +57,9 @@ protected:
     UPROPERTY(EditAnywhere)
     TObjectPtr<ACampFire> CampFire;
 
+public:
+    void SetCampFire(ACampFire* InCampFire) { CampFire = InCampFire; }
+    void SetPatrolPath(APatrolPath* InPatrolPath) { PatrolPath = InPatrolPath; }
 
 protected:
     virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
@@ -66,7 +69,8 @@ protected:
     virtual void OnConstruction(const FTransform& Transform);
 
 public:
-    virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+    virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle) override;
+    virtual void SetData(const FName& MonsterName) override;
 
 protected:
     UFUNCTION()

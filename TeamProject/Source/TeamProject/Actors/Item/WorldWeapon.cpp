@@ -103,6 +103,7 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 		StaticMeshComponent->SetStaticMesh(ItemTableRow->StaticMesh);
 		StaticMeshComponent->SetRelativeTransform(ItemTableRow->Transform);
 		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
@@ -163,6 +164,7 @@ void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHa
 		//StaticMeshComponent->SetWorldScale3D(ItemTableRow->Transform.GetScale3D());
 		StaticMeshComponent->SetRelativeTransform(ItemTableRow->Transform);
 		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

@@ -2,34 +2,37 @@
 
 
 #include "GameFramework/PC_InGame.h"
-#include "InputMappingContext.h"
-#include "EnhancedInputComponent.h"
 #include "Actors/Character/PlayerCharacter.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "EngineUtils.h"
+#include "Actors/Npc/Npc.h" 
+#include "Actors/Temple/Ice/IcePillar.h"
+#include "Actors/Temple/Ice/IcePreview.h"
+#include "Actors/Temple/Treasure/TreasureBox.h"
+#include "Actors/Object/MetalActor.h"
+#include "Actors/Object/ProjectileMetalActor.h"
+#include "Actors/Temple/Surface/FlowSurface.h"
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/TimeManager.h"
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "SubSystem/UI/ShopManager.h"
-#include "UI/HUD/MainHUD.h"
 #include "SubSystem/PlayerManager.h"
 
-#include "Actors/Npc/Npc.h" 
 #include "Components/Character/PlayerMovementComponent.h"
-
-#include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 
-
-#include "Actors/Temple/Ice/IcePillar.h"
-#include "Actors/Temple/Ice/IcePreview.h"
-
-#include "Actors/Temple/Treasure/TreasureBox.h"
-
+#include "Kismet/KismetMathLibrary.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
-#include "Actors/Object/MetalActor.h"
-#include "Actors/Temple/Surface/FlowSurface.h"
+
+#include "InputMappingContext.h"
+#include "EnhancedInputComponent.h"
+#include "EngineUtils.h"
+#include "UI/HUD/MainHUD.h"
+
+#include "Animation/AnimInstance/PlayerAnimInstance.h"
+
+
+
+
 
 APC_InGame::APC_InGame()
 {
@@ -1240,6 +1243,11 @@ void APC_InGame::CheckMetalActor()
 
 		// LastHit 업데이트
 		LastHit = HitResult;
+
+		if (AProjectileMetalActor* ProjectileMetalActor = Cast<AProjectileMetalActor>(HitActor))
+		{
+			ProjectileMetalActor->SetGrabbed(true);
+		}
 	}
 	else
 	{
@@ -1251,30 +1259,26 @@ void APC_InGame::StartMagnetGrab()
 {
 	if (IsHoldingObject()) return;
 
-	//FHitResult HitResult;
-	/*if (TraceForMetal(LastHit))
-	{*/
-		if (UPrimitiveComponent* HitComp = LastHit.GetComponent())
+	if (UPrimitiveComponent* HitComp = LastHit.GetComponent())
+	{
+		if (HitComp->IsSimulatingPhysics())
 		{
-			if (HitComp->IsSimulatingPhysics())
+			// 플레이어 위치와 MetalActor 위치 기준 거리 측정
+			ACharacter* PlayerChar = Cast<ACharacter>(GetPawn());
+			if (PlayerChar)
 			{
-				// 플레이어 위치와 MetalActor 위치 기준 거리 측정
-				ACharacter* PlayerChar = Cast<ACharacter>(GetPawn());
-				if (PlayerChar)
-				{
-					FVector PlayerLocation = PlayerChar->GetActorLocation();
-					FVector TargetLocation = HitComp->GetOwner()->GetActorLocation();
-					HoldDistance = FVector::Distance(PlayerLocation, TargetLocation);
-				}
-
-				PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, LastHit.ImpactPoint);
-				GrabbedComponent = HitComp;
-
-				// 주기적으로 위치 갱신
-				GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &APC_InGame::MoveGrabbedObject, 0.01f, true);
+				FVector PlayerLocation = PlayerChar->GetActorLocation();
+				FVector TargetLocation = HitComp->GetOwner()->GetActorLocation();
+				HoldDistance = FVector::Distance(PlayerLocation, TargetLocation);
 			}
+
+			PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, LastHit.ImpactPoint);
+			GrabbedComponent = HitComp;
+
+			// 주기적으로 위치 갱신
+			GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &APC_InGame::MoveGrabbedObject, 0.01f, true);
 		}
-	/*}*/
+	}
 }
 
 void APC_InGame::StopMagnetGrab()
@@ -1300,7 +1304,9 @@ bool APC_InGame::TraceForMetal(FHitResult& OutHit)
 
 	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_PhysicsBody, Params);
 
-	if (bHit && OutHit.GetActor()->IsA(MetalActorClass))
+	AActor* HitActor = OutHit.GetActor();
+
+	if (bHit && HitActor && HitActor->IsA(MetalActorClass))
 	{
 		return true;
 	}
