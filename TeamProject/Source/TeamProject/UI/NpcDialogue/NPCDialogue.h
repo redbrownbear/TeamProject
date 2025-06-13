@@ -30,6 +30,8 @@ private:
 	void BindDelegates();
 	void RemoveDelegates();
 
+private:
+	void FocusButton(int32 Index);
 
 public: 
 	UFUNCTION()
@@ -87,5 +89,8 @@ private:
 	UTextBlock* CancelText;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ExtraText;
+
+	TArray<UButton*> ButtonList;
+	int32 CurrentButtonIndex;
 
 };

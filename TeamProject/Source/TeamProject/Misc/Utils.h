@@ -315,6 +315,7 @@ enum class EItemCategory : int8
     IT_Armor,
     IT_Material,
     IT_Food,
+    IT_END,
 };
 
 UENUM()
@@ -441,6 +442,7 @@ enum class EMove_State
     Zoom,
     Crouch,
     Step,
+    Steping,
     BackFlip,
     Hit
 };

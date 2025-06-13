@@ -2,6 +2,7 @@
 
 
 #include "UI/Loading/LoadingWithPlayerInfo.h"
+#include "Misc/TextUtil.h"
 #include "SubSystem/PlayerManager.h"
 
 
@@ -29,8 +30,8 @@ void ULoadingWithPlayerInfo::InitUI()
 
         TextRupeeCount->SetText(FText::FromString(FString::FromInt(PlayerStatus.Rupee)));
 
-        TextTip->SetText(FText::FromString(TEXT("테스트")));
-        TextTipDescription->SetText(FText::FromString(TEXT("테스트")));
+        TextTip->SetText(FText::FromString(TextU(2001)));
+        TextTipDescription->SetText(FText::FromString(TextU(2002)));
 
         DrawHeart();
         DrawStamina();

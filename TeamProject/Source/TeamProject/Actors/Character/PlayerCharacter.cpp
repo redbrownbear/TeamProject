@@ -13,6 +13,7 @@
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "SubSystem/PlayerManager.h"
+#include "SubSystem/TimeManager.h"
 #include "UI/HUD/MainHUD.h"
 #include "Actors/Projectile/Arrow/Projectile_Arrow.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -202,21 +203,25 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(GetCharacterMovement());
-
-	if (Movement->GetMoveState() == EMove_State::BackFlip)
+	EMove_State Move_State = Movement->GetMoveState();
+	if (Move_State == EMove_State::Steping)
+	{
+		Movement->JumpZVelocity = PLAYER_NML_JUMP_HEIGHT;
+	}
+	if (Move_State == EMove_State::BackFlip)
 	{
 		UPlayerAnimInstance* AnimInst = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance());
 		AnimInst->bIsBackFlip = false;
 		Movement->JumpZVelocity = PLAYER_NML_JUMP_HEIGHT;
-		Movement->SetMoveState(EMove_State::Run);
 	}
 	if (Movement->GetMoveState() == EMove_State::Glide)
 	{
 		GetMesh()->GetAnimInstance()->Montage_Play(Movement->GetGlideUnEquipMontage());
-		Movement->SetMoveState(EMove_State::Run);
 		Movement->SetGlideMode(false);
 	}
-
+	Movement->GravityScale = 1.f;
+	Movement->SetMoveState(EMove_State::Run);
+	
 }
 
 
@@ -226,15 +231,18 @@ void APlayerCharacter::Damaged(int32 Damage)
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	const int32 CurrentHP = PlayerManager->GetHp();
 	EMove_State Move_State = Cast<UPlayerMovementComponent>(GetCharacterMovement())->GetMoveState();
-	if (Move_State == EMove_State::BackFlip || Move_State == EMove_State::Step)
+	if (Move_State == EMove_State::BackFlip || Move_State == EMove_State::Steping)
 	{
+		UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+		TimeManager->SetTimeScale(TIMESCALE_JUST);
+		TimeManager->SetJust();
 		return;
 	}
 
 	if (CurrentHP != 0)
 	{
 		int32 AfterHP = CurrentHP - Damage;
-		PlayerManager->SetPlayerHp(AfterHP);
+		PlayerManager->SetPlayerHp(AfterHP < 0 ? 0 : AfterHP);
 		Cast<UPlayerMovementComponent>(GetCharacterMovement())->Hited();
 		Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateHp();
 		UE_LOG(LogTemp, Warning, TEXT("%d"), AfterHP);

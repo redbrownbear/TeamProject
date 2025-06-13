@@ -8,6 +8,7 @@
 #include "SubSystem/UI/QuestManager.h"
 #include "SubSystem/PlayerManager.h"
 
+#include "Misc/TextUtil.h"
 #include "SubSystem/UI/UIManager.h"
 
 #include "GameFramework/PC_InGame.h"
@@ -26,8 +27,8 @@ void UNPCDialogue::ShowUI()
     CancelButton->SetVisibility(ESlateVisibility::Hidden);
     ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 
-    ConfrimText->SetText(FText::FromString(TEXT("확인")));
-    CancelText->SetText(FText::FromString(TEXT("취소")));
+    ConfrimText->SetText(FText::FromString(TextU(1007)));
+    CancelText->SetText(FText::FromString(TextU(1003)));
 
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
@@ -40,6 +41,12 @@ void UNPCDialogue::ShowUI()
         InputMode.SetHideCursorDuringCapture(false);
 
         PC_InGame->SetInputMode(InputMode);
+    }
+
+    if (ButtonList.IsValidIndex(0) && ButtonList[0])
+    {
+        CurrentButtonIndex = 0;
+        FocusButton(CurrentButtonIndex);
     }
 
     BindDelegates();
@@ -81,6 +88,12 @@ void UNPCDialogue::InitUI()
     ExtraButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnSell);
     CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancelClick);
 
+    ButtonList.Add(ConfirmButton);
+    ButtonList.Add(ExtraButton);
+    ButtonList.Add(CancelButton);
+
+
+    bIsFocusable = true;
 }
 
 void UNPCDialogue::BindDelegates()
@@ -103,8 +116,34 @@ void UNPCDialogue::RemoveDelegates()
     }
 }
 
+void UNPCDialogue::FocusButton(int32 Index)
+{
+    if (!ButtonList.IsValidIndex(Index)) return;
+
+    ButtonList[Index]->SetFocus();
+    ButtonList[Index]->OnHovered.Broadcast();
+}
+
 void UNPCDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 {
+    const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+
+    if (ActionValue.IsNearlyZero())
+        return;
+
+    if (FMath::Abs(ActionValue.X) < FMath::Abs(ActionValue.Y))
+    {
+        if (ActionValue.Y > 0)
+        {
+            CurrentButtonIndex = (CurrentButtonIndex - 1 + ButtonList.Num()) % ButtonList.Num();
+        }
+        else
+        {
+            CurrentButtonIndex = (CurrentButtonIndex + 1 + ButtonList.Num()) % ButtonList.Num();
+        } 
+    }
+
+    FocusButton(CurrentButtonIndex);
 }
 
 void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
@@ -159,16 +198,17 @@ void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
 
         if (UIManager && ShopManager && QuestDialougeManager && ConverSationManager)
         {
-            UIManager->ShowUI(UShop::StaticClass());
-            ShopManager->ShowUI(QuestChar, true);      
-            QuestDialougeManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
-
             UShop* ShopUI = UIManager->FindUI<UShop>();
             if (ShopUI)
             {
+                ShopUI->SetIsBuyScroll(true);
                 ShopUI->SetDialogueData(QuestChar, DialogueID);
             }
 
+            UIManager->ShowUI(UShop::StaticClass());
+            ShopManager->ShowUI(QuestChar, true);      
+            QuestDialougeManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
+            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Buy);
             bool IsShopping = PC_InGame->Npc->GetShopping();
 
             if (DialogueDataRow.bIsEndConversation && !IsShopping)
@@ -250,12 +290,18 @@ void UNPCDialogue::OnSell()
 
         if (UIManager && ShopManager && QuestManager)
         {
+            UShop* ShopUI = UIManager->FindUI<UShop>();
+            if (ShopUI)
+            {
+                ShopUI->SetIsBuyScroll(false);
+                ShopUI->SetDialogueData(QuestChar, DialogueID);
+            }
+
             UIManager->ShowUI(UShop::StaticClass());
             ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter, false);
-
             QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
+            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
         }
-        //PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
     }
     else
     {
@@ -332,9 +378,9 @@ void UNPCDialogue::OnNextButtonClicked()
             CancelButton->SetVisibility(ESlateVisibility::Visible);
             ExtraButton->SetVisibility(ESlateVisibility::Visible);
 
-            ConfrimText->SetText(FText::FromString(TEXT("구매")));
-            CancelText->SetText(FText::FromString(TEXT("나가기")));
-            ExtraText->SetText(FText::FromString(TEXT("판매")));
+            ConfrimText->SetText(FText::FromString(TextU(1001)));
+            CancelText->SetText(FText::FromString(TextU(1006)));
+            ExtraText->SetText(FText::FromString(TextU(1002)));
 
             CancelButton->SetRenderTranslation(FVector2D(0.0f, 0.0f));
         }
@@ -347,8 +393,8 @@ void UNPCDialogue::OnNextButtonClicked()
                 CancelButton->SetVisibility(ESlateVisibility::Visible);
                 ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 
-                ConfrimText->SetText(FText::FromString(TEXT("확인")));
-                CancelText->SetText(FText::FromString(TEXT("취소")));
+                ConfrimText->SetText(FText::FromString(TextU(1007)));
+                CancelText->SetText(FText::FromString(TextU(1003)));
 
                 CancelButton->SetRenderTranslation(FVector2D(0.0f, -95.0f));
             }
