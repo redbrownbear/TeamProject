@@ -15,7 +15,7 @@ void ATitlePlayerController::BeginPlay()
 		{
 			TitleWidget->AddToViewport();
 
-			// UI ÀÔ·Â ¸ðµå ¼³Á¤
+			// UI ï¿½Ô·ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 			FInputModeUIOnly InputMode;
 			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			SetInputMode(InputMode);
@@ -28,7 +28,7 @@ void ATitlePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	// UI¸¸ ¹Þµµ·Ï ¼³Á¤
+	// UIï¿½ï¿½ ï¿½Þµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	FInputModeUIOnly InputMode;
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	SetInputMode(InputMode);
@@ -51,7 +51,7 @@ void ATitlePlayerController::KeyBind()
 
 void ATitlePlayerController::OnNavigate(const FInputActionValue& InputActionValue)
 {
-	// ÀÔ·Â °ª °¡Á®¿À±â (¿¹: 2D Vector - °ÔÀÓÆÐµå ¾Æ³¯·Î±× ½ºÆ½, ¹æÇâÅ° µî)
+	// ï¿½Ô·ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½: 2D Vector - ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ ï¿½Æ³ï¿½ï¿½Î±ï¿½ ï¿½ï¿½Æ½, ï¿½ï¿½ï¿½ï¿½Å° ï¿½ï¿½)
 	FVector2D Direction = InputActionValue.Get<FVector2D>();
 
 	if (TitleWidget)

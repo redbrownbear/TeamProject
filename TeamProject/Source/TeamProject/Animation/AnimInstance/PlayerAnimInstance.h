@@ -21,6 +21,8 @@ public:
 
 	
 	void SetPitch();
+	UFUNCTION()
+	void SetPlayRate(float _Rate) { PlayRate = _Rate; }
 
 
 public:
@@ -56,9 +58,6 @@ public:
 	bool bIsClimingLand = false;
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsGliding = false;
-
-
-
-
-
+	UPROPERTY(BlueprintReadOnly)
+	float PlayRate = 1.f;
 };
