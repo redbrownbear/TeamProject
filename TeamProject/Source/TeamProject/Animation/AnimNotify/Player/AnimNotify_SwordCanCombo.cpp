@@ -12,6 +12,8 @@ void UAnimNotify_SwordCanCombo::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(MeshComp->GetOwner());
 	if (Player_C)
 	{
-		Cast<AWeaponSword>(Player_C->GetSword()->GetChildActor())->SetCanAttack();
+		AWeaponSword* Sword = Cast<AWeaponSword>(Player_C->GetSword()->GetChildActor());
+		Sword->SetCanAttack();
+		Sword->StopTrailEffect();
 	}
 }

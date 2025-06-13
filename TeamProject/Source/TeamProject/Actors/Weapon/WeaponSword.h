@@ -23,6 +23,7 @@ class TEAMPROJECT_API AWeaponSword : public AWeaponBase
 public:
 	AWeaponSword();
 
+	virtual void BeginPlay() override;
 
 
 public:
@@ -36,6 +37,8 @@ public:
 	void Attack();
 	void EmptyDamagedActors();
 
+	void StartTrailEffect();
+	void StopTrailEffect();
 private:
 
 
@@ -53,8 +56,11 @@ private:
 
 	bool bCanAttack= true;
 
-	UPROPERTY()
-	TObjectPtr<UNiagaraComponent> NiagaraEffectComponent;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UParticleSystemComponent> ParticleSystemComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FX")
+	UParticleSystem* CascadeTrailFX;
 
 	TArray<TObjectPtr<AActor>> DamagedActors;
 };

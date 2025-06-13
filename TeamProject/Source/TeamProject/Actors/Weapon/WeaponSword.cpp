@@ -74,15 +74,27 @@ AWeaponSword::AWeaponSword()
         }
     }
     {
-        NiagaraEffectComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
-        ConstructorHelpers::FObjectFinder<UNiagaraSystem> Asset(TEXT("/Script/Niagara.NiagaraSystem'/Game/Vefects/FxER_StylizedSlash/Niagara/Stylize/NS_sm01_Stylized_Slash_04_B.NS_sm01_Stylized_Slash_04_B'"));
+        ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystemComponent"));
+        ConstructorHelpers::FObjectFinder<UParticleSystem> Asset(TEXT("/Script/Engine.ParticleSystem'/Game/Vefects/TrailPack/Particles/Cascade/Speed/Sword_Trail/P_SpeedTrail.P_SpeedTrail'"));
         if (Asset.Object)
         {
-            NiagaraEffectComponent->SetAsset(Asset.Object);
+            CascadeTrailFX = Asset.Object;
         }
         
     }
+    if (ParticleSystemComponent)
+    {
+        ParticleSystemComponent->SetupAttachment(StaticMeshComponent);
+        ParticleSystemComponent->bAutoActivate = false; // 
+    }
+}
 
+void AWeaponSword::BeginPlay()
+{
+    Super::BeginPlay(); // 
+
+    
+    
 }
 
 void AWeaponSword::LeftClickAction()
@@ -110,9 +122,9 @@ void AWeaponSword::LeftClickAction()
 
     }
 
-    NiagaraEffectComponent->AttachToComponent(StaticMeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-    bCanAttack = false;
     
+    bCanAttack = false;
+    StartTrailEffect();
 }
 
 
@@ -133,6 +145,38 @@ void AWeaponSword::SetCanMove()
 void AWeaponSword::EmptyDamagedActors()
 {
     DamagedActors.Empty(); // 공격 시작 시 클리어
+}
+
+void AWeaponSword::StartTrailEffect()
+{
+    if (ParticleSystemComponent && CascadeTrailFX)
+    {
+        // 먼저 파티클 템플릿 지정
+        ParticleSystemComponent->SetTemplate(CascadeTrailFX);
+
+        // 소켓 존재 여부 확인
+        if (StaticMeshComponent &&
+            StaticMeshComponent->DoesSocketExist(TEXT("Trail_Started")) &&
+            StaticMeshComponent->DoesSocketExist(TEXT("Trail_Ended")))
+        {
+            // Trail 시작 (내부에서 자동 Activate됨)
+            ParticleSystemComponent->BeginTrails(
+                TEXT("Trail_Started"),
+                TEXT("Trail_Ended"),
+                ETrailWidthMode::ETrailWidthMode_FromCentre,
+                1.0f
+            );
+        }
+    }
+}
+
+void AWeaponSword::StopTrailEffect()
+{
+    if (ParticleSystemComponent)
+    {
+        ParticleSystemComponent->EndTrails();         // Trail 종료
+        ParticleSystemComponent->DeactivateSystem();  // 파티클 비활성화
+    }
 }
 
 void AWeaponSword::Attack()
