@@ -1021,30 +1021,30 @@ void UMonsterFSMComponent::SpawnProjectile(FName ProjectileName, FName Collision
 
 void UMonsterFSMComponent::UpdateUIHPBar(float CurrentHP, float MaxHP)
 {
-	if (CharacterMonster)
-	{ 
-		if (UWorld* World = CharacterMonster->GetWorld())
-		{
-			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
-			{
-				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
-				{
-					HUD->ShowBossHpUI(true, CurrentHP, MaxHP, CharacterMonster->GetMonsterData()->Name.ToString());
-				}
-			}
-		}
-	}
-	else if (PawnMonster)
-	{
-		if (UWorld* World = PawnMonster->GetWorld())
-		{
-			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
-			{
-				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
-				{
-					HUD->ShowBossHpUI(false, CurrentHP, MaxHP, PawnMonster->GetMonsterData()->Name.ToString());
-				}
-			}
-		}
-	}
+	//if (CharacterMonster)
+	//{ 
+	//	if (UWorld* World = CharacterMonster->GetWorld())
+	//	{
+	//		if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+	//		{
+	//			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+	//			{
+	//				HUD->ShowBossHpUI(true, CurrentHP, MaxHP, CharacterMonster->GetMonsterData()->Name.ToString());
+	//			}
+	//		}
+	//	}
+	//}
+	//else if (PawnMonster)
+	//{
+	//	if (UWorld* World = PawnMonster->GetWorld())
+	//	{
+	//		if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+	//		{
+	//			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+	//			{
+	//				HUD->ShowBossHpUI(false, CurrentHP, MaxHP, PawnMonster->GetMonsterData()->Name.ToString());
+	//			}
+	//		}
+	//	}
+	//}
 }

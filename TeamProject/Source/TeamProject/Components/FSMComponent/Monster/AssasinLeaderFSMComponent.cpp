@@ -11,10 +11,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PC_InGame.h"
 
-#include "UI/HUD/MainHUD.h"
-
-#include "Data/MonsterTableRow.h"
-
 #include "Misc/Utils.h"
 
 UAssasinLeaderFSMComponent::UAssasinLeaderFSMComponent()
@@ -148,44 +144,6 @@ void UAssasinLeaderFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	}
 
-
-
-	switch (NewState)
-	{
-	case EMonsterState::Idle:
-	case EMonsterState::Dead:
-		if (UWorld* World = CharacterMonster->GetWorld())
-		{
-			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
-			{
-				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
-				{
-					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
-					{
-						HUD->ShowBossHpUI(false, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
-					}
-				}
-			}
-		}
-		break;
-	case EMonsterState::Combat:
-	case EMonsterState::Stun:
-	case EMonsterState::Damage:
-		if (UWorld* World = CharacterMonster->GetWorld())
-		{
-			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
-			{
-				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
-				{
-					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
-					{
-						HUD->ShowBossHpUI(true, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
-					}
-				}
-			}
-		}
-		break;
-	}
 
 	eCurrentState = NewState;
 }

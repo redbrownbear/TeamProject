@@ -913,16 +913,18 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 							MonsterLook.Normalize();
 							float Dot = FVector::DotProduct(PlayerLook, MonsterLook);
 
-							FSMComponent->ChangeState(EMonsterState::Damage);
-
 							if (Dot > 0.8)
 							{
-								FTimerHandle TimerHandle;
-								ThisActor->GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, FSMComponent]()
-									{
-										FSMComponent->ChangeState(EMonsterState::Dead);
-									}, 0.2f, false);
+								FSMComponent->ChangeState(EMonsterState::Dead);
 							}
+							else
+							{
+								FSMComponent->ChangeState(EMonsterState::Damage);
+							}
+						}
+						else if (FSMComponent->GetCurrentState() == EMonsterState::Dead)
+						{
+							// Do Nothing
 						}
 						// Combat
 						else
