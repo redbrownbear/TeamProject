@@ -273,14 +273,27 @@ void UAssasinBossFSMComponent::UpdateCombat(float DeltaTime)
 	{
 		ToNextElapsedTime = 0.f;
 		ChangeState(EMonsterState::Idle);
+		return;
 	}
+
+	const FVector PlayerLocation = Player->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ToNextElapsedTime = 0.f;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
 
 	Hovering(DeltaTime);
 
 	ToNextElapsedTime += DeltaTime;
 
 
-	const FVector PlayerLocation = Player->GetActorLocation();
 	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 
 	if (ToNextElapsedTime > ASSASIN_BOSS_TONEXT_MAX_TIME)

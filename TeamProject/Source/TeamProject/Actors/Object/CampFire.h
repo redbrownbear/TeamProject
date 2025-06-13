@@ -34,4 +34,6 @@ private:
 	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+public:
+	FGuid GetCampFireGuid() const { return CampFireGuid; }
 };

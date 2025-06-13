@@ -14,13 +14,14 @@ TArray<FMonsterInfo> UMonsterSpawnManager::GetSpawnInfoArray(FName LevelName)
 {
     bool* bInited = LevelInit.Find(LevelName);
 
-
     if (nullptr == bInited)
     {
-        UE_LOG(LogTemp, Error, TEXT("UMonsterSpawnManager::GetSpawnInfoArray // LevelInit.Find failed, Invalid LevelName"));
-        check(false);
-        return TArray<FMonsterInfo>();
+        UE_LOG(LogTemp, Warning, TEXT("UMonsterSpawnManager::GetSpawnInfoArray // LevelInit is Empty"));
+
+        LevelInit.Add(LevelName, false);
+        bInited = LevelInit.Find(LevelName);
     }
+
 
     // Didn't inited yet
     if (!(*bInited))
@@ -30,6 +31,7 @@ TArray<FMonsterInfo> UMonsterSpawnManager::GetSpawnInfoArray(FName LevelName)
         TArray<AActor*> OutActors;
         UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMonsterSpawnPoint::StaticClass(), OutActors);
 
+        SpawnInfos.Add(LevelName);
         for (AActor* IterActor : OutActors)
         {
             if (AMonsterSpawnPoint* MonsterSpawnPoint = Cast<AMonsterSpawnPoint>(IterActor))
@@ -38,6 +40,8 @@ TArray<FMonsterInfo> UMonsterSpawnManager::GetSpawnInfoArray(FName LevelName)
                 Info.Transform = IterActor->GetActorTransform();
                 Info.MonsterDataRow = MonsterSpawnPoint->DataTableRowHandle;
                 Info.SpawnPointGuid = MonsterSpawnPoint->SpawnPointGuid;
+                Info.PatrolPathPointGuid = MonsterSpawnPoint->PatrolPathPointGuid;
+                Info.CampFirePointGuid = MonsterSpawnPoint->CampFirePointGuid;
                 Info.bIsAlive = MonsterSpawnPoint->bIsAlive;
 
                 SpawnInfos[LevelName].Add(Info);

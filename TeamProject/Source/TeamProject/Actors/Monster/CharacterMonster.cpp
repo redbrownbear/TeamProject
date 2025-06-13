@@ -14,6 +14,8 @@
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "Components/FSMComponent/Monster/LynelFSMComponent.h"
 #include "Components/FSMComponent/Monster/HinoxFSMComponent.h"
+#include "Components/FSMComponent/Monster/AssasinBossFSMComponent.h"
+#include "Components/FSMComponent/Monster/AssasinLeaderFSMComponent.h"
 #include "Components/CapsuleComponent.h"
 
 #include "Shakes/DefaultCameraShakeBase.h"
@@ -29,10 +31,11 @@
 
 #include "Engine/DamageEvents.h"
 
-
 // Sets default values
 ACharacterMonster::ACharacterMonster()
 {
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -43,6 +46,7 @@ ACharacterMonster::ACharacterMonster()
 	RootComponent = CapsuleComp;
 
 	StatusComponent = CreateDefaultSubobject<UMonsterStatusComponent>(TEXT("StatusComponent"));
+	//AIControllerClass = ACharacterMonsterAIController::StaticClass();
 }
 
 // Called when the game starts or when spawned
@@ -59,9 +63,10 @@ void ACharacterMonster::BeginPlay()
 		FSMComponent->SetCharacterMonster(this);
 		FSMComponent->BindHitEvent();
 	}
+
 	SetData(DataTableRowHandle);
 
-	if (!(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
+	if (MonsterData && !(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
 	{
 		if (UWorld* World = GetWorld())
 		{
@@ -87,7 +92,7 @@ void ACharacterMonster::BeginPlay()
 	}
 
 
-	if (!(MonsterData->BowWeaponTableRowHandle.IsNull()))
+	if (MonsterData && !(MonsterData->BowWeaponTableRowHandle.IsNull()))
 	{
 		if (UWorld* World = GetWorld())
 		{
@@ -112,8 +117,6 @@ void ACharacterMonster::BeginPlay()
 void ACharacterMonster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
 }
 
 // Called to bind functionality to input
@@ -178,10 +181,22 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	}
 
 	AIControllerClass = MonsterData->AIControllerClass;
+	//AIControllerClass = ACharacterMonsterAIController::StaticClass();
+
+
+
 
 	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 	{
 		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
+		if (PatrolPath)
+		{
+			FSMComponent->SetPatrolPath(PatrolPath);
+		}
+		if (CampFire)
+		{
+			FSMComponent->SetCampFire(CampFire);
+		}
 	}
 
 	StatusComponent->SetMaxHP(MonsterData->MaxHP);
@@ -815,6 +830,11 @@ APatrolPath* ACharacterMonster::GetPatrolPath() const
 ACampFire* ACharacterMonster::GetCampFire() const
 {
 	return CampFire;
+}
+
+FName ACharacterMonster::GetMonsterRowName() const
+{
+	return DataTableRowHandle.RowName;
 }
 
 void ACharacterMonster::SetSpeedWalk()

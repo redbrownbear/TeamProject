@@ -39,6 +39,10 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     FGuid SpawnPointGuid;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    FGuid PatrolPathPointGuid;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    FGuid CampFirePointGuid;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     bool bIsAlive = true;

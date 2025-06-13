@@ -2,11 +2,18 @@
 
 
 #include "Components/FSMComponent/Monster/AssasinLeaderFSMComponent.h"
+#include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
+
 #include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Object/PatrolPath.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PC_InGame.h"
+
+#include "UI/HUD/MainHUD.h"
+
+#include "Data/MonsterTableRow.h"
 
 #include "Misc/Utils.h"
 
@@ -138,6 +145,45 @@ void UAssasinLeaderFSMComponent::ChangeState(EMonsterState NewState)
 		break;
 	case EMonsterState::Dead:
 		CharacterMonster->PlayMontage(EMonsterMontage::DEAD);
+		break;
+	}
+
+
+
+	switch (NewState)
+	{
+	case EMonsterState::Idle:
+	case EMonsterState::Dead:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(false, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
+		break;
+	case EMonsterState::Combat:
+	case EMonsterState::Stun:
+	case EMonsterState::Damage:
+		if (UWorld* World = CharacterMonster->GetWorld())
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+					{
+						HUD->ShowBossHpUI(true, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+					}
+				}
+			}
+		}
 		break;
 	}
 
@@ -289,14 +335,13 @@ void UAssasinLeaderFSMComponent::UpdateCombat(float DeltaTime)
 	const FVector PlayerLocation = Player->GetActorLocation();
 	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
 
-	// Assasin Leader will never forgive to chase Link
-	//const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
-	//if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
-	//{
-	//	Player = nullptr;
-	//	ChangeState(EMonsterState::Idle);
-	//	return;
-	//}
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
 
 	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime, 10.f);
 

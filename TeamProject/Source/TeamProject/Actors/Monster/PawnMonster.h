@@ -55,6 +55,9 @@ protected:
     UPROPERTY(EditAnywhere)
     TObjectPtr<ACampFire> CampFire;
 
+public:
+    void SetCampFire(ACampFire* InCampFire) { CampFire = InCampFire; }
+    void SetPatrolPath(APatrolPath* InPatrolPath) { PatrolPath = InPatrolPath; }
 
 protected:
     virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;

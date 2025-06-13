@@ -129,7 +129,17 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 	{
 		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
+		if (PatrolPath)
+		{
+			FSMComponent->SetPatrolPath(PatrolPath);
+		}
+		if (CampFire)
+		{
+			FSMComponent->SetCampFire(CampFire);
+		}
 	}
+
+
 
 
 	StatusComponent->SetMaxHP(MonsterData->MaxHP);

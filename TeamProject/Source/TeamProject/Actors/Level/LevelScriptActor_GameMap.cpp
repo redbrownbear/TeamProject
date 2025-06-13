@@ -7,6 +7,10 @@
 
 #include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Monster/PawnMonster.h"
+#include "Actors/Object/CampFire.h"
+#include "Actors/Object/PatrolPath.h"
+
+#include "Kismet/GameplayStatics.h"
 
 #include "Misc/Utils.h"
 
@@ -22,6 +26,12 @@ void ALevelScriptActor_GameMap::BeginPlay()
 				const FString LevelName = World->GetName();
 				TArray<FMonsterInfo> MonsterInfoArray = MonsterSpawnManager->GetSpawnInfoArray(FName(*LevelName));
 
+				TArray<AActor*> PatrolPathActors;
+				UGameplayStatics::GetAllActorsOfClass(GetWorld(), APatrolPath::StaticClass(), PatrolPathActors);
+
+				TArray<AActor*> CampFireActors;
+				UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACampFire::StaticClass(), CampFireActors);
+
 				for (const FMonsterInfo& Info : MonsterInfoArray)
 				{
 					if (Info.bIsAlive)
@@ -35,6 +45,19 @@ void ALevelScriptActor_GameMap::BeginPlay()
 						{
 							ACharacterMonster* CharacterMonster = World->SpawnActorDeferred<ACharacterMonster>(ACharacterMonster::StaticClass(),
 								FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+							for (AActor* PatrolPathIterActor : PatrolPathActors)
+							{
+								if (APatrolPath* PatrolPath = Cast<APatrolPath>(PatrolPathIterActor))
+								{
+									const FGuid PatrolPathGuid = PatrolPath->GetPatrolPathGuid();
+									if (PatrolPathGuid == Info.PatrolPathPointGuid)
+									{
+										CharacterMonster->SetPatrolPath(PatrolPath);
+									}
+								}
+							}
+
 							CharacterMonster->SetData(Info.MonsterDataRow);
 							CharacterMonster->FinishSpawning(Info.Transform);
 						}
@@ -42,6 +65,34 @@ void ALevelScriptActor_GameMap::BeginPlay()
 						{
 							APawnMonster* PawnMonster = World->SpawnActorDeferred<APawnMonster>(APawnMonster::StaticClass(),
 								FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+
+							for (AActor* CampFireIterActor : CampFireActors)
+							{
+								if (ACampFire* CampFire = Cast<ACampFire>(CampFireIterActor))
+								{
+									const FGuid CampFireGuid = CampFire->GetCampFireGuid();
+									if (CampFireGuid == Info.CampFirePointGuid)
+									{
+										PawnMonster->SetCampFire(CampFire);
+									}
+								}
+							}
+
+
+
+							for (AActor* PatrolPathIterActor : PatrolPathActors)
+							{
+								if (APatrolPath* PatrolPath = Cast<APatrolPath>(PatrolPathIterActor))
+								{
+									const FGuid PatrolPathGuid = PatrolPath->GetPatrolPathGuid();
+									if (PatrolPathGuid == Info.PatrolPathPointGuid)
+									{
+										PawnMonster->SetPatrolPath(PatrolPath);
+									}
+								}
+							}
+
 							PawnMonster->SetData(Info.MonsterDataRow);
 							PawnMonster->FinishSpawning(Info.Transform);
 						}

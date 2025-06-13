@@ -4,6 +4,9 @@
 #include "MonsterSpawnPoint.h"
 #include "Data/MonsterTableRow.h"
 
+#include "Actors/Object/CampFire.h"
+#include "Actors/Object/PatrolPath.h"
+
 // Sets default values
 AMonsterSpawnPoint::AMonsterSpawnPoint()
 {
@@ -73,6 +76,15 @@ void AMonsterSpawnPoint::OnConstruction(const FTransform& Transform)
 
 	SetData(DataTableRowHandle);
 	SetActorTransform(Transform);
+
+	if (CampFire)
+	{
+		CampFirePointGuid = CampFire->GetCampFireGuid();
+	}
+	if (PatrolPath)
+	{
+		PatrolPathPointGuid = PatrolPath->GetPatrolPathGuid();
+	}
 }
 
 

@@ -68,10 +68,13 @@ protected:
     virtual void PostLoadSubobjects(FObjectInstancingGraph* OuterInstanceGraph) override;
     virtual void PostInitializeComponents() override;
     virtual void OnConstruction(const FTransform& Transform);
-
 public:
     virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
     virtual void SetData(const FName& MonsterName);
+
+public:
+    void SetCampFire(ACampFire* InCampFire) { CampFire = InCampFire; }
+    void SetPatrolPath(APatrolPath* InPatrolPath) { PatrolPath = InPatrolPath; }
 
 protected:
     UFUNCTION()
@@ -86,6 +89,8 @@ public:
     virtual APatrolPath* GetPatrolPath() const override;
     virtual ACampFire* GetCampFire() const override;
     virtual FMonsterTableRow* GetMonsterData() const { return MonsterData; }
+    FName GetMonsterRowName() const;
+
 
     // No const to attach WorldWeapon to SkeletalMeshComponent
     virtual UAnimInstance* GetAnimInstance() const;
