@@ -65,8 +65,8 @@ void UShopDialogue::SetSell()
         ConfirmButton->SetVisibility(ESlateVisibility::Visible);
         CancelButton->SetVisibility(ESlateVisibility::Visible);
 
-        ConfrimText->SetText(FText::FromString(TextU(1003)));
-        CancelText->SetText(FText::FromString(TextU(1001)));
+        ConfrimText->SetText(FText::FromString(TextU(1002)));
+        CancelText->SetText(FText::FromString(TextU(1003)));
 
         bIsSelect = true;
         ActionLay->SetVisibility(ESlateVisibility::Hidden);

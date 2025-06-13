@@ -52,6 +52,18 @@ namespace ProjectileName
     static inline FName Player_FireArrow = TEXT("Player_FireArrow");
 }
 
+namespace MonsterName
+{
+    static inline FName Bokoblin_TreasureBox = TEXT("Bokoblin_TreasureBox");
+    static inline FName Bokoblin_Patrol = TEXT("Bokoblin_Patrol");
+    static inline FName Moriblin_TreasureBox = TEXT("Moriblin_TreasureBox");
+    static inline FName Moriblin_Patrol = TEXT("Moriblin_Patrol");
+    static inline FName Hinox = TEXT("Hinox");
+    static inline FName Lynel = TEXT("Lynel");
+    static inline FName AssasinBoss = TEXT("AssasinBoss");
+    static inline FName AssasinLeader = TEXT("AssasinLeader");
+}
+
 namespace ParticleEffectName
 {
     static inline FName MonsterDeath = TEXT("MonsterDeath");

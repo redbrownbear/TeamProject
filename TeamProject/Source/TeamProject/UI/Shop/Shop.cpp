@@ -83,12 +83,12 @@ void UShop::SetRupeeUI()
 void UShop::StartCoinEffect(int32 FinalCoinValue)
 {
     FString Text = CoinText->GetText().ToString();
-    CurrentDisplayedCoin = FCString::Atoi(*Text); // ÇöÀç Ç¥½ÃµÈ °ª ±âÁØÀ¸·Î ½ÃÀÛ
+    CurrentDisplayedCoin = FCString::Atoi(*Text); // ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½Ãµï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     TargetCoin = FinalCoinValue;
 
     int32 Difference = FMath::Abs(TargetCoin - CurrentDisplayedCoin);
-    CoinStep = FMath::Clamp(Difference / 30, 1, 50); // Â÷ÀÌ¿¡ µû¶ó Á¶Àý
+    CoinStep = FMath::Clamp(Difference / 30, 1, 50); // ï¿½ï¿½ï¿½Ì¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     GetWorld()->GetTimerManager().SetTimer(CoinUpdateTimerHandle, this, &UShop::UpdateCoinEffect, UpdateInterval, true);
 }
