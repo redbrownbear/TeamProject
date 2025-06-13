@@ -17,14 +17,42 @@ public:
 	// Sets default values for this actor's properties
 	AScale();
 
+    virtual void Tick(float DeltaTime) override;
+
+protected:
+    virtual void BeginPlay() override;
+
 protected:
     UPROPERTY(VisibleAnywhere)
-    TObjectPtr<UStaticMeshComponent> SeesawMesh;
+    TObjectPtr<USceneComponent> Base;
 
     UPROPERTY(VisibleAnywhere)
-    TObjectPtr<UBoxComponent> CollisionComponent;
+    TObjectPtr<UStaticMeshComponent> Lever;
 
     UPROPERTY(VisibleAnywhere)
-    TObjectPtr<UPhysicalMaterial> PhysicalMaterial;
+    TObjectPtr<UStaticMeshComponent> LeftPlate;
+
+    UPROPERTY(VisibleAnywhere)
+    TObjectPtr<UStaticMeshComponent> RightPlate;
+
+    UPROPERTY(VisibleAnywhere)
+    TObjectPtr<UBoxComponent> LeftWeightArea;
+
+    UPROPERTY(VisibleAnywhere)
+    TObjectPtr<UBoxComponent> RightWeightArea;
+
+protected:
+    UFUNCTION()
+    void UpdateWeight();
+
+    UFUNCTION()
+    void ApplyOffsetFromWeight();
+
+private:
+    float LeftWeight = 0.f;
+    float RightWeight = 0.f;
+
+    FVector LeftStart;
+    FVector RightStart;
 
 };
