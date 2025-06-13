@@ -10,7 +10,12 @@ FVector2D UHUDQuestOn::OriginPosition = FVector2D(700.0f, 150.0f);
 void UHUDQuestOn::NativeConstruct()
 {
 	Super::NativeConstruct();
-	InitResource();
+
+	if (bHasInitialized == false)
+	{
+		InitResource();
+		bHasInitialized = true;
+	}
 
 	SetVisibility(ESlateVisibility::Collapsed);
 }

@@ -18,6 +18,9 @@
 #include "Actors/Projectile/Arrow/Projectile_Arrow.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
+#include "SubSystem/UI/UIManager.h"
+#include "UI/GameOver/GameOverUI.h"
+
 // Sets default values
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -249,10 +252,17 @@ void APlayerCharacter::Damaged(int32 Damage)
 		UE_LOG(LogTemp, Warning, TEXT("%d"), AfterHP);
 
 		Cast<UPlayerMovementComponent>(GetCharacterMovement())->SetMoveState(EMove_State::Hit);
-
 	}
-	
-	
+
+	//GameOver 
+	else
+	{
+		UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+		if (UIManager)
+		{
+			UIManager->ShowUI(UGameOverUI::StaticClass());
+		}
+	}
 }
 
 void APlayerCharacter::TimelineProgress(float Value)

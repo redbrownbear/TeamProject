@@ -8,8 +8,11 @@
 
 void ULoadingWithPlayerInfo::NativeConstruct()
 {
-    LoadImage();
-
+    if (bHasInitialized == false)
+    {
+        LoadImage();
+		bHasInitialized = true;
+    }
     InitUI();
 }
 

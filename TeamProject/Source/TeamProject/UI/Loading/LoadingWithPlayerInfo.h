@@ -51,4 +51,5 @@ private:
 
 	float CurrentTime = 0.f;
 	float TotalTime = 3.f;
+	bool bHasInitialized = false;
 };

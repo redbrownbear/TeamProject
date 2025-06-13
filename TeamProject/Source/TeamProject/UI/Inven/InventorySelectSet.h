@@ -60,4 +60,6 @@ private:
 
 
 	FItemData ItemData;
+
+	bool bHasInitialized = false;
 };

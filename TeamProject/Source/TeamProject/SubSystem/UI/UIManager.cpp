@@ -144,4 +144,16 @@ void UUIManager::LoadUIClass()
             CachedUIs.Add(UPopupCountSelect::StaticClass(), CachedPopupCountClass);
         }
     }
+
+    if (!CachedGameOverClass)
+    {
+        CachedGameOverClass = CreateWidget<UGameOverUI>(World, LoadClass<UGameOverUI>(nullptr, TEXT("/Game/Blueprint/UI/GameOver/BP_GameOver.BP_GameOver_C")));
+        if (CachedGameOverClass)
+        {
+            CachedGameOverClass->AddToViewport();
+            CachedGameOverClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedGameOverClass->OnCreated();
+            CachedUIs.Add(UGameOverUI::StaticClass(), CachedGameOverClass);
+        }
+    }
 }

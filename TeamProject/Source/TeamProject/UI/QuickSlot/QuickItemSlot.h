@@ -61,4 +61,6 @@ private:
 	UTextBlock* Amount;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Value;
+
+	bool bHasInitialized = false;
 };
