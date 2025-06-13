@@ -119,6 +119,7 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		//NiagaraEffectComponent->SetRelativeLocation(Data->Transform.GetLocation());
 		//NiagaraEffectComponent->SetRelativeRotation(GetActorForwardVector().Rotation().Quaternion());
 		NiagaraEffectComponent->RegisterComponent();
+		NiagaraEffectComponent->bAutoActivate = false;
 	}
 
 	const FDataTableRowHandle ParticleEffectDataTable = ProjectileTableRow->ParticleEffectTableRowHandle;
