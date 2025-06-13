@@ -13,18 +13,12 @@ void UHUDQuestOn::NativeConstruct()
 
 	if (bHasInitialized == false)
 	{
-		InitResource();
 		bHasInitialized = true;
 	}
 
 	SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UHUDQuestOn::InitResource()
-{
-	QuestOn = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Resources/UI/HUD/HUD_QuestOn.HUD_QuestOn")));
-	QuestCoplete = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), nullptr, TEXT("/Game/Resources/UI/HUD/HUD_QuestComplete.HUD_QuestComplete")));
-}
 
 void UHUDQuestOn::ShowQuestUI(bool bIsComplete, FString QuestName)
 {

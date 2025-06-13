@@ -499,6 +499,7 @@ void ACharacterMonster::SetData(const FName& MonsterName)
 	}
 
 	StatusComponent->SetMaxHP(MonsterData->MaxHP);
+	HPBarWidget->SetRelativeLocation(FVector(0.f, 0.f, (MonsterData->CollisionSphereRadius - 10.0f) * 4.0f));
 
 	for (USphereComponent* ExistingCollider : AdditionalColliders)
 	{

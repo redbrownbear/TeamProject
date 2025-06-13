@@ -17,6 +17,7 @@
 #include "UI/Map/MainMap.h"
 #include "UI/Popup/PopupCountSelect.h"
 #include "UI/GameOver/GameOverUI.h"
+#include "UI/Ending/EndingCredits.h"
 
 #include "UIManager.generated.h"
 
@@ -129,6 +130,8 @@ private:
     UPopupCountSelect* CachedPopupCountClass;
     UPROPERTY()
     UGameOverUI* CachedGameOverClass;
+    UPROPERTY()
+    UEndingCredits* CachedEndingCreditsClass;
 
 
 public:
