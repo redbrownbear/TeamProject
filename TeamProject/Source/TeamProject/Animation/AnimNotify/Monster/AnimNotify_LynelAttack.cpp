@@ -39,9 +39,10 @@ void UAnimNotify_LynelAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 			NiagaraEffect->SetData(NiagaraEffectName::Lynel_Attack);
 
 			FVector Location = Monster->GetActorLocation();
+			FRotator Rotation = Monster->GetActorRotation();
 			Location += Monster->GetActorForwardVector() * 100.f;
 			NewTransform.SetLocation(Location);
-
+			NewTransform.SetRotation(Rotation.Quaternion());
 			NiagaraEffect->FinishSpawning(NewTransform);
 		}
 	}
