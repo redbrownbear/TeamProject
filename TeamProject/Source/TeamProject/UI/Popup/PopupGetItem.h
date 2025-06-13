@@ -24,14 +24,19 @@ public:
 	virtual void ShowUI() override;
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
+public: //바인딩을 위해 퍼블릭선언
+	UFUNCTION()
+	virtual void OnNavigate(const FInputActionValue& Value) override {}
+	UFUNCTION()
+	virtual void OnConfirm(const FInputActionValue& Value) override {}
+	UFUNCTION()
+	virtual void OnCancel(const FInputActionValue& Value) override;
+
 private:
 	void InitUI();
 
 public:
 	void ShowData(FItemData ItemData);
-
-	UFUNCTION()
-	void OnCancel();
 
 private:
 	UPROPERTY(meta = (BindWidget))

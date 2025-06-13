@@ -146,6 +146,13 @@ void UInventoryScroll::UnEquipCurrentItem()
     }
 }
 
+void UInventoryScroll::MoveCategory(bool IsLeft)
+{
+    EItemCategory Category = GetNextCategory(CurrentCategory, IsLeft);
+
+    SelectCategory(Category, true);
+}
+
 FVector2D UInventoryScroll::GetItemListLocation()
 {
     FGeometry Geometry = ActiveSlots[CurrentIndex]->GetCachedGeometry();
@@ -155,6 +162,20 @@ FVector2D UInventoryScroll::GetItemListLocation()
 
     FVector2D AdjustedPos = RawPos / Scale;
     return  AdjustedPos;
+}
+
+EItemCategory UInventoryScroll::GetNextCategory(EItemCategory Current, bool bIsLeft)
+{
+    int32 CategoryCount = static_cast<int32>(EItemCategory::IT_END);
+    int32 Index = static_cast<int32>(Current) + (bIsLeft ? -1 : 1);
+
+    if (Index < 0)
+        Index = CategoryCount - 1;
+
+    if (Index >= CategoryCount)
+        Index = 0;
+
+    return static_cast<EItemCategory>(Index);
 }
 
 void UInventoryScroll::SetSort(EItemCategory Type)
@@ -180,7 +201,7 @@ void UInventoryScroll::SetSort(EItemCategory Type)
         if ((Item.eItemCategory == EItemCategory::IT_Arrow && Item.bIsArrow) || Item.eItemCategory == EItemCategory::IT_Material)
         {
             FItemData* Found = Items.FindByPredicate([&](const FItemData& Other) {
-                return Other.Name == Item.Name;
+                return Other.ItemCode == Item.ItemCode;
                 });
 
             if (Found)

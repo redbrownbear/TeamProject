@@ -77,13 +77,16 @@ public:
 
 	void BackFlip();
 
+	UFUNCTION()
+	void TimeScaleChanged(float _Scale);
 
 private:
 	bool CanGlide();
 
-	/*UFUNCTION()*/
-	/*void StepProgress(float Value);*/
+	UFUNCTION()
+	void StepProgress(float Value);
 
+	void ApplyVelocityAfterTimeScale(float _Scale);
 private:
 
 	UPROPERTY()
@@ -97,13 +100,13 @@ private:
 	UPROPERTY()
 	EMove_State Move_State = EMove_State::Run;
 
-	//UPROPERTY()
-	//TObjectPtr<UTimelineComponent> StepTimeLine;
+	UPROPERTY()
+	TObjectPtr<UTimelineComponent> StepTimeLine;
 
-	//FOnTimelineFloat InterpFunction{};
+	FOnTimelineFloat InterpFunction{};
 
-	//UPROPERTY()
-	//UCurveFloat* StepCurve;
+	UPROPERTY()
+	UCurveFloat* StepCurve;
 
 
 	FVector StepDirection;
@@ -113,7 +116,7 @@ private:
 	UStepMontageAsset* StepMontageAsset;
 
 	//float m_GravitySpeed = 0.f;
-
+	FTimerHandle ApplyVelocityTimerHandle;
 	//float Prev_Length;
 public:
 

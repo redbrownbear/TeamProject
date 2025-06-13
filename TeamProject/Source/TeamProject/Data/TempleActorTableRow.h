@@ -22,8 +22,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform MeshTransform;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FTransform CollisionTransform;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FTransform CollisionTransform;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName CollisionProfileName;

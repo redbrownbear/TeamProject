@@ -41,15 +41,19 @@ public:
 	void EquipCurrentItem();
 	void UnEquipCurrentItem();
 
+	void MoveCategory(bool IsLeft);
+
 	const FItemData& GetCurItemData()& { return ActiveSlots[CurrentIndex]->GetItemData(); }
+	bool IsEmptyItem() { return ActiveSlots.IsEmpty(); }
+
 	FVector2D GetItemListLocation();
+	EItemCategory GetNextCategory(EItemCategory Current, bool bIsLeft);
 
 private:
 	void SetSort(EItemCategory Type);
 
 	void InitCategory();
 
-	//������ �ӱݰ� �������ε�...
 	UFUNCTION()
 	void OnWeaponCheckChanged(bool bIsChecked)		{ SelectCategory(EItemCategory::IT_Weapon, bIsChecked); }
 	UFUNCTION()

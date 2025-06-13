@@ -30,16 +30,23 @@ private:
 	void BindDelegates();
 	void RemoveDelegates();
 
-public: //바인?�을 ?�해 ?�블�?��??
+private:
+	void FocusButton(int32 Index);
+
+public: 
 	UFUNCTION()
-	void OnNavigate(const FInputActionValue& InputActionValue);
+	virtual void OnNavigate(const FInputActionValue& Value) override;
 	UFUNCTION()
-	void OnConfirm();
+	virtual void OnConfirm(const FInputActionValue& Value) override;
 	UFUNCTION()
-	void OnCancel();
+	virtual void OnCancel(const FInputActionValue& Value) override;
 
 	UFUNCTION()
 	void OnSell();
+	UFUNCTION()
+	void OnConfirmClick();
+	UFUNCTION()
+	void OnCancelClick();
 
 	UFUNCTION()
 	void OnNextDialogue(const FInputActionValue& InputActionValue);
@@ -58,7 +65,6 @@ private:
 	EQuestCharacter CurQuestChar;
 	int32 NextDialogueID;
 
-	//�ѱ��ھ� ���̴� ����� ���� ����
 	FString FullText;
 	int32 CurrentCharIndex = 0;
 	FTimerHandle TypingTimerHandle;
@@ -83,5 +89,8 @@ private:
 	UTextBlock* CancelText;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ExtraText;
+
+	TArray<UButton*> ButtonList;
+	int32 CurrentButtonIndex;
 
 };

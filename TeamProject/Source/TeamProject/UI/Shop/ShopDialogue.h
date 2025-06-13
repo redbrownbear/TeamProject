@@ -44,6 +44,10 @@ private:
 	void UpdateTyping();
 	void OnNextButtonClicked();
 
+public:
+	bool IsSelectItem() {return bIsSelect;}
+	UOverlay* GetActionOverLay() { return ActionLay; }
+
 private:
 	UPROPERTY(meta = (BindWidget))
 	UMultiLineEditableTextBox* DialogueText;
@@ -78,4 +82,7 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<ANpc> Npc = nullptr;
+
+private:
+	bool bIsSelect;
 };

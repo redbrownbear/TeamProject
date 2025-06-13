@@ -5,13 +5,15 @@
 
 #include "SubSystem/PlayerManager.h"
 #include "SubSystem/UI/ShopManager.h"
+#include "GameFramework/PC_InGame.h"
+#include "Kismet/GameplayStatics.h"
+#include "Actors/Npc/Npc.h"
 
 void UShopSellScroll::NativeConstruct()
 {
     Super::NativeConstruct();
 
     InitCategory();
-
     InitializePool(100);//미리 100개의 아이콘을 만들어 놓는다.
     check(ItemWrapBox);
 }
@@ -62,23 +64,23 @@ void UShopSellScroll::UpdateSlots(const TArray<FItemData>& NewItemList)
         ActiveSlots.Add(NewSlot);
     }
 
-    InitSelectItem();
+    SelectCategory(EItemCategory::IT_Weapon, true);
 }
 
 void UShopSellScroll::MoveSelection(FIntPoint Direction)
 {
     if (ActiveSlots.Num() == 0) return;
 
-    const int32 NumPerRow = 5; // WrapBox 기준 가정
+    const int32 NumPerRow = 5;
     const int32 MaxIndex = ActiveSlots.Num() - 1;
 
     int32 NextIndex = CurrentIndex;
 
-    if (Direction.X != 0) // 좌우
+    if (Direction.X != 0)
     {
         NextIndex += Direction.X;
     }
-    else if (Direction.Y != 0) // 상하
+    else if (Direction.Y != 0)
     {
         NextIndex += Direction.Y * NumPerRow;
     }
@@ -100,7 +102,7 @@ void UShopSellScroll::MoveSelection(FIntPoint Direction)
         ShopManager->SetSelectedItem(Itemdata);
     }
 
-    OnShopDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
+    OnShopDescriptionUpdated.Broadcast(Itemdata);
 }
 
 void UShopSellScroll::InitSelectItem()
@@ -123,7 +125,73 @@ void UShopSellScroll::InitSelectItem()
         ShopManager->SetSelectedItem(Itemdata);
     }
 
-    OnShopDescriptionUpdated.Broadcast(Itemdata); // UI에게 알림
+    OnShopDescriptionUpdated.Broadcast(Itemdata);
+}
+
+void UShopSellScroll::MoveCategory(bool IsLeft)
+{
+    EItemCategory Category = GetNextCategory(CurrentCategory, IsLeft);
+
+    SelectCategory(Category, true);
+}
+
+void UShopSellScroll::ItemSell()
+{
+    FItemData CurItemData = GetCurItem();
+
+    UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+    check(PlayerManager);
+
+    UShopManager* ShopManager = GetGameInstance()->GetSubsystem<UShopManager>();
+    check(ShopManager);
+
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    check(PC_InGame);
+
+    int32 Rupee = PlayerManager->GetRupee() + CurItemData.price;
+    PlayerManager->SetRupee(Rupee);
+    PlayerManager->RemoveItemByUniqueID(CurItemData.UniqueID);
+
+    TArray<FShopDataRow> CurrentShopDataArray = ShopManager->GetShopData(PC_InGame->Npc->GetQuestCharacterType());
+    FShopDataRow ShopDataRow;
+    int iShopDataIndex = -1;
+
+    for (int32 i = 0; i < CurrentShopDataArray.Num(); ++i)
+    {
+        if (CurrentShopDataArray[i].ItemData.ItemCode == CurItemData.ItemCode)
+        {
+            CurrentShopDataArray[i].ItemData.ItemCount++;
+            iShopDataIndex = i;
+            ShopManager->UpdateShopData(PC_InGame->Npc->GetQuestCharacterType(), CurrentShopDataArray[iShopDataIndex]);
+            break;
+        }
+    }
+
+    if (iShopDataIndex == -1)
+    {
+        ShopDataRow.QuestCharacter = PC_InGame->Npc->GetQuestCharacterType();
+        ShopDataRow.ItemData = CurItemData;
+        ShopDataRow.InitialItemCount = CurItemData.ItemCount;
+        CurrentShopDataArray.Add(ShopDataRow);
+
+        ShopManager->UpdateShopData(PC_InGame->Npc->GetQuestCharacterType(), ShopDataRow);
+    }
+
+    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SuccessfulSale);
+}
+
+EItemCategory UShopSellScroll::GetNextCategory(EItemCategory Current, bool bIsLeft)
+{
+    int32 CategoryCount = static_cast<int32>(EItemCategory::IT_END);
+    int32 Index = static_cast<int32>(Current) + (bIsLeft ? -1 : 1);
+
+    if (Index < 0)
+        Index = CategoryCount - 1;
+
+    if (Index >= CategoryCount)
+        Index = 0;
+
+    return static_cast<EItemCategory>(Index);
 }
 
 void UShopSellScroll::SetSort(EItemCategory Type)
@@ -148,9 +216,8 @@ void UShopSellScroll::SetSort(EItemCategory Type)
     {
         if ((Item.eItemCategory == EItemCategory::IT_Arrow && Item.bIsArrow) || Item.eItemCategory == EItemCategory::IT_Material)
         {
-            // 이미 동일한 ItemCode가 있는지 확인
             FItemData* Found = Items.FindByPredicate([&](const FItemData& Other) {
-                return Other.UniqueID == Item.UniqueID;
+                return Other.ItemCode == Item.ItemCode;
                 });
 
             if (Found)
@@ -225,8 +292,6 @@ void UShopSellScroll::InitCategory()
     ArmorCheck->OnCheckStateChanged.AddDynamic(this, &UShopSellScroll::OnArmorCheckChanged);
     MaterialCheck->OnCheckStateChanged.AddDynamic(this, &UShopSellScroll::OnMaterialCheckChanged);
     FoodCheck->OnCheckStateChanged.AddDynamic(this, &UShopSellScroll::OnFoodCheckChanged);
-
-    SelectCategory(EItemCategory::IT_Weapon, true);
 }
 
 

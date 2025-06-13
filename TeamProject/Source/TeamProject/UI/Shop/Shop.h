@@ -27,6 +27,27 @@ public:
 	virtual void ShowUI() override;
 	virtual void HideUI(TSubclassOf<UBaseUI> UIClass) override;
 
+public:
+	UFUNCTION()
+	virtual void OnNavigate(const FInputActionValue& Value) override;
+	UFUNCTION()
+	virtual void OnConfirm(const FInputActionValue& Value) override;
+	UFUNCTION()
+	virtual void OnCancel(const FInputActionValue& Value) override;
+
+	void OnCategoryLeft(const FInputActionValue& InputActionValue);
+	void OnCategoryRight(const FInputActionValue& InputActionValue);
+
+public:
+	void SetDialogueData(EQuestCharacter InQuestChar, int32 InDialogueID);
+
+public:
+	void SetIsBuyScroll(bool IsBuy) { bIsBuyScroll = IsBuy; }
+	bool IsBuyScroll() { return bIsBuyScroll; }
+
+public:
+	void OnBuy();
+	void OnSell();
 
 private:
 	void InitUI();
@@ -35,24 +56,21 @@ private:
 	void SetRupeeUI();
 
 private:
+	void StartCoinEffect(int32 FinalCoinValue);
+	void UpdateCoinEffect();
+
+private:
 	void BindDelegates();
 	void RemoveDelegates();
 
 private:
 	void SetShopOpen();
-
 	void SetItemBuy();
 
 	UFUNCTION()
 	void RefreshAllInventory(const TArray<FItemData>& ItemDataList);
 
-public: 
-	UFUNCTION()
-	void OnNavigate(const FInputActionValue& InputActionValue);
-	UFUNCTION()
-	void OnConfirm();
-	UFUNCTION()
-	void OnCancel();
+public:
 	UFUNCTION()
 	void OnNextDialogue(const FInputActionValue& InputActionValue);
 
@@ -84,4 +102,15 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CoinText;
 
+private:
+	EQuestCharacter QuestChar;
+	int32 DialogueID;
+
+private:
+	bool bIsBuyScroll;
+	FTimerHandle CoinUpdateTimerHandle;
+	int32 CurrentDisplayedCoin;
+	int32 TargetCoin;
+	int32 CoinStep;
+	float UpdateInterval;
 };

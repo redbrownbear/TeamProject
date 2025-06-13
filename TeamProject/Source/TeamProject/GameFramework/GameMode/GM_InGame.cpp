@@ -17,7 +17,7 @@ void AGM_InGame::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
-	//ÇÃ·¹ÀÌ¾î¸¦ ¼ÒÈ¯ÇÒ¶§ ÀÌÂÊ¿¡¼­ ÀúÀåÇØµÐ Transform°ªÀ» ³Ö¾îÁÖ¸é µÈ´Ù.
+	//ï¿½Ã·ï¿½ï¿½Ì¾î¸¦ ï¿½ï¿½È¯ï¿½Ò¶ï¿½ ï¿½ï¿½ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ Transformï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½Ö¸ï¿½ ï¿½È´ï¿½.
 	//FTransform SavedTransform;
 	//RestartPlayerAtTransform(NewPlayer, SavedTransform);
 

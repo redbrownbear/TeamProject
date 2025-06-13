@@ -8,7 +8,7 @@
 #include "Actors/Effect/NiagaraEffect.h"
 #include "Actors/Effect/ParticleEffect.h"
 #include "Actors/Monster/CharacterMonster.h"
-
+#include "Actors/Monster/PawnMonster.h"
 
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "Components/FSMComponent/Monster/HinoxFSMComponent.h"
@@ -16,7 +16,6 @@
 #include "Components/FSMComponent/Monster/AssasinBossFSMComponent.h"
 #include "Components/FSMComponent/Monster/AssasinLeaderFSMComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
-
 
 #include "Data/MonsterTableRow.h"
 #include "Data/ItemDataRow.h"
@@ -978,6 +977,18 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 			AddBaseColor(ZeroVector);
 		}, 0.5f, false);
 	
+	//HPUI
+	if (APawnMonster* Monster = Cast<APawnMonster>(ThisActor))
+	{
+		Monster->ShowHpUI(UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP());
+	}
+
+	if (ACharacterMonster* BigMonster = Cast<ACharacterMonster>(ThisActor))
+	{
+		if (BigMonster->GetMonsterName() == TEXT("AssasinLeader"))
+
+			BigMonster->ShowHpUI(UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP());
+	}
 }
 
 void IMonsterInterface::OnDie()

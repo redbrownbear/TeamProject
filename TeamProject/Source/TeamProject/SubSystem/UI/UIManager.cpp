@@ -32,6 +32,19 @@ void UUIManager::BindDelegates()
     }
 }
 
+void UUIManager::PushUI(UBaseUI* UI)
+{
+    if (!UIStack.Contains(UI))
+    {
+        UIStack.Add(UI);
+    }
+}
+
+void UUIManager::PopUI(UBaseUI* UI)
+{
+    UIStack.Remove(UI);
+}
+
 void UUIManager::LoadUIClass()
 {
     UWorld* World = GetGameInstance()->GetWorld();
@@ -120,4 +133,15 @@ void UUIManager::LoadUIClass()
         }
     }
 
+    if (!CachedPopupCountClass)
+    {
+        CachedPopupCountClass = CreateWidget<UPopupCountSelect>(World, LoadClass<UPopupCountSelect>(nullptr, TEXT("/Game/Blueprint/UI/Popup/BP_PopupItemCount.BP_PopupItemCount_C")));
+        if (CachedPopupCountClass)
+        {
+            CachedPopupCountClass->AddToViewport();
+            CachedPopupCountClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedPopupCountClass->OnCreated();
+            CachedUIs.Add(UPopupCountSelect::StaticClass(), CachedPopupCountClass);
+        }
+    }
 }

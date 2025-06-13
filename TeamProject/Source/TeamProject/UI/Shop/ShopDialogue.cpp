@@ -7,6 +7,7 @@
 #include "SubSystem/UI/QuestDialogueManager.h"
 #include "SubSystem/UI/ShopManager.h"
 #include "SubSystem/PlayerManager.h"
+#include "Misc/TextUtil.h"
 
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
 
@@ -28,6 +29,8 @@ void UShopDialogue::InitUI()
     ExtraButton->SetVisibility(ESlateVisibility::Collapsed);
 
     ActionLay->SetVisibility(ESlateVisibility::Visible);
+
+    bIsSelect = false;
 }
 
 void UShopDialogue::SetBuy()
@@ -37,14 +40,15 @@ void UShopDialogue::SetBuy()
 
     ActionLay->SetVisibility(ESlateVisibility::Hidden);
 
-    ConfrimText->SetText(FText::FromString(TEXT("구매")));
-    CancelText->SetText(FText::FromString(TEXT("취소")));
+    ConfrimText->SetText(FText::FromString(TextU(1001)));
+    CancelText->SetText(FText::FromString(TextU(1003)));
 
     FInputModeGameAndUI InputMode;
     InputMode.SetWidgetToFocus(TakeWidget());
 
-    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
-    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Buy);
+    APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));  
+
+    bIsSelect = true;
 }
 
 void UShopDialogue::SetSell()
@@ -57,10 +61,11 @@ void UShopDialogue::SetSell()
         ConfirmButton->SetVisibility(ESlateVisibility::Visible);
         CancelButton->SetVisibility(ESlateVisibility::Visible);
 
-        ActionLay->SetVisibility(ESlateVisibility::Hidden);
+        ConfrimText->SetText(FText::FromString(TextU(1002)));
+        CancelText->SetText(FText::FromString(TextU(1003)));
 
-        ConfrimText->SetText(FText::FromString(TEXT("판매")));
-        CancelText->SetText(FText::FromString(TEXT("취소")));
+        bIsSelect = true;
+        ActionLay->SetVisibility(ESlateVisibility::Hidden);
 
         APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
         PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
@@ -74,119 +79,41 @@ void UShopDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 
 void UShopDialogue::OnConfirm()
 { 
-    //구매 완료   
-    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
-    check(QuestManager);
-
     UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
     check(UIManager);
 
-    UShopManager* ShopManager = GetWorld()->GetGameInstance()->GetSubsystem<UShopManager>();
-    check(ShopManager);
-
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
+    check(PC_InGame);
+
+    UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
+    check(QuestManager);
 
     UConversationManagerComponent* ConverSationManager = Cast<UConversationManagerComponent>(PC_InGame->Npc->GetComponentByClass(UConversationManagerComponent::StaticClass()));
     check(ConverSationManager);
 
-    UShop* ShopClass = UIManager->CachedShopClass;
-    if (ShopClass)
+    UShop* ShopUI = UIManager->FindUI<UShop>();
+    if (ShopUI)
     {
-        // buy
-        if (ShopManager->IsBuy())
-        {
-            if (ShopManager->CheckSoldout())
-            {
-                PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SoldOut);
-            }
+        if (ShopUI->IsBuyScroll() == true)
+            ShopUI->OnBuy();
 
-            else if (!ShopManager->CanIBuyIt())
-            {
-                PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Cashless);
-            }
-
-            else if (EDialogType::Buy == PC_InGame->Npc->GetCurrentDialogueType())
-            {
-                ShopManager->SubtractPlayerRupee();
-                ShopManager->AddItemInventory();
-
-                const FItemData SelectedItemData = ShopManager->GetSelectedItem();
-                TArray<FShopDataRow> CurrentShopDataArray = ShopManager->GetShopData(PC_InGame->Npc->GetQuestCharacterType());
-                int iShopDataIndex = -1;
-                for (int32 i = 0; i < CurrentShopDataArray.Num(); ++i)
-                {
-                    if (CurrentShopDataArray[i].ItemData.Name == SelectedItemData.Name)
-                    {
-                        CurrentShopDataArray[i].ItemData.ItemCount--;
-                        iShopDataIndex = i;
-                        break;
-                    }
-                }
-                if (iShopDataIndex == -1)
-                {
-                    UE_LOG(LogTemp, Error, TEXT("ShopDialogue::OnConfirm() // No valid item in shop"));
-                    check(false);
-                }
-
-
-                ShopManager->UpdateShopData(PC_InGame->Npc->GetQuestCharacterType(), CurrentShopDataArray[iShopDataIndex]);
-
-                PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SuccessfulShopping);
-            }
-        }
         else
-        {
-            if (EDialogType::Sell == PC_InGame->Npc->GetCurrentDialogueType())
-            {
-
-                ShopManager->AddPlayerRupee();
-                ShopManager->SubtractItemInventory();
-
-                const FItemData SelectedItemData = ShopManager->GetSelectedItem();
-                TArray<FShopDataRow> CurrentShopDataArray = ShopManager->GetShopData(PC_InGame->Npc->GetQuestCharacterType());
-                int iShopDataIndex = -1;
-                for (int32 i = 0; i < CurrentShopDataArray.Num(); ++i)
-                {
-                    if (CurrentShopDataArray[i].ItemData.Name == SelectedItemData.Name)
-                    {
-                        CurrentShopDataArray[i].ItemData.ItemCount++;
-                        iShopDataIndex = i;
-                        break;
-                    }
-                }
-                if (iShopDataIndex == -1)
-                {
-                    UE_LOG(LogTemp, Error, TEXT("ShopDialogue::OnConfirm() // No valid item in shop"));
-                    check(false);
-                }
-
-
-                ShopManager->UpdateShopData(PC_InGame->Npc->GetQuestCharacterType(), CurrentShopDataArray[iShopDataIndex]);
-
-                PC_InGame->Npc->SetCurrentDialogueType(EDialogType::SuccessfulSale);
-
-                ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter, false);
-            }
-        }
-        
+            ShopUI->OnSell();
     }
+
+    InitUI();
 
     EQuestCharacter QuestChar = PC_InGame->Npc->GetData()->QuestCharacter;
     EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
 
     int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
-
     QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
-    
-    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Shop);
 }
 
 void UShopDialogue::OnCancel()
 {
     InitUI();
 
-    //바인드 돌리기 
-
     UQuestDialogueManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
     check(QuestManager);
 
@@ -199,14 +126,10 @@ void UShopDialogue::OnCancel()
     check(ConverSationManager);
 
     EQuestCharacter QuestChar = PC_InGame->Npc->GetData()->QuestCharacter;
-    
     EDialogType DialogType = PC_InGame->Npc->GetCurrentDialogueType();
-
+    
     int32 DialogueID = ConverSationManager->GetDialogueID(ConverSationManager->GetDataTable(), QuestChar, DialogType);
-
     QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
-
-    PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Shop);
 }
 
 void UShopDialogue::RefreshDialogue(const FNPCDialogueTableRow& QuestData)

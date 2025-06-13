@@ -61,7 +61,7 @@ void UPopupGetItem::ShowData(FItemData ItemData)
 	TextItemDescription->SetText(FText::FromString(ItemData.Description));
 }
 
-void UPopupGetItem::OnCancel()
+void UPopupGetItem::OnCancel(const FInputActionValue& InputActionValue)
 {
 	HideUI(UPopupGetItem::StaticClass());
 }

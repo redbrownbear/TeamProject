@@ -15,12 +15,11 @@
 #include "UI/Popup/PopupGetItem.h"
 #include "UI/QuickSlot/QuickSlotMain.h"
 #include "UI/Map/MainMap.h"
+#include "UI/Popup/PopupCountSelect.h"
 
 #include "UIManager.generated.h"
 
-//����Ʈ��ȭ�� ���� ��������Ʈ
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDialogueNextRequested, EQuestCharacter, QuestChar, int32, DialogueID);
-
 
 /**
  * 
@@ -35,11 +34,10 @@ public:
     void BindDelegates();
     void LoadUIClass();
 
-//---�ǵ��� ����
 private:
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-    //UI ����
+    //UI
 public:
     template <typename T>
     T* FindUI()
@@ -49,6 +47,20 @@ public:
             if (T* FoundUI = Cast<T>(Pair.Value))
             {
                 return FoundUI;
+            }
+        }
+        return nullptr;
+    }
+
+    template <typename T>
+    T* FindTopUI()
+    {
+        for (int32 i = UIStack.Num() - 1; i >= 0; --i)
+        {
+            if (T* UI = Cast<T>(UIStack[i]))
+            {
+                if (UI->IsInViewport() && UI->IsVisible())
+                    return UI;
             }
         }
         return nullptr;
@@ -84,11 +96,19 @@ public:
             }
         }
     };
-//---�ǵ��� ����
 
 public:
+    void PushUI(UBaseUI* UI);
+    void PopUI(UBaseUI* UI);
+    
+    bool IsAnyUI() { return !UIStack.IsEmpty(); }
+
+private:
     UPROPERTY()
     TMap<TSubclassOf<UBaseUI>, UBaseUI*> CachedUIs;
+
+    UPROPERTY()
+    TArray<UBaseUI*> UIStack;
 
     UPROPERTY()
     UInventory* CachedInventoryClass;
@@ -104,6 +124,9 @@ public:
     UQuickSlotMain* CachedQuickSlotClass;
     UPROPERTY()
     UMainMap* CachedMainMapClass;
+    UPROPERTY()
+    UPopupCountSelect* CachedPopupCountClass;
+
 
 public:
     UPROPERTY(BlueprintAssignable)

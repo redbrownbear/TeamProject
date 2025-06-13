@@ -2,33 +2,36 @@
 
 
 #include "GameFramework/PC_InGame.h"
-#include "InputMappingContext.h"
-#include "EnhancedInputComponent.h"
 #include "Actors/Character/PlayerCharacter.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "EngineUtils.h"
-
-#include "SubSystem/UI/UIManager.h"
-#include "SubSystem/UI/QuestDialogueManager.h"
-#include "SubSystem/UI/ShopManager.h"
-#include "UI/HUD/MainHUD.h"
-#include "SubSystem/PlayerManager.h"
-
 #include "Actors/Npc/Npc.h" 
-#include "Components/Character/PlayerMovementComponent.h"
-
-#include "Animation/AnimInstance/PlayerAnimInstance.h"
-#include "Components/FSMComponent/Npc/NpcFSMComponent.h"
-
-
 #include "Actors/Temple/Ice/IcePillar.h"
 #include "Actors/Temple/Ice/IcePreview.h"
-
 #include "Actors/Temple/Treasure/TreasureBox.h"
-
-#include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Actors/Object/MetalActor.h"
 #include "Actors/Object/ProjectileMetalActor.h"
+#include "Actors/Temple/Surface/FlowSurface.h"
+
+#include "SubSystem/UI/UIManager.h"
+#include "SubSystem/TimeManager.h"
+#include "SubSystem/UI/QuestDialogueManager.h"
+#include "SubSystem/UI/ShopManager.h"
+#include "SubSystem/PlayerManager.h"
+
+#include "Components/Character/PlayerMovementComponent.h"
+#include "Components/FSMComponent/Npc/NpcFSMComponent.h"
+
+#include "Kismet/KismetMathLibrary.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
+
+#include "InputMappingContext.h"
+#include "EnhancedInputComponent.h"
+#include "EngineUtils.h"
+#include "UI/HUD/MainHUD.h"
+
+#include "Animation/AnimInstance/PlayerAnimInstance.h"
+
+
+
 
 
 APC_InGame::APC_InGame()
@@ -66,15 +69,6 @@ void APC_InGame::BeginPlay()
 		if (IcePreviewActor)
 		{
 			IcePreviewActor->SetActorEnableCollision(false);
-		}
-	}
-
-	if (MetalActorClass && !MetalActor)
-	{
-		MetalActor = GetWorld()->SpawnActor<AMetalActor>(MetalActorClass);
-		if (MetalActor)
-		{
-			MetalActor->SetActorEnableCollision(false);
 		}
 	}
 
@@ -186,7 +180,10 @@ void APC_InGame::SetupInputComponent()
 void APC_InGame::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
+	if (UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>())
+	{
+		TimeManager->Tick(DeltaSeconds);
+	}
 }
 
 void APC_InGame::ChangeInputContext(EInputContext NewContext)
@@ -229,6 +226,9 @@ void APC_InGame::BindUI()
 		EIC->BindAction(PC_InGameDataAsset->IA_DialogueNext, ETriggerEvent::Started, this, &APC_InGame::OnNextDialogue);
 
 		EIC->BindAction(PC_InGameDataAsset->IA_InvenAddItem, ETriggerEvent::Started, this, &APC_InGame::OnCreateItemTest);
+
+		EIC->BindAction(PC_InGameDataAsset->IA_CategoryLeft, ETriggerEvent::Started, this, &APC_InGame::OnCategoryLeft);
+		EIC->BindAction(PC_InGameDataAsset->IA_CategoryRight, ETriggerEvent::Started, this, &APC_InGame::OnCategoryRight);
 	}
 }
 
@@ -244,7 +244,6 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
 	if (Movement->MovementMode == MOVE_None)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MoveNone"));
 		return;
 	}
 	EMove_State MoveState = Movement->GetMoveState();
@@ -420,7 +419,6 @@ void APC_InGame::StartedStep(const FInputActionValue& InputActionValue)
 	if (MoveState == EMove_State::Run || MoveState == EMove_State::Dash)
 	{
 		Movement->SetMoveState(EMove_State::Step);
-		Movement->JumpZVelocity = PLAYER_STEP_JUMP_HEIGHT;
 	}
 }
 
@@ -428,8 +426,8 @@ void APC_InGame::CompletedStep(const FInputActionValue& InputActionValue)
 {
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(Player_C->GetCharacterMovement());
-
-	if (Movement->GetMoveState() == EMove_State::Step)
+	EMove_State Move_State = Movement->GetMoveState();
+	if (Move_State == EMove_State::Step)
 	{
 		Movement->SetMoveState(EMove_State::Run);
 		Movement->JumpZVelocity = PLAYER_NML_JUMP_HEIGHT;
@@ -492,37 +490,7 @@ void APC_InGame::LeftClick(const FInputActionValue& InputActionValue)
 	WeaponManagerComponent->LeftClickAction();
 
 	// ------- Destroy IcePilla ---------	
-	// 화면 중앙 기준 라인트레이스
-	FVector Start;
-	FRotator Rot;
-	GetPlayerViewPoint(Start, Rot);
-
-	FVector End = Start + Rot.Vector() * TraceDistance;
-
-	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(GetPawn());
-
-	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
-
-	if (bHit)
-	{
-		// 생성된 아이스 필러가 있으면 Destroy
-		AActor* HitActor = HitResult.GetActor();
-		if (IsValid(HitActor))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
-
-			if (AIcePillar* IcePillar = Cast<AIcePillar>(HitActor))
-			{
-				IcePillar->Destroy();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Hit actor is not an IcePillar"));
-			}
-		}
-	}
+	DestroyIcePillar();
 }
 
 void APC_InGame::RightClick(const FInputActionValue& InputActionValue)
@@ -597,7 +565,7 @@ void APC_InGame::OnCrouch(const FInputActionValue& InputActionValue)
 	ACharacter* ControlledCharacter = Cast<ACharacter>(GetPawn());
 	if (ControlledCharacter->GetMovementComponent()->IsFalling()) { return; }
 	ControlledCharacter->Crouch();
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *ControlledCharacter->GetCharacterMovement()->GetMovementName());
+	
 }
 
 void APC_InGame::OnUnCrouch(const FInputActionValue& InputActionValue)
@@ -683,6 +651,13 @@ void APC_InGame::OnInteract(const FInputActionValue& InputActionValue)
 	{
 		TreasureBox->CloseUI();
 	}
+
+	if (OverlappedItem != nullptr)
+	{
+		OverlappedItem->PickUpItem();
+		OverlappedItem = nullptr;
+	}
+
 }
 
 void APC_InGame::OpenInventory(const FInputActionValue& InputActionValue)
@@ -862,9 +837,37 @@ void APC_InGame::SpawnIcePillar()
 
 void APC_InGame::DestroyIcePillar()
 {
-	if (!IcePillarActor) return;
+	// 화면 중앙 기준 라인트레이스
+	FVector Start;
+	FRotator Rot;
+	GetPlayerViewPoint(Start, Rot);
 
-	IcePillarActor->Destroy();
+	FVector End = Start + Rot.Vector() * TraceDistance;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetPawn());
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	if (bHit)
+	{
+		// 생성된 아이스 필러가 있으면 Destroy
+		AActor* HitActor = HitResult.GetActor();
+		if (IsValid(HitActor))
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
+
+			if (AIcePillar* IcePillar = Cast<AIcePillar>(HitActor))
+			{
+				IcePillar->Destroy();
+			}
+			else
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("Hit actor is not an IcePillar"));
+			}
+		}
+	}
 }
 
 void APC_InGame::OnQuickSlotLeft(const FInputActionValue& InputActionValue)
@@ -958,7 +961,7 @@ void APC_InGame::OffQuickSlot(const FInputActionValue& InputActionValue)
 	{
 		UQuickSlotMain* QuickSlotUI = UIManager->FindUI<UQuickSlotMain>();
 		if (QuickSlotUI)
-			QuickSlotUI->OnCancel();
+			QuickSlotUI->OnCancel(InputActionValue);
 	}
 }
 
@@ -1087,14 +1090,22 @@ bool APC_InGame::IsSurfaceActor(AActor* Actor) const
 {
 	if (!Actor) return false;
 
-#if WITH_EDITOR
-	FString ActorName = Actor->GetActorLabel();
-#else
-	FString ActorName = Actor->GetName();
-#endif
+	if (Actor->IsA<AFlowSurface>())
+	{
+		return true;
+	}
 
-	return ActorName.StartsWith(TEXT("Surface"));
+	return false;
+
+//#if WITH_EDITOR
+//	FString ActorName = Actor->GetActorLabel();
+//#else
+//	FString ActorName = Actor->GetName();
+//#endif
+//
+//	return ActorName.StartsWith(TEXT("Surface"));
 }
+	
 
 AActor* APC_InGame::FindVisibleActorOnScreen(FHitResult& OutHit)
 {
@@ -1365,31 +1376,16 @@ void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	if (UQuickSlotMain* QuickSlot = UIManager->FindUI<UQuickSlotMain>())
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
 	{
-		if (QuickSlot->IsVisible())
-			QuickSlot->OnNavigate(InputActionValue);
+		if (IInputReceivableUI* InputUI = Cast<IInputReceivableUI>(TopUI))
+		{
+			if (TopUI->IsVisible())
+			{
+				InputUI->OnNavigate(InputActionValue);
+			}
+		}
 	}
-	if (UInventory* InvenUI = UIManager->FindUI<UInventory>())
-	{
-		if (InvenUI->IsVisible())
-			InvenUI->OnNavigate(InputActionValue);
-	}
-	if (UShop* ShopUI = UIManager->FindUI<UShop>())
-	{
-		if (ShopUI->IsVisible())
-			ShopUI->OnNavigate(InputActionValue);
-	}
-	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
-	{
-		if (DialogUI->IsVisible())
-			DialogUI->OnNavigate(InputActionValue);
-	}
-	if (UQuest* QuestUI = UIManager->FindUI<UQuest>())
-	{
-		if (QuestUI->IsVisible())
-			QuestUI->OnNavigate(InputActionValue);
-	}	
 }
 
 void APC_InGame::OnConfirm(const FInputActionValue& InputActionValue)
@@ -1397,25 +1393,15 @@ void APC_InGame::OnConfirm(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	if (UInventory* InvenUI = UIManager->FindUI<UInventory>())
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
 	{
-		if (InvenUI->IsVisible())
-			InvenUI->OnConfirm(InputActionValue);
-	}
-	if (UShop* ShopUI = UIManager->FindUI<UShop>())
-	{
-		if (ShopUI->IsVisible())
-			ShopUI->OnConfirm();
-	}
-	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
-	{
-		if (DialogUI->IsVisible())
-			DialogUI->OnConfirm();
-	}
-	if (UQuest* QuestUI = UIManager->FindUI<UQuest>())
-	{
-		if (QuestUI->IsVisible())
-			QuestUI->OnConfirm();
+		if (IInputReceivableUI* InputUI = Cast<IInputReceivableUI>(TopUI))
+		{
+			if (TopUI->IsVisible())
+			{
+				InputUI->OnConfirm(InputActionValue);
+			}
+		}
 	}
 }
 
@@ -1424,35 +1410,15 @@ void APC_InGame::OnCancel(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	if (UInventory* InvenUI = UIManager->FindUI<UInventory>())
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
 	{
-		if (InvenUI->IsVisible())
-			InvenUI->OnCancel(InputActionValue);
-	}
-	if (UShop* ShopUI = UIManager->FindUI<UShop>())
-	{
-		if (ShopUI->IsVisible())
-			ShopUI->OnCancel();
-	}
-	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
-	{
-		if (DialogUI->IsVisible())
-			DialogUI->OnCancel();
-	}
-	if (UQuest* QuestUI = UIManager->FindUI<UQuest>())
-	{
-		if (QuestUI->IsVisible())
-			QuestUI->OnCancel();
-	}
-	if (UPopupGetItem* PopupUI = UIManager->FindUI<UPopupGetItem>())
-	{
-		if (PopupUI->IsVisible())
-			PopupUI->OnCancel();
-	}
-	if (UMainMap* MainMapUI = UIManager->FindUI<UMainMap>())
-	{
-		if (MainMapUI->IsVisible())
-			MainMapUI->OnCancel();
+		if (IInputReceivableUI* InputUI = Cast<IInputReceivableUI>(TopUI))
+		{
+			if (TopUI->IsVisible())
+			{
+				InputUI->OnCancel(InputActionValue);
+			}
+		}
 	}
 }
 
@@ -1461,10 +1427,12 @@ void APC_InGame::OnNextDialogue(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	if (UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>())
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
 	{
-		if (DialogUI->IsVisible())
+		UNPCDialogue* DialogUI = UIManager->FindUI<UNPCDialogue>();
+		if (DialogUI->IsVisible() && TopUI == DialogUI)
 			DialogUI->OnNextDialogue(InputActionValue);
+		
 	}
 }
 
@@ -1473,9 +1441,12 @@ void APC_InGame::DropItem(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	UInventory* InvenUI = UIManager->FindUI<UInventory>();;
-	if (InvenUI->IsVisible())
-		InvenUI->OnCreateItemInWorld(InputActionValue);
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
+	{
+		UInventory* InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI->IsVisible() && TopUI == InvenUI)
+			InvenUI->OnCreateItemInWorld(InputActionValue);
+	}
 }
 
 void APC_InGame::OnCreateItemTest(const FInputActionValue& InputActionValue)
@@ -1483,8 +1454,45 @@ void APC_InGame::OnCreateItemTest(const FInputActionValue& InputActionValue)
 	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 	check(UIManager);
 
-	UInventory* InvenUI = UIManager->FindUI<UInventory>();
-	if (InvenUI->IsVisible())
-		InvenUI->OnCreateItemTest(InputActionValue);
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
+	{
+		UInventory* InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI->IsVisible() && TopUI == InvenUI)
+			InvenUI->OnCreateItemTest(InputActionValue);		
+	}
+}
+
+void APC_InGame::OnCategoryLeft(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
+	{
+		UInventory* InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI->IsVisible() && TopUI == InvenUI)
+			InvenUI->OnCategoryLeft(InputActionValue);
+
+		UShop* ShopUI = UIManager->FindUI<UShop>();
+		if (ShopUI->IsVisible() && TopUI == ShopUI)
+			ShopUI->OnCategoryLeft(InputActionValue);
+	}
+}
+
+void APC_InGame::OnCategoryRight(const FInputActionValue& InputActionValue)
+{
+	UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+	check(UIManager);
+
+	if (UBaseUI* TopUI = UIManager->FindTopUI<UBaseUI>())
+	{
+		UInventory* InvenUI = UIManager->FindUI<UInventory>();
+		if (InvenUI->IsVisible() && TopUI == InvenUI)
+			InvenUI->OnCategoryRight(InputActionValue);
+
+		UShop* ShopUI = UIManager->FindUI<UShop>();
+		if (ShopUI->IsVisible() && TopUI == ShopUI)
+			ShopUI->OnCategoryRight(InputActionValue);
+	}
 }
 

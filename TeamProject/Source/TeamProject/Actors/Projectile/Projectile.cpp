@@ -24,6 +24,7 @@
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Effect/NiagaraEffect.h"
 #include "Actors/Effect/ParticleEffect.h"
+#include "Actors/Object/TorchStand.h"
 
 #include "SubSystem/PlayerManager.h"
 
@@ -145,7 +146,6 @@ void AProjectile::BeginPlay()
 void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!IsValid(this)) { return; }
-
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(OtherActor);
 	if (Player_C)
 	{
@@ -218,8 +218,8 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 
 	if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
-	|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig
-	|| DataTableRowHandle.RowName == ProjectileName::Monster_HinoxStone)
+		|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig
+		|| DataTableRowHandle.RowName == ProjectileName::Monster_HinoxStone)
 	{
 		if (UWorld* World = GetWorld())
 		{
@@ -237,14 +237,12 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 
 
-	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert))
+	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert)
+		&& !OtherActor->IsA<ATorchStand>()
+		)
 	{
 		Destroy();
 	}
-
-	//{
-	//	Destroy();
-	//}
 
 
 }

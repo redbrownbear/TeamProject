@@ -5,7 +5,7 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Actors/Character/PlayerCharacter.h"
-
+#include "SubSystem/TimeManager.h"
 void UPlayerAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
@@ -14,8 +14,8 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 	if (!Pawn) { return; }
 
 	MovementComponent = Pawn->GetMovementComponent();
-
-
+	UTimeManagerSubsystem* TimeManager = GetOwningActor()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	TimeManager->OnTimeScaleUpdated.AddDynamic(this, &ThisClass::SetPlayRate);
 }
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)

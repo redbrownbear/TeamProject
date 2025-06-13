@@ -4,8 +4,7 @@
 #include "Actors/Item/WorldWeapon.h"
 #include "Actors/Projectile/Projectile.h"
 #include "Actors/Monster/MonsterInterface.h"
-
-#include "Data/ItemDataRow.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
@@ -18,6 +17,8 @@
 
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
+#include "GameFramework/PC_InGame.h"
+#include "UI/HUD/MainHUD.h"
 
 // Sets default values
 AWorldWeapon::AWorldWeapon()
@@ -59,13 +60,12 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+		CollisionComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlapWithPlayer);
 
-		// Change RootComponent 
 		SetRootComponent(CollisionComponent);
 		DefaultSceneRoot->SetRelativeTransform(FTransform::Identity);
 		DefaultSceneRoot->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
-		// check if it's CDO 
 		if (!HasAnyFlags(RF_ClassDefaultObject))
 		{
 			CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
@@ -99,6 +99,7 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 	// StaticMesh
 	if (ItemTableRow->StaticMesh)
 	{
+		StaticMeshComponent->SetCollisionProfileName(CollisionProfileName::Item);
 		StaticMeshComponent->SetStaticMesh(ItemTableRow->StaticMesh);
 		StaticMeshComponent->SetRelativeTransform(ItemTableRow->Transform);
 		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
@@ -125,6 +126,7 @@ void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHa
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
 		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+		CollisionComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlapWithPlayer);
 
 		if (!HasAnyFlags(RF_ClassDefaultObject))
 		{
@@ -175,14 +177,14 @@ void AWorldWeapon::SetDataWithData(const FItemData& InItemData)
 		FTransform WorldTransform = GetActorTransform();
 
 		CollisionComponent = NewObject<UShapeComponent>(this, InItemData.CollisionClass, TEXT("CollisionComponent"));
-		//CollisionComponent->RegisterComponent();
+		CollisionComponent->RegisterComponent();
 		CollisionComponent->SetWorldTransform(WorldTransform);
 		SetRootComponent(CollisionComponent);
 
-		DefaultSceneRoot->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
 		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+		CollisionComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlapWithPlayer);
 
 		if (!HasAnyFlags(RF_ClassDefaultObject))
 		{
@@ -202,27 +204,22 @@ void AWorldWeapon::SetDataWithData(const FItemData& InItemData)
 		}
 
 		CollisionComponent->BodyInstance.bUseCCD = true;
-		CollisionComponent->SetEnableGravity(false);
-		CollisionComponent->SetSimulatePhysics(false);
-	}
-	else
-	{
-		SetRootComponent(CollisionComponent);
-		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
-	}
+		CollisionComponent->SetEnableGravity(true);
+		CollisionComponent->SetSimulatePhysics(true);
+		CollisionComponent->SetMassOverrideInKg(NAME_None, 100.0f);
 
-	CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
-
-	// StaticMesh
+		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+	}
 	if (InItemData.StaticMesh)
 	{
 		StaticMeshComponent->SetStaticMesh(InItemData.StaticMesh);
-		StaticMeshComponent->SetWorldScale3D(FVector(45.0f, 45.0f, 45.0f));
+		StaticMeshComponent->SetRelativeTransform(InItemData.Transform);
 		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
-	ItemTableRow = &InItemData;
+	ItemDataCopy = InItemData;
+	ItemTableRow = &ItemDataCopy;
 }
 
 void AWorldWeapon::PostDuplicate(EDuplicateMode::Type DuplicateMode)
@@ -269,12 +266,28 @@ void AWorldWeapon::BeginPlay()
 	Super::BeginPlay();
 	SetDataWithHandle(DataTableRowHandle);
 
-	StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
-	StimuliSource->RegisterWithPerceptionSystem();
+
 }
 
 void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (!OtherActor || OtherActor == this)
+		return;
+
+	if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
+	{
+		if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
+		{
+			PC->SetOverlappedItem(this);
+
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			{
+				HUD->ShowInteractWidget(true);
+				HUD->ShowInteractName(true, ItemTableRow->Name);
+			}
+		}
+	}			
+
 	if (AProjectile* Proj = Cast<AProjectile>(OtherActor))
 	{
 		if (ProjectileName::Monster_CatchItem == Proj->GetProjectileName())
@@ -304,6 +317,42 @@ void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			}
 		}
 	}
+
+}
+
+void AWorldWeapon::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (!OtherActor || OtherActor == this)
+		return;
+
+	if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
+	{
+		if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
+		{
+			PC->SetOverlappedItem(nullptr);
+
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			{
+				HUD->ShowInteractWidget(false);
+				HUD->ShowInteractName(false, ItemTableRow->Name);
+			}
+		}
+	}
+}
+
+void AWorldWeapon::PickUpItem()
+{
+	AWorldWeapon* Item = Cast<AWorldWeapon>(this);
+	if (!Item)
+		return;
+
+	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
+	if (PlayerManager)
+	{
+		PlayerManager->SetInvenData(*Item->ItemTableRow);
+	}
+
+	Item->Destroy();
 }
 
 // Called every frame

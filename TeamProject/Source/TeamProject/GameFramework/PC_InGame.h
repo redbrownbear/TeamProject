@@ -14,6 +14,8 @@
 #include "UI/Popup/PopupGetItem.h"
 #include "UI/QuickSlot/QuickSlotMain.h"
 
+#include "Actors/Item/WorldWeapon.h"
+
 #include "CM_InGame.h"
 #include "PC_InGame.generated.h"
 
@@ -118,6 +120,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_DialogueNext = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_CategoryLeft = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_CategoryRight = nullptr;
+
 
 	//Supernatural
 public:
@@ -162,6 +169,8 @@ public:
 		check(IA_QuickSlotLeft);
 		check(IA_QuickSlotRight);
 		check(IA_MapOpen);
+		check(IA_CategoryLeft);
+		check(IA_CategoryRight);
 	}
 };
 
@@ -249,6 +258,9 @@ protected:
 
 	void OnCreateItemTest(const FInputActionValue& InputActionValue);
 
+	void OnCategoryLeft(const FInputActionValue& InputActionValue);
+	void OnCategoryRight(const FInputActionValue& InputActionValue);
+
 public:
 	void SetNpc(class ANpc* InNpc) { Npc = InNpc; }
 
@@ -310,6 +322,9 @@ protected:
 	UFUNCTION()
 	void ScanMetalActorInView();
 
+public:
+	void SetOverlappedItem(AWorldWeapon* Item) { OverlappedItem = Item; }
+
 protected:
 	// ------------ Ice Maker ---------------
 	UPROPERTY(EditAnywhere, Category = "Cryonis")
@@ -359,4 +374,7 @@ private:
 
 	FHitResult LastHit;
 	bool bHitResult = false;
+
+private:
+	AWorldWeapon* OverlappedItem = nullptr;
 };
