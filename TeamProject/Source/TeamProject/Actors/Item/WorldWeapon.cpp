@@ -60,6 +60,7 @@ void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+		CollisionComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlapWithPlayer);
 
 		SetRootComponent(CollisionComponent);
 		DefaultSceneRoot->SetRelativeTransform(FTransform::Identity);
@@ -124,6 +125,7 @@ void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHa
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Item);
 		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+		CollisionComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlapWithPlayer);
 
 		if (!HasAnyFlags(RF_ClassDefaultObject))
 		{

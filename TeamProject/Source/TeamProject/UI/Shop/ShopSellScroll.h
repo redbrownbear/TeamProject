@@ -32,6 +32,7 @@ protected:
 	virtual void NativeConstruct() override;
 
 	void InitializePool(int32 PreloadCount);
+	void InitCategory();
 
 public:
 	void AddItemSlot(const FItemData& NewItem);
@@ -41,12 +42,15 @@ public:
 	void MoveSelection(FIntPoint Direction);
 	void InitSelectItem();
 
+	void MoveCategory(bool IsLeft);
+
+	void ItemSell();
+
 	const FItemData& GetCurItem()& { return ActiveSlots[CurrentIndex]->GetItemData(); }
+	EItemCategory GetNextCategory(EItemCategory Current, bool bIsLeft);
 
 private:
 	void SetSort(EItemCategory Type);
-
-	void InitCategory();
 
 	//눈물을 머금고 각각바인딩...
 	UFUNCTION()

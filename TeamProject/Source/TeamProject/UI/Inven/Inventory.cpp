@@ -192,6 +192,16 @@ void UInventory::OnCreateItemTest(const FInputActionValue& InputActionValue)
     }
 }
 
+void UInventory::OnCategoryLeft(const FInputActionValue& InputActionValue)
+{
+    BP_InvenScroll->MoveCategory(true);
+}
+
+void UInventory::OnCategoryRight(const FInputActionValue& InputActionValue)
+{
+    BP_InvenScroll->MoveCategory(false);
+}
+
 void UInventory::RefreshInventory(const FItemData& ItemData)
 {
     BP_InvenScroll->AddItemSlot(ItemData);

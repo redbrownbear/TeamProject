@@ -6,7 +6,9 @@
 #include "GameFramework/Pawn.h"
 #include "Actors/Monster/MonsterInterface.h"
 #include "Misc/Utils.h"
+#include "Components/WidgetComponent.h"
 #include "PawnMonster.generated.h"
+
 
 class UMonsterStatusComponent;
 class UAIPerceptionComponent;
@@ -99,4 +101,13 @@ protected:
     virtual UMaterialInstanceDynamic* GetDynamicMaterialInstance() override;
 public:
     void AddBaseColor(FVector InColor);
+
+private:
+    UPROPERTY(VisibleAnywhere, Category = "UI")
+    UWidgetComponent* HPBarWidget;
+
+    TSubclassOf<UUserWidget> HPBarWidgetClass;
+
+public:
+    void ShowHpUI(float CurHp, float MaxHp);
 };

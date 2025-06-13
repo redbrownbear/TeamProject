@@ -73,7 +73,7 @@ public:
 	bool IsEquipPart(eEquipParts Parts);
 	const TArray<FItemData>& GetAllEquipData() const { return EquipItemList; }
 	FItemData GetItemByUniqueID(const FString& UniqueItemID);
-	int32 GetItemCountByName(const FString& ItemName);
+	int32 GetItemCountByItemCode(const FString& ItemCode);
 
 	FItemData RemoveItemByUniqueID(FString UniqueID);
 

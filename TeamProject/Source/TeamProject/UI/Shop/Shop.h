@@ -35,15 +35,29 @@ public:
 	UFUNCTION()
 	virtual void OnCancel(const FInputActionValue& Value) override;
 
+	void OnCategoryLeft(const FInputActionValue& InputActionValue);
+	void OnCategoryRight(const FInputActionValue& InputActionValue);
+
 public:
 	void SetDialogueData(EQuestCharacter InQuestChar, int32 InDialogueID);
 
+public:
+	void SetIsBuyScroll(bool IsBuy) { bIsBuyScroll = IsBuy; }
+	bool IsBuyScroll() { return bIsBuyScroll; }
+
+public:
+	void OnBuy();
+	void OnSell();
 
 private:
 	void InitUI();
 
 	UFUNCTION()
 	void SetRupeeUI();
+
+private:
+	void StartCoinEffect(int32 FinalCoinValue);
+	void UpdateCoinEffect();
 
 private:
 	void BindDelegates();
@@ -91,4 +105,12 @@ private:
 private:
 	EQuestCharacter QuestChar;
 	int32 DialogueID;
+
+private:
+	bool bIsBuyScroll;
+	FTimerHandle CoinUpdateTimerHandle;
+	int32 CurrentDisplayedCoin;
+	int32 TargetCoin;
+	int32 CoinStep;
+	float UpdateInterval;
 };

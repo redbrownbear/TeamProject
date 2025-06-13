@@ -42,6 +42,12 @@ void UNPCDialogue::ShowUI()
         PC_InGame->SetInputMode(InputMode);
     }
 
+    if (ButtonList.IsValidIndex(0) && ButtonList[0])
+    {
+        CurrentButtonIndex = 0;
+        FocusButton(CurrentButtonIndex);
+    }
+
     BindDelegates();
 }
 
@@ -81,6 +87,12 @@ void UNPCDialogue::InitUI()
     ExtraButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnSell);
     CancelButton->OnClicked.AddDynamic(this, &UNPCDialogue::OnCancelClick);
 
+    ButtonList.Add(ConfirmButton);
+    ButtonList.Add(ExtraButton);
+    ButtonList.Add(CancelButton);
+
+
+    bIsFocusable = true;
 }
 
 void UNPCDialogue::BindDelegates()
@@ -103,8 +115,34 @@ void UNPCDialogue::RemoveDelegates()
     }
 }
 
+void UNPCDialogue::FocusButton(int32 Index)
+{
+    if (!ButtonList.IsValidIndex(Index)) return;
+
+    ButtonList[Index]->SetFocus();
+    ButtonList[Index]->OnHovered.Broadcast();
+}
+
 void UNPCDialogue::OnNavigate(const FInputActionValue& InputActionValue)
 {
+    const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+
+    if (ActionValue.IsNearlyZero())
+        return;
+
+    if (FMath::Abs(ActionValue.X) < FMath::Abs(ActionValue.Y))
+    {
+        if (ActionValue.Y > 0)
+        {
+            CurrentButtonIndex = (CurrentButtonIndex - 1 + ButtonList.Num()) % ButtonList.Num();
+        }
+        else
+        {
+            CurrentButtonIndex = (CurrentButtonIndex + 1 + ButtonList.Num()) % ButtonList.Num();
+        } 
+    }
+
+    FocusButton(CurrentButtonIndex);
 }
 
 void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
@@ -159,16 +197,17 @@ void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
 
         if (UIManager && ShopManager && QuestDialougeManager && ConverSationManager)
         {
-            UIManager->ShowUI(UShop::StaticClass());
-            ShopManager->ShowUI(QuestChar, true);      
-            QuestDialougeManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
-
             UShop* ShopUI = UIManager->FindUI<UShop>();
             if (ShopUI)
             {
+                ShopUI->SetIsBuyScroll(true);
                 ShopUI->SetDialogueData(QuestChar, DialogueID);
             }
 
+            UIManager->ShowUI(UShop::StaticClass());
+            ShopManager->ShowUI(QuestChar, true);      
+            QuestDialougeManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
+            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Buy);
             bool IsShopping = PC_InGame->Npc->GetShopping();
 
             if (DialogueDataRow.bIsEndConversation && !IsShopping)
@@ -250,12 +289,18 @@ void UNPCDialogue::OnSell()
 
         if (UIManager && ShopManager && QuestManager)
         {
+            UShop* ShopUI = UIManager->FindUI<UShop>();
+            if (ShopUI)
+            {
+                ShopUI->SetIsBuyScroll(false);
+                ShopUI->SetDialogueData(QuestChar, DialogueID);
+            }
+
             UIManager->ShowUI(UShop::StaticClass());
             ShopManager->ShowUI(PC_InGame->Npc->GetData()->QuestCharacter, false);
-
             QuestManager->ShowDialogue(PC_InGame->Npc->GetData()->QuestCharacter, DialogueID);
+            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
         }
-        //PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Sell);
     }
     else
     {
