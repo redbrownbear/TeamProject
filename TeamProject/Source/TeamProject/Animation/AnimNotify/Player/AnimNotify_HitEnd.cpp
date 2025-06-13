@@ -21,6 +21,7 @@ void UAnimNotify_HitEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 	UPlayerMovementComponent* Movement = Cast<UPlayerMovementComponent>(PlayerCharacter->GetCharacterMovement());
 	Movement->SetMoveState(EMove_State::Run);
 	UWeaponManagerComponent* WeaponManagerComponent = PlayerCharacter->GetWeaponManagerComponent();
+	Movement->SetMovementMode(MOVE_Walking);
 	WeaponManagerComponent->SetCanSwordAttack();
 
 }
