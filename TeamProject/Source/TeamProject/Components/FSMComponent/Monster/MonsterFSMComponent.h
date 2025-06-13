@@ -33,6 +33,7 @@ public:
 	void SetPawnMonster(APawnMonster* InOwner) { PawnMonster = InOwner; }
 	void SetCharacterMonster(ACharacterMonster* InOwner) { CharacterMonster = InOwner; }
 	void SetPlayer(APlayerCharacter* InPlayer) { Player = InPlayer; }
+	const APlayerCharacter* GetPlayer() const { return Player; }
 	void OnHitReceived(bool bIsDead = false);
 	UFUNCTION()
 	void BindHitEvent();

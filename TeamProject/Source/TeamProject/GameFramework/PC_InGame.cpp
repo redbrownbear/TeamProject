@@ -1090,20 +1090,13 @@ bool APC_InGame::IsSurfaceActor(AActor* Actor) const
 {
 	if (!Actor) return false;
 
-	if (Actor->IsA<AFlowSurface>())
-	{
-		return true;
-	}
+#if WITH_EDITOR
+	FString ActorName = Actor->GetActorLabel();
+#else
+	FString ActorName = Actor->GetName();
+#endif
 
-	return false;
-
-//#if WITH_EDITOR
-//	FString ActorName = Actor->GetActorLabel();
-//#else
-//	FString ActorName = Actor->GetName();
-//#endif
-//
-//	return ActorName.StartsWith(TEXT("Surface"));
+	return ActorName.StartsWith(TEXT("Surface"));
 }
 	
 
@@ -1266,30 +1259,26 @@ void APC_InGame::StartMagnetGrab()
 {
 	if (IsHoldingObject()) return;
 
-	//FHitResult HitResult;
-	//if (TraceForMetal(LastHit))
-	//{
-		if (UPrimitiveComponent* HitComp = LastHit.GetComponent())
+	if (UPrimitiveComponent* HitComp = LastHit.GetComponent())
+	{
+		if (HitComp->IsSimulatingPhysics())
 		{
-			if (HitComp->IsSimulatingPhysics())
+			// 플레이어 위치와 MetalActor 위치 기준 거리 측정
+			ACharacter* PlayerChar = Cast<ACharacter>(GetPawn());
+			if (PlayerChar)
 			{
-				// 플레이어 위치와 MetalActor 위치 기준 거리 측정
-				ACharacter* PlayerChar = Cast<ACharacter>(GetPawn());
-				if (PlayerChar)
-				{
-					FVector PlayerLocation = PlayerChar->GetActorLocation();
-					FVector TargetLocation = HitComp->GetOwner()->GetActorLocation();
-					HoldDistance = FVector::Distance(PlayerLocation, TargetLocation);
-				}
-
-				PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, LastHit.ImpactPoint);
-				GrabbedComponent = HitComp;
-
-				// 주기적으로 위치 갱신
-				GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &APC_InGame::MoveGrabbedObject, 0.01f, true);
+				FVector PlayerLocation = PlayerChar->GetActorLocation();
+				FVector TargetLocation = HitComp->GetOwner()->GetActorLocation();
+				HoldDistance = FVector::Distance(PlayerLocation, TargetLocation);
 			}
+
+			PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, LastHit.ImpactPoint);
+			GrabbedComponent = HitComp;
+
+			// 주기적으로 위치 갱신
+			GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &APC_InGame::MoveGrabbedObject, 0.01f, true);
 		}
-	//}
+	}
 }
 
 void APC_InGame::StopMagnetGrab()

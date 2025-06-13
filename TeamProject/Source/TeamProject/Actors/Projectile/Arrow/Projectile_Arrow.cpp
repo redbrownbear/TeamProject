@@ -49,8 +49,15 @@ void AProjectile_Arrow::BeginPlay()
 void AProjectile_Arrow::SetData(const FName& ProjectileName, FName ProfileName)
 {
 	Super::SetData(ProjectileName, ProfileName);
-
-
+	
+	if (ProjectileName == ProjectileName::Player_FireArrow)
+	{
+		bIsFire = true;
+	}
+	else
+	{
+		bIsFire = false;
+	}
 }
 
 void AProjectile_Arrow::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

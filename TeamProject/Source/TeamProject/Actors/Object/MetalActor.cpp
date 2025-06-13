@@ -25,14 +25,6 @@ void AMetalActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	CollisionComponent->SetCanEverAffectNavigation(false);
-	CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
-	CollisionComponent->SetSimulatePhysics(true);
-	CollisionComponent->SetGenerateOverlapEvents(true);
-
-	//StaticMeshComponent->BodyInstance.bUseCCD = true;
-	//StaticMeshComponent->SetEnableGravity(true);
-
 	StaticMeshComponent->SetVisibility(true);
 	StaticMeshComponent->SetHiddenInGame(false);
 
@@ -57,13 +49,22 @@ void AMetalActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	FMetalActorTableRow* Data = DataTableRowHandle.GetRow<FMetalActorTableRow>(DataTableRowHandle.RowName.ToString());
 	if (!Data) { return; }
 	MetalActorData = Data;
-	if (CollisionComponent && MetalActorData)
+	/*if (CollisionComponent && MetalActorData)
 	{
 		CollisionComponent->SetCollisionProfileName(MetalActorData->CollisionProfileName);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		CollisionComponent->SetSimulatePhysics(true);
 		CollisionComponent->SetMassOverrideInKg(NAME_None, MetalActorData->MassInKg, true);
 		CollisionComponent->SetLinearDamping(MetalActorData->LinearDamping);
+	}*/
+
+	if (StaticMeshComponent && MetalActorData)
+	{
+		StaticMeshComponent->SetCollisionProfileName(MetalActorData->CollisionProfileName);
+		StaticMeshComponent->SetCanEverAffectNavigation(false);
+		StaticMeshComponent->SetSimulatePhysics(true);
+		StaticMeshComponent->SetMassOverrideInKg(NAME_None, MetalActorData->MassInKg, true);
+		StaticMeshComponent->SetLinearDamping(MetalActorData->LinearDamping);
 	}
 
 	if (StaticMeshComponent)
