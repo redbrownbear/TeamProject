@@ -240,7 +240,7 @@ void APlayerCharacter::Damaged(int32 Damage)
 	if (CurrentHP != 0)
 	{
 		int32 AfterHP = CurrentHP - Damage;
-		PlayerManager->SetPlayerHp(AfterHP);
+		PlayerManager->SetPlayerHp(AfterHP < 0 ? 0 : AfterHP);
 		Cast<UPlayerMovementComponent>(GetCharacterMovement())->Hited();
 		Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateHp();
 		UE_LOG(LogTemp, Warning, TEXT("%d"), AfterHP);
