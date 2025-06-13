@@ -18,7 +18,9 @@ void UAnimNotifySetMMMW::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 		return;
 	}
 	UPlayerMovementComponent* Movement= Cast<UPlayerMovementComponent>(PlayerCharacter->GetCharacterMovement());
-
-	Movement->SetClimbMode(false);
-	
+	EMove_State Move_State = Movement->GetMoveState();
+	if (Move_State == EMove_State::Climb)
+	{
+		Movement->SetClimbMode(false);
+	}
 }
