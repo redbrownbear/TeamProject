@@ -9,7 +9,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StatusComponent/PlayerStatusComponent/PlayerStatusComponent.h"
 
-
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 #include "GameFramework/PawnMovementComponent.h"
@@ -72,6 +73,15 @@ AWeaponSword::AWeaponSword()
             UnEquipMontage = Asset.Object;
         }
     }
+    {
+        NiagaraEffectComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+        ConstructorHelpers::FObjectFinder<UNiagaraSystem> Asset(TEXT("/Script/Niagara.NiagaraSystem'/Game/Vefects/FxER_StylizedSlash/Niagara/Stylize/NS_sm01_Stylized_Slash_04_B.NS_sm01_Stylized_Slash_04_B'"));
+        if (Asset.Object)
+        {
+            NiagaraEffectComponent->SetAsset(Asset.Object);
+        }
+        
+    }
 
 }
 
@@ -100,7 +110,7 @@ void AWeaponSword::LeftClickAction()
 
     }
 
-
+    NiagaraEffectComponent->AttachToComponent(StaticMeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
     bCanAttack = false;
     
 }

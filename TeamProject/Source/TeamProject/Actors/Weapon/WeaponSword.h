@@ -9,6 +9,7 @@
 /**
  * 
  */
+class UNiagaraComponent;
 UCLASS()
 class TEAMPROJECT_API AWeaponSword : public AWeaponBase
 {
@@ -52,6 +53,8 @@ private:
 
 	bool bCanAttack= true;
 
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> NiagaraEffectComponent;
 
 	TArray<TObjectPtr<AActor>> DamagedActors;
 };
