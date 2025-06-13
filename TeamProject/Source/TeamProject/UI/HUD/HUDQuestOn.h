@@ -52,6 +52,8 @@ private:
 	FTimerHandle SlideInHandle;
 	FTimerHandle SlideOutHandle;
 
+	bool bHasInitialized = false;
+
 	static FVector2D OriginPosition;
 
 };

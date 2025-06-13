@@ -127,4 +127,6 @@ private:
 	TMap<EItemCategory, UTextBlock*> MapCategoryText;
 
 	EItemCategory CurrentCategory = EItemCategory::IT_Weapon;
+
+	bool bHasInitialized = false;
 };

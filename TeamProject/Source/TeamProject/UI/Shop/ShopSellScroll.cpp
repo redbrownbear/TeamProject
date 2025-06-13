@@ -13,8 +13,13 @@ void UShopSellScroll::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    InitCategory();
-    InitializePool(100);//미리 100개의 아이콘을 만들어 놓는다.
+	if (bHasInitialized == false)
+	{
+        InitCategory();
+        InitializePool(100);
+		bHasInitialized = true;
+	}
+
     check(ItemWrapBox);
 }
 

@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Loading")
 	TSubclassOf<ULoadingWithPlayerInfo> LoadingWidgetClass;
 
+	UPROPERTY(EditAnywhere, Category = "Loading")
+	TSubclassOf<UUserWidget> LoadingWidgetToTitleClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<UUserWidget> MonsterHPWidgetClass;
 

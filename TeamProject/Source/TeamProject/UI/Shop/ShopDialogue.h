@@ -85,4 +85,5 @@ private:
 
 private:
 	bool bIsSelect;
+	bool bHasInitialized = false;
 };

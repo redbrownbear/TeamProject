@@ -9,9 +9,13 @@ void UInventoryScroll::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    InitCategory();
+    if (bHasInitialized == false)
+    {
+        InitCategory();
+        InitializePool(100);//미리 100개의 아이콘을 만들어 놓는다.
 
-    InitializePool(100);//미리 100개의 아이콘을 만들어 놓는다.
+        bHasInitialized = true;
+    }
     check(ItemWrapBox);
 }
 

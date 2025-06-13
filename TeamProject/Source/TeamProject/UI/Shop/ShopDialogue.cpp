@@ -18,8 +18,12 @@ void UShopDialogue::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    ConfirmButton->OnClicked.AddDynamic(this, &UShopDialogue::OnConfirm);
-    CancelButton->OnClicked.AddDynamic(this, &UShopDialogue::OnCancel);   
+	if (bHasInitialized == false)
+	{
+        ConfirmButton->OnClicked.AddDynamic(this, &UShopDialogue::OnConfirm);
+        CancelButton->OnClicked.AddDynamic(this, &UShopDialogue::OnCancel);
+		bHasInitialized = true;
+	}
 }
 
 void UShopDialogue::InitUI()
