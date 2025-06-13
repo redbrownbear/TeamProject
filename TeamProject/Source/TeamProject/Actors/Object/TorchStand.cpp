@@ -2,6 +2,7 @@
 
 
 #include "Actors/Object/TorchStand.h"
+#include "SubSystem/Puzzle/TorchManager.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Components/SphereComponent.h"
@@ -77,41 +78,45 @@ ATorchStand::ATorchStand()
 void ATorchStand::BeginPlay()
 {
     Super::BeginPlay();
-    
+
     TriggerColliderComponent->SetCollisionProfileName(TEXT("Trigger"));
 
-    if (NiagaraComponent->IsActive())
+    bTorchOnFire = NiagaraComponent && NiagaraComponent->IsActive();
+
+    UTorchManager* TorchManager = GetGameInstance()->GetSubsystem<UTorchManager>();
+    // 나이아가라 꺼져 있는 TorchStand만 등록
+    if (!bTorchOnFire)
+    {
+        if (TorchManager)
+        {
+            TorchManager->RegisterTorch(this);
+            UE_LOG(LogTemp, Log, TEXT("[Torch] %s 등록됨 (Niagara 꺼짐)"), *GetName());
+        }
+    }
+
+   /* if (NiagaraComponent->IsActive())
     {
         bTorchOnFire = true;
-    }
+    }*/
 }
 
 void ATorchStand::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     if (AProjectile_Arrow* Arrow = Cast<AProjectile_Arrow>(OtherActor))
     {
-        UE_LOG(LogTemp, Warning, TEXT("[Torch: %s] Overlap 시작! 화살: %s (이름: %s, bTorchOnFire: %s)"),
-            *GetName(), *Arrow->GetName(), *Arrow->GetProjectileName().ToString(), bTorchOnFire ? TEXT("true") : TEXT("false"));
-
-        if (!bTorchOnFire && ProjectileName::Player_FireArrow != Arrow->GetProjectileName()) return; // 횃대에 불이 붙어있지 않을 때
+        if (!bTorchOnFire && ProjectileName::Player_FireArrow != Arrow->GetProjectileName()) return;
 
         APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
         if (ProjectileName::Player_Arrow == Arrow->GetProjectileName())
         {
             PlayerCharacter->SetArrowFire(true);
             Arrow->SetData(TEXT("Player_FireArrow"), TEXT("ToMonster"));
-
-            UE_LOG(LogTemp, Warning, TEXT("SetData 이후 ProjectileName: %s"), *Arrow->GetProjectileName().ToString());
-            //UE_LOG(LogTemp, Log, TEXT("Arrow is Fired!"));
         }
         else if (ProjectileName::Player_FireArrow == Arrow->GetProjectileName())
         {
-            if (PlayerCharacter->GetIsFire()) //화살에 불이 붙었을 때
+            if (!bTorchOnFire) // 횃대에 불이 붙어있지 않을 때
             {
-                if (!bTorchOnFire) // 횃대에 불이 붙어있지 않을 때
-                {
-                    SetTorchStandFire(PlayerCharacter->GetIsFire());
-                }
+                SetTorchStandFire(true);
             }
         }
     }
@@ -160,14 +165,24 @@ void ATorchStand::Tick(float DeltaTime)
 void ATorchStand::SetTorchStandFire(bool _bool)
 {
     bTorchOnFire = _bool;
+
     if (_bool)
     {
         SetNiagaraVisibility(true);
+
+        UTorchManager* TorchManager = GetGameInstance()->GetSubsystem<UTorchManager>();
+
+        if (TorchManager)
+        {
+            TorchManager->NotifyTorchLit(this);
+        }
     }
     else
     {
         SetNiagaraVisibility(false);
     }
+
+    
 }
 
 void ATorchStand::SetNiagaraVisibility(bool bFlag)

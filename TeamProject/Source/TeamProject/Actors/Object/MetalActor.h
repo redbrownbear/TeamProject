@@ -27,11 +27,12 @@ protected:
 public:
 	virtual void OnConstruction(const FTransform& Transform);
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+	virtual void SetData(const FName& MetalActorName);
 
 	//USphereComponent* GetCollisionComponent() { return CollisionComponent; }
 
 public:
-	void ThisIsMetal();
+	virtual void ThisIsMetal();
 	void ChangeNomalColor();
 
 protected:
@@ -55,5 +56,6 @@ protected:
 	FDataTableRowHandle DataTableRowHandle;
 
 	FMetalActorTableRow* MetalActorData;
-	
+	const UDataTable* MetalActorDataTable;
+
 };

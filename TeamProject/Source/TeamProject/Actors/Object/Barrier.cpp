@@ -34,7 +34,7 @@ ABarrier::ABarrier()
         UE_LOG(LogTemp, Error, TEXT("ABarrier::ABarrier // No StaticMesh"));
     }
 
-    StaticMeshComponent->SetWorldScale3D(FVector(0.05, 1.2, 1.6));
+    StaticMeshComponent->SetWorldScale3D(FVector(0.05, 1.8, 2.2));
     static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialAsset
     { TEXT("/Script/Engine.Material'/Game/Resources/Monster/Assasin_Boss/M_Barrier.M_Barrier'") };
 

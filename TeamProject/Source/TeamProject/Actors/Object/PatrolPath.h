@@ -23,7 +23,15 @@ protected:
 	UPROPERTY(EditAnywhere)
 	USplineComponent* SplineComponent;
 
+	UPROPERTY(EditAnywhere)
+	FGuid PatrolPathGuid;
+
 public:
 	FVector GetSplinePointLocation(int32 InIndex);
 	int32 GetSplineMaxIndex() const;
+	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+public:
+	FGuid GetPatrolPathGuid() const { return PatrolPathGuid; }
 };

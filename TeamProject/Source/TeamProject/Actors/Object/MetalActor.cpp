@@ -16,8 +16,6 @@ AMetalActor::AMetalActor()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
-
-
 	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMaterial(TEXT("/Game/Temple/MetalActors/PM_MetalActor.PM_MetalActor"));
 	PhysicalMaterial = PhysMaterial.Object;
 }
@@ -27,14 +25,6 @@ void AMetalActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	CollisionComponent->SetCanEverAffectNavigation(false);
-	CollisionComponent->SetPhysMaterialOverride(PhysicalMaterial);
-	CollisionComponent->SetSimulatePhysics(true);
-	CollisionComponent->SetGenerateOverlapEvents(true);
-
-	StaticMeshComponent->BodyInstance.bUseCCD = true;
-	StaticMeshComponent->SetEnableGravity(true);
-
 	StaticMeshComponent->SetVisibility(true);
 	StaticMeshComponent->SetHiddenInGame(false);
 
@@ -59,6 +49,58 @@ void AMetalActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	FMetalActorTableRow* Data = DataTableRowHandle.GetRow<FMetalActorTableRow>(DataTableRowHandle.RowName.ToString());
 	if (!Data) { return; }
 	MetalActorData = Data;
+	/*if (CollisionComponent && MetalActorData)
+	{
+		CollisionComponent->SetCollisionProfileName(MetalActorData->CollisionProfileName);
+		CollisionComponent->SetCanEverAffectNavigation(false);
+		CollisionComponent->SetSimulatePhysics(true);
+		CollisionComponent->SetMassOverrideInKg(NAME_None, MetalActorData->MassInKg, true);
+		CollisionComponent->SetLinearDamping(MetalActorData->LinearDamping);
+	}*/
+
+	if (StaticMeshComponent && MetalActorData)
+	{
+		StaticMeshComponent->SetCollisionProfileName(MetalActorData->CollisionProfileName);
+		StaticMeshComponent->SetCanEverAffectNavigation(false);
+		StaticMeshComponent->SetSimulatePhysics(true);
+		StaticMeshComponent->SetMassOverrideInKg(NAME_None, MetalActorData->MassInKg, true);
+		StaticMeshComponent->SetLinearDamping(MetalActorData->LinearDamping);
+	}
+
+	if (StaticMeshComponent)
+	{
+		if (MetalActorData->StaticMesh)
+		{
+			StaticMeshComponent->SetStaticMesh(MetalActorData->StaticMesh);
+		}
+
+		if (MetalActorData->Material)
+		{
+			DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MetalActorData->Material, this);
+			StaticMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MetalActorData->Material is null!"));
+		}
+
+		StaticMeshComponent->SetRelativeScale3D(MetalActorData->MeshTransform.GetScale3D());
+	}
+}
+
+void AMetalActor::SetData(const FName& MetalActorName)
+{
+	if (!MetalActorDataTable)
+	{
+		MetalActorDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Data/ActorData/DT_MetalActor.DT_MetalActor'"));
+		check(MetalActorDataTable);
+	}
+	if (!MetalActorDataTable->GetRowMap().Find(MetalActorName)) { ensure(false); return; }
+	DataTableRowHandle.DataTable = MetalActorDataTable;
+	DataTableRowHandle.RowName = MetalActorName;
+
+	MetalActorData = DataTableRowHandle.GetRow<FMetalActorTableRow>(DataTableRowHandle.RowName.ToString());
+
 	if (CollisionComponent && MetalActorData)
 	{
 		CollisionComponent->SetCollisionProfileName(MetalActorData->CollisionProfileName);

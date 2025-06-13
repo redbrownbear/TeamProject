@@ -187,6 +187,23 @@ void UAssasinBossFSMComponent::ChangeState(EMonsterState NewState)
 
 		break;
 	case EMonsterState::Damage:
+		if (PrevState == EMonsterState::Stun)
+		{
+			if (UWorld* World = CharacterMonster->GetWorld())
+			{
+				if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+				{
+					if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+					{
+						if (UMonsterStatusComponent* StatusComponent = CharacterMonster->GetStatusComponent())
+						{
+							HUD->ShowBossHpUI(false, StatusComponent->GetCurrentHP(), StatusComponent->GetMaxHP(), CharacterMonster->GetMonsterData()->Name.ToString());
+						}
+					}
+				}
+			}
+			return;
+		}
 		DamageElapsedTime = 0.f;
 		CharacterMonster->StopAnimMontage();
 
@@ -256,14 +273,27 @@ void UAssasinBossFSMComponent::UpdateCombat(float DeltaTime)
 	{
 		ToNextElapsedTime = 0.f;
 		ChangeState(EMonsterState::Idle);
+		return;
 	}
+
+	const FVector PlayerLocation = Player->GetActorLocation();
+	const FVector MonsterLocation = CharacterMonster->GetActorLocation();
+
+	const float fDistance = FVector::Dist(PlayerLocation, MonsterLocation);
+	if (fDistance > MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS)
+	{
+		Player = nullptr;
+		ToNextElapsedTime = 0.f;
+		ChangeState(EMonsterState::Idle);
+		return;
+	}
+
 
 	Hovering(DeltaTime);
 
 	ToNextElapsedTime += DeltaTime;
 
 
-	const FVector PlayerLocation = Player->GetActorLocation();
 	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 
 	if (ToNextElapsedTime > ASSASIN_BOSS_TONEXT_MAX_TIME)

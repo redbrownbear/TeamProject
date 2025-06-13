@@ -358,6 +358,7 @@ void UNPCDialogue::UpdateTyping()
     CurrentCharIndex++;
 }
 
+
 void UNPCDialogue::OnNextButtonClicked()
 {
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));

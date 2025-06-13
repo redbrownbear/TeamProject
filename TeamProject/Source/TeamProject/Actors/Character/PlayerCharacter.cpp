@@ -48,13 +48,14 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 			SpringArm->bUsePawnControlRotation = true;
 			SpringArm->bInheritRoll = false;
 
-			SpringArm->CameraLagSpeed = 5.f;
+			SpringArm->CameraLagSpeed = 3.f;
 			SpringArm->CameraLagMaxDistance = 100.f;
+			SpringArm->ProbeChannel = ECC_Camera;
 		}
 		Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 		Camera->SetupAttachment(SpringArm);
 
-		SpringArm->bDoCollisionTest = false;
+		//SpringArm->bDoCollisionTest = false;
 	}
 
 	UCharacterMovementComponent* Movement = GetCharacterMovement();
@@ -162,7 +163,7 @@ void APlayerCharacter::BeginPlay()
 	);
 
 
-	ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
+	ChargedArrow->SetData(TEXT("Player_Charged_Arrow_Fire"), TEXT("NoCollision"));
 	ChargedArrow->SetNiagaraVisibility(false);
 	ChargedArrow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 	ChargedArrow->SetLifeSpan(0.f);
