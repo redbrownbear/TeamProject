@@ -44,23 +44,25 @@ void UGIS_ASyncLoadingScreen::OpenLevelWithLoadingScreenTitle(TSubclassOf<UUserW
 	}
 
 	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
-
-	if (IsMoviePlayerEnabled())
+	if (Widget)
 	{
-		FLoadingScreenAttributes LoadingScreenAttributes;
-		LoadingScreenAttributes.WidgetLoadingScreen = Widget->TakeWidget();
-		LoadingScreenAttributes.MinimumLoadingScreenDisplayTime = 3.f;
-		LoadingScreenAttributes.bAutoCompleteWhenLoadingCompletes = true;
-		LoadingScreenAttributes.bAllowEngineTick = true;
-
-		GetMoviePlayer()->SetupLoadingScreen(LoadingScreenAttributes);
-		GetMoviePlayer()->PlayMovie();
+		Widget->AddToViewport();
+		LoadingWidgetToTitle = Widget;
 	}
+
+	SetPendingLevel(Level);
 
 	FStreamableManager& Streamable = UAssetManager::GetStreamableManager();
 	Streamable.RequestAsyncLoad(Level.ToSoftObjectPath(), FStreamableDelegate::CreateLambda([this, Level]()
 		{
-			UGameplayStatics::OpenLevelBySoftObjectPtr(this, Level);
+			GetWorld()->GetTimerManager().SetTimerForNextTick([this, Level]()
+				{
+					FTimerHandle TimerHandle;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Level]()
+						{
+							UGameplayStatics::OpenLevel(this, TEXT("LoadingLevel"));
+						}, 0.5f, false);
+				});
 		}));
 }
 
@@ -101,7 +103,7 @@ void UGIS_ASyncLoadingScreen::OpenLevelWithLoadingScreen(const TSoftObjectPtr<UW
 		}));
 }
 
-void UGIS_ASyncLoadingScreen::OpenLevelWithLoadingScreenGameOVer(const TSoftObjectPtr<UWorld> Level)
+void UGIS_ASyncLoadingScreen::OpenLevelWithLoadingScreenGameOver(const TSoftObjectPtr<UWorld> Level)
 {
 	if (!LoadingWidgetToTitleClass)
 	{
