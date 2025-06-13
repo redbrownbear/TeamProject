@@ -8,6 +8,7 @@
 #include "SubSystem/UI/QuestManager.h"
 #include "SubSystem/PlayerManager.h"
 
+#include "Misc/TextUtil.h"
 #include "SubSystem/UI/UIManager.h"
 
 #include "GameFramework/PC_InGame.h"
@@ -26,8 +27,8 @@ void UNPCDialogue::ShowUI()
     CancelButton->SetVisibility(ESlateVisibility::Hidden);
     ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 
-    ConfrimText->SetText(FText::FromString(TEXT("확인")));
-    CancelText->SetText(FText::FromString(TEXT("취소")));
+    ConfrimText->SetText(FText::FromString(TextU(1007)));
+    CancelText->SetText(FText::FromString(TextU(1003)));
 
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
     if (PC_InGame)
@@ -377,9 +378,9 @@ void UNPCDialogue::OnNextButtonClicked()
             CancelButton->SetVisibility(ESlateVisibility::Visible);
             ExtraButton->SetVisibility(ESlateVisibility::Visible);
 
-            ConfrimText->SetText(FText::FromString(TEXT("구매")));
-            CancelText->SetText(FText::FromString(TEXT("나가기")));
-            ExtraText->SetText(FText::FromString(TEXT("판매")));
+            ConfrimText->SetText(FText::FromString(TextU(1001)));
+            CancelText->SetText(FText::FromString(TextU(1006)));
+            ExtraText->SetText(FText::FromString(TextU(1002)));
 
             CancelButton->SetRenderTranslation(FVector2D(0.0f, 0.0f));
         }
@@ -392,8 +393,8 @@ void UNPCDialogue::OnNextButtonClicked()
                 CancelButton->SetVisibility(ESlateVisibility::Visible);
                 ExtraButton->SetVisibility(ESlateVisibility::Hidden);
 
-                ConfrimText->SetText(FText::FromString(TEXT("확인")));
-                CancelText->SetText(FText::FromString(TEXT("취소")));
+                ConfrimText->SetText(FText::FromString(TextU(1007)));
+                CancelText->SetText(FText::FromString(TextU(1003)));
 
                 CancelButton->SetRenderTranslation(FVector2D(0.0f, -95.0f));
             }

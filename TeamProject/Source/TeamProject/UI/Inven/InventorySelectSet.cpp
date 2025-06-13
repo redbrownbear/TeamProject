@@ -3,6 +3,7 @@
 
 #include "UI/Inven/InventorySelectSet.h"
 #include "SubSystem/PlayerManager.h"
+#include "Misc/TextUtil.h"
 
 void UInventorySelectSet::NativeConstruct()
 {
@@ -46,13 +47,13 @@ void UInventorySelectSet::ShowButton(bool bIsShow, FItemData InItemData)
 		case EItemCategory::IT_Shield:
 		case EItemCategory::IT_Armor:
 		{
-			//TextUse->SetText(FText::FromString(TEXT("����")));
+			TextUse->SetText(FText::FromString(TextU(1005)));
 			break;
 		}
 		case EItemCategory::IT_Food:
 		case EItemCategory::IT_Material:
 		{
-			TextUse->SetText(FText::FromString(TEXT("���")));
+			TextUse->SetText(FText::FromString(TextU(1004)));
 			break;
 		}
 	}
