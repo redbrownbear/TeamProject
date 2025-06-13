@@ -226,8 +226,6 @@ void AWeaponBow::FireArrow()
         Arrow->SetData(TEXT("Player_Arrow"), TEXT("ToMonster"));
     }
 
-    //Arrow->SetData(TEXT("Player_Arrow"), TEXT("ToMonster"));
-
     Player_C->SetArrowFire(false);
 
 
