@@ -4,6 +4,8 @@
 #include "UI/Base/BaseUI.h"
 #include "SubSystem/UI/UIManager.h"
 #include "EngineUtils.h"
+#include "Misc/SoundUtil.h"
+
 #include "UI/HUD/MainHUD.h"
 #include "GameFramework/PC_InGame.h"
 
@@ -14,6 +16,8 @@ void UBaseUI::OnCreated()
 void UBaseUI::ShowUI()
 {
     PauseAllPausableActors(true);
+
+    SoundU(ESoundType::ESound_Confirm);
 
     APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
     if (PC_InGame)
@@ -34,6 +38,8 @@ void UBaseUI::HideUI(TSubclassOf<UBaseUI> UIClass)
 {
     if (!IsInViewport())
         return;
+
+    SoundU(ESoundType::ESound_Cancel);
 
     UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
     if (UIManager)
