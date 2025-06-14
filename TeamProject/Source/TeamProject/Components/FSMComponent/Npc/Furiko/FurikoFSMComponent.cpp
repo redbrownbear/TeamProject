@@ -1,5 +1,6 @@
 #include "FurikoFSMComponent.h"
 #include "Actors/Npc/Npc.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 #include "Actors/StrollPath/StrollPath.h"
 #include "Components/SplineComponent.h"
@@ -31,6 +32,27 @@ void UFurikoFSMComponent::UpdateRun(float DeltaTime)
 
 	FVector TargetLocation = StrollPath->GetSplinePointLocation(CurrentStrollIndex);
 	FVector CurrentLocation = Owner->GetActorLocation();
+	FVector MoveDirection = (TargetLocation - CurrentLocation).GetSafeNormal();
+
+	if (Player)
+	{
+		FVector PlayerLocation = Player->GetActorLocation();
+		float DistanceToPlayer = FVector::Dist(CurrentLocation, PlayerLocation);
+
+		if (DistanceToPlayer < 300.0f) // 충돌 거리 임계값
+		{
+			FVector ToPlayer = (PlayerLocation - CurrentLocation).GetSafeNormal();
+			float Dot = FVector::DotProduct(MoveDirection, ToPlayer);
+
+			if (Dot > 0.7f) // 이동 방향과 유사할 때 충돌 예측
+			{
+				FVector AvoidDirection = FVector::CrossProduct(ToPlayer, FVector::UpVector); // 횡방향 회피
+				AvoidDirection.Normalize();
+				TargetLocation += AvoidDirection * 150.0f; // 회피 거리
+			}
+		}
+	}
+
 
 	// 이동
 	MoveToLocation(TargetLocation);
