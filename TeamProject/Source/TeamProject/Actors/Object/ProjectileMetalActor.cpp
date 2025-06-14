@@ -30,8 +30,12 @@ AProjectileMetalActor::AProjectileMetalActor()
 
 	InitialLifeSpan = 15.f;
 
-	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
-	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
+	RootComponent = CollisionComponent;
+	//CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+	//CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnHit);
+
+	StaticMeshComponent->SetSimulatePhysics(false);
+	StaticMeshComponent->SetupAttachment(RootComponent);
 }
 
 void AProjectileMetalActor::BeginPlay()
@@ -39,9 +43,19 @@ void AProjectileMetalActor::BeginPlay()
 	Super::BeginPlay();
 	// We dont need Collision's Physcis in ProjectileMetalActor
 	CollisionComponent->SetSimulatePhysics(false);
-	CollisionComponent->SetSphereRadius(84.f);
-	UE_LOG(LogTemp, Warning, TEXT("Radius after set: %f"), CollisionComponent->GetUnscaledSphereRadius());
-	ProjectileMovementComponent->Activate();
+	//CollisionComponent->SetSphereRadius(110.f);
+	CollisionComponent->SetEnableGravity(false);
+	CollisionComponent->SetHiddenInGame(COLLISION_HIDDEN_IN_GAME);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Radius after set: %f"), CollisionComponent->GetUnscaledSphereRadius());
+	//ProjectileMovementComponent->Activate();
+	SetProjectileGravity(false);
+
+
+	StaticMeshComponent->SetSimulatePhysics(false);
+	StaticMeshComponent->SetEnableGravity(false);
+	
+	StaticMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 void AProjectileMetalActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
