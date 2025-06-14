@@ -62,7 +62,7 @@ FReply UGameOverUI::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent
 {
 	if (!bHasAlreadyTriggered)
 	{
-		bHasAlreadyTriggered = false;
+		bHasAlreadyTriggered = true;
 		
 		HideUI(UGameOverUI::StaticClass());
 	}

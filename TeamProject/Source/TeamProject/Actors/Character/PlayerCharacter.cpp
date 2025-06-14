@@ -20,6 +20,7 @@
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "SubSystem/UI/UIManager.h"
 #include "UI/GameOver/GameOverUI.h"
+#include "UI/Ending/EndingCredits.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
@@ -262,7 +263,7 @@ void APlayerCharacter::Damaged(int32 Damage)
 		UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
 		if (UIManager)
 		{
-			UIManager->ShowUI(UGameOverUI::StaticClass());
+			UIManager->ShowUI(UEndingCredits::StaticClass());
 		}
 	}
 }

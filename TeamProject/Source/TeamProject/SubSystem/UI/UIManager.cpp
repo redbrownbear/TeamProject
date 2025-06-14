@@ -156,4 +156,17 @@ void UUIManager::LoadUIClass()
             CachedUIs.Add(UGameOverUI::StaticClass(), CachedGameOverClass);
         }
     }
+
+    if (!CachedEndingCreditsClass)
+    {
+        CachedEndingCreditsClass = CreateWidget<UEndingCredits>(World, LoadClass<UEndingCredits>(nullptr, TEXT("/Game/Blueprint/UI/Ending/BP_EndCredits.BP_EndCredits_C")));
+        if (CachedEndingCreditsClass)
+        {
+            CachedEndingCreditsClass->AddToViewport();
+            CachedEndingCreditsClass->SetVisibility(ESlateVisibility::Collapsed);
+            CachedEndingCreditsClass->OnCreated();
+            CachedUIs.Add(UEndingCredits::StaticClass(), CachedEndingCreditsClass);
+        }
+    }
+
 }

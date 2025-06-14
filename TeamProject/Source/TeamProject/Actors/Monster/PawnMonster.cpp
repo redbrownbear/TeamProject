@@ -151,7 +151,7 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	}
 
 
-
+	HPBarWidget->SetRelativeLocation(FVector(0.f, 0.f, (MonsterData->CollisionSphereRadius - 10.0f) * 4.0f));
 
 	MovementComponent->MaxSpeed = MonsterData->WalkMovementMaxSpeed;
 
