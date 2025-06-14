@@ -9,6 +9,7 @@
 #include "SubSystem/PlayerManager.h"
 
 #include "Misc/TextUtil.h"
+#include "Misc/SoundUtil.h"
 #include "SubSystem/UI/UIManager.h"
 
 #include "GameFramework/PC_InGame.h"
@@ -175,6 +176,8 @@ void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
         }
         else
         {
+            SoundU(ESoundType::ESound_FindFuriko);
+
             PC_InGame->Npc->SetDoQuest(false);
             PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
         }
