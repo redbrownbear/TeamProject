@@ -48,10 +48,8 @@ void AMetalActor::PostDuplicate(EDuplicateMode::Type DuplicateMode)
 	{
 		FTransform Backup = GetActorTransform();
 		CollisionComponent->DestroyComponent();
+		SetData(DataTableRowHandle);
 		SetActorTransform(Backup);
-
-		if (!DataTableRowHandle.IsNull())
-			SetData(DataTableRowHandle);
 	}
 }
 
@@ -76,7 +74,7 @@ void AMetalActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		EObjectFlags SubobjectFlags = GetMaskedFlags(RF_PropagateToSubObjects) | RF_DefaultSubObject;
 		CollisionComponent = NewObject<UShapeComponent>(this, MetalActorData->CollisionClass, TEXT("CollisionComponent"), SubobjectFlags);
 		SetRootComponent(CollisionComponent);
-		DefaultSceneRoot->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		//DefaultSceneRoot->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 		CollisionComponent->SetCanEverAffectNavigation(false);
 		if (MetalActorData->CollisionProfileName == TEXT("None"))
 		{
@@ -133,6 +131,31 @@ void AMetalActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		StaticMeshComponent->SetRelativeTransform(MetalActorData->MeshTransform);
 		StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 		StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		UStaticMesh* StaticMesh = StaticMeshComponent->GetStaticMesh();
+		UMaterialInterface* CurrentMaterialOnMesh = StaticMesh->GetMaterial(0);
+
+		DynamicMaterialInstance = Cast<UMaterialInstanceDynamic>(CurrentMaterialOnMesh);
+
+		if (!DynamicMaterialInstance)
+		{
+			DynamicMaterialInstance = UMaterialInstanceDynamic::Create(CurrentMaterialOnMesh, this);
+
+			if (DynamicMaterialInstance)
+			{
+				StaticMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+				UE_LOG(LogTemp, Log, TEXT("MetalActor::SetData // Created and assigned new DynamicMaterialInstance"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("MetalActor::SetData // Failed to create and assign new DynamicMaterialInstance"));
+				DynamicMaterialInstance = nullptr;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("MetalActor::SetData // Re-using existing DynamicMaterialInstance"));
+		}
 	}
 }
 

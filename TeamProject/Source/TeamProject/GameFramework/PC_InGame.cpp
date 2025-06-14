@@ -19,6 +19,7 @@
 
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
+#include "Components/MetalComponent/MetalComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
@@ -1102,44 +1103,70 @@ bool APC_InGame::IsSurfaceActor(AActor* Actor) const
 
 AActor* APC_InGame::FindVisibleActorOnScreen(FHitResult& OutHit)
 {
-	const int GridSize = 5;
-	const float ScreenStep = 1.0f / GridSize;
+	// 화면 중앙 기준 라인트레이스
+	FVector Start;
+	FRotator Rot;
+	GetPlayerViewPoint(Start, Rot);
 
-	int32 ViewX, ViewY;
-	GetViewportSize(ViewX, ViewY);
+	FVector End = Start + Rot.Vector() * TraceDistance;
 
-	for (int X = 0; X <= GridSize; ++X)
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetPawn());
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	if (bHit)
 	{
-		for (int Y = 0; Y <= GridSize; ++Y)
-		{
-			float ScreenX = X * ScreenStep * ViewX;
-			float ScreenY = Y * ScreenStep * ViewY;
+		AActor* HitActor = HitResult.GetActor();
+		if (!HitActor) return nullptr;
 
-			FVector WorldOrigin;
-			FVector WorldDirection;
-
-			if (DeprojectScreenPositionToWorld(ScreenX, ScreenY, WorldOrigin, WorldDirection))
-			{
-				FVector End = WorldOrigin + WorldDirection * TraceDistance;
-
-				FHitResult HitResult;
-				FCollisionQueryParams Params;
-				Params.AddIgnoredActor(GetPawn());
-
-				if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldOrigin, End, ECC_Visibility, Params))
-				{
-					AMetalActor* HitMetal = Cast<AMetalActor>(HitResult.GetActor());
-					if (HitMetal)
-					{
-						OutHit = HitResult;
-						return HitMetal;
-					}
-				}
-			}
-		}
+		return HitActor;
+	}
+	else
+	{
+		return nullptr;
 	}
 
-	return nullptr;
+
+	//const int GridSize = 5;
+	//const float ScreenStep = 1.0f / GridSize;
+
+	//int32 ViewX, ViewY;
+	//GetViewportSize(ViewX, ViewY);
+
+	//for (int X = 0; X <= GridSize; ++X)
+	//{
+	//	for (int Y = 0; Y <= GridSize; ++Y)
+	//	{
+	//		float ScreenX = X * ScreenStep * ViewX;
+	//		float ScreenY = Y * ScreenStep * ViewY;
+
+	//		FVector WorldOrigin;
+	//		FVector WorldDirection;
+
+	//		if (DeprojectScreenPositionToWorld(ScreenX, ScreenY, WorldOrigin, WorldDirection))
+	//		{
+	//			FVector End = WorldOrigin + WorldDirection * TraceDistance;
+
+	//			FHitResult HitResult;
+	//			FCollisionQueryParams Params;
+	//			Params.AddIgnoredActor(GetPawn());
+
+	//			if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldOrigin, End, ECC_Visibility, Params))
+	//			{
+	//				AMetalActor* HitMetal = Cast<AMetalActor>(HitResult.GetActor());
+	//				if (HitMetal)
+	//				{
+	//					OutHit = HitResult;
+	//					return HitMetal;
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+
+	//return nullptr;
 }
 
 void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue)
@@ -1233,7 +1260,7 @@ void APC_InGame::CheckMetalActor()
 //			return;
 //		}
 
-		if (!HitActor->IsA<AMetalActor>())
+		if (!HitActor->GetComponentByClass<UMetalComponent>())
 		{
 			bCanControlMetal = false;
 			return;
