@@ -29,6 +29,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UMonsterFSMComponent> MonsterFSMComponent;
 
+
+
+
 public:
 	UFUNCTION()
 	void SetAIEnabled(bool bEnabled);

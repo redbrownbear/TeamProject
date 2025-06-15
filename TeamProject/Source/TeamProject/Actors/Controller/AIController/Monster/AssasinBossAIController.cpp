@@ -17,7 +17,7 @@ AAssasinBossAIController::AAssasinBossAIController()
 
 void AAssasinBossAIController::Tick(float DeltaTime)
 {
-	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
 
 	Super::Tick(DeltaTime);

@@ -7,6 +7,7 @@
 #include "BokoblinAnimInstance.generated.h"
 
 class UBokoblinFSMComponent;
+class UTimeManagerSubsystem;
 
 UCLASS()
 class TEAMPROJECT_API UBokoblinAnimInstance : public UAnimInstance
@@ -23,6 +24,7 @@ public:
 protected:
 	UPROPERTY()
 	TObjectPtr<UBokoblinFSMComponent> FSMComponent = nullptr;
+	TObjectPtr<UTimeManagerSubsystem> TimeManager = nullptr;
 
 protected:
 	UPROPERTY(BlueprintReadOnly) 

@@ -7,6 +7,7 @@
 #include "MoriblinAnimInstance.generated.h"
 
 class UMoriblinFSMComponent;
+class UTimeManagerSubsystem;
 
 UCLASS()
 class TEAMPROJECT_API UMoriblinAnimInstance : public UAnimInstance
@@ -23,6 +24,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UMoriblinFSMComponent> FSMComponent = nullptr;
 
+	TObjectPtr<UTimeManagerSubsystem> TimeManager = nullptr;
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsIdle = true;

@@ -28,11 +28,11 @@ void UBokoblinAnimInstance::NativeInitializeAnimation()
 
 	APawnMonster* Monster = Cast<APawnMonster>(Pawn);
 	FSMComponent = Cast<UBokoblinFSMComponent>(Monster->GetFSMComponent());
+	TimeManager = Monster->GetTimeManagerSubsystem();
 }
 
 void UBokoblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	static UTimeManagerSubsystem* TimeManager = TryGetPawnOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
 
 	Super::NativeUpdateAnimation(CustumDeltaTime);

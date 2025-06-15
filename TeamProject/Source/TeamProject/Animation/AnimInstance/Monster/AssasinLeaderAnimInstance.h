@@ -7,6 +7,7 @@
 #include "AssasinLeaderAnimInstance.generated.h"
 
 class UAssasinLeaderFSMComponent;
+class UTimeManagerSubsystem;
 
 UCLASS()
 class TEAMPROJECT_API UAssasinLeaderAnimInstance : public UAnimInstance
@@ -23,6 +24,7 @@ public:
 protected:
 	UPROPERTY()
 	TObjectPtr<UAssasinLeaderFSMComponent> FSMComponent = nullptr;
+	TObjectPtr<UTimeManagerSubsystem> TimeManager = nullptr;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)

@@ -29,12 +29,12 @@ void UAssasinLeaderAnimInstance::NativeInitializeAnimation()
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(Pawn))
 	{
 		FSMComponent = Cast<UAssasinLeaderFSMComponent>(Monster->GetFSMComponent());
+		TimeManager = Monster->GetTimeManagerSubsystem();
 	}
 }
 
 void UAssasinLeaderAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	static UTimeManagerSubsystem* TimeManager = TryGetPawnOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
 
 	Super::NativeUpdateAnimation(CustumDeltaTime);

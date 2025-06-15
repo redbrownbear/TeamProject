@@ -7,7 +7,7 @@
 #include "AssasinBossAnimInstance.generated.h"
 
 class UAssasinBossFSMComponent;
-
+class UTimeManagerSubsystem;
 UCLASS()
 class TEAMPROJECT_API UAssasinBossAnimInstance : public UAnimInstance
 {
@@ -22,7 +22,8 @@ public:
 protected:
 	UPROPERTY()
 	TObjectPtr<UAssasinBossFSMComponent> FSMComponent = nullptr;
-
+	TObjectPtr<UTimeManagerSubsystem> TimeManager = nullptr;
+	
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsIdle = true;

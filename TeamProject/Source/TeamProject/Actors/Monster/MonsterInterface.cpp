@@ -29,7 +29,7 @@
 
 void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 {
-	static UTimeManagerSubsystem* TimeManager = GetTimeManagerSubsystem();
+	UTimeManagerSubsystem* TimeManager = GetTimeManagerSubsystem();
 
 	UAnimInstance* AnimInstance = GetAnimInstance();
 	FMonsterTableRow* MonsterData = GetMonsterData();

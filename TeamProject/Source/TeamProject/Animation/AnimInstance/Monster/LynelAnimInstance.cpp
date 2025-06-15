@@ -29,12 +29,14 @@ void ULynelAnimInstance::NativeInitializeAnimation()
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(Pawn))
 	{
 		FSMComponent = Cast<ULynelFSMComponent>(Monster->GetFSMComponent());
+		TimeManager = Monster->GetTimeManagerSubsystem();
 	}
+
+
 }
 
 void ULynelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	static UTimeManagerSubsystem* TimeManager = TryGetPawnOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
 
 	Super::NativeUpdateAnimation(CustumDeltaTime);

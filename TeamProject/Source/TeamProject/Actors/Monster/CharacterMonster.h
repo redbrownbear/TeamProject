@@ -46,6 +46,8 @@ protected:
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UDefaultCameraShakeBase> DefaultCameraShakeBase;
 
+    TObjectPtr<UTimeManagerSubsystem> TimeManager;
+
 protected:
     UPROPERTY(EditAnywhere, meta = (RowType = "MonsterTableRow"))
     FDataTableRowHandle DataTableRowHandle;
@@ -136,7 +138,7 @@ private:
 public:
     void ShowHpUI(float CurHp, float MaxHp);
 
-protected:
+public:
     virtual UTimeManagerSubsystem* GetTimeManagerSubsystem() override;
 
 };

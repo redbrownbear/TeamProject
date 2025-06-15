@@ -29,12 +29,11 @@ void UMoriblinAnimInstance::NativeInitializeAnimation()
 
 	APawnMonster* Monster = Cast<APawnMonster>(Pawn);
 	FSMComponent = Cast<UMoriblinFSMComponent>(Monster->GetFSMComponent());
-
+	TimeManager = Monster->GetTimeManagerSubsystem();
 }
 
 void UMoriblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	static UTimeManagerSubsystem* TimeManager = TryGetPawnOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
 
 	Super::NativeUpdateAnimation(CustumDeltaTime);

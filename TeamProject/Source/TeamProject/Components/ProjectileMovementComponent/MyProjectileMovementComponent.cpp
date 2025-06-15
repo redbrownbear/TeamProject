@@ -14,7 +14,7 @@ void UMyProjectileMovementComponent::TickComponent(float DeltaTime, ELevelTick T
 		return;
 	}
 
-	static UTimeManagerSubsystem* TimeManager = GetOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	UTimeManagerSubsystem* TimeManager = GetOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
 
 	Super::TickComponent(CustumDeltaTime, TickType, ThisTickFunction);

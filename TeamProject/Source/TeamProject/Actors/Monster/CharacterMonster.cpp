@@ -132,12 +132,13 @@ void ACharacterMonster::BeginPlay()
 		HPBarWidget->SetWidgetClass(HPBarWidgetClass);
 		HPBarWidget->InitWidget();
 	}
+
+	GetTimeManagerSubsystem();
 }
 
 // Called every frame
 void ACharacterMonster::Tick(float DeltaTime)
 {
-	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
 
 	Super::Tick(CustumDeltaTime);
@@ -940,7 +941,10 @@ void ACharacterMonster::ShowHpUI(float CurHp, float MaxHp)
 
 UTimeManagerSubsystem* ACharacterMonster::GetTimeManagerSubsystem()
 {
-	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	if (!TimeManager)
+	{
+		TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	} 
 
 	return TimeManager;
 }

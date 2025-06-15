@@ -44,17 +44,20 @@ float UTimeManagerSubsystem::GetCustomDeltaTime() const
 
 void UTimeManagerSubsystem::SetTimeScale(float NewScale)
 {
-    
-    if (!FMath::IsNearlyEqual(TimeScale, NewScale))
-    {
-        TimeScale = NewScale;
-        OnTimeScaleUpdated.Broadcast(NewScale);
-    }
+    TimeScale = NewScale;
+    OnTimeScaleUpdated.Broadcast(NewScale);
+
+    //
+    //if (!FMath::IsNearlyEqual(TimeScale, NewScale))
+    //{
+    //    TimeScale = NewScale;
+    //    OnTimeScaleUpdated.Broadcast(NewScale);
+    //}
     
 }
 
 float UTimeManagerSubsystem::GetTimeScale() const
 {
-    return 1.f;
-    //return TimeScale;
+    //return 1.f;
+    return TimeScale;
 }
