@@ -62,6 +62,11 @@ void UTitleWidget::PlayFadeOutAndStart()
                 UGIS_ASyncLoadingScreen* LoadingScreenSystem = GetWorld()->GetGameInstance()->GetSubsystem<UGIS_ASyncLoadingScreen>();
                 if (LoadingScreenSystem)
                 {
+                    if (UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>())
+                    {
+                        PlayerManager->SetLevelName(TextU(3001));
+                    }
+
                     LoadingScreenSystem->OpenLevelWithLoadingScreenTitle(LoadingWidgetClass, GameMap);
                 }
             }

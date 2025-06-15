@@ -2,7 +2,7 @@
 
 
 #include "UI/Loading/LoadingWithPlayerInfo.h"
-#include "Misc/TextUtil.h"
+#include "Misc/Utils.h"
 #include "SubSystem/PlayerManager.h"
 
 

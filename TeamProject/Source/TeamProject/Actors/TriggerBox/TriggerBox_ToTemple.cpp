@@ -31,6 +31,7 @@ void ATriggerBox_ToTemple::OnTrigger(UPrimitiveComponent* OverlappedComponent, A
 				sPlayerStatus Status = PlayerManager->GetPlayerStatus();
 				Status.PreviousLoction = Player->GetActorLocation() - Player->GetActorForwardVector() * 200.f;
 				PlayerManager->SetPlayerStatus(Status);
+				PlayerManager->SetLevelName(TextU(3002));
 
 				TSoftObjectPtr<UWorld> GameMap = TSoftObjectPtr<UWorld>(FSoftObjectPath(TEXT("/Game/Level/WaterDungeon.WaterDungeon")));
 				LoadingScreenSubsystem->OpenLevelWithLoadingScreen(GameMap);

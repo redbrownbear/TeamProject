@@ -8,8 +8,7 @@
 #include "SubSystem/UI/QuestManager.h"
 #include "SubSystem/PlayerManager.h"
 
-#include "Misc/TextUtil.h"
-#include "Misc/SoundUtil.h"
+#include "Misc/Utils.h"
 #include "SubSystem/UI/UIManager.h"
 
 #include "GameFramework/PC_InGame.h"
