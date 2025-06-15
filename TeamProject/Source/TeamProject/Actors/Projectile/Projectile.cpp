@@ -107,7 +107,7 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 	////////////////////////////
 	// Effect
 
-	const FDataTableRowHandle NiagaraEffectDataTable = ProjectileTableRow->NiagaraEffectTableRowHandle;
+	const FDataTableRowHandle NiagaraEffectDataTable = ProjectileTableRow->TrailEffectTableRowHandle;
 	if (!NiagaraEffectDataTable.IsNull())
 	{
 		FNiagaraEffectTableRow* Data = NiagaraEffectDataTable.GetRow<FNiagaraEffectTableRow>(NiagaraEffectDataTable.RowName.ToString());
@@ -119,6 +119,30 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		//NiagaraEffectComponent->SetRelativeLocation(Data->Transform.GetLocation());
 		//NiagaraEffectComponent->SetRelativeRotation(GetActorForwardVector().Rotation().Quaternion());
 		NiagaraEffectComponent->RegisterComponent();
+	}
+
+	//Trail
+
+	const FDataTableRowHandle TrailEffectTable = ProjectileTableRow->NiagaraEffectTableRowHandle;
+	if (!TrailEffectTable.IsNull())
+	{
+		FNiagaraEffectTableRow* Data = NiagaraEffectDataTable.GetRow<FNiagaraEffectTableRow>(TrailEffectTable.RowName.ToString());
+		if (Data)
+		{
+
+			TrailEffectFX = Data->EffectNiagaraSystem;
+
+			for (auto& SocketName : ProjectileTableRow->TrailSockets)
+			{
+
+				UNiagaraComponent* NewTrail = NewObject<UNiagaraComponent>(this, UNiagaraComponent::StaticClass(), SocketName);
+				NewTrail->AttachToComponent(StaticMeshComponent, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
+				NewTrail->SetAsset(TrailEffectFX);
+
+
+				Trails.Add(NewTrail);
+			}
+		}
 	}
 
 	const FDataTableRowHandle ParticleEffectDataTable = ProjectileTableRow->ParticleEffectTableRowHandle;
@@ -236,7 +260,24 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 			ParticleEffect->FinishSpawning(NewTransform);
 		}
 	}
+	if (DataTableRowHandle.RowName == ProjectileName::Player_Arrow
+		|| DataTableRowHandle.RowName == ProjectileName::Player_FireArrow
+		)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			AParticleEffect* ParticleEffect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+			const FDataTableRowHandle ParticleEffectDataTable = ProjectileTableRow->ParticleEffectTableRowHandle;
+			FTransform NewTransform;
+			ParticleEffect->SetData(ParticleEffectDataTable);
 
+			const FVector Location = GetActorLocation();
+			NewTransform.SetLocation(Location);
+
+			ParticleEffect->FinishSpawning(NewTransform);
+		}
+	}
 
 	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert)
 		&& !OtherActor->IsA<ATorchStand>()

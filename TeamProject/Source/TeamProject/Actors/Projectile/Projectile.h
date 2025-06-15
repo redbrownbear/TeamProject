@@ -9,7 +9,7 @@
 struct FProjectileTableRow;
 class UNiagaraComponent;
 class UParticleSystemComponent;
-
+class UNiagaraSystem;
 UCLASS()
 class TEAMPROJECT_API AProjectile : public AActor
 {
@@ -56,10 +56,14 @@ public:
 	FVector GetVelocity();
 	virtual FName GetProjectileName();
 	float GetDamage();
-
+	
 protected:
 	UPROPERTY()
+	TArray<UNiagaraComponent*> Trails;
+	UPROPERTY()
 	TObjectPtr<UNiagaraComponent> NiagaraEffectComponent;
+	UPROPERTY()
+	UNiagaraSystem* TrailEffectFX;
 	UPROPERTY()
 	TObjectPtr<UParticleSystemComponent> ParticleEffectComponent;
 

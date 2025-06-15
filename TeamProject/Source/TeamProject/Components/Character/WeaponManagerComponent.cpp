@@ -40,17 +40,10 @@ UWeaponManagerComponent::UWeaponManagerComponent()
 	Arrow = CreateDefaultSubobject<UWeaponChildActorComponent>(TEXT("ArrowNormal"));
 	
 	Arrow->SetChildActorClass(AWeaponArrow::StaticClass());
-	{
-		Glider = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Glider"));
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset{
-			TEXT("/Script/Engine.SkeletalMesh'/Game/Resources/Player/Armor/Animation/Glide/Item_Parastole2_Vagrant.Item_Parastole2_Vagrant'")
-		};
-
-		if (Asset.Object)
-		{
-			Glider->SetSkeletalMesh(Asset.Object);
-		}
-	}
+	
+	Glider = CreateDefaultSubobject<UWeaponChildActorComponent>(TEXT("Glider"));
+	
+	Glider->SetChildActorClass(AWeaponGlider::StaticClass());
 	if (Mesh)
 	{
 		Shield->SetupAttachment(Player_C->GetMesh(), TEXT("Shield_Socket"));
@@ -72,30 +65,7 @@ UWeaponManagerComponent::UWeaponManagerComponent()
 			UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
 		}
 	}
-	{
-		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimMontage'/Game/Resources/Player/Armor/Animation/Glide/Equip_Float_On_Montage.Equip_Float_On_Montage'"));
 
-		if (Asset.Object)
-		{
-			EquipGlider = Asset.Object;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
-		}
-	}
-	{
-		ConstructorHelpers::FObjectFinder<UAnimMontage> Asset(TEXT("/Script/Engine.AnimSequence'/Game/Resources/Player/Armor/Animation/Glide/Equip_Float_Off.Equip_Float_Off'"));
-
-		if (Asset.Object)
-		{
-			UnEquipGlider = Asset.Object;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No Anim_Montage"));
-		}
-	}
 
 }
 
@@ -107,7 +77,7 @@ void UWeaponManagerComponent::BeginPlay()
 	Sword->GetChildActor()->SetOwner(GetOwner());
 	Shield->GetChildActor()->SetOwner(GetOwner());
 	Bow->GetChildActor()->SetOwner(GetOwner());
-	Glider->SetVisibility(false);
+	Glider->GetChildActor()->SetOwner(GetOwner());
 	// ...
 	UPlayerManager* PlayerManager = GetOwner()->GetGameInstance()->GetSubsystem<UPlayerManager>();
 	TArray<FItemData> EquipData = PlayerManager->GetAllEquipData();

@@ -318,3 +318,14 @@ void APlayerCharacter::SetArrowFire(bool _bool)
 	}
 
 }
+
+void APlayerCharacter::CameraAttach()
+{
+	Camera->AttachToComponent(SpringArm, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	Camera->SetRelativeLocation(FVector::ZeroVector); 
+}
+
+void APlayerCharacter::SetCameraTransform(FTransform& _InTransform)
+{
+	Camera->SetWorldTransform(_InTransform);
+}

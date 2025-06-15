@@ -89,6 +89,14 @@ public:
 	void SetArrowVisibility(bool _bool) { ChargedArrow->SetStaticMeshVisibility(_bool); }
 
 	bool GetIsFire() { return bIsFire; }
+
+
+public:
+	void SetSpringArmTargetArmLength(float _Length) { SpringArm->TargetArmLength = _Length; }
+
+	void CamearaDetach() { Camera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform); }
+	void CameraAttach();
+	void SetCameraTransform(FTransform& _InTransform);
 protected:
 
 	/*UPROPERTY(EditAnywhere, Category="Weapon")

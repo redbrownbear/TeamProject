@@ -15,5 +15,5 @@ void UAnimNotify_GlideVisible::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 	{
 		return;
 	}
-	PlayerCharacter->GetWeaponManagerComponent()->GetGlider()->SetVisibility(true);
+	PlayerCharacter->GetWeaponManagerComponent()->GetGlider()->SetVisibleGldier(true);
 }

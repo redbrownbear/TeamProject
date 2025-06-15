@@ -99,6 +99,10 @@
 #define GRAVITY_MODIFY_SPEED														980.f
 #define GRAVITY_MAX_SPEED															1200.f
 
+#define SPRINGARM_TARGETARM_LENGTH_NML												300.f
+#define SPRINGARM_TARGETARM_LENGTH_HOUSE											100.f
+
+
 #define ICEPILLAR_MAXSPEED														    300.f
 #define ICEPILLAR_MAXHEIGT															300.F
 
