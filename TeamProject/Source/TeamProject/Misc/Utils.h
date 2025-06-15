@@ -6,6 +6,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Defines.h"
+#include "TextUtil.h"
+#include "SoundUtil.h"
 
 namespace CollisionProfileName
 {

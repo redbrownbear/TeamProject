@@ -119,6 +119,11 @@ public:
 	bool IsStaminaFull() const { return PlayerStatus.Stamina >= PlayerStatus.MaxStamina;}
 	//Status
 
+
+public:
+	void SetLevelName(FString Name) { LevelName = Name; }
+	FString GetLevelName() { return LevelName; }
+
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnQuestUpdated OnQuestUpdated;
@@ -140,6 +145,8 @@ private:
 	TArray<FItemData> ItemInvenList;
 
 	TArray<FItemData> EquipItemList;
+
+	FString LevelName;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loading")
