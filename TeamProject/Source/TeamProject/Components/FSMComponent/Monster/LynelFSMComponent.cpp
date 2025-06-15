@@ -298,7 +298,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 	{
 		if (eReadyToAttackStep != EReadyToAttackStep::End)
 		{
-			eNextState = EMonsterState::RunningAttack;
+			eNextState = EMonsterState::DashAttack;
 			ChangeState(EMonsterState::ReadyToAttack);
 			return;
 		}
@@ -445,7 +445,7 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 	{
 		if (eReadyToAttackStep != EReadyToAttackStep::End)
 		{
-			eNextState = EMonsterState::RunningAttack;
+			eNextState = EMonsterState::HornAttack;
 			ChangeState(EMonsterState::ReadyToAttack);
 			return;
 		}
@@ -499,7 +499,6 @@ void ULynelFSMComponent::ChangeState(EMonsterState NewState)
 			ChangeState(EMonsterState::ReadyToAttack);
 			return;
 		}
-
 
 		if (CurrentWeapon)
 		{
@@ -718,24 +717,31 @@ void ULynelFSMComponent::UpdateCombat(float DeltaTime)
 	switch (eCombatIndex)
 	{
 	case ELynelCombatIndex::AimingBow:
+		UE_LOG(LogTemp, Warning, TEXT("ELynelCombatIndex::AimingBow"));
 		ChangeState(EMonsterState::AimingBow);
 		return;
 	case ELynelCombatIndex::DashAttack:
+		UE_LOG(LogTemp, Warning, TEXT("ELynelCombatIndex::DashAttack"));
 		ChangeState(EMonsterState::DashAttack);
 		return;
 	case ELynelCombatIndex::ExplosionAttack:
+		UE_LOG(LogTemp, Warning, TEXT("ELynelCombatIndex::ExplosionAttack"));
 		ChangeState(EMonsterState::ExplosionAttack);
 		return;
 	case ELynelCombatIndex::FireAttack:
+		UE_LOG(LogTemp, Warning, TEXT("ELynelCombatIndex::FireAttack"));
 		ChangeState(EMonsterState::FireAttack);
 		return;
 	case ELynelCombatIndex::AimingBowUpper:
+		UE_LOG(LogTemp, Warning, TEXT("ELynelCombatIndex::AimingBowUpper"));
 		ChangeState(EMonsterState::AimingBowUpper);
 		return;
 	case ELynelCombatIndex::HornAttack:
+		UE_LOG(LogTemp, Warning, TEXT("ELynelCombatIndex::HornAttack"));
 		ChangeState(EMonsterState::HornAttack);
 		return;
 	case ELynelCombatIndex::RunningAttack:
+		UE_LOG(LogTemp, Warning, TEXT("ELynelCombatIndex::RunningAttack"));
 		ChangeState(EMonsterState::RunningAttack);
 		return;
 	case ELynelCombatIndex::End:
