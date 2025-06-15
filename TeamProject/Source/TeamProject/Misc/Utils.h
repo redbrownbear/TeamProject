@@ -35,6 +35,7 @@ namespace ProjectileName
     static inline FName Monster_LynelExplosion = TEXT("Monster_LynelExplosion");
     static inline FName Monster_LynelFire = TEXT("Monster_LynelFire");
     static inline FName Monster_LynelArrow = TEXT("Monster_LynelArrow");
+    static inline FName Monster_LynelHorn = TEXT("Monster_LynelHorn");
 
     static inline FName Monster_HinoxAttack = TEXT("Monster_HinoxAttack");
     static inline FName Monster_HinoxGrab = TEXT("Monster_HinoxGrab");

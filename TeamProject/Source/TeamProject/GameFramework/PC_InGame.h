@@ -140,6 +140,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
 	UInputAction* IA_ControlDistance = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "Input|InputAction")
+	UInputAction* IA_Rewind = nullptr;
+
 
 	void CheckValid() const
 	{
@@ -171,6 +174,7 @@ public:
 		check(IA_MapOpen);
 		check(IA_CategoryLeft);
 		check(IA_CategoryRight);
+		check(IA_Rewind);
 	}
 };
 
@@ -238,10 +242,12 @@ protected:
 
 	// Ice Maker
 	void BeginIcePreview(const FInputActionValue& InputActionValue);
-	void SpawnIcePillar(const FInputActionValue& InputActionValue);
 	
 	// Magnesis
 	void ShowMetalActorPreview(const FInputActionValue& InputActionValue);
+
+	// Rewind
+	void ShowRewindActor(const FInputActionValue& InputActionValue);
 
 	void OnQuickSlotLeft(const FInputActionValue& InputActionValue);
 	void OnQuickSlotRight(const FInputActionValue& InputActionValue);
@@ -322,6 +328,9 @@ protected:
 	UFUNCTION()
 	void ScanMetalActorInView();
 
+	UFUNCTION()
+	void OnRewind();
+
 public:
 	void SetOverlappedItem(AWorldWeapon* Item) { OverlappedItem = Item; }
 
@@ -371,6 +380,7 @@ private:
 
 	bool bMagnesisKeyPressed = false;
 	bool bCanControlMetal = false;
+	bool bRewindKeyPressed = false;
 
 	FHitResult LastHit;
 	bool bHitResult = false;

@@ -73,8 +73,8 @@ void AScale::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    static float PrevLeftWeight = LeftWeight;
-    static float PrevRightWeight = RightWeight;
+    float PrevLeftWeight = LeftWeight;
+    float PrevRightWeight = RightWeight;
 
     UpdateWeight();
 
@@ -132,7 +132,7 @@ void AScale::UpdateWeight()
 
 void AScale::ApplyOffsetFromWeight()
 {
-    float MaxOffset = 50.0f; // 최대 이동 거리 (cm 기준)
+    float MaxOffset = 50.0f;
     float DampingFactor = 5.0f;
 
     float WeightDiff = LeftWeight - RightWeight;

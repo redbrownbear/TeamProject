@@ -66,13 +66,23 @@ void ABurningActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-    
+    UMaterialInterface* MaterialInterface = StaticMeshComponent->GetMaterial(0);
+    DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInterface, this);
+    StaticMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+
+    NiagaraComponent->Deactivate();
 }
 
 // Called every frame
 void ABurningActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+    if (bIsBurning)
+    {
+        fBurnAmount += DeltaTime * 0.2f;
+        DynamicMaterialInstance->SetScalarParameterValue(TEXT("BurnAmount"), fBurnAmount);
+    }
 
 }
 

@@ -119,7 +119,6 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		//NiagaraEffectComponent->SetRelativeLocation(Data->Transform.GetLocation());
 		//NiagaraEffectComponent->SetRelativeRotation(GetActorForwardVector().Rotation().Quaternion());
 		NiagaraEffectComponent->RegisterComponent();
-		NiagaraEffectComponent->bAutoActivate = false;
 	}
 
 	const FDataTableRowHandle ParticleEffectDataTable = ProjectileTableRow->ParticleEffectTableRowHandle;
@@ -154,7 +153,8 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		{
 			if (DataTableRowHandle.RowName == ProjectileName::Monster_Attack
 				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelAttack
-				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack)
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelHorn)
 			{
 				if (GetOwner()->IsA<APawnMonster>())
 				{

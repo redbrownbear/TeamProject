@@ -233,6 +233,8 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 void APlayerCharacter::Damaged(int32 Damage)
 {
+	if (GetIsParry()) return;
+
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	const int32 CurrentHP = PlayerManager->GetHp();
 	EMove_State Move_State = Cast<UPlayerMovementComponent>(GetCharacterMovement())->GetMoveState();

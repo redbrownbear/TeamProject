@@ -19,6 +19,7 @@
 
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
+#include "Components/MetalComponent/MetalComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
@@ -162,6 +163,9 @@ void APC_InGame::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_ControlDistance, 
 		ETriggerEvent::Triggered, this, &ThisClass::OnControlDistance);	
+
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Rewind,
+		ETriggerEvent::Triggered, this, &ThisClass::ShowRewindActor);
 
 	//QuickSlot
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotLeft,
@@ -716,6 +720,12 @@ void APC_InGame::TrySuperPower(const FInputActionValue& InputActionValue)
 			Magnesis();
 		}
 	}	
+
+	else if (bRewindKeyPressed)
+	{
+		OnRewind();
+	}
+
 }
 
 void APC_InGame::OnControlDistance(const FInputActionValue& InputActionValue)
@@ -868,6 +878,12 @@ void APC_InGame::DestroyIcePillar()
 			}
 		}
 	}
+}
+
+void APC_InGame::ShowRewindActor(const FInputActionValue& InputActionValue)
+{
+	// 되감을 액터 보여주기
+	// 화면 중앙에 RewindActor 있을 경우 TrySuperPower 호출하여 되감기
 }
 
 void APC_InGame::OnQuickSlotLeft(const FInputActionValue& InputActionValue)
@@ -1102,44 +1118,70 @@ bool APC_InGame::IsSurfaceActor(AActor* Actor) const
 
 AActor* APC_InGame::FindVisibleActorOnScreen(FHitResult& OutHit)
 {
-	const int GridSize = 5;
-	const float ScreenStep = 1.0f / GridSize;
+	// 화면 중앙 기준 라인트레이스
+	FVector Start;
+	FRotator Rot;
+	GetPlayerViewPoint(Start, Rot);
 
-	int32 ViewX, ViewY;
-	GetViewportSize(ViewX, ViewY);
+	FVector End = Start + Rot.Vector() * TraceDistance;
 
-	for (int X = 0; X <= GridSize; ++X)
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetPawn());
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	if (bHit)
 	{
-		for (int Y = 0; Y <= GridSize; ++Y)
-		{
-			float ScreenX = X * ScreenStep * ViewX;
-			float ScreenY = Y * ScreenStep * ViewY;
+		AActor* HitActor = HitResult.GetActor();
+		if (!HitActor) return nullptr;
 
-			FVector WorldOrigin;
-			FVector WorldDirection;
-
-			if (DeprojectScreenPositionToWorld(ScreenX, ScreenY, WorldOrigin, WorldDirection))
-			{
-				FVector End = WorldOrigin + WorldDirection * TraceDistance;
-
-				FHitResult HitResult;
-				FCollisionQueryParams Params;
-				Params.AddIgnoredActor(GetPawn());
-
-				if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldOrigin, End, ECC_Visibility, Params))
-				{
-					AMetalActor* HitMetal = Cast<AMetalActor>(HitResult.GetActor());
-					if (HitMetal)
-					{
-						OutHit = HitResult;
-						return HitMetal;
-					}
-				}
-			}
-		}
+		return HitActor;
+	}
+	else
+	{
+		return nullptr;
 	}
 
-	return nullptr;
+
+	//const int GridSize = 5;
+	//const float ScreenStep = 1.0f / GridSize;
+
+	//int32 ViewX, ViewY;
+	//GetViewportSize(ViewX, ViewY);
+
+	//for (int X = 0; X <= GridSize; ++X)
+	//{
+	//	for (int Y = 0; Y <= GridSize; ++Y)
+	//	{
+	//		float ScreenX = X * ScreenStep * ViewX;
+	//		float ScreenY = Y * ScreenStep * ViewY;
+
+	//		FVector WorldOrigin;
+	//		FVector WorldDirection;
+
+	//		if (DeprojectScreenPositionToWorld(ScreenX, ScreenY, WorldOrigin, WorldDirection))
+	//		{
+	//			FVector End = WorldOrigin + WorldDirection * TraceDistance;
+
+	//			FHitResult HitResult;
+	//			FCollisionQueryParams Params;
+	//			Params.AddIgnoredActor(GetPawn());
+
+	//			if (GetWorld()->LineTraceSingleByChannel(HitResult, WorldOrigin, End, ECC_Visibility, Params))
+	//			{
+	//				AMetalActor* HitMetal = Cast<AMetalActor>(HitResult.GetActor());
+	//				if (HitMetal)
+	//				{
+	//					OutHit = HitResult;
+	//					return HitMetal;
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+
+	//return nullptr;
 }
 
 void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue)
@@ -1233,7 +1275,7 @@ void APC_InGame::CheckMetalActor()
 //			return;
 //		}
 
-		if (!HitActor->IsA<AMetalActor>())
+		if (!HitActor->GetComponentByClass<UMetalComponent>())
 		{
 			bCanControlMetal = false;
 			return;
@@ -1358,6 +1400,11 @@ void APC_InGame::ScanMetalActorInView()
 		MetalActor = FoundMetal;
 		MetalActor->ThisIsMetal();
 	}
+}
+
+void APC_InGame::OnRewind()
+{
+	// 뒤로 되감기
 }
 
 void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)
