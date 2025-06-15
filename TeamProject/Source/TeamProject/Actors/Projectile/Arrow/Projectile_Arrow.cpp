@@ -2,14 +2,16 @@
 
 
 #include "Actors/Projectile/Arrow/Projectile_Arrow.h"
-#include "GameFramework/ProjectileMovementComponent.h"
+#include "Actors/Object/TorchStand.h"
+
 #include "Components/ShapeComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/ProjectileMovementComponent/MyProjectileMovementComponent.h"
+
 #include "Data/ProjectileTableRow.h"
 #include "Data/NiagaraEffectTableRow.h"
-#include "Engine/DataTable.h"
 
-#include "Actors/Object/TorchStand.h"
+#include "Engine/DataTable.h"
 
 #include "Misc/Utils.h"
 

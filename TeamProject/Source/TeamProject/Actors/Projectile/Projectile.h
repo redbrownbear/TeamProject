@@ -41,7 +41,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	class UStaticMeshComponent* StaticMeshComponent;
 	UPROPERTY()
-	class UProjectileMovementComponent* ProjectileMovementComponent;
+	class UMyProjectileMovementComponent* ProjectileMovementComponent;
 
 protected:
 	UPROPERTY(EditAnywhere, meta = (RowType = "ProjectileTableRow"))

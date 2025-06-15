@@ -7,13 +7,14 @@
 #include "Data/ParticleEffectTableRow.h"
 
 #include "Misc/Utils.h"
-#include "GameFramework/ProjectileMovementComponent.h"
+//#include "GameFramework/ProjectileMovementComponent.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "Components/Character/PlayerMovementComponent.h"
+#include "Components/ProjectileMovementComponent/MyProjectileMovementComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -44,7 +45,7 @@ AProjectile::AProjectile()
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 
-	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	ProjectileMovementComponent = CreateDefaultSubobject<UMyProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	ProjectileMovementComponent->InitialSpeed = 0.f;
 	ProjectileMovementComponent->MaxSpeed = 0.f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
