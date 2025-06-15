@@ -9,7 +9,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StatusComponent/PlayerStatusComponent/PlayerStatusComponent.h"
 
-
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 #include "GameFramework/PawnMovementComponent.h"
@@ -72,7 +73,36 @@ AWeaponSword::AWeaponSword()
             UnEquipMontage = Asset.Object;
         }
     }
+    {
+        ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystemComponent"));
+        ConstructorHelpers::FObjectFinder<UParticleSystem> Asset(TEXT("/Script/Engine.ParticleSystem'/Game/Vefects/TrailPack/Particles/Cascade/Speed/Sword_Trail/P_SpeedTrail.P_SpeedTrail'"));
+        if (Asset.Object)
+        {
+            CascadeTrailFX = Asset.Object;
+        }
+        
+    }
+    if (ParticleSystemComponent)
+    {
+        ParticleSystemComponent->SetupAttachment(StaticMeshComponent);
+        ParticleSystemComponent->bAutoActivate = false; // 
+    }
+    HitEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("HitEffectComponent"));
+    {
+        ConstructorHelpers::FObjectFinder<UParticleSystem> Asset(TEXT("/Script/Engine.ParticleSystem'/Game/Vefects/FXVarietyPack/Particles/P_ky_hit1.P_ky_hit1'"));
+        if (Asset.Object)
+        {
+            HitEffectFX = Asset.Object;
+        }
+    }
+}
 
+void AWeaponSword::BeginPlay()
+{
+    Super::BeginPlay(); // 
+    
+    HitEffectComponent->AttachToComponent(StaticMeshComponent, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Trail_Ended"));
+    HitEffectComponent->SetRelativeScale3D(FVector(0.01,0.01,0.01));
 }
 
 void AWeaponSword::LeftClickAction()
@@ -100,9 +130,9 @@ void AWeaponSword::LeftClickAction()
 
     }
 
-
-    bCanAttack = false;
     
+    bCanAttack = false;
+    StartTrailEffect();
 }
 
 
@@ -123,6 +153,65 @@ void AWeaponSword::SetCanMove()
 void AWeaponSword::EmptyDamagedActors()
 {
     DamagedActors.Empty(); // 공격 시작 시 클리어
+}
+
+void AWeaponSword::StartTrailEffect()
+{
+    if (ParticleSystemComponent && CascadeTrailFX)
+    {
+        // 먼저 파티클 템플릿 지정
+        ParticleSystemComponent->SetTemplate(CascadeTrailFX);
+
+        // 소켓 존재 여부 확인
+        if (StaticMeshComponent &&
+            StaticMeshComponent->DoesSocketExist(TEXT("Trail_Started")) &&
+            StaticMeshComponent->DoesSocketExist(TEXT("Trail_Ended")))
+        {
+            // Trail 시작 (내부에서 자동 Activate됨)
+            ParticleSystemComponent->BeginTrails(
+                TEXT("Trail_Started"),
+                TEXT("Trail_Ended"),
+                ETrailWidthMode::ETrailWidthMode_FromCentre,
+                1.0f
+            );
+        }
+    }
+}
+
+void AWeaponSword::StopTrailEffect()
+{
+    if (ParticleSystemComponent)
+    {
+        ParticleSystemComponent->EndTrails();         // Trail 종료
+        ParticleSystemComponent->DeactivateSystem();  // 파티클 비활성화
+    }
+}
+
+void AWeaponSword::StartHitEffect()
+{
+    if (HitEffectComponent && HitEffectFX)
+    {
+        // 먼저 파티클 템플릿 지정
+        HitEffectComponent->SetTemplate(HitEffectFX);
+
+        // 소켓 존재 여부 확인
+        if (StaticMeshComponent &&
+            StaticMeshComponent->DoesSocketExist(TEXT("Trail_Started")))
+        {
+            // Trail 시작 (내부에서 자동 Activate됨)
+            
+            HitEffectComponent->Activate();
+        }
+    }
+}
+void AWeaponSword::StopHitEffect()
+{
+
+    if (HitEffectComponent)
+    {
+        HitEffectComponent->EndTrails();         // Trail 종료
+        HitEffectComponent->DeactivateSystem();  // 파티클 비활성화
+    }
 }
 
 void AWeaponSword::Attack()
@@ -172,8 +261,11 @@ void AWeaponSword::Attack()
     UPlayerStatusComponent* PlayerStatusComponent = PlayerCharacter->GetPlayerStatusComponent();
     const int32 Damage = PlayerStatusComponent->GetDamage();
 
+    
+
     if (bHit)
     {
+        StartHitEffect();
         for (const FHitResult& Hit : OutHits)
         {
             AActor* HitActor = Hit.GetActor();

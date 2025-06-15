@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,9 +6,13 @@
 #include "Actors/Weapon/WeaponBase.h"
 #include "WeaponSword.generated.h"
 
+class UParticleSystemComponent;
+class UParticleSystem;
+
 /**
  * 
  */
+class UNiagaraComponent;
 UCLASS()
 class TEAMPROJECT_API AWeaponSword : public AWeaponBase
 {
@@ -22,6 +26,7 @@ class TEAMPROJECT_API AWeaponSword : public AWeaponBase
 public:
 	AWeaponSword();
 
+	virtual void BeginPlay() override;
 
 
 public:
@@ -34,6 +39,12 @@ public:
 
 	void Attack();
 	void EmptyDamagedActors();
+
+	void StartTrailEffect();
+	void StopTrailEffect();
+
+	void StartHitEffect();
+	void StopHitEffect();
 
 private:
 
@@ -52,6 +63,19 @@ private:
 
 	bool bCanAttack= true;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UParticleSystemComponent> ParticleSystemComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FX")
+	UParticleSystem* CascadeTrailFX;
+
+	UPROPERTY()
+	TObjectPtr<UParticleSystemComponent> HitEffectComponent;
+
+	UPROPERTY()
+	UParticleSystem* HitEffectFX;
 
 	TArray<TObjectPtr<AActor>> DamagedActors;
+
+	
 };

@@ -7,8 +7,10 @@
 #include "Components/WeaponChildActorComponent/WeaponChildActorComponent.h"
 #include "Misc/Utils.h"
 #include "Containers/Queue.h"
+#include "Actors/Weapon/WeaponGlider.h"
 #include "WeaponManagerComponent.generated.h"
 
+class AWeaponGlider;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TEAMPROJECT_API UWeaponManagerComponent : public UActorComponent
@@ -36,9 +38,9 @@ public:
 	
 	
 	
-	USkeletalMeshComponent* GetGlider() { return Glider; }
-	UAnimMontage* GetGliderEquipMontage() { return EquipGlider; }
-	UAnimMontage* GetGliderUnEquipMontage() { return UnEquipGlider; }
+	AWeaponGlider* GetGlider() { return Cast<AWeaponGlider>(Glider->GetChildActor()); }
+	UAnimMontage* GetGliderEquipMontage() { return GetGlider()->GetEquipMontage(); }
+	UAnimMontage* GetGliderUnEquipMontage() { return GetGlider()->GetUnEquipMontage(); }
 
 	EWeapon_Type GetNextWeaponType() { return NextWeapon; }
 	void SetNextWeaponType(EWeapon_Type _Type) { NextWeapon = _Type; }
@@ -96,6 +98,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TObjectPtr<UWeaponChildActorComponent> Arrow;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TObjectPtr<UWeaponChildActorComponent> Glider;
+
 	UPROPERTY()
 	EEquip_State Equip_State;
 	UPROPERTY()
@@ -105,14 +110,6 @@ protected:
 
 	UPROPERTY()
 	UAnimMontage* UnEquip_Sword_Shield;
-	UPROPERTY()
-	TObjectPtr<USkeletalMeshComponent> Glider;
-
-	UPROPERTY()
-	UAnimMontage* EquipGlider;
-
-	UPROPERTY()
-	UAnimMontage* UnEquipGlider;
 
 
 	bool bRightClick;
