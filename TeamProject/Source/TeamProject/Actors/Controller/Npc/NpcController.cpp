@@ -45,29 +45,29 @@ void ANpcController::BeginPlay()
 	}
 }
 
-void ANpcController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
-{
-	APlayerCharacter* Player = nullptr;
-
-	for (AActor* SeenActor : UpdatedActors)
-	{
-		if (APlayerCharacter* DetectedPlayer = Cast<APlayerCharacter>(SeenActor))
-		{
-			Player = DetectedPlayer;
-			break; 
-		}
-	}
-
-	if (Player)
-	{
-		NpcFSMComponent->SetPlayer(Player);
-	}
-	else
-	{
-		NpcFSMComponent->SetPlayer(nullptr);
-		UE_LOG(LogTemp, Warning, TEXT("ANpcController::OnPerceptionUpdated Player set Null"));
-	}
-}
+//void ANpcController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
+//{
+//	APlayerCharacter* Player = nullptr;
+//
+//	for (AActor* SeenActor : UpdatedActors)
+//	{
+//		if (APlayerCharacter* DetectedPlayer = Cast<APlayerCharacter>(SeenActor))
+//		{
+//			Player = DetectedPlayer;
+//			break; 
+//		}
+//	}
+//
+//	if (Player)
+//	{
+//		NpcFSMComponent->SetPlayer(Player);
+//	}
+//	else
+//	{
+//		NpcFSMComponent->SetPlayer(nullptr);
+//		UE_LOG(LogTemp, Warning, TEXT("ANpcController::OnPerceptionUpdated Player set Null"));
+//	}
+//}
 
 void ANpcController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {

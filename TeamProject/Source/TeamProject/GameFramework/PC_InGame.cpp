@@ -164,6 +164,9 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_ControlDistance, 
 		ETriggerEvent::Triggered, this, &ThisClass::OnControlDistance);	
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Rewind,
+		ETriggerEvent::Triggered, this, &ThisClass::ShowRewindActor);
+
 	//QuickSlot
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotLeft,
 		ETriggerEvent::Started, this, &ThisClass::OnQuickSlotLeft);
@@ -717,6 +720,12 @@ void APC_InGame::TrySuperPower(const FInputActionValue& InputActionValue)
 			Magnesis();
 		}
 	}	
+
+	else if (bRewindKeyPressed)
+	{
+		OnRewind();
+	}
+
 }
 
 void APC_InGame::OnControlDistance(const FInputActionValue& InputActionValue)
@@ -869,6 +878,12 @@ void APC_InGame::DestroyIcePillar()
 			}
 		}
 	}
+}
+
+void APC_InGame::ShowRewindActor(const FInputActionValue& InputActionValue)
+{
+	// 되감을 액터 보여주기
+	// 화면 중앙에 RewindActor 있을 경우 TrySuperPower 호출하여 되감기
 }
 
 void APC_InGame::OnQuickSlotLeft(const FInputActionValue& InputActionValue)
@@ -1385,6 +1400,11 @@ void APC_InGame::ScanMetalActorInView()
 		MetalActor = FoundMetal;
 		MetalActor->ThisIsMetal();
 	}
+}
+
+void APC_InGame::OnRewind()
+{
+	// 뒤로 되감기
 }
 
 void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)

@@ -34,6 +34,8 @@ enum class EQuestCharacter
 	Furiko,
 	Korok,
 	//Store,
+	Impa,
+	Heir,
 
 	End,
 };
