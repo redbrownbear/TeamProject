@@ -25,8 +25,12 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Subsystem/TimeManager.h"
+
 void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 {
+	static UTimeManagerSubsystem* TimeManager = GetTimeManagerSubsystem();
+
 	UAnimInstance* AnimInstance = GetAnimInstance();
 	FMonsterTableRow* MonsterData = GetMonsterData();
 	if (!MonsterData) return;
@@ -300,16 +304,16 @@ void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 	{
 		if (bIsLoop)
 		{
-			AnimInstance->Montage_Play(TempAnimMontage, TempAnimMontage->RateScale, EMontagePlayReturnType::MontageLength, 0.0f, true);
+			AnimInstance->Montage_Play(TempAnimMontage, TempAnimMontage->RateScale * TimeManager->GetTimeScale(), EMontagePlayReturnType::MontageLength, 0.0f, true);
 		}
 		else
 		{
-			AnimInstance->Montage_Play(TempAnimMontage);
+			AnimInstance->Montage_Play(TempAnimMontage, TempAnimMontage->RateScale * TimeManager->GetTimeScale());
 		}
 	}
 	else if (TempAnimMontage == MonsterData->REBOUND)
 	{
-		AnimInstance->Montage_Play(TempAnimMontage);
+		AnimInstance->Montage_Play(TempAnimMontage, TempAnimMontage->RateScale * TimeManager->GetTimeScale());
 	}
 	else
 	{

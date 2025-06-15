@@ -8,6 +8,8 @@
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "SubSystem/TimeManager.h"
+
 
 UMoriblinAnimInstance::UMoriblinAnimInstance()
 {
@@ -32,13 +34,25 @@ void UMoriblinAnimInstance::NativeInitializeAnimation()
 
 void UMoriblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
+	static UTimeManagerSubsystem* TimeManager = TryGetPawnOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+	Super::NativeUpdateAnimation(CustumDeltaTime);
 	if (APawnMonster* Monster = Cast<APawnMonster>(TryGetPawnOwner()))
 	{
 		FSMComponent = Cast<UMoriblinFSMComponent>(Monster->GetFSMComponent());
 	}
 
 	if (!FSMComponent) return;
+
+
+	UAnimMontage* CurrentMontage = GetCurrentActiveMontage();
+	if (CurrentMontage)
+	{
+		float RateScale = CurrentMontage->RateScale;
+		float TimeManagerScale = TimeManager->GetTimeScale();
+		Montage_SetPlayRate(CurrentMontage, RateScale * TimeManagerScale);
+	}
 
 	const EMonsterState eMonsterState = FSMComponent->GetCurrentState();
 

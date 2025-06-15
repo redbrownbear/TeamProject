@@ -13,6 +13,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
+#include "Subsystem/TimeManager.h"
 
 AMonsterAIController::AMonsterAIController()
 {
@@ -63,7 +64,11 @@ void AMonsterAIController::BeginPlay()
 
 void AMonsterAIController::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+
+	Super::Tick(CustumDeltaTime);
 }
 
 void AMonsterAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)

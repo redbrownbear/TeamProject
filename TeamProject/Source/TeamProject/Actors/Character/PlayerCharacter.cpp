@@ -179,13 +179,17 @@ void APlayerCharacter::BeginPlay()
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+
+	Super::Tick(CustumDeltaTime);
 
 	//스테미너 정보
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	if (PlayerManager)
 	{
-		PlayerManager->TickStamina(DeltaTime);
+		PlayerManager->TickStamina(CustumDeltaTime);
 	}
 }
 
@@ -260,10 +264,13 @@ void APlayerCharacter::Damaged(int32 Damage)
 	//GameOver 
 	else
 	{
-		UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
-		if (UIManager)
+		if (GAMEOVER_ON)
 		{
-			UIManager->ShowUI(UEndingCredits::StaticClass());
+			UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+			if (UIManager)
+			{
+				UIManager->ShowUI(UEndingCredits::StaticClass());
+			}
 		}
 	}
 }

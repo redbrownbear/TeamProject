@@ -29,6 +29,9 @@ public:
 
     void SetTimeScale(float NewScale);  // 시간 배속 설정
     void SetJust() { bIsJust = true; }
+    bool GetIsJust() const { return bIsJust; }
+    float GetTimeScale() const;
+
 public:
 
     UPROPERTY(BlueprintAssignable)

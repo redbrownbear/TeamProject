@@ -9,6 +9,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Misc/Utils.h"
 
+#include "Subsystem/TimeManager.h"
+
 UAssasinBossAnimInstance::UAssasinBossAnimInstance()
 {
 }
@@ -33,15 +35,26 @@ void UAssasinBossAnimInstance::NativeInitializeAnimation()
 
 void UAssasinBossAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
+	static UTimeManagerSubsystem* TimeManager = TryGetPawnOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+	Super::NativeUpdateAnimation(CustumDeltaTime);
 
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(TryGetPawnOwner()))
 	{
 		FSMComponent = Cast<UAssasinBossFSMComponent>(Monster->GetFSMComponent());
 	}
 	if (!FSMComponent) return;
-	const EMonsterState eMonsterState = FSMComponent->GetCurrentState();
 
+	UAnimMontage* CurrentMontage = GetCurrentActiveMontage();
+	if (CurrentMontage)
+	{
+		float RateScale = CurrentMontage->RateScale;
+		float TimeManagerScale = TimeManager->GetTimeScale();
+		Montage_SetPlayRate(CurrentMontage, RateScale * TimeManagerScale);
+	}
+
+	const EMonsterState eMonsterState = FSMComponent->GetCurrentState();
 
 	bIsIdle = false;
 	bIsFlyIdle = false;

@@ -27,11 +27,13 @@
 #include "Actors/Object/TorchStand.h"
 
 #include "SubSystem/PlayerManager.h"
+#include "SubSystem/TimeManager.h"
 
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+
 
 
 // Sets default values
@@ -156,6 +158,10 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack
 				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelHorn)
 			{
+				static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+				TimeManager->SetTimeScale(TIMESCALE_JUST);
+				TimeManager->SetJust();
+
 				if (GetOwner()->IsA<APawnMonster>())
 				{
 					APawnMonster* PawnMonster = Cast<APawnMonster>(GetOwner());

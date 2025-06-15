@@ -25,6 +25,9 @@
 
 #include "UI/UIComponent/MonsterHP.h"
 
+#include "SubSystem/TimeManager.h"
+
+
 
 // Sets default values
 APawnMonster::APawnMonster()
@@ -88,7 +91,10 @@ void APawnMonster::BeginPlay()
 // Called every frame
 void APawnMonster::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+	Super::Tick(CustumDeltaTime);
 
 	const float Speed = UKismetMathLibrary::VSizeXY(MovementComponent->Velocity);
 
@@ -574,4 +580,11 @@ void APawnMonster::ShowHpUI(float CurHp, float MaxHp)
 	{
 		HPWidget->ShowUI(CurHp, MaxHp);
 	}
+}
+
+UTimeManagerSubsystem* APawnMonster::GetTimeManagerSubsystem()
+{
+	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+
+	return TimeManager;
 }

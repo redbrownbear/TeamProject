@@ -19,7 +19,7 @@ void UTimeManagerSubsystem::Tick(float DeltaTime)
 {
     if (bTimePaused)
     {
-        CustomDeltaTime = 0.0f;
+        CustomDeltaTime = DeltaTime;
     }
     else
     {
@@ -51,4 +51,9 @@ void UTimeManagerSubsystem::SetTimeScale(float NewScale)
         OnTimeScaleUpdated.Broadcast(NewScale);
     }
     
+}
+
+float UTimeManagerSubsystem::GetTimeScale() const
+{
+    return TimeScale;
 }

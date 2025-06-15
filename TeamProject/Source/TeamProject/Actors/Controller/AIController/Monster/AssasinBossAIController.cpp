@@ -8,6 +8,8 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
+#include "SubSystem/TimeManager.h"
+
 AAssasinBossAIController::AAssasinBossAIController()
 {
 	MonsterFSMComponent = CreateDefaultSubobject<UAssasinBossFSMComponent>(TEXT("AssasinLeaderFSMComponent"));
@@ -15,6 +17,9 @@ AAssasinBossAIController::AAssasinBossAIController()
 
 void AAssasinBossAIController::Tick(float DeltaTime)
 {
+	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
 	Super::Tick(DeltaTime);
 }
 

@@ -21,7 +21,7 @@ class ACampFire;
 class UDefaultCameraShakeBase;
 class UMaterialInterface;
 class UMaterialInstanceDynamic;
-
+class UTimeManagerSubsystem;
 
 struct FMonsterTableRow;
 
@@ -135,4 +135,8 @@ private:
 
 public:
     void ShowHpUI(float CurHp, float MaxHp);
+
+protected:
+    virtual UTimeManagerSubsystem* GetTimeManagerSubsystem() override;
+
 };

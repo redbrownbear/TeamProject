@@ -33,6 +33,8 @@
 
 #include "UI/UIComponent/MonsterHP.h"
 
+#include "SubSystem/TimeManager.h"
+
 // Sets default values
 ACharacterMonster::ACharacterMonster()
 {
@@ -135,7 +137,10 @@ void ACharacterMonster::BeginPlay()
 // Called every frame
 void ACharacterMonster::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+	Super::Tick(CustumDeltaTime);
 
 	if (HPBarWidget)
 	{
@@ -931,4 +936,11 @@ void ACharacterMonster::ShowHpUI(float CurHp, float MaxHp)
 	{
 		HPWidget->ShowUI(CurHp, MaxHp);
 	}
+}
+
+UTimeManagerSubsystem* ACharacterMonster::GetTimeManagerSubsystem()
+{
+	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+
+	return TimeManager;
 }

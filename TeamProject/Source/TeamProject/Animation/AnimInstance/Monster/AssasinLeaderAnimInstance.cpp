@@ -8,6 +8,8 @@
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "Subsystem/TimeManager.h"
+
 UAssasinLeaderAnimInstance::UAssasinLeaderAnimInstance()
 {
 }
@@ -32,13 +34,26 @@ void UAssasinLeaderAnimInstance::NativeInitializeAnimation()
 
 void UAssasinLeaderAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
+	static UTimeManagerSubsystem* TimeManager = TryGetPawnOwner()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+	Super::NativeUpdateAnimation(CustumDeltaTime);
 
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(TryGetPawnOwner()))
 	{
 		FSMComponent = Cast<UAssasinLeaderFSMComponent>(Monster->GetFSMComponent());
 	}
 	if (!FSMComponent) return;
+
+	UAnimMontage* CurrentMontage = GetCurrentActiveMontage();
+	if (CurrentMontage)
+	{
+		float RateScale = CurrentMontage->RateScale;
+		float TimeManagerScale = TimeManager->GetTimeScale();
+		Montage_SetPlayRate(CurrentMontage, RateScale * TimeManagerScale);
+	}
+
+
 	const EMonsterState eMonsterState = FSMComponent->GetCurrentState();
 	bIsIdle = false;
 	bIsCombatIdle = false;

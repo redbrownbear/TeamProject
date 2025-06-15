@@ -4,6 +4,8 @@
 #include "Actors/Controller/AIController/Monster/LynelAIController.h"
 #include "Components/FSMComponent/Monster/LynelFSMComponent.h"
 
+#include "SubSystem/TimeManager.h"
+
 ALynelAIController::ALynelAIController()
 {
 	MonsterFSMComponent = CreateDefaultSubobject<ULynelFSMComponent>(TEXT("LynelFSMComponent"));
@@ -11,6 +13,9 @@ ALynelAIController::ALynelAIController()
 
 void ALynelAIController::Tick(float DeltaTime)
 {
+	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
 	Super::Tick(DeltaTime);
 }
 

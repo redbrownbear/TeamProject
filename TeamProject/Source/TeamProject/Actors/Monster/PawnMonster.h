@@ -114,4 +114,8 @@ private:
 
 public:
     void ShowHpUI(float CurHp, float MaxHp);
+
+protected:
+    virtual UTimeManagerSubsystem* GetTimeManagerSubsystem() override;
+
 };
