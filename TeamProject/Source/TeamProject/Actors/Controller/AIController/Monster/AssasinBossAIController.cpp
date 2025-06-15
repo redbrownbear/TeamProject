@@ -23,17 +23,17 @@ void AAssasinBossAIController::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AAssasinBossAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
-{
-	if (Stimulus.WasSuccessfullySensed())
-	{
-		// 감지됨
-		if (APlayerCharacter* Player = Cast<APlayerCharacter>(Actor))
-		{
-			MonsterFSMComponent->SetPlayer(Player);
-			UE_LOG(LogTemp, Warning, TEXT("AAssasinBossAIController::OnPerceptionUpdated Player set Valid"));
-			return;
-		}
-	}
-
-}
+//void AAssasinBossAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+//{
+//	if (Stimulus.WasSuccessfullySensed())
+//	{
+//		// 감지됨
+//		if (APlayerCharacter* Player = Cast<APlayerCharacter>(Actor))
+//		{
+//			MonsterFSMComponent->SetPlayer(Player);
+//			UE_LOG(LogTemp, Warning, TEXT("AAssasinBossAIController::OnPerceptionUpdated Player set Valid"));
+//			return;
+//		}
+//	}
+//
+//}
