@@ -3,13 +3,19 @@
 
 #include "UI/Inven/InventorySelectSet.h"
 #include "SubSystem/PlayerManager.h"
+#include "Misc/Utils.h"
 
 void UInventorySelectSet::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	ButtonUse->OnClicked.AddDynamic(this, &UInventorySelectSet::UseItme);
-	ButtonCancel->OnClicked.AddDynamic(this, &UInventorySelectSet::Cancel);
+	if (bHasInitialized == false)
+	{
+		ButtonUse->OnClicked.AddDynamic(this, &UInventorySelectSet::UseItme);
+		ButtonCancel->OnClicked.AddDynamic(this, &UInventorySelectSet::Cancel);
+
+		bHasInitialized = true;
+	}
 
 	SetVisibility(ESlateVisibility::Collapsed);
 }
@@ -46,13 +52,13 @@ void UInventorySelectSet::ShowButton(bool bIsShow, FItemData InItemData)
 		case EItemCategory::IT_Shield:
 		case EItemCategory::IT_Armor:
 		{
-			//TextUse->SetText(FText::FromString(TEXT("����")));
+			TextUse->SetText(FText::FromString(TextU(1005)));
 			break;
 		}
 		case EItemCategory::IT_Food:
 		case EItemCategory::IT_Material:
 		{
-			TextUse->SetText(FText::FromString(TEXT("���")));
+			TextUse->SetText(FText::FromString(TextU(1004)));
 			break;
 		}
 	}

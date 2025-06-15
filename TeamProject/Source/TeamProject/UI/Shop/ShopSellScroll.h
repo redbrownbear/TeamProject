@@ -127,4 +127,6 @@ private:
 
 	EItemCategory CurrentCategory = EItemCategory::IT_Weapon;
 
+	bool bHasInitialized = false;
+
 };

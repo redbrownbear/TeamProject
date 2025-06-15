@@ -137,6 +137,165 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	SkeletalMeshComponent->SetSkeletalMesh(MonsterData->SkeletalMesh);
 	SkeletalMeshComponent->SetAnimClass(MonsterData->AnimClass);
 	SkeletalMeshComponent->SetRelativeScale3D(MonsterData->MeshTransform.GetScale3D());
+	SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// 모리블린 전용 오프셋
+	if (TEXT("Moriblin_Patrol") == DataTableRowHandle.RowName.ToString()
+		|| TEXT("Moriblin_TreasureBox") == DataTableRowHandle.RowName.ToString())
+	{
+		SkeletalMeshComponent->SetRelativeLocation(FVector(0.0, 0.0, -1.5f * MonsterData->CollisionSphereRadius));
+	}
+	else
+	{
+		SkeletalMeshComponent->SetRelativeLocation(FVector(0.0, 0.0, -MonsterData->CollisionSphereRadius));
+	}
+
+
+	HPBarWidget->SetRelativeLocation(FVector(0.f, 0.f, (MonsterData->CollisionSphereRadius - 10.0f) * 4.0f));
+
+	MovementComponent->MaxSpeed = MonsterData->WalkMovementMaxSpeed;
+
+	AIControllerClass = MonsterData->AIControllerClass;
+
+	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
+	{
+		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
+		if (PatrolPath)
+		{
+			FSMComponent->SetPatrolPath(PatrolPath);
+		}
+		if (CampFire)
+		{
+			FSMComponent->SetCampFire(CampFire);
+		}
+	}
+
+
+
+
+	StatusComponent->SetMaxHP(MonsterData->MaxHP);
+
+
+	if (!(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
+	{
+		if (UWorld* World = GetWorld())
+		{
+			AWorldWeapon* MeleeWeapon = World->SpawnActorDeferred<AWorldWeapon>(AWorldWeapon::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+			MeleeWeapon->SetDataWithHandle(MonsterData->MeleeWeaponTableRowHandle);
+			const FVector Scale = MeleeWeapon->GetActorScale3D() * 2.f;
+			MeleeWeapon->SetActorScale3D(Scale);
+			MeleeWeapon->AttachToMonster(this, Monster_SocketName::Pod_Melee);
+			MeleeWeapon->FinishSpawning(FTransform::Identity);
+
+			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
+			{
+				FSMComponent->SetMeleeWeapon(MeleeWeapon);
+				FSMComponent->SheathMeleeWeapon();
+			}
+		}
+	}
+
+	if (!(MonsterData->BowWeaponTableRowHandle.IsNull()))
+	{
+		if (UWorld* World = GetWorld())
+		{
+			AWorldWeapon* BowWeapon = World->SpawnActorDeferred<AWorldWeapon>(AWorldWeapon::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+			BowWeapon->SetDataWithHandle(MonsterData->BowWeaponTableRowHandle);
+			const FVector Scale = BowWeapon->GetActorScale3D() * 2.f;
+			BowWeapon->SetActorScale3D(Scale);
+			BowWeapon->AttachToMonster(this, Monster_SocketName::Pod_Bow);
+			BowWeapon->FinishSpawning(FTransform::Identity);
+
+			if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
+			{
+				FSMComponent->SetBowWeapon(BowWeapon);
+				FSMComponent->SheathBowWeapon();
+			}
+		}
+	}
+
+	int32 MaterialSlotIndex = -1;
+	if (DataTableRowHandle.RowName.ToString() == TEXT("Bokoblin_TreasureBox")
+		|| DataTableRowHandle.RowName.ToString() == TEXT("Bokoblin_Patrol"))
+	{
+		MaterialSlotIndex = 2;
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("Moriblin_TreasureBox")
+		|| DataTableRowHandle.RowName.ToString() == TEXT("Moriblin_Patrol"))
+	{
+		MaterialSlotIndex = 3;
+	}
+
+	if (MaterialSlotIndex != -1)
+	{
+		UMaterialInterface* CurrentMaterialOnMesh = SkeletalMeshComponent->GetMaterial(MaterialSlotIndex);
+
+		if (!CurrentMaterialOnMesh)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SetData: No material found at slot %d. Cannot proceed with DynamicMaterialInstance setup."), MaterialSlotIndex);
+			DynamicMaterialInstance = nullptr; // 기존 포인터도 혹시 모르니 null로
+			return;
+		}
+
+		DynamicMaterialInstance = Cast<UMaterialInstanceDynamic>(CurrentMaterialOnMesh);
+
+		if (!DynamicMaterialInstance)
+		{
+			DynamicMaterialInstance = UMaterialInstanceDynamic::Create(CurrentMaterialOnMesh, this);
+
+			if (DynamicMaterialInstance)
+			{
+				SkeletalMeshComponent->SetMaterial(MaterialSlotIndex, DynamicMaterialInstance);
+				UE_LOG(LogTemp, Log, TEXT("SetData: Created and assigned new DynamicMaterialInstance (%s) to slot %d"), *DynamicMaterialInstance->GetName(), MaterialSlotIndex);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("SetData: Failed to create DynamicMaterialInstance using parent %s!"), *CurrentMaterialOnMesh->GetName());
+				DynamicMaterialInstance = nullptr;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("SetData: Re-using existing DynamicMaterialInstance (%s) at slot %d"), *DynamicMaterialInstance->GetName(), MaterialSlotIndex);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("SetData: No specific material slot handling for %s."), *DataTableRowHandle.RowName.ToString());
+		DynamicMaterialInstance = nullptr; 
+	}
+
+	AddBaseColor(FVector(0.0, 0.0, 0.0));
+}
+
+void APawnMonster::SetData(const FName& MonsterName)
+{
+	static UDataTable* MonsterDataTable = nullptr;
+	if (!MonsterDataTable)
+	{
+		MonsterDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Data/MonsterData/DT_Monster.DT_Monster'"));
+		check(MonsterDataTable);
+	}
+
+	if (!MonsterDataTable->GetRowMap().Find(MonsterName)) { ensure(false); return; }
+	DataTableRowHandle.DataTable = MonsterDataTable;
+	DataTableRowHandle.RowName = MonsterName;
+	MonsterData = DataTableRowHandle.GetRow<FMonsterTableRow>(DataTableRowHandle.RowName.ToString());
+
+	if (CollisionComponent)
+	{
+		CollisionComponent->SetSphereRadius(MonsterData->CollisionSphereRadius);
+		CollisionComponent->SetCollisionProfileName(CollisionProfileName::Monster);
+		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+		//CollisionComponent->RegisterComponent();
+	}
+
+	SkeletalMeshComponent->SetSkeletalMesh(MonsterData->SkeletalMesh);
+	SkeletalMeshComponent->SetAnimClass(MonsterData->AnimClass);
+	SkeletalMeshComponent->SetRelativeScale3D(MonsterData->MeshTransform.GetScale3D());
+	SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// 모리블린 전용 오프셋
 	if (TEXT("Moriblin_Patrol") == DataTableRowHandle.RowName.ToString()
@@ -251,7 +410,7 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	else
 	{
 		UE_LOG(LogTemp, Log, TEXT("SetData: No specific material slot handling for %s."), *DataTableRowHandle.RowName.ToString());
-		DynamicMaterialInstance = nullptr; 
+		DynamicMaterialInstance = nullptr;
 	}
 
 	AddBaseColor(FVector(0.0, 0.0, 0.0));

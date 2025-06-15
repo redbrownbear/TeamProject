@@ -4,16 +4,14 @@
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
 
 #include "Actors/Object/PatrolPath.h"
-#include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Object/CampFire.h"
+#include "Actors/Controller/AIController/Monster/MonsterAIController.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Projectile/Projectile.h"
 #include "Actors/Item/WorldWeapon.h"
 #include "Actors/Monster/MonsterInterface.h"
 #include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Monster/PawnMonster.h"
-#include "Actors/Object/CampFire.h"
-#include "Actors/Object/PatrolPath.h"
 
 
 #include "Navigation/PathFollowingComponent.h"
@@ -1023,30 +1021,30 @@ void UMonsterFSMComponent::SpawnProjectile(FName ProjectileName, FName Collision
 
 void UMonsterFSMComponent::UpdateUIHPBar(float CurrentHP, float MaxHP)
 {
-	if (CharacterMonster)
-	{ 
-		if (UWorld* World = CharacterMonster->GetWorld())
-		{
-			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
-			{
-				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
-				{
-					HUD->ShowBossHpUI(true, CurrentHP, MaxHP, CharacterMonster->GetMonsterData()->Name.ToString());
-				}
-			}
-		}
-	}
-	else if (PawnMonster)
-	{
-		if (UWorld* World = PawnMonster->GetWorld())
-		{
-			if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
-			{
-				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
-				{
-					HUD->ShowBossHpUI(false, CurrentHP, MaxHP, PawnMonster->GetMonsterData()->Name.ToString());
-				}
-			}
-		}
-	}
+	//if (CharacterMonster)
+	//{ 
+	//	if (UWorld* World = CharacterMonster->GetWorld())
+	//	{
+	//		if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+	//		{
+	//			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+	//			{
+	//				HUD->ShowBossHpUI(true, CurrentHP, MaxHP, CharacterMonster->GetMonsterData()->Name.ToString());
+	//			}
+	//		}
+	//	}
+	//}
+	//else if (PawnMonster)
+	//{
+	//	if (UWorld* World = PawnMonster->GetWorld())
+	//	{
+	//		if (APC_InGame* PC = Cast<APC_InGame>(World->GetFirstPlayerController()))
+	//		{
+	//			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+	//			{
+	//				HUD->ShowBossHpUI(false, CurrentHP, MaxHP, PawnMonster->GetMonsterData()->Name.ToString());
+	//			}
+	//		}
+	//	}
+	//}
 }

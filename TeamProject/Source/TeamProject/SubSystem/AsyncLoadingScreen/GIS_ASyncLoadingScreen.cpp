@@ -44,23 +44,25 @@ void UGIS_ASyncLoadingScreen::OpenLevelWithLoadingScreenTitle(TSubclassOf<UUserW
 	}
 
 	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass);
-
-	if (IsMoviePlayerEnabled())
+	if (Widget)
 	{
-		FLoadingScreenAttributes LoadingScreenAttributes;
-		LoadingScreenAttributes.WidgetLoadingScreen = Widget->TakeWidget();
-		LoadingScreenAttributes.MinimumLoadingScreenDisplayTime = 3.f;
-		LoadingScreenAttributes.bAutoCompleteWhenLoadingCompletes = true;
-		LoadingScreenAttributes.bAllowEngineTick = true;
-
-		GetMoviePlayer()->SetupLoadingScreen(LoadingScreenAttributes);
-		GetMoviePlayer()->PlayMovie();
+		Widget->AddToViewport();
+		LoadingWidgetToTitle = Widget;
 	}
+
+	SetPendingLevel(Level);
 
 	FStreamableManager& Streamable = UAssetManager::GetStreamableManager();
 	Streamable.RequestAsyncLoad(Level.ToSoftObjectPath(), FStreamableDelegate::CreateLambda([this, Level]()
 		{
-			UGameplayStatics::OpenLevelBySoftObjectPtr(this, Level);
+			GetWorld()->GetTimerManager().SetTimerForNextTick([this, Level]()
+				{
+					FTimerHandle TimerHandle;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Level]()
+						{
+							UGameplayStatics::OpenLevel(this, TEXT("LoadingLevel"));
+						}, 0.5f, false);
+				});
 		}));
 }
 
@@ -90,7 +92,6 @@ void UGIS_ASyncLoadingScreen::OpenLevelWithLoadingScreen(const TSoftObjectPtr<UW
 	FStreamableManager& Streamable = UAssetManager::GetStreamableManager();
 	Streamable.RequestAsyncLoad(Level.ToSoftObjectPath(), FStreamableDelegate::CreateLambda([this, Level]()
 		{
-			// ��: 0.5�� ����� �� �� ��ȯ
 			GetWorld()->GetTimerManager().SetTimerForNextTick([this, Level]()
 				{
 					FTimerHandle TimerHandle;
@@ -100,9 +101,43 @@ void UGIS_ASyncLoadingScreen::OpenLevelWithLoadingScreen(const TSoftObjectPtr<UW
 						}, 0.5f, false);
 				});
 		}));
+}
 
+void UGIS_ASyncLoadingScreen::OpenLevelWithLoadingScreenGameOver(const TSoftObjectPtr<UWorld> Level)
+{
+	if (!LoadingWidgetToTitleClass)
+	{
+		ensureMsgf(false, TEXT("LoadingWidgetClass is nullptr"));
+		return;
+	}
 
-	//UGameplayStatics::OpenLevel(this, TEXT("LoadingLevel"));
+	if (LoadingWidgetToTitle)
+	{
+		LoadingWidgetToTitle->RemoveFromParent();
+		LoadingWidgetToTitle = nullptr;
+	}
+
+	UUserWidget* Widget = CreateWidget<UUserWidget>(GetWorld(), LoadingWidgetToTitleClass);
+	if (Widget)
+	{
+		Widget->AddToViewport();
+		LoadingWidgetToTitle = Widget;
+	}
+
+	SetPendingLevel(Level);
+
+	FStreamableManager& Streamable = UAssetManager::GetStreamableManager();
+	Streamable.RequestAsyncLoad(Level.ToSoftObjectPath(), FStreamableDelegate::CreateLambda([this, Level]()
+		{
+			GetWorld()->GetTimerManager().SetTimerForNextTick([this, Level]()
+				{
+					FTimerHandle TimerHandle;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Level]()
+						{
+							UGameplayStatics::OpenLevel(this, TEXT("LoadingLevel"));
+						}, 0.5f, false);
+				});
+		}));
 }
 
 void UGIS_ASyncLoadingScreen::OpenLevelWithLoadingScreenNonAsynchronous(TSubclassOf<UUserWidget> WidgetClass, const TSoftObjectPtr<UWorld> Level)

@@ -187,7 +187,6 @@ void UHinoxFSMComponent::UpdateIdle(float DeltaTime)
 {
 	this->StopMove();
 
-
 	if (Player)
 	{
 

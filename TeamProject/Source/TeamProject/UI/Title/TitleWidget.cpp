@@ -13,13 +13,18 @@ void UTitleWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	check(NewGame);
+    Continue->SetVisibility(ESlateVisibility::Hidden);
+    ImgContinue->SetVisibility(ESlateVisibility::Hidden);
+    ImgNewGame->SetVisibility(ESlateVisibility::Hidden);
+    ImgExit->SetVisibility(ESlateVisibility::Hidden);
 
-	NewGame->OnClicked.AddDynamic(this, &UTitleWidget::OnStartClicked);
+    if (bHasInitialized == false)
+    {
+        NewGame->OnClicked.AddDynamic(this, &UTitleWidget::OnStartClicked);
+        bHasInitialized = true;
+    }
 
-	ImgContinue->SetVisibility(ESlateVisibility::Visible);
-	ImgNewGame->SetVisibility(ESlateVisibility::Hidden);
-	ImgExit->SetVisibility(ESlateVisibility::Hidden);
+    check(NewGame);
 }
 
 void UTitleWidget::OnStartClicked()
@@ -57,6 +62,11 @@ void UTitleWidget::PlayFadeOutAndStart()
                 UGIS_ASyncLoadingScreen* LoadingScreenSystem = GetWorld()->GetGameInstance()->GetSubsystem<UGIS_ASyncLoadingScreen>();
                 if (LoadingScreenSystem)
                 {
+                    if (UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>())
+                    {
+                        PlayerManager->SetLevelName(TextU(3001));
+                    }
+
                     LoadingScreenSystem->OpenLevelWithLoadingScreenTitle(LoadingWidgetClass, GameMap);
                 }
             }

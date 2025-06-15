@@ -16,6 +16,8 @@
 #include "UI/QuickSlot/QuickSlotMain.h"
 #include "UI/Map/MainMap.h"
 #include "UI/Popup/PopupCountSelect.h"
+#include "UI/GameOver/GameOverUI.h"
+#include "UI/Ending/EndingCredits.h"
 
 #include "UIManager.generated.h"
 
@@ -126,6 +128,10 @@ private:
     UMainMap* CachedMainMapClass;
     UPROPERTY()
     UPopupCountSelect* CachedPopupCountClass;
+    UPROPERTY()
+    UGameOverUI* CachedGameOverClass;
+    UPROPERTY()
+    UEndingCredits* CachedEndingCreditsClass;
 
 
 public:
@@ -134,4 +140,5 @@ public:
 
 private:
     bool bIsCompleteload;
+    bool bIsCompleteDelegate = false;
 };

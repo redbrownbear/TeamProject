@@ -95,28 +95,33 @@ void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus 
 {
 	if (Stimulus.WasSuccessfullySensed())
 	{
-		// 감지됨
+		if (AWorldWeapon* WW = Cast<AWorldWeapon>(Actor))
+		{
+			if (MonsterFSMComponent->GetPlayer())
+			{
+				if (!MonsterFSMComponent->IsToCatchWeapon())
+				{
+					if (MonsterFSMComponent->GetCurrentState() == EMonsterState::FindWeapon)
+					{
+						MonsterFSMComponent->SetToCatchWeapon(WW);
+					}
+					else if (MonsterFSMComponent->GetCurrentState() == EMonsterState::Combat)
+					{
+						MonsterFSMComponent->ChangeState(EMonsterState::FindWeapon);
+						MonsterFSMComponent->SetToCatchWeapon(WW);
+					}
+				}
+			}
+		}
+
+
 		if (APlayerCharacter* Player = Cast<APlayerCharacter>(Actor))
 		{
 			MonsterFSMComponent->SetPlayer(Player);
 			UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Valid"));
 			return;
 		}
-		else if (AWorldWeapon* WW = Cast<AWorldWeapon>(Actor))
-		{
-			if (!MonsterFSMComponent->IsToCatchWeapon())
-			{
-				if (MonsterFSMComponent->GetCurrentState() == EMonsterState::FindWeapon)
-				{
-					MonsterFSMComponent->SetToCatchWeapon(WW);
-				}
-				else if (MonsterFSMComponent->GetCurrentState() == EMonsterState::Combat)
-				{
-					MonsterFSMComponent->ChangeState(EMonsterState::FindWeapon);
-					MonsterFSMComponent->SetToCatchWeapon(WW);
-				}
-			}
-		}
+
 
 	}
 

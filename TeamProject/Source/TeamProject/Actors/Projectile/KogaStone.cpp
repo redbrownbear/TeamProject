@@ -27,7 +27,7 @@ void AKogaStone::BeginPlay()
 // Called every frame
 void AKogaStone::Tick(float DeltaTime)
 {
-	// To Prevent Project Tick called
+	// To Prevent Projectile Tick called
 	AActor::Tick(DeltaTime);
 
 	WaitTime += DeltaTime;

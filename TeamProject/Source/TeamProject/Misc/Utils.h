@@ -6,6 +6,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Defines.h"
+#include "TextUtil.h"
+#include "SoundUtil.h"
 
 namespace CollisionProfileName
 {
@@ -35,6 +37,7 @@ namespace ProjectileName
     static inline FName Monster_LynelExplosion = TEXT("Monster_LynelExplosion");
     static inline FName Monster_LynelFire = TEXT("Monster_LynelFire");
     static inline FName Monster_LynelArrow = TEXT("Monster_LynelArrow");
+    static inline FName Monster_LynelHorn = TEXT("Monster_LynelHorn");
 
     static inline FName Monster_HinoxAttack = TEXT("Monster_HinoxAttack");
     static inline FName Monster_HinoxGrab = TEXT("Monster_HinoxGrab");
@@ -50,6 +53,18 @@ namespace ProjectileName
 
     static inline FName Player_Arrow = TEXT("Player_Arrow");
     static inline FName Player_FireArrow = TEXT("Player_FireArrow");
+}
+
+namespace MonsterName
+{
+    static inline FName Bokoblin_TreasureBox = TEXT("Bokoblin_TreasureBox");
+    static inline FName Bokoblin_Patrol = TEXT("Bokoblin_Patrol");
+    static inline FName Moriblin_TreasureBox = TEXT("Moriblin_TreasureBox");
+    static inline FName Moriblin_Patrol = TEXT("Moriblin_Patrol");
+    static inline FName Hinox = TEXT("Hinox");
+    static inline FName Lynel = TEXT("Lynel");
+    static inline FName AssasinBoss = TEXT("AssasinBoss");
+    static inline FName AssasinLeader = TEXT("AssasinLeader");
 }
 
 namespace ParticleEffectName

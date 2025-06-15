@@ -23,6 +23,8 @@ public:
 	void OpenLevelWithLoadingScreenTitle(TSubclassOf<UUserWidget> WidgetClass, const TSoftObjectPtr<UWorld> Level);
 	UFUNCTION(BlueprintCallable)
 	void OpenLevelWithLoadingScreen(const TSoftObjectPtr<UWorld> Level);
+	UFUNCTION(BlueprintCallable)
+	void OpenLevelWithLoadingScreenGameOver(const TSoftObjectPtr<UWorld> Level);
 
 	UFUNCTION(BlueprintCallable)
 	void OpenLevelWithLoadingScreenNonAsynchronous(TSubclassOf<UUserWidget> WidgetClass, const TSoftObjectPtr<UWorld> Level);
@@ -30,6 +32,7 @@ public:
 
 public:
 	void SetLoadingUI(TSubclassOf<ULoadingWithPlayerInfo> WidgetClass) { LoadingWidgetClass = WidgetClass; }
+	void SetLoadingUI(TSubclassOf<UUserWidget> WidgetClass) { LoadingWidgetToTitleClass = WidgetClass; }
 
 public:
 	void BeginLoading(TSoftObjectPtr<UWorld> LevelToOpen);
@@ -40,9 +43,12 @@ private:
 
 private:
 	TSubclassOf<ULoadingWithPlayerInfo> LoadingWidgetClass;
+	TSubclassOf<UUserWidget> LoadingWidgetToTitleClass;
 
 	UPROPERTY(Transient) 
 	ULoadingWithPlayerInfo* LoadingWidget;
+	UPROPERTY(Transient)
+	UUserWidget* LoadingWidgetToTitle;
 
 	UPROPERTY()
 	TSoftObjectPtr<UWorld> PendingLevel;

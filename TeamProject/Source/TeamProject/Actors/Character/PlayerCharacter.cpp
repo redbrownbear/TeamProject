@@ -18,6 +18,10 @@
 #include "Actors/Projectile/Arrow/Projectile_Arrow.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
+#include "SubSystem/UI/UIManager.h"
+#include "UI/GameOver/GameOverUI.h"
+#include "UI/Ending/EndingCredits.h"
+
 // Sets default values
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -48,13 +52,14 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 			SpringArm->bUsePawnControlRotation = true;
 			SpringArm->bInheritRoll = false;
 
-			SpringArm->CameraLagSpeed = 5.f;
+			SpringArm->CameraLagSpeed = 3.f;
 			SpringArm->CameraLagMaxDistance = 100.f;
+			SpringArm->ProbeChannel = ECC_Camera;
 		}
 		Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 		Camera->SetupAttachment(SpringArm);
 
-		SpringArm->bDoCollisionTest = false;
+		//SpringArm->bDoCollisionTest = false;
 	}
 
 	UCharacterMovementComponent* Movement = GetCharacterMovement();
@@ -162,7 +167,7 @@ void APlayerCharacter::BeginPlay()
 	);
 
 
-	ChargedArrow->SetData(TEXT("Player_Charged_Arrow"), TEXT("NoCollision"));
+	ChargedArrow->SetData(TEXT("Player_Charged_Arrow_Fire"), TEXT("NoCollision"));
 	ChargedArrow->SetNiagaraVisibility(false);
 	ChargedArrow->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 	ChargedArrow->SetLifeSpan(0.f);
@@ -228,6 +233,8 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 void APlayerCharacter::Damaged(int32 Damage)
 {
+	if (GetIsParry()) return;
+
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	const int32 CurrentHP = PlayerManager->GetHp();
 	EMove_State Move_State = Cast<UPlayerMovementComponent>(GetCharacterMovement())->GetMoveState();
@@ -248,10 +255,17 @@ void APlayerCharacter::Damaged(int32 Damage)
 		UE_LOG(LogTemp, Warning, TEXT("%d"), AfterHP);
 
 		Cast<UPlayerMovementComponent>(GetCharacterMovement())->SetMoveState(EMove_State::Hit);
-
 	}
-	
-	
+
+	//GameOver 
+	else
+	{
+		UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
+		if (UIManager)
+		{
+			UIManager->ShowUI(UEndingCredits::StaticClass());
+		}
+	}
 }
 
 void APlayerCharacter::TimelineProgress(float Value)

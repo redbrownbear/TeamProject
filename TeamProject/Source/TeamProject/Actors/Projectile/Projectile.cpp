@@ -21,9 +21,9 @@
 #include "Actors/Monster/CharacterMonster.h"
 #include "Actors/Monster/PawnMonster.h"
 #include "Actors/Item/WorldWeapon.h"
-#include "Actors/Effect/ParticleEffect.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Effect/NiagaraEffect.h"
+#include "Actors/Effect/ParticleEffect.h"
 #include "Actors/Object/TorchStand.h"
 
 #include "SubSystem/PlayerManager.h"
@@ -127,18 +127,21 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 	if (!TrailEffectTable.IsNull())
 	{
 		FNiagaraEffectTableRow* Data = NiagaraEffectDataTable.GetRow<FNiagaraEffectTableRow>(TrailEffectTable.RowName.ToString());
-		
-		TrailEffectFX = Data->EffectNiagaraSystem;
-		
-		for (auto& SocketName : ProjectileTableRow->TrailSockets)
+		if (Data)
 		{
 
-			UNiagaraComponent* NewTrail = NewObject<UNiagaraComponent>(this, UNiagaraComponent::StaticClass(), SocketName);
-			NewTrail->AttachToComponent(StaticMeshComponent, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
-			NewTrail->SetAsset(TrailEffectFX);
-			
-			
-			Trails.Add(NewTrail);
+			TrailEffectFX = Data->EffectNiagaraSystem;
+
+			for (auto& SocketName : ProjectileTableRow->TrailSockets)
+			{
+
+				UNiagaraComponent* NewTrail = NewObject<UNiagaraComponent>(this, UNiagaraComponent::StaticClass(), SocketName);
+				NewTrail->AttachToComponent(StaticMeshComponent, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
+				NewTrail->SetAsset(TrailEffectFX);
+
+
+				Trails.Add(NewTrail);
+			}
 		}
 	}
 
@@ -174,7 +177,8 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		{
 			if (DataTableRowHandle.RowName == ProjectileName::Monster_Attack
 				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelAttack
-				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack)
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack
+				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelHorn)
 			{
 				if (GetOwner()->IsA<APawnMonster>())
 				{
@@ -394,7 +398,14 @@ float AProjectile::GetDamage()
 
 void AProjectile::SetProjectileMovementActivate(bool bFlag)
 {
-	ProjectileMovementComponent->Deactivate();
+	if (bFlag)
+	{
+		ProjectileMovementComponent->Activate();
+	}
+	else
+	{
+		ProjectileMovementComponent->Deactivate();
+	}
 }
 
 void AProjectile::SetGravityScale(float Scale)
@@ -414,7 +425,8 @@ void AProjectile::SetNiagaraVisibility(bool bFlag)
 {
 	if (!NiagaraEffectComponent)
 	{
-		return;
+		UE_LOG(LogTemp, Warning, TEXT("AProjectile::SetNiagaraVisibility // No NiagaraEffectComponent"))
+			return;
 	}
 
 	if(bFlag)

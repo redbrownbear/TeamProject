@@ -31,6 +31,7 @@ void ATriggerBox_ToAssasinHideout::OnTrigger(UPrimitiveComponent* OverlappedComp
 				sPlayerStatus Status = PlayerManager->GetPlayerStatus();
 				Status.PreviousLoction = Player->GetActorLocation() - Player->GetActorForwardVector() * 200.f;
 				PlayerManager->SetPlayerStatus(Status);
+				PlayerManager->SetLevelName(TextU(3003));
 
 				TSoftObjectPtr<UWorld> GameMap = TSoftObjectPtr<UWorld>(FSoftObjectPath(TEXT("/Game/Level/AssasinHideout.AssasinHideout")));
 				LoadingScreenSubsystem->OpenLevelWithLoadingScreen(GameMap);

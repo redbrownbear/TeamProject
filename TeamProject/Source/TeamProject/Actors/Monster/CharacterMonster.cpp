@@ -6,6 +6,7 @@
 #include "Actors/Projectile/Projectile.h"
 #include "Actors/Character/PlayerCharacter.h"
 #include "Actors/Item/WorldWeapon.h"
+#include "Actors/Object/ProjectileMetalActor.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/StatusComponent/MonsterStatusComponent/MonsterStatusComponent.h"
@@ -13,6 +14,8 @@
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "Components/FSMComponent/Monster/LynelFSMComponent.h"
 #include "Components/FSMComponent/Monster/HinoxFSMComponent.h"
+#include "Components/FSMComponent/Monster/AssasinBossFSMComponent.h"
+#include "Components/FSMComponent/Monster/AssasinLeaderFSMComponent.h"
 #include "Components/CapsuleComponent.h"
 
 #include "Shakes/DefaultCameraShakeBase.h"
@@ -30,10 +33,11 @@
 
 #include "UI/UIComponent/MonsterHP.h"
 
-
 // Sets default values
 ACharacterMonster::ACharacterMonster()
 {
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -72,9 +76,10 @@ void ACharacterMonster::BeginPlay()
 		FSMComponent->SetCharacterMonster(this);
 		FSMComponent->BindHitEvent();
 	}
+
 	SetData(DataTableRowHandle);
 
-	if (!(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
+	if (MonsterData && !(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
 	{
 		if (UWorld* World = GetWorld())
 		{
@@ -100,7 +105,7 @@ void ACharacterMonster::BeginPlay()
 	}
 
 
-	if (!(MonsterData->BowWeaponTableRowHandle.IsNull()))
+	if (MonsterData && !(MonsterData->BowWeaponTableRowHandle.IsNull()))
 	{
 		if (UWorld* World = GetWorld())
 		{
@@ -196,6 +201,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		FVector RelativeLocation = MonsterData->MeshTransform.GetLocation();
 		RelativeLocation += FVector(0.0, 0.0, -MonsterData->CapsuleHalfHeight);
 		MeshComp->SetRelativeLocation(RelativeLocation);
+		MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 
@@ -206,10 +212,22 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	}
 
 	AIControllerClass = MonsterData->AIControllerClass;
+	//AIControllerClass = ACharacterMonsterAIController::StaticClass();
+
+
+
 
 	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 	{
 		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
+		if (PatrolPath)
+		{
+			FSMComponent->SetPatrolPath(PatrolPath);
+		}
+		if (CampFire)
+		{
+			FSMComponent->SetCampFire(CampFire);
+		}
 	}
 
 	StatusComponent->SetMaxHP(MonsterData->MaxHP);
@@ -256,6 +274,274 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 			if (NewSphereCollider)
 			{
 				NewSphereCollider->RegisterComponent(); 
+
+				AdditionalColliders.Add(NewSphereCollider);
+
+				NewSphereCollider->SetCanEverAffectNavigation(false);
+				NewSphereCollider->SetCollisionProfileName(CollisionProfileName::Monster); // 몬스터 피격 판정에 적합한 프로파일
+
+				if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+				{
+					if (static_cast<EAdditionalCollider>(i) == EAdditionalCollider::Eye_Ball)
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnEyeBeginOverlap);
+					}
+					else
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+					}
+				}
+				else if (DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
+				{
+					if (static_cast<EAdditionalCollider>(i) == EAdditionalCollider::Chin)
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnEyeBeginOverlap);
+					}
+					else
+					{
+						NewSphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+					}
+				}
+				FAttachmentTransformRules AttachRules = FAttachmentTransformRules::SnapToTargetNotIncludingScale;
+
+				FName AttachSocketName = NAME_None; // 기본은 메시의 루트
+
+				// 몬스터 타입 및 콜리더 인덱스에 따른 소켓 이름 및 크기 설정
+				if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+				{
+					switch (static_cast<EAdditionalCollider>(i))
+					{
+					case EAdditionalCollider::Chin:
+						AttachSocketName = Monster_SocketName::Chin;
+						NewSphereCollider->SetSphereRadius(75.0f);
+						break;
+					case EAdditionalCollider::Center_1:
+						AttachSocketName = Monster_SocketName::Center_1;
+						NewSphereCollider->SetSphereRadius(150.f);
+						break;
+					case EAdditionalCollider::Center_2:
+						AttachSocketName = Monster_SocketName::Center_2;
+						NewSphereCollider->SetSphereRadius(150.f);
+						break;
+					case EAdditionalCollider::Leg_1_R:
+						AttachSocketName = Monster_SocketName::Leg_1_R;
+						NewSphereCollider->SetSphereRadius(50.f);
+						break;
+					case EAdditionalCollider::Leg_2_R:
+						AttachSocketName = Monster_SocketName::Leg_2_R;
+						NewSphereCollider->SetSphereRadius(50.f);
+						break;
+					case EAdditionalCollider::Leg_1_L:
+						AttachSocketName = Monster_SocketName::Leg_1_L;
+						NewSphereCollider->SetSphereRadius(50.f);
+						break;
+					case EAdditionalCollider::Leg_2_L:
+						AttachSocketName = Monster_SocketName::Leg_2_L;
+						NewSphereCollider->SetSphereRadius(50.f);
+						break;
+					case EAdditionalCollider::Toe_R:
+						AttachSocketName = Monster_SocketName::Toe_R;
+						NewSphereCollider->SetSphereRadius(50.f);
+						break;
+					case EAdditionalCollider::Toe_L:
+						AttachSocketName = Monster_SocketName::Toe_L;
+						NewSphereCollider->SetSphereRadius(50.f);
+						break;
+					case EAdditionalCollider::Eye_Ball:
+						AttachSocketName = Monster_SocketName::EyeBall;
+						NewSphereCollider->SetSphereRadius(70.f);
+						break;
+					default:
+						UE_LOG(LogTemp, Error, TEXT("ACharacterMonster::SetData // Hinox: Unexpected AdditionalCollider index: %d"), i);
+						// check(false); // 릴리스 빌드에 영향을 주므로 주의하여 사용
+						break;
+					}
+				}
+				else if (DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
+				{
+					switch (static_cast<EAdditionalCollider>(i))
+					{
+					case EAdditionalCollider::Chin:
+						AttachSocketName = Monster_SocketName::Chin;
+						NewSphereCollider->SetSphereRadius(50.0f);
+						break;
+					default:
+						UE_LOG(LogTemp, Error, TEXT("ACharacterMonster::SetData // Lynel: Unexpected AdditionalCollider index: %d"), i);
+						// check(false);
+						break;
+					}
+				}
+
+				// 실제 부착 수행
+				NewSphereCollider->AttachToComponent(SkeletalmeshComp, AttachRules, AttachSocketName);
+				NewSphereCollider->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+
+			}
+		}
+	}
+
+	if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+	{
+		DefaultCameraShakeBase = NewObject<UDefaultCameraShakeBase>(this, UDefaultCameraShakeBase::StaticClass(), TEXT("DefaultCameraShakeBase"));
+	}
+
+
+
+	int32 MaterialSlotIndex = -1;
+	if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+	{
+		MaterialSlotIndex = 4;
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("Moriblin_TreasureBox"))
+	{
+		MaterialSlotIndex = 1;
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinLeader"))
+	{
+		MaterialSlotIndex = 0;
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinBoss"))
+	{
+		MaterialSlotIndex = 1;
+	}
+
+	USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
+
+	if (MaterialSlotIndex != -1)
+	{
+		UMaterialInterface* CurrentMaterialOnMesh = SkeletalMeshComponent->GetMaterial(MaterialSlotIndex);
+
+		if (!CurrentMaterialOnMesh)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SetData: No material found at slot %d. Cannot proceed with DynamicMaterialInstance setup."), MaterialSlotIndex);
+			DynamicMaterialInstance = nullptr; // 기존 포인터도 혹시 모르니 null로
+			return;
+		}
+
+		DynamicMaterialInstance = Cast<UMaterialInstanceDynamic>(CurrentMaterialOnMesh);
+
+		if (!DynamicMaterialInstance)
+		{
+			DynamicMaterialInstance = UMaterialInstanceDynamic::Create(CurrentMaterialOnMesh, this);
+
+			if (DynamicMaterialInstance)
+			{
+				SkeletalMeshComponent->SetMaterial(MaterialSlotIndex, DynamicMaterialInstance);
+				UE_LOG(LogTemp, Log, TEXT("SetData: Created and assigned new DynamicMaterialInstance (%s) to slot %d"), *DynamicMaterialInstance->GetName(), MaterialSlotIndex);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("SetData: Failed to create DynamicMaterialInstance using parent %s!"), *CurrentMaterialOnMesh->GetName());
+				DynamicMaterialInstance = nullptr;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("SetData: Re-using existing DynamicMaterialInstance (%s) at slot %d"), *DynamicMaterialInstance->GetName(), MaterialSlotIndex);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("SetData: No specific material slot handling for %s."), *DataTableRowHandle.RowName.ToString());
+		DynamicMaterialInstance = nullptr;
+	}
+
+	AddBaseColor(FVector(0.0, 0.0, 0.0));
+}
+void ACharacterMonster::SetData(const FName& MonsterName)
+{
+	static UDataTable* MonsterDataTable = nullptr;
+	if (!MonsterDataTable)
+	{
+		MonsterDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Data/MonsterData/DT_Monster.DT_Monster'"));
+		check(MonsterDataTable);
+	}
+
+	if (!MonsterDataTable->GetRowMap().Find(MonsterName)) { ensure(false); return; }
+	DataTableRowHandle.DataTable = MonsterDataTable;
+	DataTableRowHandle.RowName = MonsterName;
+	MonsterData = DataTableRowHandle.GetRow<FMonsterTableRow>(DataTableRowHandle.RowName.ToString());
+
+
+	UCapsuleComponent* CapsuleComp = GetComponentByClass<UCapsuleComponent>();
+	if (CapsuleComp)
+	{
+		CapsuleComp->SetCollisionProfileName(CollisionProfileName::Monster);
+		CapsuleComp->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+		CapsuleComp->SetCapsuleHalfHeight(MonsterData->CapsuleHalfHeight);
+		CapsuleComp->SetCapsuleRadius(MonsterData->CapsuleRadius);
+	}
+
+	USkeletalMeshComponent* MeshComp = GetMesh(); // GetMesh() returns ACharacter's USkeletalMeshComponent.
+	if (MeshComp) // Make sure MeshComp is Valid
+	{
+		MeshComp->SetSkeletalMesh(MonsterData->SkeletalMesh);
+		MeshComp->SetAnimClass(MonsterData->AnimClass);
+		MeshComp->SetRelativeScale3D(MonsterData->MeshTransform.GetScale3D());
+		FVector RelativeLocation = MonsterData->MeshTransform.GetLocation();
+		RelativeLocation += FVector(0.0, 0.0, -MonsterData->CapsuleHalfHeight);
+		MeshComp->SetRelativeLocation(RelativeLocation);
+		MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+
+	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
+	if (MovementComp) // MovementComp가 유효한지 확인
+	{
+		MovementComp->MaxWalkSpeed = MonsterData->WalkMovementMaxSpeed;
+	}
+
+	AIControllerClass = MonsterData->AIControllerClass;
+
+	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
+	{
+		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
+	}
+
+	StatusComponent->SetMaxHP(MonsterData->MaxHP);
+	HPBarWidget->SetRelativeLocation(FVector(0.f, 0.f, (MonsterData->CollisionSphereRadius - 10.0f) * 4.0f));
+
+	for (USphereComponent* ExistingCollider : AdditionalColliders)
+	{
+		if (ExistingCollider && ExistingCollider->IsValidLowLevelFast())
+		{
+			ExistingCollider->DestroyComponent();
+		}
+	}
+	AdditionalColliders.Empty(); // 배열 비우기
+
+	if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox") || DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
+	{
+		USkeletalMeshComponent* SkeletalmeshComp = GetMesh();
+
+		if (!SkeletalmeshComp)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SetData: SkeletalMeshComponent is null. Cannot attach colliders."));
+			return;
+		}
+
+		// Hinox와 Lynel 모두를 처리하는 단일 루프
+		int32 NumCollidersToCreate = 0;
+		if (DataTableRowHandle.RowName.ToString() == TEXT("Hinox"))
+		{
+			NumCollidersToCreate = static_cast<int32>(EAdditionalCollider::End);
+		}
+		else if (DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
+		{
+			// Lynel의 경우 EAdditionalCollider::Chin까지만 사용하도록 설정
+			NumCollidersToCreate = static_cast<int32>(EAdditionalCollider::Chin) + 1;
+		}
+
+		AdditionalColliders.Reserve(NumCollidersToCreate);
+
+		for (int32 i = 0; i < NumCollidersToCreate; ++i)
+		{
+			FString ComponentName = FString::Printf(TEXT("AdditionalCollider_%d"), i);
+			USphereComponent* NewSphereCollider = NewObject<USphereComponent>(this, USphereComponent::StaticClass(), FName(*ComponentName));
+
+			if (NewSphereCollider)
+			{
+				NewSphereCollider->RegisterComponent();
 
 				AdditionalColliders.Add(NewSphereCollider);
 
@@ -528,6 +814,20 @@ void ACharacterMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 			}
 		}
 	}
+	else if (AProjectileMetalActor* ProjectileMetalActor = Cast<AProjectileMetalActor>(OtherActor))
+	{
+		FDamageEvent DamageEvent;
+		if (UWorld* World = GetWorld())
+		{
+			if (AController* PlayerController = World->GetFirstPlayerController())
+			{
+				if (AActor* Player = Controller->GetPawn())
+				{
+					IMonsterInterface::TakeDamage(ProjectileMetalActor->GetDamage(), DamageEvent, GetController(), this);
+				}
+			}
+		}
+	}
 }
 void ACharacterMonster::OnEyeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -563,6 +863,11 @@ APatrolPath* ACharacterMonster::GetPatrolPath() const
 ACampFire* ACharacterMonster::GetCampFire() const
 {
 	return CampFire;
+}
+
+FName ACharacterMonster::GetMonsterRowName() const
+{
+	return DataTableRowHandle.RowName;
 }
 
 void ACharacterMonster::SetSpeedWalk()

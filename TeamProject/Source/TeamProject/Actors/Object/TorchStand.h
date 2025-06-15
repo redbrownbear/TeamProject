@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "TorchStand.generated.h"
 
-
 class UStaticMeshComponent;
 class USphereComponent;
 class UNiagaraComponent;
@@ -47,4 +46,7 @@ public:
 
 private:
 	bool bTorchOnFire = false;
+
+	TArray<TObjectPtr<ATorchStand>> TorchList;
+	TSet<TObjectPtr<ATorchStand>> LitTorchSet;
 };

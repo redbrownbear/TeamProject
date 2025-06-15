@@ -12,7 +12,6 @@
 #include "Components/WrapBox.h"
 #include "Components/Progressbar.h"
 
-#include "UI/HUD/HUDMiniMap.h"
 #include "UI/HUD/HUDQuestOn.h"
 
 #include "MainHUDWidget.generated.h"
@@ -80,8 +79,6 @@ public:
 	UWrapBox* HpWrapBox;
 
 private:
-	UHUDMiniMap* MiniMap;
-
 	UPROPERTY(meta = (BindWIdget))
 	UHUDQuestOn* QuestOn;
 

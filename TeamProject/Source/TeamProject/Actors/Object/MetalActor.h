@@ -9,6 +9,7 @@
 
 class USphereComponent;
 class UPhysicalMaterial;
+class UMetalComponent;
 struct FMetalActorTableRow;
 
 UCLASS()
@@ -24,36 +25,52 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
 	virtual void OnConstruction(const FTransform& Transform);
+	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
+
+public:
 	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+	virtual void SetData(const FName& MetalActorName);
 
 	//USphereComponent* GetCollisionComponent() { return CollisionComponent; }
 
+protected:
+	UFUNCTION()
+	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+
+
 public:
-	void ThisIsMetal();
+	virtual void ThisIsMetal();
 	void ChangeNomalColor();
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USphereComponent> CollisionComponent;
+	TObjectPtr<USceneComponent> DefaultSceneRoot;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UShapeComponent> CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
-	UPROPERTY()
-	TObjectPtr<UMaterialInterface> MaterialInterface;
-
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UMetalComponent> MetalComponent;
+	
 	TObjectPtr<UMaterialInstanceDynamic> DynamicMaterialInstance;	
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UPhysicalMaterial> PhysicalMaterial;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Table")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MetalActorTableRow")
 	FDataTableRowHandle DataTableRowHandle;
 
 	FMetalActorTableRow* MetalActorData;
-	
+	const UDataTable* MetalActorDataTable;
+
 };

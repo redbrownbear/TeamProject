@@ -65,3 +65,25 @@ void ACampFire::Tick(float DeltaTime)
 
 }
 
+void ACampFire::PostDuplicate(EDuplicateMode::Type DuplicateMode)
+{
+    Super::PostDuplicate(DuplicateMode);
+
+    if (DuplicateMode == EDuplicateMode::Normal)
+    {
+        FTransform Backup = GetActorTransform();
+        SetActorTransform(Backup);
+        CampFireGuid = FGuid::NewGuid();
+    }
+}
+
+void ACampFire::OnConstruction(const FTransform& Transform)
+{
+    Super::OnConstruction(Transform);
+
+    if (!CampFireGuid.IsValid())
+    {
+        CampFireGuid = FGuid::NewGuid();
+    }
+}
+

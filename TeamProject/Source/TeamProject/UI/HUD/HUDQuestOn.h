@@ -22,9 +22,6 @@ class TEAMPROJECT_API UHUDQuestOn : public UUserWidget
 private:
 	virtual void NativeConstruct() override;
 	
-private:
-	void InitResource();
-
 public:
 	void ShowQuestUI(bool bIsComplete, FString QuestName);
 
@@ -43,14 +40,18 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* TextQuestName;
 
-private:
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest", meta = (AllowPrivateAccess = "true"))
 	UTexture2D* QuestOn;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Quest", meta = (AllowPrivateAccess = "true"))
 	UTexture2D* QuestCoplete;
 
 private:
 	FTimerHandle HideTimerHandle;
 	FTimerHandle SlideInHandle;
 	FTimerHandle SlideOutHandle;
+
+	bool bHasInitialized = false;
 
 	static FVector2D OriginPosition;
 

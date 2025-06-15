@@ -59,4 +59,6 @@ public:
 private:
 	int CurrentStep = 0;
 	FTimerHandle FadeHandle;
+
+	bool bHasInitialized = false;
 };
