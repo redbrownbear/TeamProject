@@ -224,6 +224,27 @@ void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
             }
         }
     }
+
+    if (CurQuestChar == EQuestCharacter::Impa)
+    {
+        bool IsQuest = PC_InGame->Npc->GetDoQuest();
+
+        if (DialogueDataRow.bIsEndConversation && !IsQuest)
+        {
+            PC_InGame->Npc->SetDoQuest(true);
+            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Quest);
+
+            PlayerManager->SetQuestData(QuestManager->GetQuestDataByNum(CurQuestNum));
+        }
+        else
+        {
+            //SoundU(ESoundType::ESound_FindFuriko);
+            // @TODO Add Impa SoundU
+
+            PC_InGame->Npc->SetDoQuest(false);
+            PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
+        }
+    }
 }
 
 void UNPCDialogue::OnCancel(const FInputActionValue& InputActionValue)
@@ -259,6 +280,11 @@ void UNPCDialogue::OnCancel(const FInputActionValue& InputActionValue)
     {
         PC_InGame->Npc->SetIsConfirmed(false);
 
+    }
+
+    if (CurQuestChar == EQuestCharacter::Impa)
+    {
+        PC_InGame->Npc->SetIsConfirmed(false);
     }
 
     HideUI(UNPCDialogue::StaticClass());
