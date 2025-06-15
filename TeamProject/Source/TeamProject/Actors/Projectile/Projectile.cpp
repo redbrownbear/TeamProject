@@ -256,7 +256,24 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 			ParticleEffect->FinishSpawning(NewTransform);
 		}
 	}
+	if (DataTableRowHandle.RowName == ProjectileName::Player_Arrow
+		|| DataTableRowHandle.RowName == ProjectileName::Player_FireArrow
+		)
+	{
+		if (UWorld* World = GetWorld())
+		{
+			AParticleEffect* ParticleEffect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+			const FDataTableRowHandle ParticleEffectDataTable = ProjectileTableRow->ParticleEffectTableRowHandle;
+			FTransform NewTransform;
+			ParticleEffect->SetData(ParticleEffectDataTable);
 
+			const FVector Location = GetActorLocation();
+			NewTransform.SetLocation(Location);
+
+			ParticleEffect->FinishSpawning(NewTransform);
+		}
+	}
 
 	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert)
 		&& !OtherActor->IsA<ATorchStand>()

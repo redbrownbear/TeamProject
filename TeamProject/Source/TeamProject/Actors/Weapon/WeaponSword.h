@@ -1,10 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Actors/Weapon/WeaponBase.h"
 #include "WeaponSword.generated.h"
+
+class UParticleSystemComponent;
+class UParticleSystem;
 
 /**
  * 
@@ -39,6 +42,10 @@ public:
 
 	void StartTrailEffect();
 	void StopTrailEffect();
+
+	void StartHitEffect();
+	void StopHitEffect();
+
 private:
 
 
@@ -62,5 +69,13 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "FX")
 	UParticleSystem* CascadeTrailFX;
 
+	UPROPERTY()
+	TObjectPtr<UParticleSystemComponent> HitEffectComponent;
+
+	UPROPERTY()
+	UParticleSystem* HitEffectFX;
+
 	TArray<TObjectPtr<AActor>> DamagedActors;
+
+	
 };

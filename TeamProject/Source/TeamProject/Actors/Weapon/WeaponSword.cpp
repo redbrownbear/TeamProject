@@ -87,14 +87,22 @@ AWeaponSword::AWeaponSword()
         ParticleSystemComponent->SetupAttachment(StaticMeshComponent);
         ParticleSystemComponent->bAutoActivate = false; // 
     }
+    HitEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("HitEffectComponent"));
+    {
+        ConstructorHelpers::FObjectFinder<UParticleSystem> Asset(TEXT("/Script/Engine.ParticleSystem'/Game/Vefects/FXVarietyPack/Particles/P_ky_hit1.P_ky_hit1'"));
+        if (Asset.Object)
+        {
+            HitEffectFX = Asset.Object;
+        }
+    }
 }
 
 void AWeaponSword::BeginPlay()
 {
     Super::BeginPlay(); // 
-
     
-    
+    HitEffectComponent->AttachToComponent(StaticMeshComponent, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Trail_Ended"));
+    HitEffectComponent->SetRelativeScale3D(FVector(0.01,0.01,0.01));
 }
 
 void AWeaponSword::LeftClickAction()
@@ -179,6 +187,33 @@ void AWeaponSword::StopTrailEffect()
     }
 }
 
+void AWeaponSword::StartHitEffect()
+{
+    if (HitEffectComponent && HitEffectFX)
+    {
+        // 먼저 파티클 템플릿 지정
+        HitEffectComponent->SetTemplate(HitEffectFX);
+
+        // 소켓 존재 여부 확인
+        if (StaticMeshComponent &&
+            StaticMeshComponent->DoesSocketExist(TEXT("Trail_Started")))
+        {
+            // Trail 시작 (내부에서 자동 Activate됨)
+            
+            HitEffectComponent->Activate();
+        }
+    }
+}
+void AWeaponSword::StopHitEffect()
+{
+
+    if (HitEffectComponent)
+    {
+        HitEffectComponent->EndTrails();         // Trail 종료
+        HitEffectComponent->DeactivateSystem();  // 파티클 비활성화
+    }
+}
+
 void AWeaponSword::Attack()
 {
     AActor* OwnerActor = GetOwner();
@@ -226,8 +261,11 @@ void AWeaponSword::Attack()
     UPlayerStatusComponent* PlayerStatusComponent = PlayerCharacter->GetPlayerStatusComponent();
     const int32 Damage = PlayerStatusComponent->GetDamage();
 
+    
+
     if (bHit)
     {
+        StartHitEffect();
         for (const FHitResult& Hit : OutHits)
         {
             AActor* HitActor = Hit.GetActor();
