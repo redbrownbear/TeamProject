@@ -140,4 +140,5 @@ public:
 
 private:
     bool bIsCompleteload;
+    bool bIsCompleteDelegate = false;
 };
