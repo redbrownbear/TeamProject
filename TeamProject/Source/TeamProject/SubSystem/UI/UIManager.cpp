@@ -7,13 +7,14 @@
 
 void UUIManager::PostWorldInitialize()
 {
-    //if (bIsCompleteload == true)
-    //    return;
-
-    BindDelegates();
     LoadUIClass();
 
-    //bIsCompleteload = true;
+    if (bIsCompleteDelegate)
+    {
+        BindDelegates();
+        bIsCompleteDelegate = true;
+        return;
+    } 
 }
 
 void UUIManager::Initialize(FSubsystemCollectionBase& Collection)
@@ -25,11 +26,6 @@ void UUIManager::Initialize(FSubsystemCollectionBase& Collection)
 
 void UUIManager::BindDelegates()
 {
-    if (bIsCompleteDelegate)
-    {
-        return;
-    }
-    bIsCompleteDelegate = true;
     UQuestDialogueManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestDialogueManager>();
     if (QuestManager)
     {

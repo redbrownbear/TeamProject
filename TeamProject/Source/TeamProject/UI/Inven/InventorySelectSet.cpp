@@ -3,7 +3,7 @@
 
 #include "UI/Inven/InventorySelectSet.h"
 #include "SubSystem/PlayerManager.h"
-#include "Misc/TextUtil.h"
+#include "Misc/Utils.h"
 
 void UInventorySelectSet::NativeConstruct()
 {
