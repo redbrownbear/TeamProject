@@ -16,7 +16,7 @@ void UAnimNotify_GlideUnVisible::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 	{
 		return;
 	}
-	PlayerCharacter->GetWeaponManagerComponent()->GetGlider()->SetVisibility(false);
-	
+	PlayerCharacter->GetWeaponManagerComponent()->GetGlider()->SetVisibleGldier(false);
+
 	
 }

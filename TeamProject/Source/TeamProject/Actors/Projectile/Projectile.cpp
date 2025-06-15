@@ -107,7 +107,7 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 	////////////////////////////
 	// Effect
 
-	const FDataTableRowHandle NiagaraEffectDataTable = ProjectileTableRow->NiagaraEffectTableRowHandle;
+	const FDataTableRowHandle NiagaraEffectDataTable = ProjectileTableRow->TrailEffectTableRowHandle;
 	if (!NiagaraEffectDataTable.IsNull())
 	{
 		FNiagaraEffectTableRow* Data = NiagaraEffectDataTable.GetRow<FNiagaraEffectTableRow>(NiagaraEffectDataTable.RowName.ToString());
@@ -119,6 +119,27 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		//NiagaraEffectComponent->SetRelativeLocation(Data->Transform.GetLocation());
 		//NiagaraEffectComponent->SetRelativeRotation(GetActorForwardVector().Rotation().Quaternion());
 		NiagaraEffectComponent->RegisterComponent();
+	}
+
+	//Trail
+
+	const FDataTableRowHandle TrailEffectTable = ProjectileTableRow->NiagaraEffectTableRowHandle;
+	if (!TrailEffectTable.IsNull())
+	{
+		FNiagaraEffectTableRow* Data = NiagaraEffectDataTable.GetRow<FNiagaraEffectTableRow>(TrailEffectTable.RowName.ToString());
+		
+		TrailEffectFX = Data->EffectNiagaraSystem;
+		
+		for (auto& SocketName : ProjectileTableRow->TrailSockets)
+		{
+
+			UNiagaraComponent* NewTrail = NewObject<UNiagaraComponent>(this, UNiagaraComponent::StaticClass(), SocketName);
+			NewTrail->AttachToComponent(StaticMeshComponent, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
+			NewTrail->SetAsset(TrailEffectFX);
+			
+			
+			Trails.Add(NewTrail);
+		}
 	}
 
 	const FDataTableRowHandle ParticleEffectDataTable = ProjectileTableRow->ParticleEffectTableRowHandle;

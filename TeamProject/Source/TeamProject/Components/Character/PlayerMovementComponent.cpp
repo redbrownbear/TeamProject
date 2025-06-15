@@ -355,7 +355,6 @@ void UPlayerMovementComponent::SetGlideMode(bool _bool)
 		}
 		else
 		{
-			WeaponManagerComponent->GetGlider()->SetVisibility(false);
 			AnimInst->Montage_Play(WeaponManagerComponent->GetGliderUnEquipMontage());
 		}
 	}

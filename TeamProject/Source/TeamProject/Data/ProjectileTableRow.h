@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -17,6 +17,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	FTransform Transform = FTransform::Identity;
 
+	
 public:
 	UPROPERTY(EditAnywhere, Category = "Collision")
 	TSubclassOf<UShapeComponent> CollisionClass/* = USphereComponent::StaticClass()*/;
@@ -48,9 +49,14 @@ public:
 	float LifeSpan = 3.f;
 
 
+
 public:
 	UPROPERTY(EditAnywhere, Category = "NiagaraEffect", meta = (RowType = "NiagaraEffectTableRow"))
 	FDataTableRowHandle NiagaraEffectTableRowHandle;
+	UPROPERTY(EditAnywhere, Category = "TrailEffect", meta = (RowType = "NiagaraEffectTableRow"))
+	FDataTableRowHandle TrailEffectTableRowHandle;
+	UPROPERTY(EditAnywhere, Category = "TrailEffect")
+	TArray<FName> TrailSockets;
 	UPROPERTY(EditAnywhere, Category = "ParticleEffect", meta = (RowType = "ParticleEffectTableRow"))
 	FDataTableRowHandle ParticleEffectTableRowHandle;
 };
