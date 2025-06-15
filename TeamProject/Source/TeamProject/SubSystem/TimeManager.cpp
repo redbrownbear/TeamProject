@@ -55,5 +55,6 @@ void UTimeManagerSubsystem::SetTimeScale(float NewScale)
 
 float UTimeManagerSubsystem::GetTimeScale() const
 {
-    return TimeScale;
+    return 1.f;
+    //return TimeScale;
 }

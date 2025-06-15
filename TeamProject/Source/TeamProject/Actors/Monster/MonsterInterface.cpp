@@ -300,7 +300,14 @@ void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 		break;
 	}
 	
-	if (TempAnimMontage && !AnimInstance->Montage_IsPlaying(TempAnimMontage))
+	if (!TempAnimMontage)
+	{
+		UE_LOG(LogTemp, Error, TEXT("MonsterInterface::PlayMontage // TempAnimMontage is NULL"))
+		return;
+
+	}
+
+	if (!AnimInstance->Montage_IsPlaying(TempAnimMontage))
 	{
 		if (bIsLoop)
 		{
@@ -317,7 +324,6 @@ void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
 	}
 	else
 	{
-		int a = 0;
 	}
 }
 

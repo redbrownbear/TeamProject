@@ -16,7 +16,8 @@ public class TeamProject : ModuleRules
             "InputCore", "EnhancedInput", "UMG",
             "MoviePlayer", "AIModule", "Paper2D",
             "PhysicsCore", "RenderCore", "RHI", "Niagara", 
-            "MediaAssets", "Slate", "SlateCore", "Landscape"/*"Graphics",*/
+            "MediaAssets", "Slate", "SlateCore", "Landscape",
+            "AudioMixer", "AudioExtensions"/*"Graphics",*/
 
         });
 
