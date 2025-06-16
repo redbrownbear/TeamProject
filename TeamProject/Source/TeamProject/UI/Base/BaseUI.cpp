@@ -72,7 +72,7 @@ void UBaseUI::PauseAllPausableActors(bool bPause)
         AActor* Actor = *It;
         if (Actor && !Actor->IsA<APlayerController>())
         {
-            Actor->CustomTimeDilation = bPause ? 0.0f : 1.0f;
+            Actor->CustomTimeDilation = bPause ? 0.00001f : 1.0f;
         }
     }
 }
