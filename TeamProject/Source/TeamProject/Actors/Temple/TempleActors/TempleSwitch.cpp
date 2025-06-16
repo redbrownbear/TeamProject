@@ -3,7 +3,7 @@
 
 #include "Components/SphereComponent.h"
 
-#include "SubSystem/Puzzle/TempleSwitchManager.h"
+#include "SubSystem/Puzzle/EventManager.h"
 
 #include "Data/TempleActorTableRow.h"
 
@@ -42,11 +42,11 @@ void ATempleSwitch::BeginPlay()
 
 void ATempleSwitch::UnlockGate()
 {
-	UTempleSwitchManager* TempleSwitchManager = GetGameInstance()->GetSubsystem<UTempleSwitchManager>();
+	UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
 
-	if (TempleSwitchManager)
+	if (EventManager)
 	{
-		TempleSwitchManager->NotifyOverlapTempleBall();
+		EventManager->NotifyOverlapTempleBall();
 		bIsOpenedGate = true;
 	}
 }

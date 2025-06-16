@@ -1,6 +1,5 @@
 #include "Actors/Object/LockedGate.h"
-#include "SubSystem/Puzzle/TorchManager.h"
-#include "SubSystem/Puzzle/TempleSwitchManager.h"
+#include "SubSystem/Puzzle/EventManager.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -28,18 +27,13 @@ void ALockedGate::BeginPlay()
 		StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
 	}		
 
-	UTorchManager* TorchManager = GetGameInstance()->GetSubsystem<UTorchManager>();
-	if (TorchManager)
+	UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
+	if (EventManager)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("TorchManager found, adding dynamic delegate"));
-		TorchManager->OnAllTorchesLit.AddDynamic(this, &ALockedGate::OpenGateSequence);
-	}
-
-	UTempleSwitchManager* TempleSwitchManager = GetGameInstance()->GetSubsystem<UTempleSwitchManager>();
-	if (TempleSwitchManager)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("TempleSwitchManager found, adding dynamic delegate"));
-		TempleSwitchManager->OnOverlapTempleBall.AddDynamic(this, &ALockedGate::OpenGateSequence);
+		UE_LOG(LogTemp, Warning, TEXT("EventManager found, adding dynamic delegate"));
+		EventManager->OnOverlapTempleBall.AddDynamic(this, &ALockedGate::OpenGateSequence);
+		EventManager->OnAllTorchesLit.AddDynamic(this, &ALockedGate::OpenGateSequence);
+		EventManager->OnAssasinBossDead.AddDynamic(this, &ALockedGate::OpenGateSequence);
 	}
 }
 
