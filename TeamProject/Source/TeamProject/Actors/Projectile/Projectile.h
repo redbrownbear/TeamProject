@@ -63,6 +63,8 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UNiagaraComponent> NiagaraEffectComponent;
 	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> ProjectileNiagaraEffectComponent;
+	UPROPERTY()
 	UNiagaraSystem* TrailEffectFX;
 	UPROPERTY()
 	TObjectPtr<UParticleSystemComponent> ParticleEffectComponent;

@@ -317,6 +317,19 @@ void UAssasinBossFSMComponent::UpdateCombat(float DeltaTime)
 
 }
 
+void UAssasinBossFSMComponent::UpdateDying(float DeltaTime)
+{
+	this->StopMove();
+
+	if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DEAD))
+	{
+		DropWeapons();
+
+		CharacterMonster->OnDeadEnd();
+		CharacterMonster->Destroy();
+	}
+}
+
 void UAssasinBossFSMComponent::UpdateStun(float DeltaTime)
 {
 	StopMove();

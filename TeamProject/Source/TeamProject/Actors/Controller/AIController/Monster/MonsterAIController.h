@@ -8,6 +8,7 @@
 #include "MonsterAIController.generated.h"
 
 class UMonsterFSMComponent;
+class UTimeManagerSubsystem;
 
 UCLASS()
 class TEAMPROJECT_API AMonsterAIController : public AAIController
@@ -29,6 +30,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UMonsterFSMComponent> MonsterFSMComponent;
 
+	TObjectPtr<UTimeManagerSubsystem> TimeManager;
 
 
 
