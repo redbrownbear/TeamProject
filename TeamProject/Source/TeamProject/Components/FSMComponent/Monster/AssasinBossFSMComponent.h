@@ -26,6 +26,8 @@ public:
 protected:
 	virtual void UpdateIdle(float DeltaTime) override;
 	virtual void UpdateCombat(float DeltaTime) override;
+	virtual void UpdateDying(float DeltaTime) override;
+
 	virtual void UpdateStun(float DeltaTime);
 	virtual void UpdateBarrier(float DeltaTime);
 	virtual void UpdateStone(float DeltaTime);
