@@ -941,10 +941,15 @@ void ACharacterMonster::ShowHpUI(float CurHp, float MaxHp)
 
 UTimeManagerSubsystem* ACharacterMonster::GetTimeManagerSubsystem()
 {
-	if (!TimeManager)
+	UWorld* World = GetWorld();
+	if (IsValid(World) && World->IsGameWorld())
 	{
-		TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
-	} 
+		if (!TimeManager)
+		{
+			TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+		}
 
-	return TimeManager;
+		return TimeManager;
+	}
+	return nullptr;
 }

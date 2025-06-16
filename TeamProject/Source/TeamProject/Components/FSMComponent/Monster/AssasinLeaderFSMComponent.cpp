@@ -142,6 +142,8 @@ void UAssasinLeaderFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Dead:
 		CharacterMonster->PlayMontage(EMonsterMontage::DEAD);
 		break;
+	default:
+		return;
 	}
 
 
