@@ -4,6 +4,8 @@
 #include "Actors/Controller/AIController/Monster/BokoblinAIController.h"
 #include "Components/FSMComponent/Monster/BokoblinFSMComponent.h"
 
+#include "SubSystem/TimeManager.h"
+
 ABokoblinAIController::ABokoblinAIController()
 {
 	MonsterFSMComponent = CreateDefaultSubobject<UBokoblinFSMComponent>(TEXT("BokoblinFSMComponent"));
@@ -11,6 +13,9 @@ ABokoblinAIController::ABokoblinAIController()
 
 void ABokoblinAIController::Tick(float DeltaTime)
 {
+	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
 	Super::Tick(DeltaTime);
 }
 

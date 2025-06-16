@@ -16,6 +16,6 @@ public:
 
 protected:	
 	virtual void BeginPlay() override;
-	virtual void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus) override;
+	//virtual void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus) override;
 
 };

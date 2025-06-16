@@ -4,8 +4,8 @@
 #include "Animation/AnimNotify/Monster/AnimNotify_AB_SpawnStone.h"
 #include "Actors/Monster/CharacterMonster.h"
 #include "Components/FSMComponent/Monster/AssasinBossFSMComponent.h"
-#include "Actors/Projectile/KogaStone.h"
 #include "Actors/Object/ProjectileMetalActor.h"
+#include "Actors/Projectile/KogaStone.h"
 
 void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {

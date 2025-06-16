@@ -20,6 +20,7 @@ class USkeletalMeshComponent;
 
 class UMaterialInterface;
 class UMaterialInstanceDynamic;
+class UTimeManagerSubsystem;
 
 struct FMonsterTableRow;
 
@@ -81,4 +82,7 @@ public:
 protected:
 	virtual UMaterialInterface* GetMaterialInterface() = 0;
 	virtual UMaterialInstanceDynamic* GetDynamicMaterialInstance() = 0;
+
+protected:
+	virtual UTimeManagerSubsystem* GetTimeManagerSubsystem() = 0;
 };

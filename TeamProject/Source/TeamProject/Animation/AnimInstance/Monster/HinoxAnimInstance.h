@@ -7,6 +7,7 @@
 #include "HinoxAnimInstance.generated.h"
 
 class UHinoxFSMComponent;
+class UTimeManagerSubsystem;
 
 UCLASS()
 class TEAMPROJECT_API UHinoxAnimInstance : public UAnimInstance
@@ -23,6 +24,7 @@ public:
 protected:
 	UPROPERTY()
 	TObjectPtr<UHinoxFSMComponent> FSMComponent = nullptr;
+	TObjectPtr<UTimeManagerSubsystem> TimeManager = nullptr;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)

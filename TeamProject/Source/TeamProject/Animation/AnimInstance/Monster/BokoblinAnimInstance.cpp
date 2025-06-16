@@ -8,6 +8,8 @@
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "Subsystem/TimeManager.h"
+
 UBokoblinAnimInstance::UBokoblinAnimInstance()
 {
 }
@@ -26,17 +28,29 @@ void UBokoblinAnimInstance::NativeInitializeAnimation()
 
 	APawnMonster* Monster = Cast<APawnMonster>(Pawn);
 	FSMComponent = Cast<UBokoblinFSMComponent>(Monster->GetFSMComponent());
+	TimeManager = Monster->GetTimeManagerSubsystem();
 }
 
 void UBokoblinAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+	Super::NativeUpdateAnimation(CustumDeltaTime);
+
 	if (APawnMonster* Monster = Cast<APawnMonster>(TryGetPawnOwner()))
 	{
 		FSMComponent = Cast<UBokoblinFSMComponent>(Monster->GetFSMComponent());
 	}
 
 	if (!FSMComponent) return;
+
+	UAnimMontage* CurrentMontage = GetCurrentActiveMontage();
+	if (CurrentMontage)
+	{
+		float RateScale = CurrentMontage->RateScale;
+		float TimeManagerScale = TimeManager->GetTimeScale();
+		Montage_SetPlayRate(CurrentMontage, RateScale * TimeManagerScale);
+	}
 
 	const EMonsterState eMonsterState = FSMComponent->GetCurrentState();
 

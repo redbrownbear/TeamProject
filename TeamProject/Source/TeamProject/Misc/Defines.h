@@ -1,4 +1,4 @@
-﻿
+﻿#define GAMEOVER_ON																	false
 #define	COLLISION_HIDDEN_IN_GAME													false
 
 #define MONSTER_AISENSECONFIG_SIGHT_SIGHTRADIUS										1000.f

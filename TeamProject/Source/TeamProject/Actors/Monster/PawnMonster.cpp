@@ -25,6 +25,9 @@
 
 #include "UI/UIComponent/MonsterHP.h"
 
+#include "SubSystem/TimeManager.h"
+
+
 
 // Sets default values
 APawnMonster::APawnMonster()
@@ -36,8 +39,8 @@ APawnMonster::APawnMonster()
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->SetCanEverAffectNavigation(false);
-	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
-	CollisionComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlap);
+	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &APawnMonster::OnBeginOverlap);
+	CollisionComponent->OnComponentEndOverlap.AddDynamic(this, &APawnMonster::OnEndOverlap);
 
 	RootComponent = CollisionComponent;
 
@@ -83,12 +86,16 @@ void APawnMonster::BeginPlay()
 		HPBarWidget->SetWidgetClass(HPBarWidgetClass);
 		HPBarWidget->InitWidget();
 	}
+
+	GetTimeManagerSubsystem();
 }
 
 // Called every frame
 void APawnMonster::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+	Super::Tick(CustumDeltaTime);
 
 	const float Speed = UKismetMathLibrary::VSizeXY(MovementComponent->Velocity);
 
@@ -574,4 +581,14 @@ void APawnMonster::ShowHpUI(float CurHp, float MaxHp)
 	{
 		HPWidget->ShowUI(CurHp, MaxHp);
 	}
+}
+
+UTimeManagerSubsystem* APawnMonster::GetTimeManagerSubsystem()
+{
+	if (!TimeManager)
+	{ 
+		TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	}
+
+	return TimeManager;
 }

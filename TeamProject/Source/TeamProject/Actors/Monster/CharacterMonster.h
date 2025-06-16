@@ -21,7 +21,7 @@ class ACampFire;
 class UDefaultCameraShakeBase;
 class UMaterialInterface;
 class UMaterialInstanceDynamic;
-
+class UTimeManagerSubsystem;
 
 struct FMonsterTableRow;
 
@@ -45,6 +45,8 @@ protected:
     TArray<USphereComponent*> AdditionalColliders;
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UDefaultCameraShakeBase> DefaultCameraShakeBase;
+
+    TObjectPtr<UTimeManagerSubsystem> TimeManager;
 
 protected:
     UPROPERTY(EditAnywhere, meta = (RowType = "MonsterTableRow"))
@@ -135,4 +137,8 @@ private:
 
 public:
     void ShowHpUI(float CurHp, float MaxHp);
+
+public:
+    virtual UTimeManagerSubsystem* GetTimeManagerSubsystem() override;
+
 };

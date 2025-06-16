@@ -2,12 +2,12 @@
 
 
 #include "Actors/Projectile/KogaStone.h"
-#include "GameFramework/ProjectileMovementComponent.h"
-#include "Data/ProjectileTableRow.h"
-
 #include "Actors/Monster/CharacterMonster.h"
 
+#include "Data/ProjectileTableRow.h"
+
 #include "Components/FSMComponent/Monster/AssasinBossFSMComponent.h"
+#include "Components/ProjectileMovementComponent/MyProjectileMovementComponent.h"
 
 // Sets default values
 AKogaStone::AKogaStone()

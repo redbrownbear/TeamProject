@@ -8,6 +8,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
+#include "SubSystem/TimeManager.h"
 
 AAssasinLeaderAIController::AAssasinLeaderAIController()
 {
@@ -16,6 +17,10 @@ AAssasinLeaderAIController::AAssasinLeaderAIController()
 
 void AAssasinLeaderAIController::Tick(float DeltaTime)
 {
+	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+
 	Super::Tick(DeltaTime);
 }
 
@@ -24,16 +29,16 @@ void AAssasinLeaderAIController::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AAssasinLeaderAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
-{
-	if (Stimulus.WasSuccessfullySensed())
-	{
-		// 감지됨
-		if (APlayerCharacter* Player = Cast<APlayerCharacter>(Actor))
-		{
-			MonsterFSMComponent->SetPlayer(Player);
-			UE_LOG(LogTemp, Warning, TEXT("AAssasinLeaderAIController::OnPerceptionUpdated Player set Valid"));
-			return;
-		}
-	}
-}
+//void AAssasinLeaderAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+//{
+//	if (Stimulus.WasSuccessfullySensed())
+//	{
+//		// 감지됨
+//		if (APlayerCharacter* Player = Cast<APlayerCharacter>(Actor))
+//		{
+//			MonsterFSMComponent->SetPlayer(Player);
+//			UE_LOG(LogTemp, Warning, TEXT("AAssasinLeaderAIController::OnPerceptionUpdated Player set Valid"));
+//			return;
+//		}
+//	}
+//}

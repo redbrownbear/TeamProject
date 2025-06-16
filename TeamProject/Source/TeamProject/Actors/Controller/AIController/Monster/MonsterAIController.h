@@ -20,14 +20,17 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	//UFUNCTION()
-	//void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
 	UFUNCTION()
-	virtual void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
+	//UFUNCTION()
+	//virtual void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 protected:
 	UPROPERTY()
 	TObjectPtr<UMonsterFSMComponent> MonsterFSMComponent;
+
+
+
 
 public:
 	UFUNCTION()

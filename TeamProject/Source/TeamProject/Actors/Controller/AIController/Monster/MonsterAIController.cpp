@@ -13,6 +13,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
+#include "Subsystem/TimeManager.h"
 
 AMonsterAIController::AMonsterAIController()
 {
@@ -34,8 +35,8 @@ AMonsterAIController::AMonsterAIController()
 	PerceptionComponent->SetDominantSense(SightConfig->GetSenseImplementation());
 
 	// 감지 업데이트 이벤트 바인딩
-	//PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AMonsterAIController::OnPerceptionUpdated);
-	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMonsterAIController::OnTargetPerceptionUpdated);
+	PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &AMonsterAIController::OnPerceptionUpdated);
+	//PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AMonsterAIController::OnTargetPerceptionUpdated);
 }
 
 void AMonsterAIController::BeginPlay()
@@ -63,40 +64,26 @@ void AMonsterAIController::BeginPlay()
 
 void AMonsterAIController::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+
+	Super::Tick(CustumDeltaTime);
 }
 
-//void AMonsterAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
-//{
-//	APlayerCharacter* Player = nullptr;
-//
-//	for (AActor* SeenActor : UpdatedActors)
-//	{
-//		if (APlayerCharacter* DetectedPlayer = Cast<APlayerCharacter>(SeenActor))
-//		{
-//			Player = DetectedPlayer;
-//			break; // 플레이어 감지
-//		}
-//	}
-//
-//	if (Player)
-//	{
-//		MonsterFSMComponent->SetPlayer(Player);
-//		UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Valid"));
-//	}
-//	else
-//	{
-//		MonsterFSMComponent->SetPlayer(nullptr);
-//		UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Null"));
-//	}
-//}
-
-void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+void AMonsterAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 {
-	if (Stimulus.WasSuccessfullySensed())
+	APlayerCharacter* Player = nullptr;
+
+	for (AActor* SeenActor : UpdatedActors)
 	{
-		if (AWorldWeapon* WW = Cast<AWorldWeapon>(Actor))
+		if (SeenActor->IsA<APlayerCharacter>())
 		{
+			Player = Cast<APlayerCharacter>(SeenActor);
+		}
+		else if (SeenActor->IsA<AWorldWeapon>())
+		{
+			AWorldWeapon* WW = Cast<AWorldWeapon>(SeenActor);
 			if (MonsterFSMComponent->GetPlayer())
 			{
 				if (!MonsterFSMComponent->IsToCatchWeapon())
@@ -113,19 +100,55 @@ void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus 
 				}
 			}
 		}
-
-
-		if (APlayerCharacter* Player = Cast<APlayerCharacter>(Actor))
-		{
-			MonsterFSMComponent->SetPlayer(Player);
-			UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Valid"));
-			return;
-		}
-
-
 	}
 
+	if (Player)
+	{
+		MonsterFSMComponent->SetPlayer(Player);
+		UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Valid"));
+	}
+	//else
+	//{
+	//	MonsterFSMComponent->SetPlayer(nullptr);
+	//	UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Null"));
+	//}
 }
+
+//void AMonsterAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+//{
+//	if (Stimulus.WasSuccessfullySensed())
+//	{
+//		if (AWorldWeapon* WW = Cast<AWorldWeapon>(Actor))
+//		{
+//			if (MonsterFSMComponent->GetPlayer())
+//			{
+//				if (!MonsterFSMComponent->IsToCatchWeapon())
+//				{
+//					if (MonsterFSMComponent->GetCurrentState() == EMonsterState::FindWeapon)
+//					{
+//						MonsterFSMComponent->SetToCatchWeapon(WW);
+//					}
+//					else if (MonsterFSMComponent->GetCurrentState() == EMonsterState::Combat)
+//					{
+//						MonsterFSMComponent->ChangeState(EMonsterState::FindWeapon);
+//						MonsterFSMComponent->SetToCatchWeapon(WW);
+//					}
+//				}
+//			}
+//		}
+//
+//
+//		if (APlayerCharacter* Player = Cast<APlayerCharacter>(Actor))
+//		{
+//			MonsterFSMComponent->SetPlayer(Player);
+//			UE_LOG(LogTemp, Warning, TEXT("AMonsterAIController::OnPerceptionUpdated Player set Valid"));
+//			return;
+//		}
+//
+//
+//	}
+//
+//}
 void AMonsterAIController::SetAIEnabled(bool bEnabled)
 {
 }

@@ -7,7 +7,7 @@
 #include "LynelAnimInstance.generated.h"
 
 class ULynelFSMComponent;
-
+class UTimeManagerSubsystem;
 UCLASS()
 class TEAMPROJECT_API ULynelAnimInstance : public UAnimInstance
 {
@@ -24,6 +24,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<ULynelFSMComponent> FSMComponent = nullptr;
 
+	TObjectPtr<UTimeManagerSubsystem> TimeManager = nullptr;
+
+	
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsIdle = true;

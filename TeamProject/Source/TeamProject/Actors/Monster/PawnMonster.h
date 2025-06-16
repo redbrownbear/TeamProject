@@ -18,6 +18,7 @@ class UMonsterFSMComponent;
 class USphereComponent;
 class APatrolPath;
 class ACampFire;
+class UTimeManagerSubsystem;
 
 struct FMonsterTableRow;
 
@@ -44,6 +45,9 @@ protected:
     TObjectPtr<UAdvancedFloatingPawnMovement> MovementComponent;
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UMonsterStatusComponent> StatusComponent;
+
+    TObjectPtr<UTimeManagerSubsystem> TimeManager;
+
 
 protected:
     UPROPERTY(EditAnywhere, meta = (RowType = "MonsterTableRow"))
@@ -114,4 +118,8 @@ private:
 
 public:
     void ShowHpUI(float CurHp, float MaxHp);
+
+public:
+    virtual UTimeManagerSubsystem* GetTimeManagerSubsystem() override;
+
 };

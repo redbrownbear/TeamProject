@@ -7,13 +7,14 @@
 #include "Data/ParticleEffectTableRow.h"
 
 #include "Misc/Utils.h"
-#include "GameFramework/ProjectileMovementComponent.h"
+//#include "GameFramework/ProjectileMovementComponent.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "Components/Character/PlayerMovementComponent.h"
+#include "Components/ProjectileMovementComponent/MyProjectileMovementComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -27,11 +28,13 @@
 #include "Actors/Object/TorchStand.h"
 
 #include "SubSystem/PlayerManager.h"
+#include "SubSystem/TimeManager.h"
 
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+
 
 
 // Sets default values
@@ -42,7 +45,7 @@ AProjectile::AProjectile()
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 
-	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
+	ProjectileMovementComponent = CreateDefaultSubobject<UMyProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	ProjectileMovementComponent->InitialSpeed = 0.f;
 	ProjectileMovementComponent->MaxSpeed = 0.f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
@@ -180,6 +183,10 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack
 				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelHorn)
 			{
+				static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+				TimeManager->SetTimeScale(TIMESCALE_JUST);
+				TimeManager->SetJust();
+
 				if (GetOwner()->IsA<APawnMonster>())
 				{
 					APawnMonster* PawnMonster = Cast<APawnMonster>(GetOwner());

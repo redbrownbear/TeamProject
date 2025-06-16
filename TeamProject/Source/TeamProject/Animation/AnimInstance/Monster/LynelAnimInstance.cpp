@@ -8,6 +8,8 @@
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
 //#include "Kismet/KismetMathLibrary.h"
 
+#include "Subsystem/TimeManager.h"
+
 ULynelAnimInstance::ULynelAnimInstance()
 {
 }
@@ -27,12 +29,17 @@ void ULynelAnimInstance::NativeInitializeAnimation()
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(Pawn))
 	{
 		FSMComponent = Cast<ULynelFSMComponent>(Monster->GetFSMComponent());
+		TimeManager = Monster->GetTimeManagerSubsystem();
 	}
+
+
 }
 
 void ULynelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
+	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+
+	Super::NativeUpdateAnimation(CustumDeltaTime);
 
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(TryGetPawnOwner()))
 	{
@@ -40,6 +47,14 @@ void ULynelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 
 	if (!FSMComponent) return;
+
+	UAnimMontage* CurrentMontage = GetCurrentActiveMontage();
+	if (CurrentMontage)
+	{
+		float RateScale = CurrentMontage->RateScale;
+		float TimeManagerScale = TimeManager->GetTimeScale();
+		Montage_SetPlayRate(CurrentMontage, RateScale * TimeManagerScale);
+	}
 
 	const EMonsterState eMonsterState = FSMComponent->GetCurrentState();
 

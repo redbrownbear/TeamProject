@@ -36,6 +36,7 @@ AWorldWeapon::AWorldWeapon()
 	PhysicalMaterial = PhysMaterial.Object;
 
 	StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
+	StimuliSource->RegisterForSense(UAISense_Sight::StaticClass());
 }
 
 void AWorldWeapon::SetDataWithName(const FName& WorldWeaponName)
@@ -265,8 +266,8 @@ void AWorldWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	SetDataWithHandle(DataTableRowHandle);
-
-
+	StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
+	StimuliSource->RegisterWithPerceptionSystem();
 }
 
 void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
