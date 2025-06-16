@@ -60,13 +60,13 @@ void AMonsterAIController::BeginPlay()
 
 		MonsterFSMComponent->SetPlayer(nullptr);
 	}
+
+	TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 }
 
 void AMonsterAIController::Tick(float DeltaTime)
 {
-	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
-
 
 	Super::Tick(CustumDeltaTime);
 }

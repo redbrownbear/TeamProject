@@ -13,10 +13,9 @@ AMoriblinAIController::AMoriblinAIController()
 
 void AMoriblinAIController::Tick(float DeltaTime)
 {
-	static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
 
-	Super::Tick(DeltaTime);
+	Super::Tick(CustumDeltaTime);
 }
 
 void AMoriblinAIController::BeginPlay()
