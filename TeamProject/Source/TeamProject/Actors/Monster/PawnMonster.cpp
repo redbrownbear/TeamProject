@@ -585,10 +585,15 @@ void APawnMonster::ShowHpUI(float CurHp, float MaxHp)
 
 UTimeManagerSubsystem* APawnMonster::GetTimeManagerSubsystem()
 {
-	if (!TimeManager)
-	{ 
-		TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
-	}
+	UWorld* World = GetWorld();
+	if (IsValid(World) && World->IsGameWorld())
+	{
+		if (!TimeManager)
+		{
+			TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+		}
 
-	return TimeManager;
+		return TimeManager;
+	}
+	return nullptr;
 }

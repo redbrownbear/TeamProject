@@ -35,8 +35,14 @@ void UHinoxAnimInstance::NativeInitializeAnimation()
 
 void UHinoxAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	const float CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+	float CustumDeltaTime = 0.016f;
+	float TimeManagerScale = 1.f;
 
+	if (TimeManager)
+	{
+		CustumDeltaTime = TimeManager->GetCustomDeltaTime();
+		TimeManagerScale = TimeManager->GetTimeScale();
+	}
 	Super::NativeUpdateAnimation(CustumDeltaTime);
 
 	if (ACharacterMonster* Monster = Cast<ACharacterMonster>(TryGetPawnOwner()))
@@ -50,7 +56,6 @@ void UHinoxAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (CurrentMontage)
 	{
 		float RateScale = CurrentMontage->RateScale;
-		float TimeManagerScale = TimeManager->GetTimeScale();
 		Montage_SetPlayRate(CurrentMontage, RateScale * TimeManagerScale);
 	}
 
