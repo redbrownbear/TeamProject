@@ -35,6 +35,7 @@ public:
 	void OnConfirm();
 
 private:
+	void OnFadeOutStep();
 	void PlayFadeOutAndStart();
 
 private:
@@ -53,11 +54,16 @@ private:
 	UImage* ImgExit;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loading")
+	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UUserWidget> LoadingWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSoftClassPtr<UUserWidget> LoadingWidgetSoftClass;
 
 private:
 	int CurrentStep = 0;
+	const int StepCount = 30;
+	const float StepTime = 0.033f;
 	FTimerHandle FadeHandle;
 
 	bool bHasInitialized = false;

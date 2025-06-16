@@ -9,7 +9,7 @@ void UUIManager::PostWorldInitialize()
 {
     LoadUIClass();
 
-    if (bIsCompleteDelegate)
+    if (bIsCompleteDelegate == false)
     {
         BindDelegates();
         bIsCompleteDelegate = true;
