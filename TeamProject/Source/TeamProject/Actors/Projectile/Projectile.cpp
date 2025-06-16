@@ -110,7 +110,7 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 	////////////////////////////
 	// Effect
 
-	const FDataTableRowHandle NiagaraEffectDataTable = ProjectileTableRow->TrailEffectTableRowHandle;
+	const FDataTableRowHandle NiagaraEffectDataTable = ProjectileTableRow->NiagaraEffectTableRowHandle;
 	if (!NiagaraEffectDataTable.IsNull())
 	{
 		FNiagaraEffectTableRow* Data = NiagaraEffectDataTable.GetRow<FNiagaraEffectTableRow>(NiagaraEffectDataTable.RowName.ToString());
@@ -122,6 +122,21 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		//NiagaraEffectComponent->SetRelativeLocation(Data->Transform.GetLocation());
 		//NiagaraEffectComponent->SetRelativeRotation(GetActorForwardVector().Rotation().Quaternion());
 		NiagaraEffectComponent->RegisterComponent();
+	}
+
+
+	const FDataTableRowHandle ProjectileNiagaraEffectDataTable = ProjectileTableRow->TrailEffectTableRowHandle;
+	if (!ProjectileNiagaraEffectDataTable.IsNull())
+	{
+		FNiagaraEffectTableRow* Data = ProjectileNiagaraEffectDataTable.GetRow<FNiagaraEffectTableRow>(ProjectileNiagaraEffectDataTable.RowName.ToString());
+
+		ProjectileNiagaraEffectComponent = NewObject<UNiagaraComponent>(this, UNiagaraComponent::StaticClass(), TEXT("ProjectileNiagaraEffectComponent"));
+		ProjectileNiagaraEffectComponent->SetAsset(Data->EffectNiagaraSystem);
+		ProjectileNiagaraEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		ProjectileNiagaraEffectComponent->SetRelativeTransform(Data->Transform);
+		//ProjectileNiagaraEffectComponent->SetRelativeLocation(Data->Transform.GetLocation());
+		//ProjectileNiagaraEffectComponent->SetRelativeRotation(GetActorForwardVector().Rotation().Quaternion());
+		ProjectileNiagaraEffectComponent->RegisterComponent();
 	}
 
 	//Trail
