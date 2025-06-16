@@ -15,7 +15,6 @@ void ATitlePlayerController::BeginPlay()
 		{
 			TitleWidget->AddToViewport();
 
-			// UI �Է� ��� ����
 			FInputModeUIOnly InputMode;
 			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			SetInputMode(InputMode);
@@ -28,7 +27,6 @@ void ATitlePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	// UI�� �޵��� ����
 	FInputModeUIOnly InputMode;
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	SetInputMode(InputMode);
@@ -51,7 +49,6 @@ void ATitlePlayerController::KeyBind()
 
 void ATitlePlayerController::OnNavigate(const FInputActionValue& InputActionValue)
 {
-	// �Է� �� �������� (��: 2D Vector - �����е� �Ƴ��α� ��ƽ, ����Ű ��)
 	FVector2D Direction = InputActionValue.Get<FVector2D>();
 
 	if (TitleWidget)
