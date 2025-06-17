@@ -14,4 +14,9 @@ class TEAMPROJECT_API UZeldaFSMComponent : public UNpcFSMComponent
 {
 	GENERATED_BODY()
 	
+public:
+	UZeldaFSMComponent();
+
+protected:
+	virtual void UpdateIdle(float DeltaTime) override;
 };

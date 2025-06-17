@@ -37,6 +37,9 @@ enum class EQuestCharacter
 	Impa,
 	Heir,
 	Zelda,
+	Artist,
+	Musician,
+	Scientist,
 
 	End,
 };
