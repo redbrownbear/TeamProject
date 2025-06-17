@@ -329,13 +329,13 @@ void UAssasinBossFSMComponent::UpdateDying(float DeltaTime)
 
 		CharacterMonster->OnDeadEnd();
 		CharacterMonster->Destroy();
-	}
 
-	UEventManager* EventManager = GetWorld()->GetGameInstance()->GetSubsystem<UEventManager>();
+		UEventManager* EventManager = GetWorld()->GetGameInstance()->GetSubsystem<UEventManager>();
 
-	if (EventManager)
-	{
-		EventManager->AssasinBossDead();
+		if (EventManager)
+		{
+			EventManager->AssasinBossDead();
+		}
 	}
 }
 
