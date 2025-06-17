@@ -1,10 +1,11 @@
-#include "Actors/Object/LockedGate.h"
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Actors/Object/BossLockedGate.h"
 #include "SubSystem/Puzzle/EventManager.h"
 
-#include "Kismet/KismetSystemLibrary.h"
-
 // Sets default values
-ALockedGate::ALockedGate()
+ABossLockedGate::ABossLockedGate()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -17,41 +18,40 @@ ALockedGate::ALockedGate()
 }
 
 // Called when the game starts or when spawned
-void ALockedGate::BeginPlay()
+void ABossLockedGate::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	if (StaticMeshComponent)
 	{
 		StaticMeshComponent->SetCollisionObjectType(ECC_WorldStatic);
 		StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
-	}		
+	}
 
 	UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
 	if (EventManager)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("EventManager found, adding dynamic delegate"));
-		EventManager->OnOverlapTempleBall.AddDynamic(this, &ALockedGate::OpenGateSequence);
-		EventManager->OnAllTorchesLit.AddDynamic(this, &ALockedGate::OpenGateSequence);
+		
+		EventManager->OnAssasinBossDead.AddDynamic(this, &ABossLockedGate::OpenFinalGate);
 	}
 }
 
-void ALockedGate::OpenGate()
+void ABossLockedGate::OpenFinalGate()
 {
 	StartLocation = StaticMeshComponent->GetComponentLocation();
-	TargetLocation = StartLocation + FVector::UpVector * GetComponentsBoundingBox().GetSize().Z;
+	TargetLocation = StartLocation + FVector::BackwardVector * GetComponentsBoundingBox().GetSize().Y;
 	ElapsedTime = 0.f;
 
-	GetWorldTimerManager().SetTimer(GateMoveTimer, this, &ALockedGate::MoveGateTick, 0.01f, true);
-
+	GetWorldTimerManager().SetTimer(GateMoveTimer, this, &ABossLockedGate::MoveGateTick, 0.01f, true);
 }
 
-void ALockedGate::ClearDungeon()
+void ABossLockedGate::ClearDungeon()
 {
-	// í´ë¦¬ì–´ ë˜ì—ˆë‹¤ëŠ” ì‹œí€€ìŠ¤ ì¬ìƒ
+	// Å¬¸®¾î µÇ¾ú´Ù´Â ½ÃÄö½º Àç»ı
 }
 
-void ALockedGate::MoveGateTick()
+void ABossLockedGate::MoveGateTick()
 {
 	ElapsedTime += 0.01f;
 
@@ -65,11 +65,4 @@ void ALockedGate::MoveGateTick()
 
 	FVector NewLocation = FMath::Lerp(StartLocation, TargetLocation, Alpha);
 	StaticMeshComponent->SetWorldLocation(NewLocation);
-}
-
-void ALockedGate::OpenGateSequence()
-{
-	// ë¬¸ ì—´ë¦¬ëŠ” ì‹œí€€ìŠ¤ ì¬ìƒ 
-
-	OpenGate();
 }

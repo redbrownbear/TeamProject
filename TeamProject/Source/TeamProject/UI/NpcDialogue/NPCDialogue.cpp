@@ -154,6 +154,9 @@ void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
     UPlayerManager* PlayerManager = GetWorld()->GetGameInstance()->GetSubsystem<UPlayerManager>();
     check(PlayerManager);
 
+    UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
+    check(UIManager);
+
     UQuestManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestManager>();
     check(QuestManager);
 
@@ -187,9 +190,6 @@ void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
 
     if (DialogType == EDialogType::Shop)
     {	
-        UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
-        check(UIManager);
-
         UShopManager* ShopManager = GetWorld()->GetGameInstance()->GetSubsystem<UShopManager>();
         check(ShopManager);
 
@@ -244,6 +244,15 @@ void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
             PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
         }
     }
+
+    if (CurQuestChar == EQuestCharacter::Zelda)
+    {
+        if (DialogueDataRow.bIsEndConversation)
+        {
+            //PC_InGame->Npc->SetDoQuest(false);
+            UIManager->ShowUI(UEndingCredits::StaticClass());
+        }
+    }
 }
 
 void UNPCDialogue::OnCancel(const FInputActionValue& InputActionValue)
@@ -284,6 +293,17 @@ void UNPCDialogue::OnCancel(const FInputActionValue& InputActionValue)
     if (CurQuestChar == EQuestCharacter::Impa)
     {
         PC_InGame->Npc->SetIsConfirmed(false);
+    }
+
+    if (CurQuestChar == EQuestCharacter::Zelda)
+    {
+        if (DialogueDataRow.bIsEndConversation)
+        {
+            UUIManager* UIManager = GetWorld()->GetGameInstance()->GetSubsystem<UUIManager>();
+            check(UIManager);
+
+            UIManager->ShowUI(UEndingCredits::StaticClass());
+        }
     }
 
     HideUI(UNPCDialogue::StaticClass());
