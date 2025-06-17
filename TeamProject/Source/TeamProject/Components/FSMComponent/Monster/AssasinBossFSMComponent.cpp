@@ -10,6 +10,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PC_InGame.h"
 
+#include "SubSystem/Puzzle/EventManager.h"
+
 #include "UI/HUD/MainHUD.h"
 
 #include "Data/MonsterTableRow.h"
@@ -327,6 +329,13 @@ void UAssasinBossFSMComponent::UpdateDying(float DeltaTime)
 
 		CharacterMonster->OnDeadEnd();
 		CharacterMonster->Destroy();
+
+		UEventManager* EventManager = GetWorld()->GetGameInstance()->GetSubsystem<UEventManager>();
+
+		if (EventManager)
+		{
+			EventManager->AssasinBossDead();
+		}
 	}
 }
 

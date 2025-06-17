@@ -1,10 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SubSystem/Puzzle/TorchManager.h"
+#include "SubSystem/Puzzle/EventManager.h"
 #include "Actors/Object/TorchStand.h"
 
-void UTorchManager::RegisterTorch(ATorchStand* Torch)
+void UEventManager::NotifyOverlapTempleBall()
+{
+	OnOverlapTempleBall.Broadcast();
+}
+
+void UEventManager::RegisterTorch(ATorchStand* Torch)
 {
     if (Torch)
     {
@@ -12,7 +17,7 @@ void UTorchManager::RegisterTorch(ATorchStand* Torch)
     }
 }
 
-void UTorchManager::NotifyTorchLit(ATorchStand* Torch)
+void UEventManager::NotifyTorchLit(ATorchStand* Torch)
 {
     if (Torch)
     {
@@ -24,4 +29,9 @@ void UTorchManager::NotifyTorchLit(ATorchStand* Torch)
             OnAllTorchesLit.Broadcast();
         }
     }
+}
+
+void UEventManager::AssasinBossDead()
+{
+    OnAssasinBossDead.Broadcast();
 }

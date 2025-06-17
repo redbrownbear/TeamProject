@@ -5,8 +5,6 @@
 #include "Actors/Object/LockedGate.h"
 #include "Actors/Projectile/Arrow/Projectile_Arrow.h"
 
-#include "SubSystem/Puzzle/TorchManager.h"
-
 #include "Components/BoxComponent.h"
 
 #include "NiagaraComponent.h"

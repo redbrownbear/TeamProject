@@ -2,7 +2,7 @@
 
 
 #include "Actors/Object/TorchStand.h"
-#include "SubSystem/Puzzle/TorchManager.h"
+#include "SubSystem/Puzzle/EventManager.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Components/SphereComponent.h"
@@ -83,13 +83,13 @@ void ATorchStand::BeginPlay()
 
     bTorchOnFire = NiagaraComponent && NiagaraComponent->IsActive();
 
-    UTorchManager* TorchManager = GetGameInstance()->GetSubsystem<UTorchManager>();
+    UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
     // 나이아가라 꺼져 있는 TorchStand만 등록
     if (!bTorchOnFire)
     {
-        if (TorchManager)
+        if (EventManager)
         {
-            TorchManager->RegisterTorch(this);
+            EventManager->RegisterTorch(this);
             UE_LOG(LogTemp, Log, TEXT("[Torch] %s 등록됨 (Niagara 꺼짐)"), *GetName());
         }
     }
@@ -170,11 +170,11 @@ void ATorchStand::SetTorchStandFire(bool _bool)
     {
         SetNiagaraVisibility(true);
 
-        UTorchManager* TorchManager = GetGameInstance()->GetSubsystem<UTorchManager>();
+        UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
 
-        if (TorchManager)
+        if (EventManager)
         {
-            TorchManager->NotifyTorchLit(this);
+            EventManager->NotifyTorchLit(this);
         }
     }
     else

@@ -36,6 +36,10 @@ enum class EQuestCharacter
 	//Store,
 	Impa,
 	Heir,
+	Zelda,
+	Artist,
+	Musician,
+	Scientist,
 
 	End,
 };
