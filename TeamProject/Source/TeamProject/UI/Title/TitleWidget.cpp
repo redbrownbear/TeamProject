@@ -9,6 +9,7 @@
 #include "SubSystem/AsyncLoadingScreen/GIS_ASyncLoadingScreen.h"
 #include "SubSystem/UI/UIManager.h"
 
+
 void UTitleWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -22,6 +23,12 @@ void UTitleWidget::NativeConstruct()
     {
         NewGame->OnClicked.AddDynamic(this, &UTitleWidget::OnStartClicked);
         bHasInitialized = true;
+    }
+
+    if (!LoadingWidgetSoftClass.IsNull())
+    {
+        LoadingWidgetSoftClass.LoadSynchronous();
+        LoadingWidgetClass = LoadingWidgetSoftClass.Get();
     }
 
     check(NewGame);
@@ -42,34 +49,41 @@ void UTitleWidget::OnConfirm()
 
 }
 
+void UTitleWidget::OnFadeOutStep()
+{
+    float Alpha = 1.0f - (static_cast<float>(CurrentStep) / StepCount);
+    SetRenderOpacity(Alpha);
+
+    CurrentStep++;
+    if (CurrentStep > StepCount)
+    {
+        GetWorld()->GetTimerManager().ClearTimer(FadeHandle);
+
+        UGameInstance* GI = GetWorld()->GetGameInstance();
+        if (!GI) return;
+
+        auto* LoadingScreenSystem = GI->GetSubsystem<UGIS_ASyncLoadingScreen>();
+        if (!LoadingScreenSystem) return;
+
+        auto* PlayerManager = GI->GetSubsystem<UPlayerManager>();
+        if (PlayerManager)
+        {
+            PlayerManager->SetLevelName(TextU(3001));
+        }
+
+        TSoftObjectPtr<UWorld> GameMap = TSoftObjectPtr<UWorld>(FSoftObjectPath(TEXT("/Game/Level/GameMap.GameMap")));
+        GameMap.LoadSynchronous();
+
+        LoadingScreenSystem->OpenLevelWithLoadingScreenTitle(LoadingWidgetClass, GameMap);
+    }
+}
+
 void UTitleWidget::PlayFadeOutAndStart()
 {
     CurrentStep = 0;
-    const int StepCount = 30;
-    const float StepTime = 0.033f;
 
-    TSoftObjectPtr<UWorld> GameMap = TSoftObjectPtr<UWorld>(FSoftObjectPath(TEXT("/Game/Level/GameMap.GameMap")));
-    GetWorld()->GetTimerManager().SetTimer(FadeHandle, FTimerDelegate::CreateLambda([this, StepCount, GameMap]()
-        {
-            float Alpha = 1.0f - (static_cast<float>(CurrentStep) / StepCount);
-            this->SetRenderOpacity(Alpha);
+    LoadingWidgetSoftClass.LoadSynchronous();
+    LoadingWidgetClass = LoadingWidgetSoftClass.Get();
 
-            CurrentStep++;
-            if (CurrentStep > StepCount)
-            {
-                GetWorld()->GetTimerManager().ClearTimer(FadeHandle);
-
-                UGIS_ASyncLoadingScreen* LoadingScreenSystem = GetWorld()->GetGameInstance()->GetSubsystem<UGIS_ASyncLoadingScreen>();
-                if (LoadingScreenSystem)
-                {
-                    if (UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>())
-                    {
-                        PlayerManager->SetLevelName(TextU(3001));
-                    }
-
-                    LoadingScreenSystem->OpenLevelWithLoadingScreenTitle(LoadingWidgetClass, GameMap);
-                }
-            }
-        }), StepTime, true);
-
+    GetWorld()->GetTimerManager().SetTimer(FadeHandle, this, &UTitleWidget::OnFadeOutStep, StepTime, true);
 }
