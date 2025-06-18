@@ -25,6 +25,10 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "GameFramework/PC_InGame.h"
+
+#include "UI/HUD/MainHUD.h"
+
 #include "Subsystem/TimeManager.h"
 
 void IMonsterInterface::PlayMontage(EMonsterMontage _InEnum, bool bIsLoop)
@@ -897,7 +901,7 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 			else
 			{
 				// check if it is a head shot
-				if (iOption)
+				if (iOption == DAMAGE_OPTION_HEADSHOT)
 				{
 					if (FSMComponent->IsA<UHinoxFSMComponent>())
 					{
@@ -907,6 +911,10 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 					{
 						FSMComponent->ChangeState(EMonsterState::Stun);
 					}
+				}
+				else if (iOption == DAMAGE_OPTION_ARROW)
+				{
+					FSMComponent->ChangeState(EMonsterState::Damage);
 				}
 				else
 				{
@@ -960,6 +968,11 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 							}
 						}
 					}
+					// TakeDamamge with sword
+					else if (FSMComponent->IsA<UAssasinBossFSMComponent>())
+					{
+						// Do Nothing
+					}
 					else
 					{
 						FSMComponent->ChangeState(EMonsterState::Damage);
@@ -996,9 +1009,19 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 	if (ACharacterMonster* BigMonster = Cast<ACharacterMonster>(ThisActor))
 	{
 		if (BigMonster->GetMonsterName() == TEXT("AssasinLeader"))
-
 			BigMonster->ShowHpUI(UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP());
+		else
+		{
+			if (APC_InGame* PC = Cast<APC_InGame>(BigMonster->GetWorld()->GetFirstPlayerController()))
+			{
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					HUD->ShowBossHpUI(true, UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP(), BigMonster->GetMonsterData()->Name.ToString());
+				}
+			}
+		}
 	}
+
 }
 
 void IMonsterInterface::OnDie()
