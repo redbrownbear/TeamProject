@@ -89,7 +89,7 @@ AWeaponSword::AWeaponSword()
     }
     HitEffectComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("HitEffectComponent"));
     {
-        ConstructorHelpers::FObjectFinder<UParticleSystem> Asset(TEXT("/Script/Engine.ParticleSystem'/Game/Vefects/FXVarietyPack/Particles/P_ky_hit1.P_ky_hit1'"));
+        ConstructorHelpers::FObjectFinder<UParticleSystem> Asset(TEXT("/Script/Engine.ParticleSystem'/Game/Vefects/TrailPack/Particles/Cascade/Speed/Hit/P_SpeedHit.P_SpeedHit'"));
         if (Asset.Object)
         {
             HitEffectFX = Asset.Object;
