@@ -1394,26 +1394,28 @@ void APC_InGame::ScanMetalActorInView()
 
 	AActor* FoundActor = FindVisibleActorOnScreen(MetalHit);
 
-
-	UMetalComponent* MetalComponent = FoundActor->GetComponentByClass<UMetalComponent>();
-	if (MetalComponent)
+	if (FoundActor)
 	{
-		if (FoundActor && FoundActor != MetalActor)
+		UMetalComponent* MetalComponent = FoundActor->GetComponentByClass<UMetalComponent>();
+		if (MetalComponent)
 		{
-			MetalComponent->SetColorScanned();
-			if (MetalActor)
+			if (FoundActor && FoundActor != MetalActor)
 			{
-				if (UMetalComponent* ExistsMetalComponent = MetalActor->GetComponentByClass<UMetalComponent>())
+				MetalComponent->SetColorScanned();
+				if (MetalActor)
 				{
-					ExistsMetalComponent->SetColorNormal();
+					if (UMetalComponent* ExistsMetalComponent = MetalActor->GetComponentByClass<UMetalComponent>())
+					{
+						ExistsMetalComponent->SetColorNormal();
+					}
+					else
+					{
+						UE_LOG(LogTemp, Error, TEXT("APC_InGame::ScanMetalActorInView // No UMetalComponent in MetalActor"));
+						check(false);
+					}
 				}
-				else
-				{
-					UE_LOG(LogTemp, Error, TEXT("APC_InGame::ScanMetalActorInView // No UMetalComponent in MetalActor"));
-					check(false);
-				}
+				MetalActor = FoundActor;
 			}
-			MetalActor = FoundActor;
 		}
 	}
 }
