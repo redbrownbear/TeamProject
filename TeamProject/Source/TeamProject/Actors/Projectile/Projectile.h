@@ -10,6 +10,10 @@ struct FProjectileTableRow;
 class UNiagaraComponent;
 class UParticleSystemComponent;
 class UNiagaraSystem;
+class UStaticMeshComponent;
+class UMyProjectileMovementComponent;
+class URewindComponent;
+
 UCLASS()
 class TEAMPROJECT_API AProjectile : public AActor
 {
@@ -39,9 +43,15 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UShapeComponent> CollisionComponent;
 	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* StaticMeshComponent;
+	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 	UPROPERTY()
-	class UMyProjectileMovementComponent* ProjectileMovementComponent;
+	TObjectPtr<UMyProjectileMovementComponent> ProjectileMovementComponent;
+	UPROPERTY()
+	TObjectPtr<URewindComponent> RewindComponent;
+
+
+
+
 
 protected:
 	UPROPERTY(EditAnywhere, meta = (RowType = "ProjectileTableRow"))

@@ -20,6 +20,7 @@
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 #include "Components/MetalComponent/MetalComponent.h"
+#include "Components/RewindComponent/RewindComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
@@ -158,14 +159,15 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Magnesis, 
 		ETriggerEvent::Started, this, &ThisClass::ShowMetalActorPreview);
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Rewind,
+		ETriggerEvent::Triggered, this, &ThisClass::ShowRewindActor);
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_TrySuperPower, 
 		ETriggerEvent::Started, this, &ThisClass::TrySuperPower);
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_ControlDistance, 
 		ETriggerEvent::Triggered, this, &ThisClass::OnControlDistance);	
 
-	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Rewind,
-		ETriggerEvent::Triggered, this, &ThisClass::ShowRewindActor);
 
 	//QuickSlot
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotLeft,
@@ -711,8 +713,6 @@ void APC_InGame::TrySuperPower(const FInputActionValue& InputActionValue)
 	{
 		if (IsHoldingObject()) return;
 
-		if (!MetalActorClass) return;
-
 		CheckMetalActor();
 
 		if (bCanControlMetal)
@@ -880,11 +880,6 @@ void APC_InGame::DestroyIcePillar()
 	}
 }
 
-void APC_InGame::ShowRewindActor(const FInputActionValue& InputActionValue)
-{
-	// 되감을 액터 보여주기
-	// 화면 중앙에 RewindActor 있을 경우 TrySuperPower 호출하여 되감기
-}
 
 void APC_InGame::OnQuickSlotLeft(const FInputActionValue& InputActionValue)
 {
@@ -1201,7 +1196,6 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 	if (bMagnesisKeyPressed)
 	{
 		Player_C->ZoomIn();
-
 		GetWorld()->GetTimerManager().SetTimer(
 			MoveTimerHandle,
 			this,
@@ -1234,6 +1228,45 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 
 }
 
+void APC_InGame::ShowRewindActor(const FInputActionValue& InputActionValue)
+{
+	if (bIceKeyPressed) { return; }
+
+	bRewindKeyPressed = !bRewindKeyPressed;
+
+	AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
+	if (MainHUD)
+	{
+		MainHUD->ShowAbilityAimUI(bRewindKeyPressed);
+	}
+
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+
+	if (bRewindKeyPressed)
+	{
+		Player_C->ZoomIn();
+		
+		GetWorld()->GetTimerManager().SetTimer(
+			MoveTimerHandle,
+			this,
+			&APC_InGame::ScanRewindActorInView,
+			0.16f,  // 주기 (초)
+			true   // 반복
+		);
+	}
+	else
+	{
+		Player_C->ZoomOut();
+
+		if (RewindActor)
+		{
+			URewindComponent* RewindComponent = RewindActor->GetComponentByClass<URewindComponent>();
+			RewindComponent->SetColorNormal();
+			RewindComponent->StopRewind();
+			RewindActor = nullptr;
+		}
+	}
+}
 
 void APC_InGame::Magnesis()
 {	
@@ -1399,7 +1432,7 @@ void APC_InGame::ScanMetalActorInView()
 		UMetalComponent* MetalComponent = FoundActor->GetComponentByClass<UMetalComponent>();
 		if (MetalComponent)
 		{
-			if (FoundActor && FoundActor != MetalActor)
+			if (FoundActor != MetalActor)
 			{
 				MetalComponent->SetColorScanned();
 				if (MetalActor)
@@ -1419,9 +1452,49 @@ void APC_InGame::ScanMetalActorInView()
 		}
 	}
 }
+
+void APC_InGame::ScanRewindActorInView()
+{
+	if (!bRewindKeyPressed) return;
+
+	FHitResult RewindHit;
+
+	AActor* FoundActor = FindVisibleActorOnScreen(RewindHit);
+
+	if (FoundActor)
+	{
+		URewindComponent* RewindComponent = FoundActor->GetComponentByClass<URewindComponent>();
+		if (RewindComponent)
+		{
+			if (FoundActor != RewindActor)
+			{
+				RewindComponent->SetColorScanned();
+				if (RewindActor)
+				{
+					if (URewindComponent* ExistsRewindComponent = RewindActor->GetComponentByClass<URewindComponent>())
+					{
+						ExistsRewindComponent->SetColorNormal();
+					}
+					else
+					{
+						UE_LOG(LogTemp, Error, TEXT("APC_InGame::ScanRewindActorInView // No URewindComponent in Actor"));
+						check(false);
+					}
+				}
+				RewindActor = FoundActor;
+			}
+		}
+	}
+}
 void APC_InGame::OnRewind()
 {
-	// 뒤로 되감기
+	if (RewindActor)
+	{
+		if (URewindComponent* RewindComponent = RewindActor->GetComponentByClass<URewindComponent>())
+		{
+			RewindComponent->StartRewind();
+		}
+	}
 }
 
 void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)

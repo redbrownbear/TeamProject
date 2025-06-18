@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "RewindComponent.generated.h"
 
+#define REWIND_TRANSFORM_COUNT_MAX				180
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TEAMPROJECT_API URewindComponent : public UActorComponent
@@ -26,15 +27,22 @@ public:
 
 	void StartRewind();
 	void StopRewind();
+
 	bool IsRewinding() const { return bIsRewinding; }
 
-private:
-	TArray<FVector> PositionHistory;
-	float RecordDuration = 5.0f; // 되감기 가능 시간 
-	float TimeStep = 0.05f; // 1초에 20프레임 저장
-	float TimeAccumulator = 0.0f;
+protected:
+	void StoreRewind();
+	void ApplyRewind();
 
+
+private:
+	TArray<FTransform> TransformHistory;
 	bool bIsRewinding = false;
-	int32 CurrentRewindIndex = 0;
-		
+	int32 CurrentIndex = 0;
+	int32 RewindIndex = -1;
+	bool bBufferFilled = false;
+
+public:
+	void SetColorNormal();
+	void SetColorScanned();
 };
