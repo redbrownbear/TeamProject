@@ -7,6 +7,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOverlapTempleBall);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllTorchesLit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAssasinBossDead);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeightFull);
 
 class ATorchStand;
 
@@ -29,6 +30,9 @@ public:
 	// -------- MonsterDead --------
 	UFUNCTION()
 	void AssasinBossDead();
+
+	UFUNCTION()
+	void WeightFull();
 	
 public:
 	// -------- Temple Switches --------
@@ -42,6 +46,10 @@ public:
 	// -------- MonsterDead --------
 	UPROPERTY(BlueprintAssignable)
 	FOnAssasinBossDead OnAssasinBossDead;
+
+	// -------- WeightFull --------
+	UPROPERTY(BlueprintAssignable)
+	FOnWeightFull OnWeightFull;
 
 private:
 	// -------- Temple Switches --------

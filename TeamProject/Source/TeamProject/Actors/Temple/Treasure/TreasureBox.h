@@ -7,6 +7,8 @@
 #include "TreasureBox.generated.h"
 
 class UBoxComponent;
+class UMetalComponent;
+class UPhysicalMaterial;
 class UPopupGetItem;
 struct FItemData;
 
@@ -75,6 +77,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UMetalComponent> MetalComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPhysicalMaterial> PhysicalMaterial;
 
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TObjectPtr<UPopupGetItem> PopupItemUI;

@@ -116,6 +116,10 @@ void AMetalActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		CollisionComponent->SetEnableGravity(true);
 		CollisionComponent->SetSimulatePhysics(true);
 		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+
+		CollisionComponent->SetMassOverrideInKg(NAME_None, MetalActorData->MassInKg);
+		CollisionComponent->BodyInstance.bOverrideMass = true;
+		CollisionComponent->BodyInstance.UpdateMassProperties();
 	}
 	else
 	{

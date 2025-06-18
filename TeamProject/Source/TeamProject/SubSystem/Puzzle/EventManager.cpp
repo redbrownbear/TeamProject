@@ -35,3 +35,8 @@ void UEventManager::AssasinBossDead()
 {
     OnAssasinBossDead.Broadcast();
 }
+
+void UEventManager::WeightFull()
+{
+	OnWeightFull.Broadcast();
+}

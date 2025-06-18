@@ -316,9 +316,6 @@ protected:
 
 	//  Magnesis 내부 기능 함수
 	UFUNCTION()
-	bool TraceForMetal(FHitResult& OutHit);
-
-	UFUNCTION()
 	void MoveGrabbedObject();
 
 	// 상태 체크

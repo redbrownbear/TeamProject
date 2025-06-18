@@ -1337,29 +1337,6 @@ void APC_InGame::StopMagnetGrab()
 	GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
 }
 
-bool APC_InGame::TraceForMetal(FHitResult& OutHit)
-{
-	FVector Start;
-	FRotator Rot;
-	GetPlayerViewPoint(Start, Rot);
-
-	FVector End = Start + Rot.Vector() * TraceDistance;
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(GetPawn());
-
-	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_PhysicsBody, Params);
-
-	AActor* HitActor = OutHit.GetActor();
-
-	if (bHit && HitActor && HitActor->IsA(MetalActorClass))
-	{
-		return true;
-	}
-
-	return false;
-}
-
 void APC_InGame::MoveGrabbedObject()
 {
 	if (!IsHoldingObject()) return;
