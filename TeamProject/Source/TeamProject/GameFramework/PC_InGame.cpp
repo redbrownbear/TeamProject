@@ -1214,20 +1214,22 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 	{
 		Player_C->ZoomOut();
 
-		if (MetalActor)
-		{
-			MetalActor->ChangeNomalColor();
-		}
 
 		if (IsHoldingObject())
 		{
 			StopMagnetGrab();
 		}
 
+		if (MetalActor)
+		{
+			UMetalComponent* MetalComponent = MetalActor->GetComponentByClass<UMetalComponent>();
+			MetalComponent->SetIsControlled(false);
+			MetalComponent->SetColorNormal();
+			MetalActor = nullptr;
+		}
+
 		// 타이머 종료
 		GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
-
-		MetalActor = nullptr;
 	}
 
 }
@@ -1275,20 +1277,22 @@ void APC_InGame::CheckMetalActor()
 //			return;
 //		}
 
-		if (!HitActor->GetComponentByClass<UMetalComponent>())
+		UMetalComponent* MetalComponent = HitActor->GetComponentByClass<UMetalComponent>();
+		if (!MetalComponent)
 		{
 			bCanControlMetal = false;
 			return;
 		}
 
+		MetalComponent->SetIsControlled(true);
 		bCanControlMetal = true;
 
 		// LastHit 업데이트
 		LastHit = HitResult;
 
-		if (AProjectileMetalActor* ProjectileMetalActor = Cast<AProjectileMetalActor>(HitActor))
+		if (AProjectile* Projectile = Cast<AProjectile>(HitActor))
 		{
-			ProjectileMetalActor->SetGrabbed(true);
+			Projectile->SetPhysicsEnabled(true);
 		}
 	}
 	else
@@ -1387,21 +1391,32 @@ void APC_InGame::ScanMetalActorInView()
 	if (!bMagnesisKeyPressed) return;
 
 	FHitResult MetalHit;
-	AMetalActor* FoundMetal = Cast<AMetalActor>(FindVisibleActorOnScreen(MetalHit));
 
-	// 변경이 감지된 경우만 업데이트
-	if (FoundMetal && FoundMetal != MetalActor)
+	AActor* FoundActor = FindVisibleActorOnScreen(MetalHit);
+
+
+	UMetalComponent* MetalComponent = FoundActor->GetComponentByClass<UMetalComponent>();
+	if (MetalComponent)
 	{
-		if (MetalActor)
+		if (FoundActor && FoundActor != MetalActor)
 		{
-			MetalActor->ChangeNomalColor(); // 기존 액터 색상 복구
+			MetalComponent->SetColorScanned();
+			if (MetalActor)
+			{
+				if (UMetalComponent* ExistsMetalComponent = MetalActor->GetComponentByClass<UMetalComponent>())
+				{
+					ExistsMetalComponent->SetColorNormal();
+				}
+				else
+				{
+					UE_LOG(LogTemp, Error, TEXT("APC_InGame::ScanMetalActorInView // No UMetalComponent in MetalActor"));
+					check(false);
+				}
+			}
+			MetalActor = FoundActor;
 		}
-
-		MetalActor = FoundMetal;
-		MetalActor->ThisIsMetal();
 	}
 }
-
 void APC_InGame::OnRewind()
 {
 	// 뒤로 되감기

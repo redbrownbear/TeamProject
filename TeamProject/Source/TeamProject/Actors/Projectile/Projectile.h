@@ -69,9 +69,15 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UParticleSystemComponent> ParticleEffectComponent;
 
+	TObjectPtr<UMaterialInstanceDynamic> DynamicMaterialInstance;
 public:
 	void SetProjectileMovementActivate(bool bFlag);
 	void SetGravityScale(float Scale);
 	void SetStaticMeshVisibility(bool bFlag);
 	void SetNiagaraVisibility(bool bFlag);
+	void SetPhysicsEnabled(bool bFlag);
+
+public:
+	void SetColorScanned();
+	void SetColorNormal();
 };
