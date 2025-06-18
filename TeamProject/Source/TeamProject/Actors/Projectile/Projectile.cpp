@@ -15,6 +15,7 @@
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Components/ProjectileMovementComponent/MyProjectileMovementComponent.h"
+#include "Components/RewindComponent/RewindComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -60,6 +61,8 @@ AProjectile::AProjectile()
 	StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 	CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+
+	RewindComponent = CreateDefaultSubobject<URewindComponent>(TEXT("RewindComponent"));
 }
 
 void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
@@ -372,6 +375,16 @@ void AProjectile::Tick(float DeltaTime)
 	//	FRotator NewRotation = UKismetMathLibrary::MakeRotFromX(CurrentVelocity);
 	//	SetActorRotation(NewRotation);
 	//}
+
+	if (RewindComponent && RewindComponent->IsRewinding())
+	{
+		ProjectileMovementComponent->Velocity = FVector::Zero();
+		if (CollisionComponent)
+		{
+			CollisionComponent->SetSimulatePhysics(true);
+		}
+	}
+
 }
 
 FVector AProjectile::GetVelocity()
@@ -491,7 +504,7 @@ void AProjectile::SetPhysicsEnabled(bool bFlag)
 {
 	if (!CollisionComponent) 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AProjectile::SetNiagaraVisibility // No CollisionComponent"))
+		UE_LOG(LogTemp, Warning, TEXT("AProjectile::SetPhysicsEnabled // No CollisionComponent"))
 		return;
 	}
 

@@ -9,6 +9,7 @@
 #include "Components/FSMComponent/Monster/AssasinBossFSMComponent.h"
 #include "Components/ProjectileMovementComponent/MyProjectileMovementComponent.h"
 #include "Components/MetalComponent/MetalComponent.h"
+#include "Components/RewindComponent/RewindComponent.h"
 #include "Components/ShapeComponent.h"
 
 // Sets default values
@@ -50,7 +51,14 @@ void AKogaStone::Tick(float DeltaTime)
 			}
 		}
 
-		if (!MetalComponent->GetIsControlled())
+		if ((MetalComponent && MetalComponent->GetIsControlled())
+			|| (RewindComponent && RewindComponent->IsRewinding()))
+		{
+			bLostControl = true;
+			SetFallTrue();
+		}
+		
+		if (!bLostControl)
 		{
 			if (WaitTime > KOGASTONE_WAIT_TIME_MAX)
 			{

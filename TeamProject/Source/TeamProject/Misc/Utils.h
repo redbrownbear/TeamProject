@@ -427,7 +427,33 @@ inline float GetSideOfActor(AActor* A_Actor, AActor* B_Actor)
     return DotProductResult;
 }
 
+inline bool AreTransformsNearlyEqual(const FTransform& A, const FTransform& B,
+    float LocationTolerance = 0.1f, float RotationToleranceDegrees = 1.0f, float ScaleTolerance = 0.01f)
+{
+    const FVector LocA = A.GetLocation();
+    const FVector LocB = B.GetLocation();
 
+    const FVector ScaleA = A.GetScale3D();
+    const FVector ScaleB = B.GetScale3D();
+
+    const FQuat RotA = A.GetRotation();
+    const FQuat RotB = B.GetRotation();
+
+    // 위치 비교
+    if (!LocA.Equals(LocB, LocationTolerance))
+        return false;
+
+    // 회전 비교 (쿼터니언의 각도 차이 비교)
+    float AngleDiffDegrees = FMath::RadiansToDegrees(RotA.AngularDistance(RotB));
+    if (AngleDiffDegrees > RotationToleranceDegrees)
+        return false;
+
+    // 스케일 비교
+    if (!ScaleA.Equals(ScaleB, ScaleTolerance))
+        return false;
+
+    return true;
+}
 
 UENUM()
 enum class EWeapon_Type

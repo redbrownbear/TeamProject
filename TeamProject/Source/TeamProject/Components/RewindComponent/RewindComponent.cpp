@@ -4,6 +4,12 @@
 #include "Components/RewindComponent/RewindComponent.h"
 #include "RewindComponent.h"
 
+#include "Actors/Projectile/Projectile.h"
+#include "Actors/Object/MetalActor.h"
+
+#include "Misc/Utils.h"
+
+
 // Sets default values for this component's properties
 URewindComponent::URewindComponent()
 {
@@ -19,7 +25,7 @@ void URewindComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+    TransformHistory.Reserve(REWIND_TRANSFORM_COUNT_MAX);
 }
 
 
@@ -33,42 +39,120 @@ void URewindComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
     if (bIsRewinding)
     {
-        if (CurrentRewindIndex >= 0)
-        {
-            Owner->SetActorLocation(PositionHistory[CurrentRewindIndex]);
-            --CurrentRewindIndex;
-        }
-        else
-        {
-            StopRewind(); // 자동 종료
-        }
+        ApplyRewind();
     }
     else
     {
-        TimeAccumulator += DeltaTime;
-        if (TimeAccumulator >= TimeStep)
-        {
-            TimeAccumulator = 0.0f;
-            PositionHistory.Insert(Owner->GetActorLocation(), 0); // 최신 위치 맨 앞에 저장
-
-            // 오래된 기록 삭제
-            float MaxRecord = RecordDuration / TimeStep;
-            if (PositionHistory.Num() > MaxRecord)
-            {
-                PositionHistory.RemoveAt(PositionHistory.Num() - 1);
-            }
-        }
+        StoreRewind();
     }
 }
 
 void URewindComponent::StartRewind()
 {
-	bIsRewinding = true;
-	CurrentRewindIndex = PositionHistory.Num() - 1;
+    bIsRewinding = true;
+    RewindIndex = -1;
 }
-
 void URewindComponent::StopRewind()
 {
 	bIsRewinding = false;
 }
 
+void URewindComponent::StoreRewind()
+{
+    const FTransform Transform = GetOwner()->GetActorTransform();
+
+    const bool bUseBuffer = TransformHistory.Num() == REWIND_TRANSFORM_COUNT_MAX;
+
+    // 가장 최근 Transform 가져오기 (없으면 첫 저장)
+    if (!bUseBuffer && TransformHistory.Num() == 0)
+    {
+        TransformHistory.Add(Transform);
+        return;
+    }
+
+    const int32 LastIndex = bUseBuffer
+        ? (CurrentIndex - 1 + REWIND_TRANSFORM_COUNT_MAX) % REWIND_TRANSFORM_COUNT_MAX
+        : TransformHistory.Num() - 1;
+
+    const FTransform& LastTransform = TransformHistory[LastIndex];
+    const bool bIsSame = AreTransformsNearlyEqual(Transform, LastTransform);
+
+    if (bIsSame)
+    {
+        return; // 변화 없으면 저장 안 함
+    }
+
+    if (!bUseBuffer)
+    {
+        TransformHistory.Add(Transform);
+        CurrentIndex = (CurrentIndex + 1) % REWIND_TRANSFORM_COUNT_MAX;
+    }
+    else
+    {
+        TransformHistory[CurrentIndex] = Transform;
+        CurrentIndex = (CurrentIndex + 1) % REWIND_TRANSFORM_COUNT_MAX;
+        bBufferFilled = true;
+    }
+}
+
+void URewindComponent::ApplyRewind()
+{
+    const int32 HistoryCount = TransformHistory.Num();
+    if (HistoryCount == 0) return;
+
+    int32 Count = bBufferFilled ? REWIND_TRANSFORM_COUNT_MAX : TransformHistory.Num();
+    AActor* Owner = GetOwner();
+    if (!Owner)
+    {
+        return;
+    }
+
+    // if it starts, init RewindIndex
+    if (RewindIndex == -1)
+    {
+        RewindIndex = (CurrentIndex - 1 + Count) % Count;
+    }
+
+    // Apply Current Index's Transform
+    const FTransform& Record = TransformHistory[RewindIndex];
+    Owner->SetActorTransform(Record);
+
+    // Update Index
+    RewindIndex = (RewindIndex - 1 + Count) % Count;
+
+    // check Rewinding is over
+    if (RewindIndex  == CurrentIndex)
+    {
+        bIsRewinding = false;
+    }
+}
+
+void URewindComponent::SetColorNormal()
+{
+    AActor* OwnerActor = GetOwner();
+    if (OwnerActor->IsA<AProjectile>())
+    {
+        AProjectile* Projectile = Cast<AProjectile>(OwnerActor);
+        Projectile->SetColorNormal();
+    }
+    else if (OwnerActor->IsA<AMetalActor>())
+    {
+        AMetalActor* MetalActor = Cast<AMetalActor>(OwnerActor);
+        MetalActor->ChangeNomalColor();
+    }
+}
+
+void URewindComponent::SetColorScanned()
+{
+    AActor* OwnerActor = GetOwner();
+    if (OwnerActor->IsA<AProjectile>())
+    {
+        AProjectile* Projectile = Cast<AProjectile>(OwnerActor);
+        Projectile->SetColorScanned();
+    }
+    else if (OwnerActor->IsA<AMetalActor>())
+    {
+        AMetalActor* MetalActor = Cast<AMetalActor>(OwnerActor);
+        MetalActor->ThisIsMetal();
+    }
+}

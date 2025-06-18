@@ -50,4 +50,10 @@ private:
 
 protected:
 	TObjectPtr<UMetalComponent> MetalComponent;
+
+protected:
+	bool bLostControl = false;
+public:
+	void SetLostControl() { bLostControl = true; }
+
 };

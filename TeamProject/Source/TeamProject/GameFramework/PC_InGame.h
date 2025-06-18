@@ -326,6 +326,9 @@ protected:
 	void ScanMetalActorInView();
 
 	UFUNCTION()
+	void ScanRewindActorInView();
+
+	UFUNCTION()
 	void OnRewind();
 
 public:
@@ -352,6 +355,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class AActor> MetalActor = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<class AActor> RewindActor = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Magnet | Trace")
 	float TraceDistance = 5000.f;

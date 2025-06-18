@@ -10,6 +10,7 @@
 class USphereComponent;
 class UPhysicalMaterial;
 class UMetalComponent;
+class URewindComponent;
 struct FMetalActorTableRow;
 
 UCLASS()
@@ -60,7 +61,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UMetalComponent> MetalComponent;
-	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<URewindComponent> RewindComponent;
+
 	TObjectPtr<UMaterialInstanceDynamic> DynamicMaterialInstance;	
 
 	UPROPERTY(VisibleAnywhere)
