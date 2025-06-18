@@ -175,8 +175,6 @@ void UHinoxFSMComponent::ChangeState(EMonsterState NewState)
 		}
 		break;
 	default:
-		UE_LOG(LogTemp, Error, TEXT("UHinoxFSMComponent::ChangeState // Unexpected MonsterState, ChangeState Failed"));
-		return;
 		break;
 	}
 

@@ -13,16 +13,21 @@ class TEAMPROJECT_API UMetalComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UMetalComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+protected:
+	bool bIsControlled = false;
+public:
+	void SetIsControlled(bool bFlag);
+	bool GetIsControlled() const;
+
+public:
+	void SetColorNormal();
+	void SetColorScanned();
 };

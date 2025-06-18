@@ -3,6 +3,7 @@
 
 #include "Actors/Object/Barrier.h"
 #include "Actors/Projectile/Projectile.h"
+#include "Actors/Character/PlayerCharacter.h"
 
 #include "Components/StaticMeshComponent.h"
 
@@ -92,7 +93,13 @@ void ABarrier::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 {
     if (AProjectile* Projectile = Cast<AProjectile>(OtherActor))
     {
-        Projectile->Destroy();
+        if (AActor* OwnerActor = Projectile->GetOwner())
+        {
+            if (OwnerActor->IsA<APlayerCharacter>())
+            {
+                Projectile->Destroy();
+            }
+        }
     }
 }
 

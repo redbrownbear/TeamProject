@@ -3,32 +3,66 @@
 
 #include "Components/MetalComponent/MetalComponent.h"
 
-// Sets default values for this component's properties
+#include "Actors/Projectile/Projectile.h"
+#include "Actors/Object/MetalActor.h"
+
 UMetalComponent::UMetalComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
 }
 
 
-// Called when the game starts
 void UMetalComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
 }
 
 
-// Called every frame
 void UMetalComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+}
+
+void UMetalComponent::SetIsControlled(bool bFlag)
+{
+	bIsControlled = bFlag;
+}
+
+bool UMetalComponent::GetIsControlled() const
+{
+	return bIsControlled;
+}
+
+void UMetalComponent::SetColorNormal()
+{
+	AActor* OwnerActor = GetOwner();
+	if (OwnerActor->IsA<AProjectile>())
+	{
+		AProjectile* Projectile = Cast<AProjectile>(OwnerActor);
+		Projectile->SetColorNormal();
+	}
+	else if (OwnerActor->IsA<AMetalActor>())
+	{
+		AMetalActor* MetalActor = Cast<AMetalActor>(OwnerActor);
+		MetalActor->ChangeNomalColor();
+	}
+}
+
+void UMetalComponent::SetColorScanned()
+{
+	AActor* OwnerActor = GetOwner();
+	if (OwnerActor->IsA<AProjectile>())
+	{
+		AProjectile* Projectile = Cast<AProjectile>(OwnerActor);
+		Projectile->SetColorScanned();
+	}
+	else if (OwnerActor->IsA<AMetalActor>())
+	{
+		AMetalActor* MetalActor = Cast<AMetalActor>(OwnerActor);
+		MetalActor->ThisIsMetal();
+	}
 }
 

@@ -20,6 +20,7 @@
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 #include "Components/MetalComponent/MetalComponent.h"
+#include "Components/RewindComponent/RewindComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
@@ -158,14 +159,15 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Magnesis, 
 		ETriggerEvent::Started, this, &ThisClass::ShowMetalActorPreview);
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Rewind,
+		ETriggerEvent::Triggered, this, &ThisClass::ShowRewindActor);
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_TrySuperPower, 
 		ETriggerEvent::Started, this, &ThisClass::TrySuperPower);
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_ControlDistance, 
 		ETriggerEvent::Triggered, this, &ThisClass::OnControlDistance);	
 
-	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Rewind,
-		ETriggerEvent::Triggered, this, &ThisClass::ShowRewindActor);
 
 	//QuickSlot
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_QuickSlotLeft,
@@ -711,8 +713,6 @@ void APC_InGame::TrySuperPower(const FInputActionValue& InputActionValue)
 	{
 		if (IsHoldingObject()) return;
 
-		if (!MetalActorClass) return;
-
 		CheckMetalActor();
 
 		if (bCanControlMetal)
@@ -880,11 +880,6 @@ void APC_InGame::DestroyIcePillar()
 	}
 }
 
-void APC_InGame::ShowRewindActor(const FInputActionValue& InputActionValue)
-{
-	// 되감을 액터 보여주기
-	// 화면 중앙에 RewindActor 있을 경우 TrySuperPower 호출하여 되감기
-}
 
 void APC_InGame::OnQuickSlotLeft(const FInputActionValue& InputActionValue)
 {
@@ -1201,7 +1196,6 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 	if (bMagnesisKeyPressed)
 	{
 		Player_C->ZoomIn();
-
 		GetWorld()->GetTimerManager().SetTimer(
 			MoveTimerHandle,
 			this,
@@ -1214,24 +1208,65 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 	{
 		Player_C->ZoomOut();
 
-		if (MetalActor)
-		{
-			MetalActor->ChangeNomalColor();
-		}
 
 		if (IsHoldingObject())
 		{
 			StopMagnetGrab();
 		}
 
+		if (MetalActor)
+		{
+			UMetalComponent* MetalComponent = MetalActor->GetComponentByClass<UMetalComponent>();
+			MetalComponent->SetIsControlled(false);
+			MetalComponent->SetColorNormal();
+			MetalActor = nullptr;
+		}
+
 		// 타이머 종료
 		GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
-
-		MetalActor = nullptr;
 	}
 
 }
 
+void APC_InGame::ShowRewindActor(const FInputActionValue& InputActionValue)
+{
+	if (bIceKeyPressed) { return; }
+
+	bRewindKeyPressed = !bRewindKeyPressed;
+
+	AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
+	if (MainHUD)
+	{
+		MainHUD->ShowAbilityAimUI(bRewindKeyPressed);
+	}
+
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
+
+	if (bRewindKeyPressed)
+	{
+		Player_C->ZoomIn();
+		
+		GetWorld()->GetTimerManager().SetTimer(
+			MoveTimerHandle,
+			this,
+			&APC_InGame::ScanRewindActorInView,
+			0.16f,  // 주기 (초)
+			true   // 반복
+		);
+	}
+	else
+	{
+		Player_C->ZoomOut();
+
+		if (RewindActor)
+		{
+			URewindComponent* RewindComponent = RewindActor->GetComponentByClass<URewindComponent>();
+			RewindComponent->SetColorNormal();
+			RewindComponent->StopRewind();
+			RewindActor = nullptr;
+		}
+	}
+}
 
 void APC_InGame::Magnesis()
 {	
@@ -1275,20 +1310,22 @@ void APC_InGame::CheckMetalActor()
 //			return;
 //		}
 
-		if (!HitActor->GetComponentByClass<UMetalComponent>())
+		UMetalComponent* MetalComponent = HitActor->GetComponentByClass<UMetalComponent>();
+		if (!MetalComponent)
 		{
 			bCanControlMetal = false;
 			return;
 		}
 
+		MetalComponent->SetIsControlled(true);
 		bCanControlMetal = true;
 
 		// LastHit 업데이트
 		LastHit = HitResult;
 
-		if (AProjectileMetalActor* ProjectileMetalActor = Cast<AProjectileMetalActor>(HitActor))
+		if (AProjectile* Projectile = Cast<AProjectile>(HitActor))
 		{
-			ProjectileMetalActor->SetGrabbed(true);
+			Projectile->SetPhysicsEnabled(true);
 		}
 	}
 	else
@@ -1333,29 +1370,6 @@ void APC_InGame::StopMagnetGrab()
 	GetWorld()->GetTimerManager().ClearTimer(MoveTimerHandle);
 }
 
-bool APC_InGame::TraceForMetal(FHitResult& OutHit)
-{
-	FVector Start;
-	FRotator Rot;
-	GetPlayerViewPoint(Start, Rot);
-
-	FVector End = Start + Rot.Vector() * TraceDistance;
-
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(GetPawn());
-
-	bool bHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_PhysicsBody, Params);
-
-	AActor* HitActor = OutHit.GetActor();
-
-	if (bHit && HitActor && HitActor->IsA(MetalActorClass))
-	{
-		return true;
-	}
-
-	return false;
-}
-
 void APC_InGame::MoveGrabbedObject()
 {
 	if (!IsHoldingObject()) return;
@@ -1387,24 +1401,77 @@ void APC_InGame::ScanMetalActorInView()
 	if (!bMagnesisKeyPressed) return;
 
 	FHitResult MetalHit;
-	AMetalActor* FoundMetal = Cast<AMetalActor>(FindVisibleActorOnScreen(MetalHit));
 
-	// 변경이 감지된 경우만 업데이트
-	if (FoundMetal && FoundMetal != MetalActor)
+	AActor* FoundActor = FindVisibleActorOnScreen(MetalHit);
+
+	if (FoundActor)
 	{
-		if (MetalActor)
+		UMetalComponent* MetalComponent = FoundActor->GetComponentByClass<UMetalComponent>();
+		if (MetalComponent)
 		{
-			MetalActor->ChangeNomalColor(); // 기존 액터 색상 복구
+			if (FoundActor != MetalActor)
+			{
+				MetalComponent->SetColorScanned();
+				if (MetalActor)
+				{
+					if (UMetalComponent* ExistsMetalComponent = MetalActor->GetComponentByClass<UMetalComponent>())
+					{
+						ExistsMetalComponent->SetColorNormal();
+					}
+					else
+					{
+						UE_LOG(LogTemp, Error, TEXT("APC_InGame::ScanMetalActorInView // No UMetalComponent in MetalActor"));
+						check(false);
+					}
+				}
+				MetalActor = FoundActor;
+			}
 		}
-
-		MetalActor = FoundMetal;
-		MetalActor->ThisIsMetal();
 	}
 }
 
+void APC_InGame::ScanRewindActorInView()
+{
+	if (!bRewindKeyPressed) return;
+
+	FHitResult RewindHit;
+
+	AActor* FoundActor = FindVisibleActorOnScreen(RewindHit);
+
+	if (FoundActor)
+	{
+		URewindComponent* RewindComponent = FoundActor->GetComponentByClass<URewindComponent>();
+		if (RewindComponent)
+		{
+			if (FoundActor != RewindActor)
+			{
+				RewindComponent->SetColorScanned();
+				if (RewindActor)
+				{
+					if (URewindComponent* ExistsRewindComponent = RewindActor->GetComponentByClass<URewindComponent>())
+					{
+						ExistsRewindComponent->SetColorNormal();
+					}
+					else
+					{
+						UE_LOG(LogTemp, Error, TEXT("APC_InGame::ScanRewindActorInView // No URewindComponent in Actor"));
+						check(false);
+					}
+				}
+				RewindActor = FoundActor;
+			}
+		}
+	}
+}
 void APC_InGame::OnRewind()
 {
-	// 뒤로 되감기
+	if (RewindActor)
+	{
+		if (URewindComponent* RewindComponent = RewindActor->GetComponentByClass<URewindComponent>())
+		{
+			RewindComponent->StartRewind();
+		}
+	}
 }
 
 void APC_InGame::OnNavigate(const FInputActionValue& InputActionValue)
