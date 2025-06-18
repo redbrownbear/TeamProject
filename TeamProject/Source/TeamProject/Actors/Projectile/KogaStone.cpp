@@ -8,6 +8,8 @@
 
 #include "Components/FSMComponent/Monster/AssasinBossFSMComponent.h"
 #include "Components/ProjectileMovementComponent/MyProjectileMovementComponent.h"
+#include "Components/MetalComponent/MetalComponent.h"
+#include "Components/ShapeComponent.h"
 
 // Sets default values
 AKogaStone::AKogaStone()
@@ -15,6 +17,7 @@ AKogaStone::AKogaStone()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	MetalComponent = CreateDefaultSubobject<UMetalComponent>(TEXT("MetalComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -32,9 +35,6 @@ void AKogaStone::Tick(float DeltaTime)
 
 	WaitTime += DeltaTime;
 
-
-
-
 	if (!bFall)
 	{
 		if (ACharacterMonster* CharacterMonster = Cast<ACharacterMonster>(Owner))
@@ -50,37 +50,39 @@ void AKogaStone::Tick(float DeltaTime)
 			}
 		}
 
-
-		if (WaitTime > KOGASTONE_WAIT_TIME_MAX)
+		if (!MetalComponent->GetIsControlled())
 		{
-			if (!bVelocitySet)
+			if (WaitTime > KOGASTONE_WAIT_TIME_MAX)
 			{
-				bVelocitySet = true;
-				SetVelocity();
-			}
-		}
-		else
-		{
-			if (eKind == EKogaStoneKind::SECOND)
-			{
-
-				if (AActor* CenterActor = GetInstigator())
+				if (!bVelocitySet)
 				{
-					OrbitAngle += KOGASTONE_ROTATE_SPEED * DeltaTime;
-					float TotalAngle = OrbitAngle + InitialAngleOffset;
-					float Radians = FMath::DegreesToRadians(TotalAngle);
+					bVelocitySet = true;
+					SetVelocity();
+				}
+			}
+			else
+			{
+				if (eKind == EKogaStoneKind::SECOND)
+				{
 
-					// 회전 평면을 Instigator 기준으로 맞춤
-					FVector Forward = CenterActor->GetActorForwardVector(); // X
-					FVector Right = CenterActor->GetActorRightVector();     // Y
-					FVector Up = CenterActor->GetActorUpVector();           // Z
+					if (AActor* CenterActor = GetInstigator())
+					{
+						OrbitAngle += KOGASTONE_ROTATE_SPEED * DeltaTime;
+						float TotalAngle = OrbitAngle + InitialAngleOffset;
+						float Radians = FMath::DegreesToRadians(TotalAngle);
 
-					// 원형 궤도: Right(=Y) & Up(=Z) 기준으로 회전
-					FVector Offset = FMath::Cos(Radians) * Right * OrbitRadius + FMath::Sin(Radians) * Up * OrbitRadius;
+						// 회전 평면을 Instigator 기준으로 맞춤
+						FVector Forward = CenterActor->GetActorForwardVector(); // X
+						FVector Right = CenterActor->GetActorRightVector();     // Y
+						FVector Up = CenterActor->GetActorUpVector();           // Z
 
-					FVector Center = CenterActor->GetActorLocation();
-					FVector NewLocation = Center + Offset;
-					SetActorLocation(NewLocation);
+						// 원형 궤도: Right(=Y) & Up(=Z) 기준으로 회전
+						FVector Offset = FMath::Cos(Radians) * Right * OrbitRadius + FMath::Sin(Radians) * Up * OrbitRadius;
+
+						FVector Center = CenterActor->GetActorLocation();
+						FVector NewLocation = Center + Offset;
+						SetActorLocation(NewLocation);
+					}
 				}
 			}
 		}

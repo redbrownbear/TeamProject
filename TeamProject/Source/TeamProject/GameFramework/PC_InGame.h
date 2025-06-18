@@ -354,7 +354,7 @@ protected:
 	TSubclassOf<class AMetalActor> MetalActorClass;
 
 	UPROPERTY()
-	TObjectPtr<class AMetalActor> MetalActor = nullptr;
+	TObjectPtr<class AActor> MetalActor = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Magnet | Trace")
 	float TraceDistance = 5000.f;

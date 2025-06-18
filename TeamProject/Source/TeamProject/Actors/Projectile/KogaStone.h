@@ -7,6 +7,8 @@
 #include "Misc/Utils.h"
 #include "KogaStone.generated.h"
 
+class UMetalComponent;
+
 UCLASS()
 class TEAMPROJECT_API AKogaStone : public AProjectile
 {
@@ -45,4 +47,7 @@ private:
 private:
 	bool bVelocitySet = false;
 	void SetVelocity();
+
+protected:
+	TObjectPtr<UMetalComponent> MetalComponent;
 };

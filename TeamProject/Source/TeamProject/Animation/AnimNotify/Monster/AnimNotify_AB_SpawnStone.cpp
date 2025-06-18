@@ -93,18 +93,18 @@ void UAnimNotify_AB_SpawnStone::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 
 				//KogaStone->FinishSpawning(NewTransform);
 
-				AProjectileMetalActor* ProjectileMetalActor = World->SpawnActorDeferred<AProjectileMetalActor>(AProjectileMetalActor::StaticClass(),
+				AKogaStone* KogaStone = World->SpawnActorDeferred<AKogaStone>(AKogaStone::StaticClass(),
 					FTransform::Identity, CharacterMonster, CharacterMonster, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 
 				FTransform NewTransform;
-				ProjectileMetalActor->SetData(ProjectileName::Monster_AB_KogaStoneBig);
+				KogaStone->SetData(ProjectileName::Monster_AB_KogaStoneBig, CollisionProfileName::ToPlayerMonster);
 
 				const FVector Location = CharacterMonster->GetActorLocation();
 				const FVector TargetLocation = Location + FVector(0.0, 0.0, 1.0) * KOGASTONE_ORBIT_RADIUS * 1.5f;
 
 				NewTransform.SetLocation(TargetLocation);
-				ProjectileMetalActor->FinishSpawning(NewTransform);
+				KogaStone->FinishSpawning(NewTransform);
 			}
 				break;
 			case EAssasinBossPhase::END:
