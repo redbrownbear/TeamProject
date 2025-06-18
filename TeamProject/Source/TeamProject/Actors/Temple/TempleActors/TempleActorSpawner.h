@@ -45,7 +45,7 @@ protected:
 	FVector SpawnAreaExtent;
 
 	UPROPERTY(EditAnywhere, Category = "Spawning")
-	float SpawnInterval;
+	float SpawnInterval = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = "Spawning", meta = (RowType = "TempleActorTableRow"))
 	FDataTableRowHandle SpawnRowHandle;
