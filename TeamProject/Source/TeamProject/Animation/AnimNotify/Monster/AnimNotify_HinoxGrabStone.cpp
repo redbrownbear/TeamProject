@@ -9,7 +9,7 @@ void UAnimNotify_HinoxGrabStone::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
-	static UDataTable* ThrownObjectDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Data/ItemData/DT_ThrownObject.DT_ThrownObject'"));
+	UDataTable* ThrownObjectDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Data/ItemData/DT_ThrownObject.DT_ThrownObject'"));
 
 	if (!ThrownObjectDataTable)
 	{

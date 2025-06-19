@@ -226,7 +226,7 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack
 				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelHorn)
 			{
-				static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+				UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 				TimeManager->SetTimeScale(TIMESCALE_JUST);
 				TimeManager->SetJust();
 

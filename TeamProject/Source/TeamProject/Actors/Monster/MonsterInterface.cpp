@@ -1006,21 +1006,25 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 		Monster->ShowHpUI(UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP());
 	}
 
-	if (ACharacterMonster* BigMonster = Cast<ACharacterMonster>(ThisActor))
+	if (fDamage > 0.f)
 	{
-		if (BigMonster->GetMonsterName() == TEXT("AssasinLeader"))
-			BigMonster->ShowHpUI(UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP());
-		else
+		if (ACharacterMonster* BigMonster = Cast<ACharacterMonster>(ThisActor))
 		{
-			if (APC_InGame* PC = Cast<APC_InGame>(BigMonster->GetWorld()->GetFirstPlayerController()))
+			if (BigMonster->GetMonsterName() == TEXT("AssasinLeader"))
+				BigMonster->ShowHpUI(UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP());
+			else
 			{
-				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				if (APC_InGame* PC = Cast<APC_InGame>(BigMonster->GetWorld()->GetFirstPlayerController()))
 				{
-					HUD->ShowBossHpUI(true, UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP(), BigMonster->GetMonsterData()->Name.ToString());
+					if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+					{
+						HUD->ShowBossHpUI(true, UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP(), BigMonster->GetMonsterData()->Name.ToString());
+					}
 				}
 			}
 		}
 	}
+
 
 }
 

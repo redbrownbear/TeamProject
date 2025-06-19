@@ -12,48 +12,32 @@
 
 TArray<FMonsterInfo> UMonsterSpawnManager::GetSpawnInfoArray(FName LevelName)
 {
-    bool* bInited = LevelInit.Find(LevelName);
+    TArray<AActor*> OutActors;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMonsterSpawnPoint::StaticClass(), OutActors);
 
-    if (nullptr == bInited)
+    SpawnInfos.Empty();
+
+    for (AActor* IterActor : OutActors)
     {
-        UE_LOG(LogTemp, Warning, TEXT("UMonsterSpawnManager::GetSpawnInfoArray // LevelInit is Empty"));
-
-        LevelInit.Add(LevelName, false);
-        bInited = LevelInit.Find(LevelName);
-    }
-
-
-    // Didn't inited yet
-    if (!(*bInited))
-    {
-        LevelInit[LevelName] = true;
-
-        TArray<AActor*> OutActors;
-        UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMonsterSpawnPoint::StaticClass(), OutActors);
-
-        SpawnInfos.Add(LevelName);
-        for (AActor* IterActor : OutActors)
+        if (AMonsterSpawnPoint* MonsterSpawnPoint = Cast<AMonsterSpawnPoint>(IterActor))
         {
-            if (AMonsterSpawnPoint* MonsterSpawnPoint = Cast<AMonsterSpawnPoint>(IterActor))
-            {
-                FMonsterInfo Info;
-                Info.Transform = IterActor->GetActorTransform();
-                Info.MonsterDataRow = MonsterSpawnPoint->DataTableRowHandle;
-                Info.SpawnPointGuid = MonsterSpawnPoint->SpawnPointGuid;
-                Info.PatrolPathPointGuid = MonsterSpawnPoint->PatrolPathPointGuid;
-                Info.CampFirePointGuid = MonsterSpawnPoint->CampFirePointGuid;
-                Info.bIsAlive = MonsterSpawnPoint->bIsAlive;
+            FMonsterInfo Info;
+            Info.Transform = IterActor->GetActorTransform();
+            Info.MonsterDataRow = MonsterSpawnPoint->DataTableRowHandle;
+            Info.SpawnPointGuid = MonsterSpawnPoint->SpawnPointGuid;
+            Info.PatrolPathPointGuid = MonsterSpawnPoint->PatrolPathPointGuid;
+            Info.CampFirePointGuid = MonsterSpawnPoint->CampFirePointGuid;
+            Info.bIsAlive = MonsterSpawnPoint->bIsAlive;
 
-                SpawnInfos[LevelName].Add(Info);
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("UMonsterSpawnManager::GetSpawnInfoArray // Cast<AMonsterSpawnPoint>() Failed"));
-                check(false);
-            }
+            SpawnInfos.Add(Info);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("UMonsterSpawnManager::GetSpawnInfoArray // Cast<AMonsterSpawnPoint>() Failed"));
+            check(false);
         }
     }
 
 
-    return SpawnInfos[LevelName];
+    return SpawnInfos;
 }

@@ -275,19 +275,22 @@ void AWorldWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	if (!OtherActor || OtherActor == this)
 		return;
 
-	if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
+	if (!bIsCatched)
 	{
-		if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
+		if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
 		{
-			PC->SetOverlappedItem(this);
-
-			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+			if (APC_InGame* PC = Cast<APC_InGame>(Player->GetController()))
 			{
-				HUD->ShowInteractWidget(true);
-				HUD->ShowInteractName(true, ItemTableRow->Name);
+				PC->SetOverlappedItem(this);
+
+				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				{
+					HUD->ShowInteractWidget(true);
+					HUD->ShowInteractName(true, ItemTableRow->Name);
+				}
 			}
 		}
-	}			
+	}
 
 	if (AProjectile* Proj = Cast<AProjectile>(OtherActor))
 	{
