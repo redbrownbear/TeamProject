@@ -1,7 +1,6 @@
 #include "Actors/Object/LockedGate.h"
 #include "SubSystem/Puzzle/EventManager.h"
-
-#include "Kismet/KismetSystemLibrary.h"
+#include "Components/GateComponent/GateComponent.h"
 
 // Sets default values
 ALockedGate::ALockedGate()
@@ -14,6 +13,8 @@ ALockedGate::ALockedGate()
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
+
+	GateComponent = CreateDefaultSubobject<UGateComponent>(TEXT("GateComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -27,13 +28,6 @@ void ALockedGate::BeginPlay()
 		StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
 	}		
 
-	UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
-	if (EventManager)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("EventManager found, adding dynamic delegate"));
-		EventManager->OnOverlapTempleBall.AddDynamic(this, &ALockedGate::OpenGateSequence);
-		EventManager->OnAllTorchesLit.AddDynamic(this, &ALockedGate::OpenGateSequence);
-	}
 }
 
 void ALockedGate::OpenGate()
@@ -65,6 +59,16 @@ void ALockedGate::MoveGateTick()
 
 	FVector NewLocation = FMath::Lerp(StartLocation, TargetLocation, Alpha);
 	StaticMeshComponent->SetWorldLocation(NewLocation);
+}
+
+void ALockedGate::TorchLitOn()
+{
+	++LittedTorchNum;
+
+	if (LittedTorchNum >= 4)
+	{
+		OpenGate();
+	}
 }
 
 void ALockedGate::OpenGateSequence()

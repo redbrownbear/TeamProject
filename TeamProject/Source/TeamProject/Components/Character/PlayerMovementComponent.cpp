@@ -189,7 +189,10 @@ bool UPlayerMovementComponent::CanClimbUpLand()
 	FCollisionQueryParams TraceParams;
 	TraceParams.AddIgnoredActor(OwnerActor);
 
-	DrawDebugLine(GetWorld(), ForwardEnd, DownEnd, FColor::Red, false, 2.f);
+	if (!COLLISION_HIDDEN_IN_GAME)
+	{
+		DrawDebugLine(GetWorld(), ForwardEnd, DownEnd, FColor::Red, false, 2.f);
+	}
 
 
 	bool CanStand = !GetWorld()->LineTraceSingleByChannel(
@@ -259,7 +262,11 @@ bool UPlayerMovementComponent::CanClimbDownLand()
 	{
 		SetClimbMode(false);
 	}
-	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
+
+	if (!COLLISION_HIDDEN_IN_GAME)
+	{
+		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
+	}
 
 	return false;
 }

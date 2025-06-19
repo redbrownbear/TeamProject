@@ -2,12 +2,14 @@
 
 
 #include "Actors/Object/TorchStand.h"
-#include "SubSystem/Puzzle/EventManager.h"
+#include "Actors/Object/LockedGate.h"
+#include "Actors/TriggerBox/TorchTriggerBox.h"
+#include "Actors/Character/PlayerCharacter.h"
+
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Components/SphereComponent.h"
-#include "Actors/TriggerBox/TorchTriggerBox.h"
-#include "Actors/Character/PlayerCharacter.h"
+
 #include "Misc/Utils.h"
 
 
@@ -83,20 +85,11 @@ void ATorchStand::BeginPlay()
 
     bTorchOnFire = NiagaraComponent && NiagaraComponent->IsActive();
 
-    UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
     // 나이아가라 꺼져 있는 TorchStand만 등록
-    if (!bTorchOnFire)
+    /*if (!bTorchOnFire)
     {
-        if (EventManager)
-        {
-            EventManager->RegisterTorch(this);
-            UE_LOG(LogTemp, Log, TEXT("[Torch] %s 등록됨 (Niagara 꺼짐)"), *GetName());
-        }
-    }
-
-   /* if (NiagaraComponent->IsActive())
-    {
-        bTorchOnFire = true;
+        RegisterTorch();
+        UE_LOG(LogTemp, Log, TEXT("[Torch] %s 등록됨 (Niagara 꺼짐)"), *GetName());
     }*/
 }
 
@@ -117,6 +110,15 @@ void ATorchStand::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
             if (!bTorchOnFire) // 횃대에 불이 붙어있지 않을 때
             {
                 SetTorchStandFire(true);
+                if (LockedGate)
+                {
+                    LockedGate->TorchLitOn();
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Error, TEXT("ATorchStand::OnBeginOverlap // LockedGate null"));
+                    check(false);
+                }
             }
         }
     }
@@ -155,12 +157,20 @@ void ATorchStand::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 }
 
-// Called every frame
-void ATorchStand::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
+//void ATorchStand::RegisterTorch()
+//{
+//    TorchList.Add(this);
+//}
+//
+//void ATorchStand::NotifyTorchLit()
+//{
+//    LitTorchSet.Add(this);
+//
+//    if (LitTorchSet.Num() == TorchList.Num())
+//    {
+//        LockedGate->OpenGateSequence();
+//    }
+//}
 
 void ATorchStand::SetTorchStandFire(bool _bool)
 {
@@ -170,19 +180,12 @@ void ATorchStand::SetTorchStandFire(bool _bool)
     {
         SetNiagaraVisibility(true);
 
-        UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
-
-        if (EventManager)
-        {
-            EventManager->NotifyTorchLit(this);
-        }
+        //NotifyTorchLit();
     }
     else
     {
         SetNiagaraVisibility(false);
     }
-
-    
 }
 
 void ATorchStand::SetNiagaraVisibility(bool bFlag)
