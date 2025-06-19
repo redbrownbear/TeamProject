@@ -741,8 +741,6 @@ void APC_InGame::OnControlDistance(const FInputActionValue& InputActionValue)
 	if (bMagnesisKeyPressed)
 	{		
 		const float DistanceStep = 20.f; // HoldDistance 변화량
-		const float MinHoldDistance = 100.f; // 너무 가까워지는 것 방지
-		const float MaxHoldDistance = 2000.f; // 너무 멀어지지 않도록 제한
 
 		// Magnesis 상태일 경우, HoldDistance 조절
 		if (IsHoldingObject())
@@ -1267,7 +1265,6 @@ void APC_InGame::ShowRewindActor(const FInputActionValue& InputActionValue)
 		{
 			URewindComponent* RewindComponent = RewindActor->GetComponentByClass<URewindComponent>();
 			RewindComponent->SetColorNormal();
-			RewindComponent->StopRewind();
 			RewindActor = nullptr;
 		}
 	}
@@ -1354,6 +1351,8 @@ void APC_InGame::StartMagnetGrab()
 				FVector PlayerLocation = PlayerChar->GetActorLocation();
 				FVector TargetLocation = HitComp->GetOwner()->GetActorLocation();
 				HoldDistance = FVector::Distance(PlayerLocation, TargetLocation);
+
+				HoldDistance = FMath::Clamp(HoldDistance, MinHoldDistance, MaxHoldDistance);
 			}
 
 			PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, LastHit.ImpactPoint);

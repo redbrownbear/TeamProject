@@ -127,7 +127,7 @@ void AScale::UpdateWeight()
         }
     }
 
-    if ((RightWeight != 0.0f && LeftWeight != 0.0f) && RightWeight == LeftWeight)
+    if ((RightWeight > 100000.0f && LeftWeight > 100000.0f) && RightWeight == LeftWeight)
     {
         UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
 
