@@ -77,9 +77,18 @@ void ACharacterMonster::BeginPlay()
 	{
 		FSMComponent->SetCharacterMonster(this);
 		FSMComponent->BindHitEvent();
+		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
+		if (PatrolPath)
+		{
+			FSMComponent->SetPatrolPath(PatrolPath);
+		}
+		if (CampFire)
+		{
+			FSMComponent->SetCampFire(CampFire);
+		}
 	}
 
-	SetData(DataTableRowHandle);
+	//SetData(DataTableRowHandle);
 
 	if (MonsterData && !(MonsterData->MeleeWeaponTableRowHandle.IsNull()))
 	{
@@ -223,18 +232,18 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 
 
 
-	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
-	{
-		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
-		if (PatrolPath)
-		{
-			FSMComponent->SetPatrolPath(PatrolPath);
-		}
-		if (CampFire)
-		{
-			FSMComponent->SetCampFire(CampFire);
-		}
-	}
+	//if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
+	//{
+	//	FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
+	//	if (PatrolPath)
+	//	{
+	//		FSMComponent->SetPatrolPath(PatrolPath);
+	//	}
+	//	if (CampFire)
+	//	{
+	//		FSMComponent->SetCampFire(CampFire);
+	//	}
+	//}
 
 	StatusComponent->SetMaxHP(MonsterData->MaxHP);
 	HPBarWidget->SetRelativeLocation(FVector(0.f, 0.f, (MonsterData->CollisionSphereRadius - 10.0f) * 4.0f));
@@ -456,7 +465,7 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 }
 void ACharacterMonster::SetData(const FName& MonsterName)
 {
-	static UDataTable* MonsterDataTable = nullptr;
+	UDataTable* MonsterDataTable = nullptr;
 	if (!MonsterDataTable)
 	{
 		MonsterDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Data/MonsterData/DT_Monster.DT_Monster'"));

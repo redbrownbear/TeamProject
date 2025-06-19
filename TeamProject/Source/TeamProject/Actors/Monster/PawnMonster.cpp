@@ -71,12 +71,21 @@ void APawnMonster::BeginPlay()
 	
 	CollisionComponent->SetCollisionProfileName(CollisionProfileName::Monster);
 	CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
-	SetData(DataTableRowHandle);
+
 
 	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
 	{
 		FSMComponent->SetPawnMonster(this);
 		FSMComponent->BindHitEvent();
+		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
+		if (PatrolPath)
+		{
+			FSMComponent->SetPatrolPath(PatrolPath);
+		}
+		if (CampFire)
+		{
+			FSMComponent->SetCampFire(CampFire);
+		}
 	}
 
 	//StatusComponent->OnDie.AddDynamic(this, &ThisClass::OnDie);
@@ -163,22 +172,6 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	MovementComponent->MaxSpeed = MonsterData->WalkMovementMaxSpeed;
 
 	AIControllerClass = MonsterData->AIControllerClass;
-
-	if (UMonsterFSMComponent* FSMComponent = GetFSMComponent())
-	{
-		FSMComponent->SetMonsterGroupType(MonsterData->eMonsterGroupType);
-		if (PatrolPath)
-		{
-			FSMComponent->SetPatrolPath(PatrolPath);
-		}
-		if (CampFire)
-		{
-			FSMComponent->SetCampFire(CampFire);
-		}
-	}
-
-
-
 
 	StatusComponent->SetMaxHP(MonsterData->MaxHP);
 
@@ -279,7 +272,7 @@ void APawnMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 
 void APawnMonster::SetData(const FName& MonsterName)
 {
-	static UDataTable* MonsterDataTable = nullptr;
+	UDataTable* MonsterDataTable = nullptr;
 	if (!MonsterDataTable)
 	{
 		MonsterDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Script/Engine.DataTable'/Game/Data/MonsterData/DT_Monster.DT_Monster'"));

@@ -40,8 +40,7 @@ class TEAMPROJECT_API UMonsterSpawnManager : public UGameInstanceSubsystem
 
 private:
 	// <Level, <MonsterInfo, bAlive>> 
-	TMap<FName, TArray<FMonsterInfo>> SpawnInfos;
-    TMap<FName, bool> LevelInit;
+	TArray<FMonsterInfo> SpawnInfos;
 
 public:
     TArray<FMonsterInfo> GetSpawnInfoArray(FName LevelName);
