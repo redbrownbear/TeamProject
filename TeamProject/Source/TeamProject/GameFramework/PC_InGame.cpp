@@ -287,7 +287,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 		Movement->TrySetMoveClimb(ActionValue);
 
-		UE_LOG(LogTemp, Warning, TEXT("Climbing"));
+		//UE_LOG(LogTemp, Warning, TEXT("Climbing"));
 
 		
 	}
@@ -301,7 +301,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		P_Anim->ActionValue = ActionValue;
 		
 		Movement->GlidingMove(ActionValue);
-		UE_LOG(LogTemp, Warning, TEXT("Gliding"));
+		//UE_LOG(LogTemp, Warning, TEXT("Gliding"));
 	}
 	// Step Move
 	else if (Movement->GetMoveState() == EMove_State::Step)
