@@ -10,6 +10,7 @@
 #include "Actors/Object/MetalActor.h"
 #include "Actors/Object/ProjectileMetalActor.h"
 #include "Actors/Temple/Surface/FlowSurface.h"
+#include "Actors/Temple/Surface/WaterSurface.h"
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/TimeManager.h"
@@ -1101,13 +1102,17 @@ bool APC_InGame::IsSurfaceActor(AActor* Actor) const
 {
 	if (!Actor) return false;
 
-#if WITH_EDITOR
-	FString ActorName = Actor->GetActorLabel();
-#else
-	FString ActorName = Actor->GetName();
-#endif
+//#if WITH_EDITOR
+//	FString ActorName = Actor->GetActorLabel();
+//#else
+//	FString ActorName = Actor->GetName();
+//#endif
+//
+//	return ActorName.StartsWith(TEXT("Surface"));
 
-	return ActorName.StartsWith(TEXT("Surface"));
+	if (!Actor->IsA<AWaterSurface>()) return false;
+	
+	return true;
 }
 	
 
