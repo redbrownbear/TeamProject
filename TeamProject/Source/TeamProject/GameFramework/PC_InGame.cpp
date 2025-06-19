@@ -22,6 +22,7 @@
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 #include "Components/MetalComponent/MetalComponent.h"
 #include "Components/RewindComponent/RewindComponent.h"
+#include "Components/WaterComponent/WaterComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
@@ -1107,8 +1108,8 @@ bool APC_InGame::IsSurfaceActor(AActor* Actor) const
 //#endif
 //
 //	return ActorName.StartsWith(TEXT("Surface"));
-
-	if (!Actor->IsA<AWaterSurface>()) return false;
+	
+	if (!Actor->GetComponentByClass<UWaterComponent>()) return false;
 	
 	return true;
 }

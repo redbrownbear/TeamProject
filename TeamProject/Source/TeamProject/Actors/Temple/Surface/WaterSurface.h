@@ -7,6 +7,7 @@
 #include "WaterSurface.generated.h"
 
 class UBoxComponent;
+class UWaterComponent;
 
 UCLASS()
 class TEAMPROJECT_API AWaterSurface : public AActor
@@ -25,4 +26,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UWaterComponent> WaterComponent;
 };
