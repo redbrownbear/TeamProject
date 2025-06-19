@@ -9,6 +9,7 @@
 class UStaticMeshComponent;
 class USphereComponent;
 class UNiagaraComponent;
+class ALockedGate;
 
 UCLASS()
 class TEAMPROJECT_API ATorchStand : public AActor
@@ -28,16 +29,20 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> TriggerColliderComponent;
 
-
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<ALockedGate> LockedGate;
 
 protected:
 	virtual void BeginPlay() override;
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+//protected:
+//	UFUNCTION()
+//	void RegisterTorch();
+//	UFUNCTION()
+//	void NotifyTorchLit();
 public:	
-	virtual void Tick(float DeltaTime) override;
-	 
 	void SetTorchStandFire(bool _bool);
 
 	void SetNiagaraVisibility(bool bFlag);
@@ -47,6 +52,6 @@ public:
 private:
 	bool bTorchOnFire = false;
 
-	TArray<TObjectPtr<ATorchStand>> TorchList;
-	TSet<TObjectPtr<ATorchStand>> LitTorchSet;
+	//TArray<TObjectPtr<ATorchStand>> TorchList;
+	//TSet<TObjectPtr<ATorchStand>> LitTorchSet;
 };
