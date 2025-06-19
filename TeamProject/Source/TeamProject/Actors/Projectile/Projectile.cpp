@@ -511,12 +511,12 @@ void AProjectile::SetPhysicsEnabled(bool bFlag)
 	CollisionComponent->SetSimulatePhysics(bFlag);
 }
 
-void AProjectile::SetColorScanned()
+void AProjectile::SetColorScanned(float Value)
 {
 	// Change Material Color	
 	if (DynamicMaterialInstance)
 	{
-		DynamicMaterialInstance->SetScalarParameterValue("Color", 1.f);
+		DynamicMaterialInstance->SetScalarParameterValue("Color", Value);
 	}
 	else
 	{

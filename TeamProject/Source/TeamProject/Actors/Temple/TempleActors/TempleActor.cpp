@@ -64,6 +64,9 @@ void ATempleActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		CollisionComponent->SetSimulatePhysics(true);
 		CollisionComponent->SetMassOverrideInKg(NAME_None, TempleActorData->MassInKg, true);
 		CollisionComponent->SetLinearDamping(TempleActorData->LinearDamping);
+
+		/*CollisionComponent->BodyInstance.bOverrideMass = true;
+		CollisionComponent->BodyInstance.UpdateMassProperties();*/
 	}
 
 	if (StaticMeshComponent)

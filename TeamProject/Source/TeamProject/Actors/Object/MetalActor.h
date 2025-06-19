@@ -46,7 +46,7 @@ protected:
 
 
 public:
-	virtual void ThisIsMetal();
+	virtual void ThisIsMetal(float fValue = 0.8f);
 	void ChangeNomalColor();
 
 protected:

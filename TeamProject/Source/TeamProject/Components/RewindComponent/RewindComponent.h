@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "RewindComponent.generated.h"
 
-#define REWIND_TRANSFORM_COUNT_MAX				180
+#define REWIND_TRANSFORM_COUNT_MAX				400
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TEAMPROJECT_API URewindComponent : public UActorComponent
