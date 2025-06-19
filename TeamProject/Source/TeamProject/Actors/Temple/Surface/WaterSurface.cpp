@@ -3,6 +3,7 @@
 
 #include "Actors/Temple/Surface/WaterSurface.h"
 #include "Components/BoxComponent.h"
+#include "Components/WaterComponent/WaterComponent.h"
 
 // Sets default values
 AWaterSurface::AWaterSurface()
@@ -12,6 +13,8 @@ AWaterSurface::AWaterSurface()
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	RootComponent = StaticMeshComponent;
+
+    WaterComponent = CreateDefaultSubobject<UWaterComponent>(TEXT("WaterComponent"));
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset
     (TEXT("/Script/Engine.StaticMesh'/Engine/BasicShapes/Plane.Plane'"));

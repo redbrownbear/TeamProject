@@ -98,9 +98,13 @@ void URewindComponent::StoreRewind()
 void URewindComponent::ApplyRewind()
 {
     const int32 HistoryCount = TransformHistory.Num();
-    if (HistoryCount == 0) return;
+    if (HistoryCount == 0) 
+    {
+        bIsRewinding = false;
+        return;
+    }
 
-    int32 Count = bBufferFilled ? REWIND_TRANSFORM_COUNT_MAX : TransformHistory.Num();
+    const int32 Count = bBufferFilled ? REWIND_TRANSFORM_COUNT_MAX : TransformHistory.Num();
     AActor* Owner = GetOwner();
     if (!Owner)
     {
@@ -123,6 +127,7 @@ void URewindComponent::ApplyRewind()
     // check Rewinding is over
     if (RewindIndex  == CurrentIndex)
     {
+        RewindIndex = -1;
         bIsRewinding = false;
     }
 }
