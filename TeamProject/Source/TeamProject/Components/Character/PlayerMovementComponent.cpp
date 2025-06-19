@@ -506,7 +506,8 @@ void UPlayerMovementComponent::BackFlip()
 void UPlayerMovementComponent::TimeScaleChanged(float _Scale)
 {
 	// 물리 궤적을 동일하게 유지
-	GravityScale *= FMath::Square(_Scale);
+	
+	
 
 	UAnimInstance* AnimInst = Cast<ACharacter>(GetOwner())->GetMesh()->GetAnimInstance();
 
@@ -518,12 +519,20 @@ void UPlayerMovementComponent::TimeScaleChanged(float _Scale)
 	}
 	UWorld* World = GetOwner() ? GetOwner()->GetWorld() : nullptr;
 
-	World->GetTimerManager().SetTimer(
-		ApplyVelocityTimerHandle,
-		FTimerDelegate::CreateUObject(this, &ThisClass::ApplyVelocityAfterTimeScale, _Scale),
-		0.001f,
-		false
-	);
+	
+	if (Move_State == EMove_State::Steping || Move_State == EMove_State::BackFlip)
+	{
+		GravityScale *= FMath::Square(_Scale);
+
+		World->GetTimerManager().SetTimer(
+			ApplyVelocityTimerHandle,
+			FTimerDelegate::CreateUObject(this, &ThisClass::ApplyVelocityAfterTimeScale, _Scale),
+			0.001f,
+			false
+		);
+	}
+	
+	
 }
 
 bool UPlayerMovementComponent::CanGlide()
