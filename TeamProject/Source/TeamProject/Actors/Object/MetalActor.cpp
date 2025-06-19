@@ -252,12 +252,12 @@ void AMetalActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 {
 }
 
-void AMetalActor::ThisIsMetal()
+void AMetalActor::ThisIsMetal(float fValue)
 {
 	// Change Material Color	
 	if (DynamicMaterialInstance)
 	{
-		DynamicMaterialInstance->SetScalarParameterValue("Color", 1.f);
+		DynamicMaterialInstance->SetScalarParameterValue("Color", fValue);
 	}
 	else
 	{

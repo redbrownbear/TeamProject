@@ -88,6 +88,6 @@ public:
 	void SetPhysicsEnabled(bool bFlag);
 
 public:
-	void SetColorScanned();
+	void SetColorScanned(float Value = 0.8f);
 	void SetColorNormal();
 };

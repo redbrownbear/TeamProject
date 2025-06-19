@@ -148,11 +148,11 @@ void URewindComponent::SetColorScanned()
     if (OwnerActor->IsA<AProjectile>())
     {
         AProjectile* Projectile = Cast<AProjectile>(OwnerActor);
-        Projectile->SetColorScanned();
+        Projectile->SetColorScanned(0.3f);
     }
     else if (OwnerActor->IsA<AMetalActor>())
     {
         AMetalActor* MetalActor = Cast<AMetalActor>(OwnerActor);
-        MetalActor->ThisIsMetal();
+        MetalActor->ThisIsMetal(0.3f);
     }
 }
