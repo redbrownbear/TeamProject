@@ -4,6 +4,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/MetalComponent/MetalComponent.h"
+#include "Components/RewindComponent/RewindComponent.h"
 
 #include "PhysicalMaterials/PhysicalMaterial.h"
 
@@ -27,6 +28,7 @@ AMetalActor::AMetalActor()
 	//PhysicalMaterial = PhysMaterial.Object;
 
 	MetalComponent = CreateDefaultSubobject<UMetalComponent>(TEXT("MetalComponent"));
+	RewindComponent = CreateDefaultSubobject<URewindComponent>(TEXT("RewindComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -116,6 +118,10 @@ void AMetalActor::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 		CollisionComponent->SetEnableGravity(true);
 		CollisionComponent->SetSimulatePhysics(true);
 		CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+
+		CollisionComponent->SetMassOverrideInKg(NAME_None, MetalActorData->MassInKg);
+		CollisionComponent->BodyInstance.bOverrideMass = true;
+		CollisionComponent->BodyInstance.UpdateMassProperties();
 	}
 	else
 	{

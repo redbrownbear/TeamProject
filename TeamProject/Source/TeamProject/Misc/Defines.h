@@ -107,3 +107,6 @@
 #define ICEPILLAR_MAXHEIGT															300.F
 
 #define STEMINA_USE_SPEED															5.f
+
+#define DAMAGE_OPTION_HEADSHOT														1
+#define DAMAGE_OPTION_ARROW															2

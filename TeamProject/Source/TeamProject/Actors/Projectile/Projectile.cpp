@@ -15,6 +15,7 @@
 #include "Components/FSMComponent/Monster/MonsterFSMComponent.h"
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Components/ProjectileMovementComponent/MyProjectileMovementComponent.h"
+#include "Components/RewindComponent/RewindComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -26,6 +27,7 @@
 #include "Actors/Effect/NiagaraEffect.h"
 #include "Actors/Effect/ParticleEffect.h"
 #include "Actors/Object/TorchStand.h"
+#include "Actors/Object/Barrier.h"
 
 #include "SubSystem/PlayerManager.h"
 #include "SubSystem/TimeManager.h"
@@ -49,7 +51,7 @@ AProjectile::AProjectile()
 	ProjectileMovementComponent->InitialSpeed = 0.f;
 	ProjectileMovementComponent->MaxSpeed = 0.f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
-	InitialLifeSpan = 3.f;
+	InitialLifeSpan = 0.f;
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->SetCanEverAffectNavigation(false);
@@ -59,6 +61,8 @@ AProjectile::AProjectile()
 	StaticMeshComponent->AttachToComponent(CollisionComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 	CollisionComponent->bHiddenInGame = COLLISION_HIDDEN_IN_GAME;
+
+	RewindComponent = CreateDefaultSubobject<URewindComponent>(TEXT("RewindComponent"));
 }
 
 void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
@@ -81,6 +85,30 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 	{
 		StaticMeshComponent->SetStaticMesh(ProjectileTableRow->StaticMesh);
 		StaticMeshComponent->SetRelativeTransform(ProjectileTableRow->Transform);
+
+		UMaterialInterface* CurrentMaterialOnMesh = StaticMeshComponent->GetMaterial(0);
+
+		DynamicMaterialInstance = Cast<UMaterialInstanceDynamic>(CurrentMaterialOnMesh);
+
+		if (!DynamicMaterialInstance)
+		{
+			DynamicMaterialInstance = UMaterialInstanceDynamic::Create(CurrentMaterialOnMesh, this);
+
+			if (DynamicMaterialInstance)
+			{
+				StaticMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+				UE_LOG(LogTemp, Log, TEXT("AProjectile::SetData // Created and assigned new DynamicMaterialInstance"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("AProjectile::SetData // Failed to create and assign new DynamicMaterialInstance"));
+				DynamicMaterialInstance = nullptr;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("AProjectile::SetData // Re-using existing DynamicMaterialInstance"));
+		}
 	}
 
 	CollisionComponent->SetCollisionProfileName(ProfileName);
@@ -124,6 +152,7 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		NiagaraEffectComponent->RegisterComponent();
 	}
 
+	//Trail
 
 	const FDataTableRowHandle ProjectileNiagaraEffectDataTable = ProjectileTableRow->TrailEffectTableRowHandle;
 	if (!ProjectileNiagaraEffectDataTable.IsNull())
@@ -139,7 +168,6 @@ void AProjectile::SetData(const FName& ProjectileName, FName ProfileName)
 		ProjectileNiagaraEffectComponent->RegisterComponent();
 	}
 
-	//Trail
 
 	const FDataTableRowHandle TrailEffectTable = ProjectileTableRow->NiagaraEffectTableRowHandle;
 	if (!TrailEffectTable.IsNull())
@@ -264,51 +292,52 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		return;
 	}
 
-	if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
-		|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig
-		|| DataTableRowHandle.RowName == ProjectileName::Monster_HinoxStone)
-	{
-		if (UWorld* World = GetWorld())
-		{
-			AParticleEffect* ParticleEffect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
-				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-			FTransform NewTransform;
-			ParticleEffect->SetData(ParticleEffectName::Hinox_AttackShockWave);
-
-			const FVector Location = GetActorLocation();
-			NewTransform.SetLocation(Location);
-
-			ParticleEffect->FinishSpawning(NewTransform);
-		}
-	}
-	if (DataTableRowHandle.RowName == ProjectileName::Player_Arrow
-		|| DataTableRowHandle.RowName == ProjectileName::Player_FireArrow
-		)
-	{
-		if (UWorld* World = GetWorld())
-		{
-			AParticleEffect* ParticleEffect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
-				FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-			const FDataTableRowHandle ParticleEffectDataTable = ProjectileTableRow->ParticleEffectTableRowHandle;
-			FTransform NewTransform;
-			ParticleEffect->SetData(ParticleEffectDataTable);
-
-			const FVector Location = GetActorLocation();
-			NewTransform.SetLocation(Location);
-
-			ParticleEffect->FinishSpawning(NewTransform);
-		}
-	}
 
 	if (!(DataTableRowHandle.RowName == ProjectileName::Monster_PlayerAlert)
 		&& !OtherActor->IsA<ATorchStand>()
+		&& !OtherActor->IsA<ABarrier>()
 		)
 	{
+		if (DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStone
+			|| DataTableRowHandle.RowName == ProjectileName::Monster_AB_KogaStoneBig
+			|| DataTableRowHandle.RowName == ProjectileName::Monster_HinoxStone)
+		{
+			if (UWorld* World = GetWorld())
+			{
+				AParticleEffect* ParticleEffect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+					FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+				FTransform NewTransform;
+				ParticleEffect->SetData(ParticleEffectName::Hinox_AttackShockWave);
+
+				const FVector Location = GetActorLocation();
+				NewTransform.SetLocation(Location);
+
+				ParticleEffect->FinishSpawning(NewTransform);
+			}
+		}
+		if (DataTableRowHandle.RowName == ProjectileName::Player_Arrow
+			|| DataTableRowHandle.RowName == ProjectileName::Player_FireArrow
+			)
+		{
+			if (UWorld* World = GetWorld())
+			{
+				AParticleEffect* ParticleEffect = World->SpawnActorDeferred<AParticleEffect>(AParticleEffect::StaticClass(),
+					FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+				const FDataTableRowHandle ParticleEffectDataTable = ProjectileTableRow->ParticleEffectTableRowHandle;
+				FTransform NewTransform;
+				ParticleEffect->SetData(ParticleEffectDataTable);
+
+				const FVector Location = GetActorLocation();
+				NewTransform.SetLocation(Location);
+
+				ParticleEffect->FinishSpawning(NewTransform);
+			}
+		}
+
 		Destroy();
 	}
-
-
 }
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -346,6 +375,16 @@ void AProjectile::Tick(float DeltaTime)
 	//	FRotator NewRotation = UKismetMathLibrary::MakeRotFromX(CurrentVelocity);
 	//	SetActorRotation(NewRotation);
 	//}
+
+	if (RewindComponent && RewindComponent->IsRewinding())
+	{
+		ProjectileMovementComponent->Velocity = FVector::Zero();
+		if (CollisionComponent)
+		{
+			CollisionComponent->SetSimulatePhysics(true);
+		}
+	}
+
 }
 
 FVector AProjectile::GetVelocity()
@@ -458,6 +497,43 @@ void AProjectile::SetNiagaraVisibility(bool bFlag)
 	else
 	{
 		NiagaraEffectComponent->Deactivate();
+	}
+}
+
+void AProjectile::SetPhysicsEnabled(bool bFlag)
+{
+	if (!CollisionComponent) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AProjectile::SetPhysicsEnabled // No CollisionComponent"))
+		return;
+	}
+
+	CollisionComponent->SetSimulatePhysics(bFlag);
+}
+
+void AProjectile::SetColorScanned()
+{
+	// Change Material Color	
+	if (DynamicMaterialInstance)
+	{
+		DynamicMaterialInstance->SetScalarParameterValue("Color", 1.f);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AProjectile::SetColorScanned // DynamicMaterialInstance is Invalid"));
+	}
+}
+
+void AProjectile::SetColorNormal()
+{
+	// Change Material Color	
+	if (DynamicMaterialInstance)
+	{
+		DynamicMaterialInstance->SetScalarParameterValue("Color", 0.f);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AProjectile::SetColorNormal // DynamicMaterialInstance is Invalid"));
 	}
 }
 

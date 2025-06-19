@@ -4,6 +4,7 @@
 #include "Actors/Object/Scale.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "SubSystem/Puzzle/EventManager.h"
 
 // Sets default values
 AScale::AScale()
@@ -30,11 +31,11 @@ AScale::AScale()
 
     LeftPlate = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftPlate"));
     LeftPlate->SetupAttachment(Base);
-    LeftPlate->SetRelativeLocation(FVector(300.f, 0.f, 0.f));
-    LeftPlate->SetRelativeScale3D(FVector(1.f, 1.f, 0.1f));
+    LeftPlate->SetRelativeLocation(FVector(300.f, 0.f, -50.f));
+    LeftPlate->SetRelativeScale3D(FVector(50.f, 50.f, 50.f));
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset1
-    { TEXT("/Game/StarterContent/Shapes/Shape_Cube.Shape_Cube") };
+    { TEXT("/Game/Resources/Object/Bowl/DgnObj_BowlIron_A_01.DgnObj_BowlIron_A_01") };
     if (Asset1.Object)
     {
         LeftPlate->SetStaticMesh(Asset1.Object);
@@ -46,11 +47,11 @@ AScale::AScale()
 
     RightPlate = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightPlate"));
     RightPlate->SetupAttachment(Base);
-    RightPlate->SetRelativeLocation(FVector(-300.f, 0.f, 0.f));
-    RightPlate->SetRelativeScale3D(FVector(1.f, 1.f, 0.1f));
+    RightPlate->SetRelativeLocation(FVector(-300.f, 0.f, -50.f));
+    RightPlate->SetRelativeScale3D(FVector(50.f, 50.f, 50.f));
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset2
-    { TEXT("/Game/StarterContent/Shapes/Shape_Cube.Shape_Cube") };
+    { TEXT("/Game/Resources/Object/Bowl/DgnObj_BowlIron_A_01.DgnObj_BowlIron_A_01") };
     if (Asset2.Object)
     {
         RightPlate->SetStaticMesh(Asset2.Object);
@@ -62,28 +63,22 @@ AScale::AScale()
     
     LeftWeightArea = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftWeightArea"));
     LeftWeightArea->SetupAttachment(LeftPlate);
-    LeftWeightArea->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
+    LeftWeightArea->SetRelativeLocation(FVector(0.f, 0.f, 1.5f));
+    LeftWeightArea->SetBoxExtent(FVector(1.5f, 1.5f, 0.5f));
 
     RightWeightArea = CreateDefaultSubobject<UBoxComponent>(TEXT("RightWeightArea"));
     RightWeightArea->SetupAttachment(RightPlate);
-    RightWeightArea->SetRelativeLocation(FVector(0.f, 0.f, 100.f));    
+    RightWeightArea->SetRelativeLocation(FVector(0.f, 0.f, 1.5f));    
+    RightWeightArea->SetBoxExtent(FVector(1.5f, 1.5f, 0.5f));
 }
 
 void AScale::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    float PrevLeftWeight = LeftWeight;
-    float PrevRightWeight = RightWeight;
-
     UpdateWeight();
 
-    if (!FMath::IsNearlyEqual(PrevLeftWeight, LeftWeight) || !FMath::IsNearlyEqual(PrevRightWeight, RightWeight))
-    {
-        ApplyOffsetFromWeight();
-        PrevLeftWeight = LeftWeight;
-        PrevRightWeight = RightWeight;
-    }
+    ApplyOffsetFromWeight();
 }
 
 void AScale::BeginPlay()
@@ -97,6 +92,9 @@ void AScale::BeginPlay()
 void AScale::UpdateWeight()
 {
     constexpr float Gravity = 980.0f; 
+
+    LeftWeight = 0.f; // 무게 누적 방지
+    RightWeight = 0.f;
 
     TArray<AActor*> LeftOverlappingActors;
     TArray<AActor*> RightOverlappingActors;
@@ -126,6 +124,16 @@ void AScale::UpdateWeight()
             {
                 RightWeight += Comp->GetMass() * Gravity;
             }
+        }
+    }
+
+    if ((RightWeight != 0.0f && LeftWeight != 0.0f) && RightWeight == LeftWeight)
+    {
+        UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
+
+        if (EventManager)
+        {
+            EventManager->WeightFull();
         }
     }
 }

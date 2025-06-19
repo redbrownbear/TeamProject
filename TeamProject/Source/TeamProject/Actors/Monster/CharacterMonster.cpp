@@ -798,7 +798,7 @@ void ACharacterMonster::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 					if (APlayerCharacter* Player = Cast<APlayerCharacter>(PlayerController->GetPawn()))
 					{
 						GetFSMComponent()->SetPlayer(Player);
-						IMonsterInterface::TakeDamage(Projectile->GetDamage(), DamageEvent, PlayerController, Player);
+						IMonsterInterface::TakeDamage(Projectile->GetDamage(), DamageEvent, PlayerController, Player, DAMAGE_OPTION_ARROW);
 					}
 				}
 			}

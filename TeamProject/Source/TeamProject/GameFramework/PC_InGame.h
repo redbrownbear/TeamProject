@@ -316,9 +316,6 @@ protected:
 
 	//  Magnesis 내부 기능 함수
 	UFUNCTION()
-	bool TraceForMetal(FHitResult& OutHit);
-
-	UFUNCTION()
 	void MoveGrabbedObject();
 
 	// 상태 체크
@@ -327,6 +324,9 @@ protected:
 
 	UFUNCTION()
 	void ScanMetalActorInView();
+
+	UFUNCTION()
+	void ScanRewindActorInView();
 
 	UFUNCTION()
 	void OnRewind();
@@ -354,7 +354,10 @@ protected:
 	TSubclassOf<class AMetalActor> MetalActorClass;
 
 	UPROPERTY()
-	TObjectPtr<class AMetalActor> MetalActor = nullptr;
+	TObjectPtr<class AActor> MetalActor = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<class AActor> RewindActor = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Magnet | Trace")
 	float TraceDistance = 5000.f;

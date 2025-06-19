@@ -131,7 +131,13 @@ void UAssasinBossFSMComponent::ChangeState(EMonsterState NewState)
 		eCombat = EAssasinBossCombat::BARRIER;
 		break;
 	case EMonsterState::Stun:
+		if (NewState == EMonsterState::Damage
+			|| NewState == EMonsterState::Stun)
+		{
+			return;
+		}
 		CharacterMonster->PlayMontage(EMonsterMontage::STUN_END);
+
 		break;
 	default:
 		break;

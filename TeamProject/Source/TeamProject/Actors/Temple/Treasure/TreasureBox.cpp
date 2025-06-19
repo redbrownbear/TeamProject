@@ -1,5 +1,7 @@
 #include "Actors/Temple/Treasure/TreasureBox.h"
 #include "Components/BoxComponent.h"
+#include "Components/MetalComponent/MetalComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Actors/Effect/ParticleEffect.h"
 
 #include "Actors/Character/PlayerCharacter.h"
@@ -25,6 +27,7 @@ ATreasureBox::ATreasureBox()
 	SkeletalMeshComponent->SetupAttachment(RootComponent);
 	SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
+	MetalComponent = CreateDefaultSubobject<UMetalComponent>(TEXT("MetalComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -35,6 +38,8 @@ void ATreasureBox::BeginPlay()
 	CollisionComponent->SetCollisionProfileName(CollisionProfileName::ToPlayer);
 
 	CollisionComponent->SetGenerateOverlapEvents(true);
+	/*CollisionComponent->SetSimulatePhysics(true);
+	CollisionComponent->SetCollisionProfileName(TEXT("Item"));*/
 
 	SkeletalMeshComponent->SetCollisionObjectType(ECC_WorldStatic);
 	SkeletalMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
