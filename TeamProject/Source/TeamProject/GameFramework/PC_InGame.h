@@ -388,6 +388,9 @@ private:
 	FHitResult LastHit;
 	bool bHitResult = false;
 
+	const float MinHoldDistance = 300.f;
+	const float MaxHoldDistance = 1000.f;
+
 private:
 	AWorldWeapon* OverlappedItem = nullptr;
 };

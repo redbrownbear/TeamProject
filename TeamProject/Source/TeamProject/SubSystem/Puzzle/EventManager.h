@@ -33,7 +33,7 @@ public:
 
 	UFUNCTION()
 	void WeightFull();
-	
+
 public:
 	// -------- Temple Switches --------
 	UPROPERTY(BlueprintAssignable)
