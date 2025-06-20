@@ -112,7 +112,7 @@ void UWeaponManagerComponent::BeginPlay()
 			SetShieldStaticMesh(Data.StaticMesh);
 		}
 	}
-
+	NextWeapon = EWeapon_Type::None;
 }
 
 
@@ -163,7 +163,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 
 	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
 
-
+	UnEquipWeapons.Empty();
 	UAnimMontage* PlayingMontage = AnimInstance->GetCurrentActiveMontage();
 	if (PlayingMontage)
 		return;
@@ -172,7 +172,8 @@ void UWeaponManagerComponent::TryEquipWeapon()
 	{
 		return;
 	}
-	
+
+	SetWeaponSwapState(EWeapon_Swap_State::Swaping);
 
 	if (NextWeapon == EWeapon_Type::Sword)
 	{
@@ -318,10 +319,25 @@ void UWeaponManagerComponent::TryEquipWeapon()
 
 void UWeaponManagerComponent::EquipWeapon(UAnimMontage* Montage, bool bInterrupted)
 {
-	ACharacter* CRT = Cast<ACharacter>(GetOwner());
+
+	if (GetEquipState() != EEquip_State::None)
+	{
+		return;
+	}
+	
+
+	APlayerCharacter* CRT = Cast<APlayerCharacter>(GetOwner());
+	if (CRT->GetMoveState() == EMove_State::Hit)
+	{
+		return;
+	}
 	USkeletalMeshComponent* Mesh = CRT->GetMesh();
+	
+
+	SetWeaponSwapState(EWeapon_Swap_State::Swaping);
 	if (NextWeapon == EWeapon_Type::Bow)
 	{
+		
 		AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
 		UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
 
@@ -329,6 +345,7 @@ void UWeaponManagerComponent::EquipWeapon(UAnimMontage* Montage, bool bInterrupt
 	}
 	else if (NextWeapon == EWeapon_Type::Sword)
 	{
+		
 		AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Sword->GetChildActor());
 		UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
 

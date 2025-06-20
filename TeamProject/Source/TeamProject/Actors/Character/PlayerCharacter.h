@@ -97,6 +97,7 @@ public:
 	void CamearaDetach() { Camera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform); }
 	void CameraAttach();
 	void SetCameraTransform(FTransform& _InTransform);
+	void EquipWeapon(EWeapon_Type Weapon_Type);
 protected:
 
 	/*UPROPERTY(EditAnywhere, Category="Weapon")

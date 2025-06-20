@@ -58,5 +58,5 @@ void UAnimNotifyUnEquipWeapon::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 			WeaponManagerComponent->SetEquipState(EEquip_State::Sword);
 		}
 	}
-
+	WeaponManagerComponent->SetWeaponSwapState(EWeapon_Swap_State::None);
 }

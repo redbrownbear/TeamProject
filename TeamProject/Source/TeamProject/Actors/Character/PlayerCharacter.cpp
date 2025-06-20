@@ -252,13 +252,28 @@ void APlayerCharacter::Damaged(int32 Damage)
 
 	if (CurrentHP != 0)
 	{
+		if (WeaponManagerComponent->GetWeaponSwapState() == EWeapon_Swap_State::Swaping)
+		{
+			WeaponManagerComponent->SetNextWeaponType(EWeapon_Type::None);
+			WeaponManagerComponent->SetWeaponSwapState(EWeapon_Swap_State::None);
+		}
+
+		UAnimInstance* AnimInst = GetMesh()->GetAnimInstance();
+		UAnimMontage* PlayingMontage = AnimInst->GetCurrentActiveMontage();
+
+		if (PlayingMontage)
+		{
+			AnimInst->Montage_Stop(0.f, PlayingMontage);
+		}
 		int32 AfterHP = CurrentHP - Damage;
 		PlayerManager->SetPlayerHp(AfterHP < 0 ? 0 : AfterHP);
-		Cast<UPlayerMovementComponent>(GetCharacterMovement())->Hited();
+		UPlayerMovementComponent* PlayerMovement = Cast<UPlayerMovementComponent>(GetCharacterMovement());
+		PlayerMovement->SetMoveState(EMove_State::Hit);
+		PlayerMovement->Hited();
 		Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->UpdateHp();
 		UE_LOG(LogTemp, Warning, TEXT("%d"), AfterHP);
 
-		Cast<UPlayerMovementComponent>(GetCharacterMovement())->SetMoveState(EMove_State::Hit);
+		
 	}
 
 	//GameOver 
@@ -335,4 +350,24 @@ void APlayerCharacter::CameraAttach()
 void APlayerCharacter::SetCameraTransform(FTransform& _InTransform)
 {
 	Camera->SetWorldTransform(_InTransform);
+}
+
+void APlayerCharacter::EquipWeapon(EWeapon_Type Weapon_Type)
+{
+	EMove_State mMove_State = GetMoveState();
+	if (mMove_State == EMove_State::Run || mMove_State == EMove_State::Run)
+	{
+		
+		// Swap중 이면 리턴
+		if (WeaponManagerComponent->GetWeaponSwapState() == EWeapon_Swap_State::Swaping)
+		{
+			return;
+		}
+
+		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
+
+		WeaponManagerComponent->SetNextWeaponType(Weapon_Type);
+
+		WeaponManagerComponent->TryEquipWeapon();
+	}
 }

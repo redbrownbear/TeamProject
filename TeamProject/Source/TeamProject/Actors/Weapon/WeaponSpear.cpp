@@ -13,7 +13,7 @@ AWeaponSpear::AWeaponSpear()
 			DataAsset = Asset.Object;
 		}
 	}
-
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	{
 		ConstructorHelpers::FObjectFinder<UStaticMesh> Asset(TEXT("/Script/Engine.StaticMesh'/Game/Resources/Weapon/SpearStaticMesh/Spear_001.Spear_001'"));
 

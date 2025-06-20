@@ -46,6 +46,10 @@ public:
 	void SetNextWeaponType(EWeapon_Type _Type) { NextWeapon = _Type; }
 	EEquip_State GetEquipState() { return Equip_State; }
 	void SetEquipState(EEquip_State _State) { Equip_State = _State; }
+	EWeapon_Swap_State GetWeaponSwapState() { return Weapon_Swap_State; }
+	void SetWeaponSwapState(EWeapon_Swap_State _State) { Weapon_Swap_State = _State; }
+
+
 
 	void SetRightClick(bool _RightClick) { bRightClick = _RightClick; }
 	bool GetRightClick() { return bRightClick; }
@@ -105,6 +109,9 @@ protected:
 	EEquip_State Equip_State;
 	UPROPERTY()
 	EWeapon_Type NextWeapon;
+	UPROPERTY()
+	EWeapon_Swap_State Weapon_Swap_State;
+
 
 	TQueue<EWeapon_Type> UnEquipWeapons;
 
