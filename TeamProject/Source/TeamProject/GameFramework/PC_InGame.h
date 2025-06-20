@@ -242,10 +242,11 @@ protected:
 
 	// Ice Maker
 	void BeginIcePreview(const FInputActionValue& InputActionValue);
+	void EndIcePreview(const FInputActionValue& InputActionValue);
 	
 	// Magnesis
 	void ShowMetalActorPreview(const FInputActionValue& InputActionValue);
-
+	
 	// Rewind
 	void ShowRewindActor(const FInputActionValue& InputActionValue);
 

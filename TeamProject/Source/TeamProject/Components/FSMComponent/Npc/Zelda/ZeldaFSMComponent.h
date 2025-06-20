@@ -19,4 +19,5 @@ public:
 
 protected:
 	virtual void UpdateIdle(float DeltaTime) override;
+	virtual void UpdateTalk(float DeltaTime) override;
 };
