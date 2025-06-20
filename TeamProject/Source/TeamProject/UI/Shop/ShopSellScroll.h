@@ -20,6 +20,7 @@
  * 
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnShopDescriptionUpdated, const FItemData&, ItemData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShopDescriptionInitUpdated);
 /**
  *
  */
@@ -49,6 +50,8 @@ public:
 	const FItemData& GetCurItem()& { return ActiveSlots[CurrentIndex]->GetItemData(); }
 	EItemCategory GetNextCategory(EItemCategory Current, bool bIsLeft);
 
+	const TArray<FItemData>& GetSellableItems();
+
 private:
 	void SetSort(EItemCategory Type);
 
@@ -72,6 +75,8 @@ private:
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnShopDescriptionUpdated OnShopDescriptionUpdated;
+	UPROPERTY(BlueprintAssignable)
+	FOnShopDescriptionInitUpdated OnShopDescriptionInitUpdated;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -129,4 +134,5 @@ private:
 
 	bool bHasInitialized = false;
 
+	TArray<FItemData> SellableItems;
 };

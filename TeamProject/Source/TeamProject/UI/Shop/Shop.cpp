@@ -136,6 +136,7 @@ void UShop::BindDelegates()
     BP_ShopScroll->OnShopHighlightChanged.AddDynamic(this, &UShop::RefreshDescription);
 
     BP_ShopSellScroll->OnShopDescriptionUpdated.AddDynamic(this, &UShop::RefreshDescriptionSellItem);
+    BP_ShopSellScroll->OnShopDescriptionInitUpdated.AddDynamic(this, &UShop::RefreshDescriptionNoItem);
 }
 
 void UShop::RemoveDelegates()
@@ -162,6 +163,7 @@ void UShop::RemoveDelegates()
     BP_ShopScroll->OnShopHighlightChanged.RemoveDynamic(this, &UShop::RefreshDescription);
 
     BP_ShopSellScroll->OnShopDescriptionUpdated.RemoveDynamic(this, &UShop::RefreshDescriptionSellItem);
+    BP_ShopSellScroll->OnShopDescriptionInitUpdated.RemoveDynamic(this, &UShop::RefreshDescriptionNoItem);
 }
 
 void UShop::SetShopOpen()
@@ -181,7 +183,7 @@ void UShop::SetItemBuy()
         BP_ShopDialogue->SetBuy();
 
     if(bIsBuyScroll == false)
-        BP_ShopDialogue->SetSell();
+        BP_ShopDialogue->SetSell(BP_ShopSellScroll->GetSellableItems());
 
 }
 
@@ -351,6 +353,11 @@ void UShop::RefreshDescription(int32 CurrentIdx)
 void UShop::RefreshDescriptionSellItem(const FItemData& ItemData)
 {
     BP_ShopDescription->RefreshUI(ItemData);
+}
+
+void UShop::RefreshDescriptionNoItem()
+{
+    BP_ShopDescription->InitUI();
 }
 
 void UShop::RefreshShopList(const TArray<FShopDataRow>& ShopList)
