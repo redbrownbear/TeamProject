@@ -95,10 +95,10 @@ void UAssasinLeaderFSMComponent::ChangeState(EMonsterState NewState)
 	case EMonsterState::Signal:
 		break;
 	case EMonsterState::Combat:
-		if (NewState != EMonsterState::Damage)
-		{
-			CharacterMonster->PlayMontage(EMonsterMontage::SEARCH);
-		}
+		//if (NewState != EMonsterState::Damage)
+		//{
+		//	CharacterMonster->PlayMontage(EMonsterMontage::SEARCH);
+		//}
 		break;
 	case EMonsterState::Happy:
 		break;
