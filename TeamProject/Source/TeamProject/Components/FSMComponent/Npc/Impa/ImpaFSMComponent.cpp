@@ -26,5 +26,8 @@ void UImpaFSMComponent::UpdateTalk(float DeltaTime)
 		{
 			ChangeState(ENpcState::Idle);
 		}
+
+		// Quest Clear
+		Owner->GetFSMComponent()->ClearQuest(EQuestCharacter::Impa);
 	}
 }

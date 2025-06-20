@@ -34,6 +34,18 @@ void UPlayerManager::SetQuestData(FQuestDataRow QuestRow)
     QuestList.Add(QuestRow);
 }
 
+void UPlayerManager::SetQuestCompleteData(FQuestDataRow QuestRow)
+{
+    UQuestManager* QuestManager = GetGameInstance()->GetSubsystem<UQuestManager>();
+    check(QuestManager);
+
+    AMainHUD* MainHUD = Cast<AMainHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+    if (MainHUD)
+    {
+        MainHUD->ShowQuestOn(QuestRow.bIsComplete, QuestRow.QuestTitle);
+    }
+}
+
 void UPlayerManager::ShowQuestUI()
 {
     OnQuestUpdated.Broadcast(QuestList);

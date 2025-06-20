@@ -33,7 +33,6 @@ void UArtistFSMComponent::UpdateTalk(float DeltaTime)
 		if (EDialogType::None == Owner->GetCurrentDialogueType())
 		{
 			ChangeState(ENpcState::Walk);
-			Owner->SetIsHide(false);
 		}
 	}
 }

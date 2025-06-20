@@ -56,6 +56,7 @@ private:
 	//Quest
 public:
 	void SetQuestData(FQuestDataRow QuestRow);
+	void SetQuestCompleteData(FQuestDataRow QuestRow);
 	void ShowQuestUI();
 	const TArray<FQuestDataRow>& GetAllQuestData() const { return QuestList; }
 private:

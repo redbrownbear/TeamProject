@@ -44,9 +44,9 @@ public:
 	UNpcFSMComponent* GetFSMComponent() const;
 
 public:
-	void PlayMontage(EDogMontage _InEnum, bool bIsLoop = false);
-	bool IsMontage(EDogMontage _InEnum);
-	bool IsPlayingMontage(EDogMontage _InEnum);
+	/*void PlayMontage(ENpcMontage _InEnum, bool bIsLoop = false);
+	bool IsMontage(ENpcMontage _InEnum);
+	bool IsPlayingMontage(ENpcMontage _InEnum);*/
 
 protected:
 	UPROPERTY(VisibleAnywhere)
