@@ -17,6 +17,17 @@ ABossLockedGate::ABossLockedGate()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset
+	{ TEXT("/Script/Engine.StaticMesh'/Game/Level/_GENERATED/yxixi/Prison_Door.Prison_Door'") };
+	if (Asset.Object)
+	{
+		StaticMeshComponent->SetStaticMesh(Asset.Object);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ABossLockedGate::ABossLockedGate // No ABossLockedGate StaticMeshAsset"));
+	}
+
 	GateComponent = CreateDefaultSubobject<UGateComponent>(TEXT("GateComponent"));
 }
 

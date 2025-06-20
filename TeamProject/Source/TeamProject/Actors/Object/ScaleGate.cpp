@@ -16,6 +16,17 @@ AScaleGate::AScaleGate()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset
+	{ TEXT("/Game/Resources/Object/Door/DgnObj_IronDoorL_B_01.DgnObj_IronDoorL_B_01") };
+	if (Asset.Object)
+	{
+		StaticMeshComponent->SetStaticMesh(Asset.Object);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AScaleGate::AScaleGate // No AScaleGate StaticMeshAsset"));
+	}
+
 	StaticMeshComponent->SetRelativeScale3D(FVector(90.f, 90.f, 90.f));
 }
 
