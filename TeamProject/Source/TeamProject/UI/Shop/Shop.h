@@ -81,6 +81,8 @@ private:
 	void RefreshDescription(int32 CurrentIdx);
 	UFUNCTION()
 	void RefreshDescriptionSellItem(const FItemData& ItemData);
+	UFUNCTION()
+	void RefreshDescriptionNoItem();
 
 	UFUNCTION()
 	void RefreshShopList(const TArray<FShopDataRow>& ShopList);

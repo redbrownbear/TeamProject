@@ -55,12 +55,12 @@ void UShopDialogue::SetBuy()
     bIsSelect = true;
 }
 
-void UShopDialogue::SetSell()
+void UShopDialogue::SetSell(const TArray<FItemData>& SellableItems)
 {
     UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
     check(PlayerManager);
 
-    if (PlayerManager->GetAllItemData().Num() > 0)
+    if (SellableItems.Num() > 0)
     {
         ConfirmButton->SetVisibility(ESlateVisibility::Visible);
         CancelButton->SetVisibility(ESlateVisibility::Visible);
