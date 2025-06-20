@@ -158,6 +158,9 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker, 
 		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
+		ETriggerEvent::Completed, this, &ThisClass::EndIcePreview);
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Magnesis, 
 		ETriggerEvent::Started, this, &ThisClass::ShowMetalActorPreview);
 
@@ -728,6 +731,12 @@ void APC_InGame::TrySuperPower(const FInputActionValue& InputActionValue)
 		OnRewind();
 	}
 
+
+	AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
+	if (MainHUD)
+	{
+		MainHUD->ShowAbilityAimUI(false);
+	}
 }
 
 void APC_InGame::OnControlDistance(const FInputActionValue& InputActionValue)
@@ -996,50 +1005,47 @@ void APC_InGame::OnMapOpen(const FInputActionValue& InputActionValue)
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 {	
-	if (bMagnesisKeyPressed) { return; }
-	bIceKeyPressed = !bIceKeyPressed;
+	if (bMagnesisKeyPressed) return;
 
-	if (!bIceKeyPressed) { bIceKeyPressed = false; }
+	if (bIceKeyPressed) return;
+	bIceKeyPressed = true;
 
 	AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
 	if (MainHUD)
 	{
-		MainHUD->ShowAbilityAimUI(bIceKeyPressed);
+		MainHUD->ShowAbilityAimUI(true);
 	}
 
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 
-	if (bIceKeyPressed)
+	Player_C->ZoomIn();
+	IcePreviewActor->SetActorHiddenInGame(false);
+	bIceMaker = true;
+	InitIcePreview();
+
+	bIcePreviewPlaced = false;
+
+
+}
+
+void APC_InGame::EndIcePreview(const FInputActionValue& InputActionValue)
+{
+	if (!bIceKeyPressed) return;
+	bIceKeyPressed = false;
+
+	AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
+	if (MainHUD)
 	{
-		Player_C->ZoomIn();
-
-		IcePreviewActor->SetActorHiddenInGame(false);
-
-		//FindVisibleActorOnScreen(LastHit); // Surface에 그리드 표현?
-
-		bIceMaker = true;
-
-		InitIcePreview();
-	
-		/*if (bIcePreviewPlaced)
-		{
-			SetIgnoreLookInput(true); // 카메라 고정
-		}*/
-
-		bIcePreviewPlaced = false; // 새 위치 탐색 허용
-
-		// 캐릭터 IcePreviewActor에 정면 고정?
+		MainHUD->ShowAbilityAimUI(false);
 	}
-	else
-	{
-		Player_C->ZoomOut();
 
-		IcePreviewActor->SetActorHiddenInGame(true);
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 
-		SetIgnoreLookInput(false);
+	Player_C->ZoomOut();
+	IcePreviewActor->SetActorHiddenInGame(true);
+	SetIgnoreLookInput(false);
 
-		bIcePreviewPlaced = false; // 해제되면 다시 재탐색 가능
-	}
+	bIcePreviewPlaced = false;
 
 }
 
@@ -1199,7 +1205,7 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 
 	if (bMagnesisKeyPressed)
 	{
-		Player_C->ZoomIn();
+		Player_C->ZoomIn();	
 		GetWorld()->GetTimerManager().SetTimer(
 			MoveTimerHandle,
 			this,
@@ -1207,7 +1213,7 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 			0.16f,  // 주기 (초)
 			true   // 반복
 		);
-	}
+	}	
 	else
 	{
 		Player_C->ZoomOut();

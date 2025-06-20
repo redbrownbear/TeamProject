@@ -5,7 +5,7 @@
 #include "Actors/Character/PlayerCharacter.h"
 
 #include "Components/SphereComponent.h"
-
+#include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 #include "Components/MovementComponent/AdvancedFloatingPawnMovement.h"
 #include "GameFramework/PC_InGame.h"
 
@@ -29,7 +29,7 @@ ADog::ADog()
 
 	// Movement
 	MovementComponent = CreateDefaultSubobject<UAdvancedFloatingPawnMovement>(TEXT("MovementComponent"));
-	MovementComponent->UpdatedComponent = CollisionComponent; // ï¿½æµ¹ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
+	MovementComponent->UpdatedComponent = CollisionComponent; // Ãæµ¹ ±âÁØ ÄÄÆ÷³ÍÆ® ¼³Á¤
 
 	// Collision Overlap Event Binding
 	if (CollisionComponent)
@@ -100,7 +100,7 @@ void ADog::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 	}
 }
 
-//void ADog::PlayMontage(EDogMontage _InEnum, bool bIsLoop)
+//void ADog::PlayMontage(ENpcMontage _InEnum, bool bIsLoop)
 //{
 //	UAnimInstance* AnimInstance = BodyMeshComponent->GetAnimInstance();
 //
@@ -151,7 +151,7 @@ void ADog::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 //	}*/
 //}
 //
-//bool ADog::IsMontage(EDogMontage _InEnum)
+//bool ADog::IsMontage(ENpcMontage _InEnum)
 //{
 //	UAnimMontage* TempAnimMontage = nullptr;
 //
@@ -191,7 +191,7 @@ void ADog::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 //	return TempAnimMontage ? true : false;
 //}
 //
-//bool ADog::IsPlayingMontage(EDogMontage _InEnum)
+//bool ADog::IsPlayingMontage(ENpcMontage _InEnum)
 //{
 //	UAnimInstance* AnimInstance = BodyMeshComponent->GetAnimInstance();
 //
@@ -232,4 +232,4 @@ void ADog::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 //
 //	return AnimInstance->Montage_IsPlaying(nullptr);
 //}
-//
+
