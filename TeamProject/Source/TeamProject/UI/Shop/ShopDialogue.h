@@ -10,7 +10,6 @@
 #include "Components/TextBlock.h"
 #include "Components/Overlay.h"
 #include "Data/NPCDialogueTableRow.h"
-#include "Data/ItemDataRow.h"
 
 #include "ShopDialogue.generated.h"
 
@@ -28,7 +27,7 @@ protected:
 public:
 	void InitUI();
 	void SetBuy();
-	void SetSell(const TArray<FItemData>& SellableItems);
+	void SetSell();
 
 public: 
 	UFUNCTION()

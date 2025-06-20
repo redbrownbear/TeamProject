@@ -22,7 +22,6 @@ class TEAMPROJECT_API UShopDescription : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	void InitUI();
 	void RefreshUI(const FItemData& ItemData);
 
 public:

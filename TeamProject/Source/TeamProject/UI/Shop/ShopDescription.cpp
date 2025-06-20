@@ -4,18 +4,6 @@
 #include "UI/Shop/ShopDescription.h"
 #include "SubSystem/PlayerManager.h"
 
-void UShopDescription::InitUI()
-{
-	ItemImg->SetVisibility(ESlateVisibility::Hidden);
-
-	PriceText->SetText(FText::FromString(FString::FromInt(0)));
-
-	InfoTitle->SetText(FText::FromString(""));
-	InfoDescription->SetText(FText::FromString(""));
-
-	CountText->SetText(FText::FromString(FString::FromInt(0)));
-}
-
 void UShopDescription::RefreshUI(const FItemData& ItemData)
 {
 	UPlayerManager* PlayerManager = GetWorld()->GetGameInstance()->GetSubsystem<UPlayerManager>();
@@ -24,7 +12,6 @@ void UShopDescription::RefreshUI(const FItemData& ItemData)
 	UTexture2D* LoadedTexture = ItemData.ItemIcon.LoadSynchronous();
 	if (LoadedTexture)
 	{
-		ItemImg->SetVisibility(ESlateVisibility::Visible);
 		ItemImg->SetBrushFromTexture(LoadedTexture);
 	}
 

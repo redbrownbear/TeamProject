@@ -113,11 +113,7 @@ void UShopSellScroll::MoveSelection(FIntPoint Direction)
 void UShopSellScroll::InitSelectItem()
 {
     if (ActiveSlots.IsEmpty())
-    {
-        OnShopDescriptionInitUpdated.Broadcast();
         return;
-    }
-        
 
     for (UShopSellSlot* slot : ActiveSlots)
     {
@@ -203,18 +199,6 @@ EItemCategory UShopSellScroll::GetNextCategory(EItemCategory Current, bool bIsLe
     return static_cast<EItemCategory>(Index);
 }
 
-const TArray<FItemData>& UShopSellScroll::GetSellableItems()
-{
-    SellableItems.Reset();
-
-    for (UShopSellSlot* ActiveSlot : ActiveSlots)
-    {
-        SellableItems.Add(ActiveSlot->GetItemData());
-    }
-
-    return SellableItems;
-}
-
 void UShopSellScroll::SetSort(EItemCategory Type)
 {
     if (!SlotWidgetClass)
@@ -254,11 +238,8 @@ void UShopSellScroll::SetSort(EItemCategory Type)
     }
 
     if (Items.IsEmpty())
-    {
-        OnShopDescriptionInitUpdated.Broadcast();
         return;
-    }
-        
+
     Items.Sort([](const FItemData& A, const FItemData& B)
         {
             if (A.eItemCategory == B.eItemCategory)
