@@ -44,6 +44,15 @@ void UPlayerManager::SetQuestCompleteData(FQuestDataRow QuestRow)
     {
         MainHUD->ShowQuestOn(QuestRow.bIsComplete, QuestRow.QuestTitle);
     }
+
+    for (int32 i = 0; i < QuestList.Num(); ++i)
+    {
+        if (QuestList[i].QuestNum == QuestRow.QuestNum)
+        {
+            QuestList.RemoveAt(i);
+            break;
+        }
+    }
 }
 
 void UPlayerManager::ShowQuestUI()
