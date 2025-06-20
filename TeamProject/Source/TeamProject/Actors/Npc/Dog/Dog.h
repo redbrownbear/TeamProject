@@ -6,6 +6,10 @@
 #include "GameFramework/Character.h"
 #include "Dog.generated.h"
 
+class USphereComponent;
+class UAdvancedFloatingPawnMovement;
+class UNpcFSMComponent;
+
 UCLASS()
 class TEAMPROJECT_API ADog : public ACharacter
 {
@@ -26,4 +30,44 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	TObjectPtr<USphereComponent> CollisionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC")
+	TObjectPtr<USkeletalMeshComponent> BodyMeshComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+	TObjectPtr<UAdvancedFloatingPawnMovement> MovementComponent;
+
+public:
+	UNpcFSMComponent* GetFSMComponent() const;
+
+public:
+	void PlayMontage(EDogMontage _InEnum, bool bIsLoop = false);
+	bool IsMontage(EDogMontage _InEnum);
+	bool IsPlayingMontage(EDogMontage _InEnum);
+
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UNpcFSMComponent> NpcFSMComponent;
+
+private:
+	// 상호작용 가능 변수
+	UPROPERTY()
+	bool bPlayerInRange = false;
+
+	UPROPERTY() 
+	bool bIsConfirm = false;
+
+protected:
+	// 상호작용 
+	UFUNCTION()
+	void OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };
