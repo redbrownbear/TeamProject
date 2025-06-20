@@ -29,7 +29,7 @@ ADog::ADog()
 
 	// Movement
 	MovementComponent = CreateDefaultSubobject<UAdvancedFloatingPawnMovement>(TEXT("MovementComponent"));
-	MovementComponent->UpdatedComponent = CollisionComponent; // Ãæµ¹ ±âÁØ ÄÄÆ÷³ÍÆ® ¼³Á¤
+	MovementComponent->UpdatedComponent = CollisionComponent; // ï¿½æµ¹ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
 
 	// Collision Overlap Event Binding
 	if (CollisionComponent)
@@ -100,136 +100,136 @@ void ADog::OnEndOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AAct
 	}
 }
 
-void ADog::PlayMontage(EDogMontage _InEnum, bool bIsLoop)
-{
-	UAnimInstance* AnimInstance = BodyMeshComponent->GetAnimInstance();
-
-	/*if (!NpcData) return;
-
-	UAnimMontage* TempAnimMontage = nullptr;
-	switch (_InEnum)
-	{
-	case ENpcMontage::IDLE:
-		TempAnimMontage = NpcData->IdleMontage;
-		break;
-	case ENpcMontage::SIT:
-		TempAnimMontage = NpcData->SitMontage;
-		break;
-	case ENpcMontage::STAND:
-		TempAnimMontage = NpcData->StandMontage;
-		break;
-	case ENpcMontage::WALK:
-		TempAnimMontage = NpcData->WalkMontage;
-		break;
-	case ENpcMontage::RUN:
-		TempAnimMontage = NpcData->RunMontage;
-		break;
-	case ENpcMontage::TALK:
-		TempAnimMontage = NpcData->TalkMontage;
-		break;
-	case ENpcMontage::HIDE:
-		TempAnimMontage = NpcData->HideMontage;
-		break;
-	case ENpcMontage::SELL:
-		TempAnimMontage = NpcData->SellMontage;
-		break;
-	default:
-		check(false);
-		break;
-	}*/
-
-	/*if (TempAnimMontage && !AnimInstance->Montage_IsPlaying(TempAnimMontage))
-	{
-		if (bIsLoop)
-		{
-			AnimInstance->Montage_Play(TempAnimMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
-		}
-		else
-		{
-			AnimInstance->Montage_Play(TempAnimMontage);
-		}
-	}*/
-}
-
-bool ADog::IsMontage(EDogMontage _InEnum)
-{
-	UAnimMontage* TempAnimMontage = nullptr;
-
-	/*switch (_InEnum)
-	{
-	case ENpcMontage::IDLE:
-		TempAnimMontage = NpcData->IdleMontage;
-		break;
-	case ENpcMontage::SIT:
-		TempAnimMontage = NpcData->SitMontage;
-		break;
-	case ENpcMontage::STAND:
-		TempAnimMontage = NpcData->StandMontage;
-		break;
-	case ENpcMontage::WALK:
-		TempAnimMontage = NpcData->WalkMontage;
-		break;
-	case ENpcMontage::RUN:
-		TempAnimMontage = NpcData->RunMontage;
-		break;
-	case ENpcMontage::TALK:
-		TempAnimMontage = NpcData->TalkMontage;
-		break;
-	case ENpcMontage::HIDE:
-		TempAnimMontage = NpcData->HideMontage;
-		break;
-	case ENpcMontage::SELL:
-		TempAnimMontage = NpcData->SellMontage;
-		break;
-	case ENpcMontage::END:
-		TempAnimMontage = nullptr;
-		break;
-	default:
-		break;
-	}*/
-
-	return TempAnimMontage ? true : false;
-}
-
-bool ADog::IsPlayingMontage(EDogMontage _InEnum)
-{
-	UAnimInstance* AnimInstance = BodyMeshComponent->GetAnimInstance();
-
-	UAnimMontage* TempAnimMontage = nullptr;
-
-	/*switch (_InEnum)
-	{
-	case ENpcMontage::IDLE:
-		TempAnimMontage = NpcData->IdleMontage;
-		break;
-	case ENpcMontage::SIT:
-		TempAnimMontage = NpcData->SitMontage;
-		break;
-	case ENpcMontage::STAND:
-		TempAnimMontage = NpcData->StandMontage;
-		break;
-	case ENpcMontage::WALK:
-		TempAnimMontage = NpcData->WalkMontage;
-		break;
-	case ENpcMontage::RUN:
-		TempAnimMontage = NpcData->RunMontage;
-		break;
-	case ENpcMontage::TALK:
-		TempAnimMontage = NpcData->TalkMontage;
-		break;
-	case ENpcMontage::HIDE:
-		TempAnimMontage = NpcData->HideMontage;
-		break;
-	case ENpcMontage::SELL:
-		TempAnimMontage = NpcData->SellMontage;
-		break;
-	case ENpcMontage::END:
-		TempAnimMontage = nullptr;
-		break;
-	default:
-		break;
-	}*/
-
-	return AnimInstance->Montage_IsPlaying(nullptr);
-}
-
+//void ADog::PlayMontage(EDogMontage _InEnum, bool bIsLoop)
+//{
+//	UAnimInstance* AnimInstance = BodyMeshComponent->GetAnimInstance();
+//
+//	/*if (!NpcData) return;
+//
+//	UAnimMontage* TempAnimMontage = nullptr;
+//	switch (_InEnum)
+//	{
+//	case ENpcMontage::IDLE:
+//		TempAnimMontage = NpcData->IdleMontage;
+//		break;
+//	case ENpcMontage::SIT:
+//		TempAnimMontage = NpcData->SitMontage;
+//		break;
+//	case ENpcMontage::STAND:
+//		TempAnimMontage = NpcData->StandMontage;
+//		break;
+//	case ENpcMontage::WALK:
+//		TempAnimMontage = NpcData->WalkMontage;
+//		break;
+//	case ENpcMontage::RUN:
+//		TempAnimMontage = NpcData->RunMontage;
+//		break;
+//	case ENpcMontage::TALK:
+//		TempAnimMontage = NpcData->TalkMontage;
+//		break;
+//	case ENpcMontage::HIDE:
+//		TempAnimMontage = NpcData->HideMontage;
+//		break;
+//	case ENpcMontage::SELL:
+//		TempAnimMontage = NpcData->SellMontage;
+//		break;
+//	default:
+//		check(false);
+//		break;
+//	}*/
+//
+//	/*if (TempAnimMontage && !AnimInstance->Montage_IsPlaying(TempAnimMontage))
+//	{
+//		if (bIsLoop)
+//		{
+//			AnimInstance->Montage_Play(TempAnimMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+//		}
+//		else
+//		{
+//			AnimInstance->Montage_Play(TempAnimMontage);
+//		}
+//	}*/
+//}
+//
+//bool ADog::IsMontage(EDogMontage _InEnum)
+//{
+//	UAnimMontage* TempAnimMontage = nullptr;
+//
+//	/*switch (_InEnum)
+//	{
+//	case ENpcMontage::IDLE:
+//		TempAnimMontage = NpcData->IdleMontage;
+//		break;
+//	case ENpcMontage::SIT:
+//		TempAnimMontage = NpcData->SitMontage;
+//		break;
+//	case ENpcMontage::STAND:
+//		TempAnimMontage = NpcData->StandMontage;
+//		break;
+//	case ENpcMontage::WALK:
+//		TempAnimMontage = NpcData->WalkMontage;
+//		break;
+//	case ENpcMontage::RUN:
+//		TempAnimMontage = NpcData->RunMontage;
+//		break;
+//	case ENpcMontage::TALK:
+//		TempAnimMontage = NpcData->TalkMontage;
+//		break;
+//	case ENpcMontage::HIDE:
+//		TempAnimMontage = NpcData->HideMontage;
+//		break;
+//	case ENpcMontage::SELL:
+//		TempAnimMontage = NpcData->SellMontage;
+//		break;
+//	case ENpcMontage::END:
+//		TempAnimMontage = nullptr;
+//		break;
+//	default:
+//		break;
+//	}*/
+//
+//	return TempAnimMontage ? true : false;
+//}
+//
+//bool ADog::IsPlayingMontage(EDogMontage _InEnum)
+//{
+//	UAnimInstance* AnimInstance = BodyMeshComponent->GetAnimInstance();
+//
+//	UAnimMontage* TempAnimMontage = nullptr;
+//
+//	/*switch (_InEnum)
+//	{
+//	case ENpcMontage::IDLE:
+//		TempAnimMontage = NpcData->IdleMontage;
+//		break;
+//	case ENpcMontage::SIT:
+//		TempAnimMontage = NpcData->SitMontage;
+//		break;
+//	case ENpcMontage::STAND:
+//		TempAnimMontage = NpcData->StandMontage;
+//		break;
+//	case ENpcMontage::WALK:
+//		TempAnimMontage = NpcData->WalkMontage;
+//		break;
+//	case ENpcMontage::RUN:
+//		TempAnimMontage = NpcData->RunMontage;
+//		break;
+//	case ENpcMontage::TALK:
+//		TempAnimMontage = NpcData->TalkMontage;
+//		break;
+//	case ENpcMontage::HIDE:
+//		TempAnimMontage = NpcData->HideMontage;
+//		break;
+//	case ENpcMontage::SELL:
+//		TempAnimMontage = NpcData->SellMontage;
+//		break;
+//	case ENpcMontage::END:
+//		TempAnimMontage = nullptr;
+//		break;
+//	default:
+//		break;
+//	}*/
+//
+//	return AnimInstance->Montage_IsPlaying(nullptr);
+//}
+//

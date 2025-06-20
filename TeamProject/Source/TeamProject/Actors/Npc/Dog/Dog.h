@@ -44,16 +44,16 @@ public:
 	UNpcFSMComponent* GetFSMComponent() const;
 
 public:
-	void PlayMontage(EDogMontage _InEnum, bool bIsLoop = false);
-	bool IsMontage(EDogMontage _InEnum);
-	bool IsPlayingMontage(EDogMontage _InEnum);
+	//void PlayMontage(EDogMontage _InEnum, bool bIsLoop = false);
+	//bool IsMontage(EDogMontage _InEnum);
+	//bool IsPlayingMontage(EDogMontage _InEnum);
 
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UNpcFSMComponent> NpcFSMComponent;
 
 private:
-	// »óÈ£ÀÛ¿ë °¡´É º¯¼ö
+	// ï¿½ï¿½È£ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY()
 	bool bPlayerInRange = false;
 
@@ -61,7 +61,7 @@ private:
 	bool bIsConfirm = false;
 
 protected:
-	// »óÈ£ÀÛ¿ë 
+	// ï¿½ï¿½È£ï¿½Û¿ï¿½ 
 	UFUNCTION()
 	void OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
