@@ -13,6 +13,20 @@ ARewindGate::ARewindGate()
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset
+	{ TEXT("/Script/Engine.StaticMesh'/Game/Resources/Object/Door/DgnObj_IronDoorR_B_01.DgnObj_IronDoorR_B_01'") };
+	if (Asset.Object)
+	{
+		StaticMeshComponent->SetStaticMesh(Asset.Object);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ARewindGate::ARewindGate // No ARewindGate StaticMeshAsset"));
+	}
+
+	StaticMeshComponent->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	StaticMeshComponent->SetRelativeScale3D(FVector(90.f, 90.f, 90.f));
 }
 
 // Called when the game starts or when spawned
