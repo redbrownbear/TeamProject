@@ -1094,3 +1094,17 @@ float IMonsterInterface::GetDamageFromWeapon()
 	}
 	return 0.0f;
 }
+
+void IMonsterInterface::SetMaterialDeadAmount(float InDeadAmount)
+{
+	if (UMaterialInstanceDynamic* MID = GetDynamicMaterialInstance())
+	{
+		MID->SetScalarParameterValue(TEXT("DeadAmount"), InDeadAmount);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("IMonsterInterface::SetdMaterialDeadAmount // No UMaterialInstanceDynamic"));
+		check(false);
+	}
+}
+

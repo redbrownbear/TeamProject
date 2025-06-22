@@ -110,3 +110,5 @@
 
 #define DAMAGE_OPTION_HEADSHOT														1
 #define DAMAGE_OPTION_ARROW															2
+
+#define MONSTER_DEAD_AMOUNT_COEFFICIENT												0.3f
