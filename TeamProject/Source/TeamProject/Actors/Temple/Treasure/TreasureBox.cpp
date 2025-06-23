@@ -121,7 +121,7 @@ void ATreasureBox::GetTreasure()
 	APC_InGame* PC_InGame = Cast<APC_InGame>(UGameplayStatics::GetPlayerController(this, 0));
 	if (PC_InGame)
 	{
-		if (ItemDataPtr && bCanTakeItem)
+		if (bCanTakeItem)
 		{
 			// open Item UI
 			ShowItemPopup(ItemRowHandle.RowName);
@@ -171,12 +171,17 @@ void ATreasureBox::ShowItemByRowName(FName RowName)
 
 	//ItemDataPtr = ItemDataTable->FindRow<FItemData>(RowName, TEXT("Find Item Row"));
 
-	ItemDataPtr = ItemRowHandle.GetRow<FItemData>(TEXT("Find Item Row"));
+	
+	FItemData* ItemDataptr = ItemRowHandle.GetRow<FItemData>(TEXT("Find Item Row"));
 
-	if (!ItemDataPtr)
+	if (!ItemDataptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Item Row not found: %s"), *RowName.ToString());
+		return;
 	}
+
+	ItemDataInfo = *ItemDataptr;
+	ItemDataInfo.UniqueID = FGuid::NewGuid().ToString();
 }
 
 void ATreasureBox::ShowItemPopup(FName ItemRowName)
@@ -190,7 +195,7 @@ void ATreasureBox::ShowItemPopup(FName ItemRowName)
 	PopupItemUI = UIManager->FindUI<UPopupGetItem>();
 	if (PopupItemUI)
 	{
-		PopupItemUI->ShowData(*ItemDataPtr);
+		PopupItemUI->ShowData(ItemDataInfo);
 	}
 }
 
@@ -199,6 +204,6 @@ void ATreasureBox::AddItemInventory()
 	UPlayerManager* PlayerManager = GetGameInstance()->GetSubsystem<UPlayerManager>();
 	if (PlayerManager)
 	{
-		PlayerManager->SetInvenData(*ItemDataPtr);
+		PlayerManager->SetInvenData(ItemDataInfo);
 	}
 }
