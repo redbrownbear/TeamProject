@@ -72,6 +72,8 @@ public:
 
 	bool GetDoQuest() { return bDoQuest; }
 
+	bool GetClearQuest() { return bClearQuest; }
+
 	bool GetShopping() { return bShopping; }
 
 	bool GetBuy() { return bBuy; }
@@ -88,6 +90,8 @@ public:
 	void SetIsHide(bool IsHide) { bIsHide = IsHide; }
 
 	void SetDoQuest(bool IsQuest) { bDoQuest = IsQuest; }
+
+	void SetClearQuest(bool IsClearQuest) { bClearQuest = IsClearQuest; }
 
 	void SetShopping(bool IsShopping) { bShopping = IsShopping; }
 
@@ -148,6 +152,9 @@ private:
 	// 콘텐츠 변수
 	UPROPERTY()
 	bool bDoQuest = false;
+
+	UPROPERTY()
+	bool bClearQuest = false;
 
 	UPROPERTY()
 	bool bShopping = false;

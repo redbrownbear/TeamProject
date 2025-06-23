@@ -172,15 +172,21 @@ void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
         if (DialogueDataRow.bIsEndConversation && !IsQuest)
         {
             PC_InGame->Npc->SetDoQuest(true);
+            PC_InGame->Npc->SetClearQuest(false);
             PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Quest);
 
-            PlayerManager->SetQuestData(QuestManager->GetQuestDataByNum(CurQuestNum));
+            bool bClearQuest = PC_InGame->Npc->GetClearQuest();
+            if (!bClearQuest)
+            {
+                PlayerManager->SetQuestData(QuestManager->GetQuestDataByNum(CurQuestNum));
+            }     
         }
         else
         {
             SoundU(ESoundType::ESound_FindFuriko);
 
-            PC_InGame->Npc->SetDoQuest(false);
+            //PC_InGame->Npc->SetDoQuest(false);
+            //PC_InGame->Npc->SetClearQuest(true);
             PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
         }
     }   
@@ -231,16 +237,22 @@ void UNPCDialogue::OnConfirm(const FInputActionValue& InputActionValue)
         if (DialogueDataRow.bIsEndConversation && !IsQuest)
         {
             PC_InGame->Npc->SetDoQuest(true);
+            PC_InGame->Npc->SetClearQuest(false);
             PC_InGame->Npc->SetCurrentDialogueType(EDialogType::Quest);
 
-            PlayerManager->SetQuestData(QuestManager->GetQuestDataByNum(CurQuestNum));
+            bool bClearQuest = PC_InGame->Npc->GetClearQuest();
+            if (!bClearQuest)
+            {
+                PlayerManager->SetQuestData(QuestManager->GetQuestDataByNum(CurQuestNum));
+            }
         }
         else
         {
             //SoundU(ESoundType::ESound_FindFuriko);
             // @TODO Add Impa SoundU
 
-            PC_InGame->Npc->SetDoQuest(false);
+            //PC_InGame->Npc->SetDoQuest(false);
+            //PC_InGame->Npc->SetClearQuest(true);
             PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
         }
     }
@@ -265,7 +277,10 @@ void UNPCDialogue::OnCancel(const FInputActionValue& InputActionValue)
         switch (PC_InGame->Npc->GetCurrentDialogueType())
         {
         case EDialogType::Quest:
-            PC_InGame->Npc->SetDoQuest(false);
+            if (PC_InGame->Npc->GetClearQuest())
+            {
+                PC_InGame->Npc->SetDoQuest(false);
+            }           
             PC_InGame->Npc->SetCurrentDialogueType(EDialogType::None);
             break;
         default:

@@ -30,9 +30,15 @@ void UZeldaFSMComponent::UpdateTalk(float DeltaTime)
 		EDialogType DType = Owner->GetCurrentDialogueType();
 		if (EDialogType::Quest == DType || EDialogType::None == DType)
 		{
-			ChangeState(ENpcState::Idle);
-			Owner->GetFSMComponent()->ClearQuest(EQuestCharacter::Zelda);
-		}
-
+			bool bClearQuest = Owner->GetClearQuest();
+			bool bDoQuest = Owner->GetDoQuest();
+			if (!bClearQuest && bDoQuest)
+			{
+				ChangeState(ENpcState::Idle);
+				Owner->GetFSMComponent()->ClearQuest(EQuestCharacter::Zelda);
+				Owner->SetClearQuest(true);
+				Owner->SetDoQuest(false);
+			}
+		}		
 	}
 }
