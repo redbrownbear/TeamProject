@@ -99,7 +99,7 @@ protected:
 	float SuspicionGauge = 0.0f;
 	float SignalElapsedTime = 0.f;
 	float AimingBowElapsedTime = 0.f;
-
+	float DeadAmount = 0.f;
 
 protected:
 	int32 CurrentPatrolIndex = 0;

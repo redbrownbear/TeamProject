@@ -10,6 +10,7 @@
 #include "Actors/Object/MetalActor.h"
 #include "Actors/Object/ProjectileMetalActor.h"
 #include "Actors/Temple/Surface/FlowSurface.h"
+#include "Actors/Temple/Surface/WaterSurface.h"
 
 #include "SubSystem/UI/UIManager.h"
 #include "SubSystem/TimeManager.h"
@@ -21,6 +22,7 @@
 #include "Components/FSMComponent/Npc/NpcFSMComponent.h"
 #include "Components/MetalComponent/MetalComponent.h"
 #include "Components/RewindComponent/RewindComponent.h"
+#include "Components/WaterComponent/WaterComponent.h"
 
 #include "Kismet/KismetMathLibrary.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
@@ -156,6 +158,9 @@ void APC_InGame::SetupInputComponent()
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker, 
 		ETriggerEvent::Started, this, &ThisClass::BeginIcePreview);
 
+	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_IceMaker,
+		ETriggerEvent::Completed, this, &ThisClass::EndIcePreview);
+
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_Magnesis, 
 		ETriggerEvent::Started, this, &ThisClass::ShowMetalActorPreview);
 
@@ -286,7 +291,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 
 		Movement->TrySetMoveClimb(ActionValue);
 
-		UE_LOG(LogTemp, Warning, TEXT("Climbing"));
+		//UE_LOG(LogTemp, Warning, TEXT("Climbing"));
 
 		
 	}
@@ -300,7 +305,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		P_Anim->ActionValue = ActionValue;
 		
 		Movement->GlidingMove(ActionValue);
-		UE_LOG(LogTemp, Warning, TEXT("Gliding"));
+		//UE_LOG(LogTemp, Warning, TEXT("Gliding"));
 	}
 	// Step Move
 	else if (Movement->GetMoveState() == EMove_State::Step)
@@ -703,6 +708,12 @@ void APC_InGame::TrySuperPower(const FInputActionValue& InputActionValue)
 		OnRewind();
 	}
 
+
+	AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
+	if (MainHUD)
+	{
+		MainHUD->ShowAbilityAimUI(false);
+	}
 }
 
 void APC_InGame::OnControlDistance(const FInputActionValue& InputActionValue)
@@ -717,8 +728,6 @@ void APC_InGame::OnControlDistance(const FInputActionValue& InputActionValue)
 	if (bMagnesisKeyPressed)
 	{		
 		const float DistanceStep = 20.f; // HoldDistance 변화량
-		const float MinHoldDistance = 100.f; // 너무 가까워지는 것 방지
-		const float MaxHoldDistance = 2000.f; // 너무 멀어지지 않도록 제한
 
 		// Magnesis 상태일 경우, HoldDistance 조절
 		if (IsHoldingObject())
@@ -973,50 +982,47 @@ void APC_InGame::OnMapOpen(const FInputActionValue& InputActionValue)
 
 void APC_InGame::BeginIcePreview(const FInputActionValue& InputActionValue)
 {	
-	if (bMagnesisKeyPressed) { return; }
-	bIceKeyPressed = !bIceKeyPressed;
+	if (bMagnesisKeyPressed) return;
 
-	if (!bIceKeyPressed) { bIceKeyPressed = false; }
+	if (bIceKeyPressed) return;
+	bIceKeyPressed = true;
 
 	AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
 	if (MainHUD)
 	{
-		MainHUD->ShowAbilityAimUI(bIceKeyPressed);
+		MainHUD->ShowAbilityAimUI(true);
 	}
 
 	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 
-	if (bIceKeyPressed)
+	Player_C->ZoomIn();
+	IcePreviewActor->SetActorHiddenInGame(false);
+	bIceMaker = true;
+	InitIcePreview();
+
+	bIcePreviewPlaced = false;
+
+
+}
+
+void APC_InGame::EndIcePreview(const FInputActionValue& InputActionValue)
+{
+	if (!bIceKeyPressed) return;
+	bIceKeyPressed = false;
+
+	AMainHUD* MainHUD = Cast<AMainHUD>(GetHUD());
+	if (MainHUD)
 	{
-		Player_C->ZoomIn();
-
-		IcePreviewActor->SetActorHiddenInGame(false);
-
-		//FindVisibleActorOnScreen(LastHit); // Surface에 그리드 표현?
-
-		bIceMaker = true;
-
-		InitIcePreview();
-	
-		/*if (bIcePreviewPlaced)
-		{
-			SetIgnoreLookInput(true); // 카메라 고정
-		}*/
-
-		bIcePreviewPlaced = false; // 새 위치 탐색 허용
-
-		// 캐릭터 IcePreviewActor에 정면 고정?
+		MainHUD->ShowAbilityAimUI(false);
 	}
-	else
-	{
-		Player_C->ZoomOut();
 
-		IcePreviewActor->SetActorHiddenInGame(true);
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetPawn());
 
-		SetIgnoreLookInput(false);
+	Player_C->ZoomOut();
+	IcePreviewActor->SetActorHiddenInGame(true);
+	SetIgnoreLookInput(false);
 
-		bIcePreviewPlaced = false; // 해제되면 다시 재탐색 가능
-	}
+	bIcePreviewPlaced = false;
 
 }
 
@@ -1078,13 +1084,17 @@ bool APC_InGame::IsSurfaceActor(AActor* Actor) const
 {
 	if (!Actor) return false;
 
-#if WITH_EDITOR
-	FString ActorName = Actor->GetActorLabel();
-#else
-	FString ActorName = Actor->GetName();
-#endif
-
-	return ActorName.StartsWith(TEXT("Surface"));
+//#if WITH_EDITOR
+//	FString ActorName = Actor->GetActorLabel();
+//#else
+//	FString ActorName = Actor->GetName();
+//#endif
+//
+//	return ActorName.StartsWith(TEXT("Surface"));
+	
+	if (!Actor->GetComponentByClass<UWaterComponent>()) return false;
+	
+	return true;
 }
 	
 
@@ -1172,7 +1182,7 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 
 	if (bMagnesisKeyPressed)
 	{
-		Player_C->ZoomIn();
+		Player_C->ZoomIn();	
 		GetWorld()->GetTimerManager().SetTimer(
 			MoveTimerHandle,
 			this,
@@ -1180,7 +1190,7 @@ void APC_InGame::ShowMetalActorPreview(const FInputActionValue& InputActionValue
 			0.16f,  // 주기 (초)
 			true   // 반복
 		);
-	}
+	}	
 	else
 	{
 		Player_C->ZoomOut();
@@ -1239,7 +1249,6 @@ void APC_InGame::ShowRewindActor(const FInputActionValue& InputActionValue)
 		{
 			URewindComponent* RewindComponent = RewindActor->GetComponentByClass<URewindComponent>();
 			RewindComponent->SetColorNormal();
-			RewindComponent->StopRewind();
 			RewindActor = nullptr;
 		}
 	}
@@ -1326,6 +1335,8 @@ void APC_InGame::StartMagnetGrab()
 				FVector PlayerLocation = PlayerChar->GetActorLocation();
 				FVector TargetLocation = HitComp->GetOwner()->GetActorLocation();
 				HoldDistance = FVector::Distance(PlayerLocation, TargetLocation);
+
+				HoldDistance = FMath::Clamp(HoldDistance, MinHoldDistance, MaxHoldDistance);
 			}
 
 			PhysicsHandle->GrabComponentAtLocation(HitComp, NAME_None, LastHit.ImpactPoint);

@@ -16,6 +16,17 @@ AScaleGate::AScaleGate()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset
+	{ TEXT("/Game/Resources/Object/Door/DgnObj_IronDoorL_B_01.DgnObj_IronDoorL_B_01") };
+	if (Asset.Object)
+	{
+		StaticMeshComponent->SetStaticMesh(Asset.Object);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AScaleGate::AScaleGate // No AScaleGate StaticMeshAsset"));
+	}
+
 	StaticMeshComponent->SetRelativeScale3D(FVector(90.f, 90.f, 90.f));
 }
 
@@ -29,37 +40,28 @@ void AScaleGate::BeginPlay()
 		StaticMeshComponent->SetCollisionObjectType(ECC_WorldStatic);
 		StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Block);
 	}
+}
 
-	UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
-	if (EventManager)
+void AScaleGate::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (bOpenGate)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EventManager found, adding dynamic delegate"));
-
-		EventManager->OnWeightFull.AddDynamic(this, &AScaleGate::OpenScaleGate);
+		MoveGateTick(DeltaTime);
 	}
 }
 
 void AScaleGate::OpenScaleGate()
 {
-	StartLocation = StaticMeshComponent->GetComponentLocation();
+	StartLocation = GetActorLocation();
 	TargetLocation = StartLocation + FVector::UpVector * GetComponentsBoundingBox().GetSize().Z;
-	ElapsedTime = 0.f;
-
-	GetWorldTimerManager().SetTimer(GateMoveTimer, this, &AScaleGate::MoveGateTick, 0.01f, true);
+	bOpenGate = true;
 }
 
-void AScaleGate::MoveGateTick()
+void AScaleGate::MoveGateTick(float DeltaTime)
 {
-	ElapsedTime += 0.01f;
-
-	float Alpha = ElapsedTime / Duration;
-	if (Alpha >= 1.f)
-	{
-		StaticMeshComponent->SetWorldLocation(TargetLocation);
-		GetWorldTimerManager().ClearTimer(GateMoveTimer);
-		return;
-	}
-
-	FVector NewLocation = FMath::Lerp(StartLocation, TargetLocation, Alpha);
+	FVector NewLocation = FMath::Lerp(StartLocation, TargetLocation, DeltaTime);
 	StaticMeshComponent->SetWorldLocation(NewLocation);
+	StartLocation = NewLocation;
 }

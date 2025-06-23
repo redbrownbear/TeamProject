@@ -26,5 +26,6 @@ void UImpaFSMComponent::UpdateTalk(float DeltaTime)
 		{
 			ChangeState(ENpcState::Idle);
 		}
+
 	}
 }

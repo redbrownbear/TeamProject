@@ -13,7 +13,7 @@ FString TextU(int32 TextID)
 	UWorld* World = GEngine->GetCurrentPlayWorld();
 	if (!World)
 	{
-		// ´ëÃ¼ ¹æ¹ý: UGameplayStatics
+		// ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½: UGameplayStatics
 		World = GEngine->GetWorldContexts().Num() > 0 ? GEngine->GetWorldContexts()[0].World() : nullptr;
 	}
 	if (!World) return TEXT(" ");

@@ -85,4 +85,7 @@ protected:
 
 protected:
 	virtual UTimeManagerSubsystem* GetTimeManagerSubsystem() = 0;
+
+public:
+	virtual void SetMaterialDeadAmount(float InDeadAmount);
 };

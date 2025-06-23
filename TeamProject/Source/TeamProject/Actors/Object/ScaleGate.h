@@ -18,13 +18,12 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	UFUNCTION()
+	virtual void Tick(float DeltaTime) override;
+public:
 	void OpenScaleGate();
-
+	bool GetOpenGate() const { return bOpenGate; }
 protected:
-	UFUNCTION()
-	void MoveGateTick();
+	void MoveGateTick(float DeltaTime);
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -38,9 +37,10 @@ private:
 	FVector StartLocation;
 	FVector TargetLocation;
 
-	UPROPERTY()
-	float ElapsedTime = 0.f;
 
 	UPROPERTY()
 	float Duration = 1.0f;
+
+	bool bOpenGate = false;
+
 };

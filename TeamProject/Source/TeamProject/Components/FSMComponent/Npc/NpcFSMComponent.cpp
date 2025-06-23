@@ -1,7 +1,10 @@
 #include "NpcFSMComponent.h"
+
 #include "Actors/Npc/Npc.h"
 #include "Actors/Controller/Npc/NpcController.h"
 #include "Actors/Character/PlayerCharacter.h"
+#include "Actors/TargetPoint/HidePoint.h"
+
 #include "GameFramework/PC_InGame.h"
 
 #include "Navigation/PathFollowingComponent.h"
@@ -9,7 +12,8 @@
 
 #include "Components/ConversationComponent/ConversationManagerComponent.h"
 
-#include "Actors/TargetPoint/HidePoint.h"
+#include "SubSystem/UI/QuestManager.h"
+#include "Data/NpcCharacterTableRow.h"
 
 UNpcFSMComponent::UNpcFSMComponent()
 {
@@ -295,4 +299,24 @@ void UNpcFSMComponent::PlayInterectSequence()
 		SmoothRotateActorToDirection(Owner, PlayerLocation, DeltaTime);
 		SmoothRotateActorToDirection(Player, NpcLocation, DeltaTime);
 	}*/
+}
+
+void UNpcFSMComponent::ClearQuest(EQuestCharacter QuestChar)
+{
+	UPlayerManager* PlayerManager = GetWorld()->GetGameInstance()->GetSubsystem<UPlayerManager>();
+	check(PlayerManager);
+
+	UQuestManager* QuestManager = GetWorld()->GetGameInstance()->GetSubsystem<UQuestManager>();
+	check(QuestManager);
+
+	TArray<FQuestDataRow> QuestData = QuestManager->GetQuestData();
+
+	for (FQuestDataRow& Row : QuestData)
+	{
+		if (Row.QuestCharacter == QuestChar)
+		{
+			Row.bIsComplete = true;
+			PlayerManager->SetQuestCompleteData(Row);
+		}
+	}
 }

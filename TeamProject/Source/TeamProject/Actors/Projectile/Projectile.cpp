@@ -226,7 +226,7 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 				|| DataTableRowHandle.RowName == ProjectileName::Monster_AL_Attack
 				|| DataTableRowHandle.RowName == ProjectileName::Monster_LynelHorn)
 			{
-				static UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
+				UTimeManagerSubsystem* TimeManager = GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 				TimeManager->SetTimeScale(TIMESCALE_JUST);
 				TimeManager->SetJust();
 
@@ -511,12 +511,12 @@ void AProjectile::SetPhysicsEnabled(bool bFlag)
 	CollisionComponent->SetSimulatePhysics(bFlag);
 }
 
-void AProjectile::SetColorScanned()
+void AProjectile::SetColorScanned(float Value)
 {
 	// Change Material Color	
 	if (DynamicMaterialInstance)
 	{
-		DynamicMaterialInstance->SetScalarParameterValue("Color", 1.f);
+		DynamicMaterialInstance->SetScalarParameterValue("Color", Value);
 	}
 	else
 	{

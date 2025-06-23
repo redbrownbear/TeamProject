@@ -2,9 +2,9 @@
 
 
 #include "Actors/Object/Scale.h"
+#include "Actors/Object/ScaleGate.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "SubSystem/Puzzle/EventManager.h"
 
 // Sets default values
 AScale::AScale()
@@ -127,13 +127,11 @@ void AScale::UpdateWeight()
         }
     }
 
-    if ((RightWeight != 0.0f && LeftWeight != 0.0f) && RightWeight == LeftWeight)
+    if ((RightWeight > 100000.0f && LeftWeight > 100000.0f) && RightWeight == LeftWeight)
     {
-        UEventManager* EventManager = GetGameInstance()->GetSubsystem<UEventManager>();
-
-        if (EventManager)
+        if (!ScaleGate->GetOpenGate())
         {
-            EventManager->WeightFull();
+            ScaleGate->OpenScaleGate();
         }
     }
 }

@@ -517,6 +517,8 @@ enum class ENpcState : uint8
     Talk,
     Hide, // 술래잡기: 시간 되면 추가
     Sell,
+    Notify,
+    Find,
     End,
 };
 
@@ -531,5 +533,7 @@ enum class ENpcMontage : uint8
     TALK,
     HIDE,
     SELL,
+    NOTIFY,
+    FIND,
     END,
 };

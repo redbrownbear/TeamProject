@@ -988,7 +988,7 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 
 	if (!FMath::IsNearlyZero(fDamage))
 	{
-		AddBaseColor(FVector(1.f, -0.3f, -0.3f));
+		AddBaseColor(FVector(0.4f, 0.f, 0.f));
 	}
 
 	FVector ZeroVector = FVector::Zero();
@@ -1006,21 +1006,25 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 		Monster->ShowHpUI(UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP());
 	}
 
-	if (ACharacterMonster* BigMonster = Cast<ACharacterMonster>(ThisActor))
+	if (fDamage > 0.f)
 	{
-		if (BigMonster->GetMonsterName() == TEXT("AssasinLeader"))
-			BigMonster->ShowHpUI(UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP());
-		else
+		if (ACharacterMonster* BigMonster = Cast<ACharacterMonster>(ThisActor))
 		{
-			if (APC_InGame* PC = Cast<APC_InGame>(BigMonster->GetWorld()->GetFirstPlayerController()))
+			if (BigMonster->GetMonsterName() == TEXT("AssasinLeader"))
+				BigMonster->ShowHpUI(UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP());
+			else
 			{
-				if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+				if (APC_InGame* PC = Cast<APC_InGame>(BigMonster->GetWorld()->GetFirstPlayerController()))
 				{
-					HUD->ShowBossHpUI(true, UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP(), BigMonster->GetMonsterData()->Name.ToString());
+					if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
+					{
+						HUD->ShowBossHpUI(true, UMonsterStatusComponent->GetCurrentHP(), UMonsterStatusComponent->GetMaxHP(), BigMonster->GetMonsterData()->Name.ToString());
+					}
 				}
 			}
 		}
 	}
+
 
 }
 
@@ -1090,3 +1094,17 @@ float IMonsterInterface::GetDamageFromWeapon()
 	}
 	return 0.0f;
 }
+
+void IMonsterInterface::SetMaterialDeadAmount(float InDeadAmount)
+{
+	if (UMaterialInstanceDynamic* MID = GetDynamicMaterialInstance())
+	{
+		MID->SetScalarParameterValue(TEXT("DeadAmount"), InDeadAmount);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("IMonsterInterface::SetdMaterialDeadAmount // No UMaterialInstanceDynamic"));
+		check(false);
+	}
+}
+

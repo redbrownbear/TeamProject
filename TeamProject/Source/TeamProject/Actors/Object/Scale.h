@@ -7,6 +7,7 @@
 #include "Scale.generated.h"
 
 class UBoxComponent;
+class AScaleGate;
 
 UCLASS()
 class TEAMPROJECT_API AScale : public AActor
@@ -40,6 +41,9 @@ protected:
 
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UBoxComponent> RightWeightArea;
+
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<AScaleGate> ScaleGate;
 
 protected:
     UFUNCTION()

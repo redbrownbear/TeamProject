@@ -5,9 +5,7 @@
 #include "EventManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOverlapTempleBall);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllTorchesLit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAssasinBossDead);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeightFull);
 
 class ATorchStand;
 
@@ -21,38 +19,17 @@ public:
 	UFUNCTION()
 	void NotifyOverlapTempleBall();
 
-	// -------- Torches --------
-	UFUNCTION()
-	void RegisterTorch(ATorchStand* Torch);
-	UFUNCTION()
-	void NotifyTorchLit(ATorchStand* Torch);
-
 	// -------- MonsterDead --------
 	UFUNCTION()
 	void AssasinBossDead();
 
-	UFUNCTION()
-	void WeightFull();
-	
 public:
 	// -------- Temple Switches --------
 	UPROPERTY(BlueprintAssignable)
 	FOnOverlapTempleBall OnOverlapTempleBall;
 
-	// -------- Torches --------
-	UPROPERTY(BlueprintAssignable)
-	FOnAllTorchesLit OnAllTorchesLit;
-
 	// -------- MonsterDead --------
 	UPROPERTY(BlueprintAssignable)
 	FOnAssasinBossDead OnAssasinBossDead;
 
-	// -------- WeightFull --------
-	UPROPERTY(BlueprintAssignable)
-	FOnWeightFull OnWeightFull;
-
-private:
-	// -------- Temple Switches --------
-	TArray<TObjectPtr<ATorchStand>> TorchList;
-	TSet<TObjectPtr<ATorchStand>> LitTorchSet;
 };

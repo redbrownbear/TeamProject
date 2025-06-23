@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "BossLockedGate.generated.h"
 
+class UGateComponent;
+
 UCLASS()
 class TEAMPROJECT_API ABossLockedGate : public AActor
 {
@@ -19,7 +21,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
+	/*UFUNCTION()
 	void OpenFinalGate();
 
 protected:
@@ -27,7 +29,7 @@ protected:
 	void ClearDungeon();
 
 	UFUNCTION()
-	void MoveGateTick();
+	void MoveGateTick();*/
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -36,14 +38,17 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
-private:
-	FTimerHandle GateMoveTimer;
-	FVector StartLocation;
-	FVector TargetLocation;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UGateComponent> GateComponent;
 
-	UPROPERTY()
-	float ElapsedTime = 0.f;
-
-	UPROPERTY()
-	float Duration = 1.0f;
+//private:
+//	FTimerHandle GateMoveTimer;
+//	FVector StartLocation;
+//	FVector TargetLocation;
+//
+//	UPROPERTY()
+//	float ElapsedTime = 0.f;
+//
+//	UPROPERTY()
+//	float Duration = 1.0f;
 };

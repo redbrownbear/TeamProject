@@ -23,7 +23,7 @@ ABarrier::ABarrier()
     StaticMeshComponent->SetCollisionProfileName(CollisionProfileName::Monster);
     StaticMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
 
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset
+    ConstructorHelpers::FObjectFinder<UStaticMesh> Asset
     { TEXT("/Script/Engine.StaticMesh'/Game/StarterContent/Shapes/Shape_Cube.Shape_Cube'") };
 
     if (Asset.Object)
@@ -36,7 +36,7 @@ ABarrier::ABarrier()
     }
 
     StaticMeshComponent->SetWorldScale3D(FVector(0.05, 1.8, 2.2));
-    static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialAsset
+    ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialAsset
     { TEXT("/Script/Engine.Material'/Game/Resources/Monster/Assasin_Boss/M_Barrier.M_Barrier'") };
 
     if (MaterialAsset.Object)
@@ -53,7 +53,7 @@ ABarrier::ABarrier()
     ParticleEffectComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
     ParticleEffectComponent->SetAutoActivate(true);
 
-    static ConstructorHelpers::FObjectFinder<UParticleSystem> EffectAsset
+    ConstructorHelpers::FObjectFinder<UParticleSystem> EffectAsset
     { TEXT("/Script/Engine.ParticleSystem'/Game/Vefects/FXVarietyPack/Particles/BarrierEffect.BarrierEffect'") };
 
     if (EffectAsset.Object)

@@ -240,10 +240,11 @@ protected:
 
 	// Ice Maker
 	void BeginIcePreview(const FInputActionValue& InputActionValue);
+	void EndIcePreview(const FInputActionValue& InputActionValue);
 	
 	// Magnesis
 	void ShowMetalActorPreview(const FInputActionValue& InputActionValue);
-
+	
 	// Rewind
 	void ShowRewindActor(const FInputActionValue& InputActionValue);
 
@@ -385,6 +386,9 @@ private:
 
 	FHitResult LastHit;
 	bool bHitResult = false;
+
+	const float MinHoldDistance = 300.f;
+	const float MaxHoldDistance = 1000.f;
 
 private:
 	AWorldWeapon* OverlappedItem = nullptr;

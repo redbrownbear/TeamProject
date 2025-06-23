@@ -10,6 +10,7 @@ class APlayerCharacter;
 class ANpcController;
 class UNPCDialogue;
 class AHidePoint;
+enum class EQuestCharacter;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TEAMPROJECT_API UNpcFSMComponent : public UActorComponent
@@ -78,6 +79,9 @@ protected:
 	void SetHideLocation(FVector InLocation);
 
 	void PlayInterectSequence();
+
+public:
+	void ClearQuest(EQuestCharacter QuestChar);
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Teleport")

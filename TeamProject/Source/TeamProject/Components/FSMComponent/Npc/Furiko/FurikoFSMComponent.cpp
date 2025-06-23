@@ -102,6 +102,9 @@ void UFurikoFSMComponent::UpdateTalk(float DeltaTime)
 		{
 			ChangeState(ENpcState::Run);
 			Owner->SetIsHide(false);
+
+			// Quest Clear
+			Owner->GetFSMComponent()->ClearQuest(EQuestCharacter::Furiko);
 		}
 		else if(EDialogType::Quest == Owner->GetCurrentDialogueType())
 		{

@@ -1,5 +1,5 @@
 ﻿#define GAMEOVER_ON																	false
-#define	COLLISION_HIDDEN_IN_GAME													false
+#define	COLLISION_HIDDEN_IN_GAME													true
 
 #define MONSTER_AISENSECONFIG_SIGHT_SIGHTRADIUS										1000.f
 #define MONSTER_AISENSECONFIG_SIGHT_LOSESIGHTRADIUS									1500.f
@@ -110,3 +110,5 @@
 
 #define DAMAGE_OPTION_HEADSHOT														1
 #define DAMAGE_OPTION_ARROW															2
+
+#define MONSTER_DEAD_AMOUNT_COEFFICIENT												0.3f

@@ -889,19 +889,33 @@ void UMonsterFSMComponent::UpdateDying(float DeltaTime)
 {
 	this->StopMove();
 
-	if (CharacterMonster && !CharacterMonster->IsPlayingMontage(EMonsterMontage::DEAD))
-	{
-		DropWeapons();
+	DeadAmount += DeltaTime * 0.5f;
 
-		CharacterMonster->OnDeadEnd();
-		CharacterMonster->Destroy();
-	}
-	else if (PawnMonster && !PawnMonster->IsPlayingMontage(EMonsterMontage::DEAD))
+	if (CharacterMonster)
 	{
-		DropWeapons();
-		PawnMonster->OnDeadEnd();
-		PawnMonster->Destroy();
+		CharacterMonster->SetMaterialDeadAmount(DeadAmount);
+
+		if (!CharacterMonster->IsPlayingMontage(EMonsterMontage::DEAD))
+		{
+			DropWeapons();
+
+			CharacterMonster->OnDeadEnd();
+			CharacterMonster->Destroy();
+		}
 	}
+	else if (PawnMonster)
+	{
+		PawnMonster->SetMaterialDeadAmount(DeadAmount);
+
+		if (!PawnMonster->IsPlayingMontage(EMonsterMontage::DEAD))
+		{
+			DropWeapons();
+			PawnMonster->OnDeadEnd();
+			PawnMonster->Destroy();
+		}
+	}
+
+
 }
 
 void UMonsterFSMComponent::UpdateDamage(float DeltaTime)

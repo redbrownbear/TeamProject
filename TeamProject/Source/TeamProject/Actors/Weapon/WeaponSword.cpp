@@ -17,6 +17,8 @@
 
 #include "Engine/DamageEvents.h"
 
+#include "Misc/Utils.h"
+
 AWeaponSword::AWeaponSword()
 {
     {
@@ -248,7 +250,7 @@ void AWeaponSword::Attack()
         ObjectTypes,
         false,
         ActorsToIgnore,
-        EDrawDebugTrace::ForDuration,
+        COLLISION_HIDDEN_IN_GAME ? EDrawDebugTrace::None : EDrawDebugTrace::ForDuration,
         OutHits,
         true,
         FLinearColor::Red,

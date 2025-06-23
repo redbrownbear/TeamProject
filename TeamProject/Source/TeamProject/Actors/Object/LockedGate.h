@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "LockedGate.generated.h"
 
+class UGateComponent;
+
 UCLASS()
 class TEAMPROJECT_API ALockedGate : public AActor
 {
@@ -20,12 +22,12 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void OpenGate();
-
 	UFUNCTION()
 	void OpenGateSequence();
 
 protected:
+	void OpenGate();
+
 	UFUNCTION()
 	void ClearDungeon();
 
@@ -39,6 +41,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UGateComponent> GateComponent;
+
 private:
 	FTimerHandle GateMoveTimer;
 	FVector StartLocation;
@@ -50,4 +55,9 @@ private:
 	UPROPERTY()
 	float Duration = 1.0f;
 
+private:
+	int LittedTorchNum = 0;
+
+public:
+	void TorchLitOn();
 };
