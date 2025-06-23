@@ -988,7 +988,7 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 
 	if (!FMath::IsNearlyZero(fDamage))
 	{
-		AddBaseColor(FVector(1.f, -0.3f, -0.3f));
+		AddBaseColor(FVector(0.4f, 0.f, 0.f));
 	}
 
 	FVector ZeroVector = FVector::Zero();
@@ -1094,3 +1094,17 @@ float IMonsterInterface::GetDamageFromWeapon()
 	}
 	return 0.0f;
 }
+
+void IMonsterInterface::SetMaterialDeadAmount(float InDeadAmount)
+{
+	if (UMaterialInstanceDynamic* MID = GetDynamicMaterialInstance())
+	{
+		MID->SetScalarParameterValue(TEXT("DeadAmount"), InDeadAmount);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("IMonsterInterface::SetdMaterialDeadAmount // No UMaterialInstanceDynamic"));
+		check(false);
+	}
+}
+
