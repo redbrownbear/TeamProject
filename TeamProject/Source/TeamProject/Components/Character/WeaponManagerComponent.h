@@ -12,6 +12,9 @@
 
 class AWeaponGlider;
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipStateUpdate, EEquip_State, TimeScale);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TEAMPROJECT_API UWeaponManagerComponent : public UActorComponent
 {
@@ -31,11 +34,11 @@ public:
 
 		
 public:
-	UWeaponChildActorComponent* GetSword() { return Sword; }
+	UWeaponChildActorComponent* GetWeapon() { return Weapon; }
 	UWeaponChildActorComponent* GetShield() { return Shield; }
 	UWeaponChildActorComponent* GetBow() { return Bow; }
 	
-	
+	void WhatWeaponKind(EWeapon_Type InType);
 	
 	
 	AWeaponGlider* GetGlider() { return Cast<AWeaponGlider>(Glider->GetChildActor()); }
@@ -45,7 +48,7 @@ public:
 	EWeapon_Type GetNextWeaponType() { return NextWeapon; }
 	void SetNextWeaponType(EWeapon_Type _Type) { NextWeapon = _Type; }
 	EEquip_State GetEquipState() { return Equip_State; }
-	void SetEquipState(EEquip_State _State) { Equip_State = _State; }
+	void SetEquipState(EEquip_State _State);
 	EWeapon_Swap_State GetWeaponSwapState() { return Weapon_Swap_State; }
 	void SetWeaponSwapState(EWeapon_Swap_State _State) { Weapon_Swap_State = _State; }
 
@@ -58,10 +61,10 @@ public:
 	bool GetCanShot() { return bCanShot; }
 
 	void SetBowStaticMesh(UStaticMesh* InMesh);
-	void SetSwordStaticMesh(UStaticMesh* InMesh);
+	void SetWeaponStaticMesh(UStaticMesh* InMesh, EWeaponKind WeaponKind);
 	void SetShieldStaticMesh(UStaticMesh* InMesh);
 
-	void SetCanSwordAttack();
+	void SetCanAttack();
 
 	bool GetIsParry() { return bIsGuard; }
 	void SetIsParry(bool bFlag) { bIsGuard = bFlag; }
@@ -78,7 +81,7 @@ public:
 
 
 	void TryEquipWeapon();
-	void EquipWeapon(UAnimMontage* Montage, bool bInterrupted);
+	
 
 
 	void LeftClickAction();
@@ -94,7 +97,7 @@ protected:
 	TObjectPtr<UWeaponChildActorComponent> Shield;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	TObjectPtr<UWeaponChildActorComponent> Sword;
+	TObjectPtr<UWeaponChildActorComponent> Weapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TObjectPtr<UWeaponChildActorComponent> Bow;
@@ -104,6 +107,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	TObjectPtr<UWeaponChildActorComponent> Glider;
+
+
+
 
 	UPROPERTY()
 	EEquip_State Equip_State;
@@ -122,4 +128,7 @@ protected:
 	bool bRightClick;
 	bool bCanShot;
 	bool bIsGuard = false;
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnEquipStateUpdate OnEquipStateUpdate;
 };

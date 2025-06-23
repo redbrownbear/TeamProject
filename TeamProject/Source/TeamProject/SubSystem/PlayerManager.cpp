@@ -66,11 +66,11 @@ void UPlayerManager::SetEquipData(const FItemData& ItemRow)
         });
 
     EquipItemList.Add(ItemRow);
-    SetWeaponMesh(ItemRow.GetParts(), ItemRow.StaticMesh);
+    SetWeaponMesh(ItemRow.GetParts(), ItemRow.StaticMesh, ItemRow.eWeaponKind);
     UpDateInvenEquipUI(EquipItemList);
 }
 
-void UPlayerManager::SetWeaponMesh(eEquipParts Parts, UStaticMesh* _Mesh)
+void UPlayerManager::SetWeaponMesh(eEquipParts Parts, UStaticMesh* _Mesh, EWeaponKind WeaponKind)
 {
     APlayerCharacter* Player_C = Cast<APlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
     switch (Parts)
@@ -84,7 +84,8 @@ void UPlayerManager::SetWeaponMesh(eEquipParts Parts, UStaticMesh* _Mesh)
     case eEquipParts::UNDER:
         break;
     case eEquipParts::RIGHT:
-        Player_C->SetSwordStaticMesh(_Mesh);
+        
+        Player_C->SetWeaponStaticMesh(_Mesh, WeaponKind);
         break;
     case eEquipParts::LEFT:
         Player_C->SetShieldStaticMesh(_Mesh);

@@ -28,7 +28,7 @@ void UAnimNotifyUnEquipWeapon::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 
 	if (UnEquipWeapon == EWeapon_Type::Sword)
 	{
-		PlayerCharacter->GetSword()->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Sword_Socket"));
+		PlayerCharacter->GetWeapon()->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Sword_Socket"));
 		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
 		if (m_State == EEquip_State::Sword)
 		{

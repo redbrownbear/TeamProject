@@ -46,6 +46,7 @@ public:
 	void StartHitEffect();
 	void StopHitEffect();
 
+	void ComboReset() { CurrentComboIndex = 0; }
 private:
 
 

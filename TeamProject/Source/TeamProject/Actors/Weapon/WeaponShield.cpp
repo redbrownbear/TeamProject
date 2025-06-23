@@ -86,7 +86,7 @@ AWeaponShield::AWeaponShield()
         }
 
     }
-
+    WeaponType = EWeapon_Type::Shield;
 }
 
 void AWeaponShield::SetGuard()

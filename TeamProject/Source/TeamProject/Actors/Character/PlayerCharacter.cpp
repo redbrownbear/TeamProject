@@ -6,6 +6,7 @@
 #include "Actors/Weapon/WeaponBase.h"
 #include "Actors/Weapon/WeaponSword.h"
 #include "Actors/Weapon/WeaponShield.h"
+#include "Actors/Weapon/WeaponSpear.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -235,6 +236,11 @@ void APlayerCharacter::Landed(const FHitResult& Hit)
 
 
 
+void APlayerCharacter::SetWeaponStaticMesh(UStaticMesh* InMesh, EWeaponKind WeaponKind)
+{
+	WeaponManagerComponent->SetWeaponStaticMesh(InMesh, WeaponKind);
+}
+
 void APlayerCharacter::Damaged(int32 Damage)
 {
 	if (GetIsParry()) return;
@@ -303,6 +309,15 @@ void APlayerCharacter::TimelineProgress(float Value)
 	SpringArm->TargetArmLength = Length;
 }
 
+void APlayerCharacter::PlayMoveUpperMontage()
+{
+	EEquip_State Equip_State = WeaponManagerComponent->GetEquipState();
+	if (Equip_State == EEquip_State::Spear)
+	{
+		GetMesh()->GetAnimInstance()->Montage_Play(Cast<AWeaponSpear>(WeaponManagerComponent->GetWeapon()->GetChildActor())->GetMoveUpperMontage());
+	}
+}
+
 
 
 
@@ -355,7 +370,7 @@ void APlayerCharacter::SetCameraTransform(FTransform& _InTransform)
 void APlayerCharacter::EquipWeapon(EWeapon_Type Weapon_Type)
 {
 	EMove_State mMove_State = GetMoveState();
-	if (mMove_State == EMove_State::Run || mMove_State == EMove_State::Run)
+	if (mMove_State == EMove_State::Run || mMove_State == EMove_State::Dash)
 	{
 		
 		// Swap중 이면 리턴
@@ -366,8 +381,6 @@ void APlayerCharacter::EquipWeapon(EWeapon_Type Weapon_Type)
 
 		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
 
-		WeaponManagerComponent->SetNextWeaponType(Weapon_Type);
-
-		WeaponManagerComponent->TryEquipWeapon();
+		WeaponManagerComponent->WhatWeaponKind(Weapon_Type);
 	}
 }

@@ -10,9 +10,3 @@ void UWeaponChildActorComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UWeaponChildActorComponent::SetData(FDataTableRowHandle InDataTableRowHandle)
-{
-	AWeaponBase* Weapon = Cast<AWeaponBase>(GetChildActor());
-	
-
-}

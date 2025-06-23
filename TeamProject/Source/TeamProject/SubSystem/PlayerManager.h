@@ -67,7 +67,7 @@ public:
 	void ShowInvenUI();
 	const TArray<FItemData>& GetAllItemData() const { return ItemInvenList; }
 
-	void SetWeaponMesh(eEquipParts Parts, UStaticMesh* _Mesh);
+	void SetWeaponMesh(eEquipParts Parts, UStaticMesh* _Mesh, EWeaponKind WeaponKind);
 	void ShowEquipUI();
 
 	bool IsEquipPart(eEquipParts Parts);

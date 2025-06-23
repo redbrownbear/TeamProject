@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Misc/Utils.h"
 #include "WeaponBase.generated.h"
 
 
@@ -49,6 +50,8 @@ public:
 	UAnimMontage* GetUnEquipMontage() { return UnEquipMontage; }
 	UAnimMontage* GetEquipMontage() { return EquipMontage; }
 
+	EWeapon_Type GetWeaponType() { return WeaponType; }
+
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -63,10 +66,14 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UAnimMontage* UnEquipMontage;
 
+	UPROPERTY(VisibleAnywhere)
+	UAnimMontage* UpperNmlMontage;
 
 
 protected:
 	friend class UItemAction_Weapon;
 	UPROPERTY(EditAnywhere, meta = (RowType = "/Script/TeamProject.WeaponTableRow"))
 	FDataTableRowHandle DataTableRowHandle;
+
+	EWeapon_Type WeaponType;
 };

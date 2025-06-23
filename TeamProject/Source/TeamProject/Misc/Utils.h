@@ -461,17 +461,19 @@ enum class EWeapon_Type
     None,
     Sword,
     Shield,
-    Bow
+    Bow,
+    Spear
 };
 
-UENUM()
-enum class EEquip_State
+UENUM(BlueprintType)
+enum class EEquip_State :uint8
 {
     None,
     Sword,
     Shield,
     Sword_Shield,
     Bow,
+    Spear,
 
 };
 UENUM()

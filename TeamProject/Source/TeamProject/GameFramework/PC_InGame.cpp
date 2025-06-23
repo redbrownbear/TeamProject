@@ -132,7 +132,7 @@ void APC_InGame::SetupInputComponent()
 
 	// ------------ Weapon Swap -----------------
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_EquipSword,
-		ETriggerEvent::Started, this, &ThisClass::EquipSword);
+		ETriggerEvent::Started, this, &ThisClass::EquipWeapon);
 
 	EnhancedInputComponent->BindAction(PC_InGameDataAsset->IA_EquipShield,
 		ETriggerEvent::Started, this, &ThisClass::EquipShield);
@@ -310,11 +310,11 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 	}
 	
 	// 노말 상태일 때의 캐릭터 무브
-	else if(MoveState == EMove_State::Run
+	else if (MoveState == EMove_State::Run
 		|| MoveState == EMove_State::Dash
 		|| MoveState == EMove_State::Crouch
 		|| MoveState == EMove_State::Zoom
-		
+
 		)
 	{
 		P_Anim->ActionValue = ActionValue;
@@ -324,12 +324,14 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 		const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
 		const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
 
-
+		if (!Player_C->GetMesh()->GetAnimInstance()->GetActiveMontageInstance())
+		{
+			Player_C->PlayMoveUpperMontage();
+		}
 		
 
-		APawn* ControlledPawn = GetPawn();
-		ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
-		ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
+		Player_C->AddMovementInput(ForwardVector, ActionValue.X);
+		Player_C->AddMovementInput(RightVector, ActionValue.Y);
 
 		if (Movement->GetMoveState() == EMove_State::Dash)
 		{
@@ -365,6 +367,8 @@ void APC_InGame::OnMoveCancel(const FInputActionValue& InputActionValue)
 	UAnimInstance* Anim = Player_C->GetMesh()->GetAnimInstance();
 
 	UPlayerAnimInstance* P_Anim = Cast<UPlayerAnimInstance>(Anim);
+	if(Movement->GetMoveState() == EMove_State::Run || Movement->GetMoveState() == EMove_State::Dash)
+	P_Anim->Montage_Stop(0.f);
 
 	const FVector2D ActionValue = FVector2D::Zero();
 
@@ -581,7 +585,7 @@ void APC_InGame::OnUnCrouch(const FInputActionValue& InputActionValue)
 }
 
 
-void APC_InGame::EquipSword(const FInputActionValue& InputActionValue)
+void APC_InGame::EquipWeapon(const FInputActionValue& InputActionValue)
 {
 	APawn* PlayerPawn = GetPawn();
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerPawn);

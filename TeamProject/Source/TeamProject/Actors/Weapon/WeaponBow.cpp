@@ -94,7 +94,7 @@ void AWeaponBow::BeginPlay()
 {
     Super::BeginPlay();
 
-    
+    WeaponType = EWeapon_Type::Bow;
 
 }
 
@@ -114,7 +114,7 @@ void AWeaponBow::LeftClickAction()
         AnimInst->bIsWaitShield = false;
 
     }
-    Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);
+    
 
     Player_C->GetWeaponManagerComponent()->SetCanShot(false);
 

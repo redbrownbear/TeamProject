@@ -212,8 +212,6 @@ protected:
 	void StartedStep(const FInputActionValue& InputActionValue);
 	void CompletedStep(const FInputActionValue& InputActionValue);
 
-	void OnBackFlip(const FInputActionValue& InputActionValue);
-
 	void OnLook(const FInputActionValue& InputActionValue);
 	void Climb(const FInputActionValue& InputActionValue);
 
@@ -227,7 +225,7 @@ protected:
 
 	// --------- Weapon Swap ------------------------------
 
-	void EquipSword(const FInputActionValue& InputActionValue);
+	void EquipWeapon(const FInputActionValue& InputActionValue);
 	void EquipShield(const FInputActionValue& InputActionValue);
 	void EquipBow(const FInputActionValue& InputActionValue);
 

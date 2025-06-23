@@ -22,7 +22,7 @@ void UAnimNotify_EquipWeapon::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 
 	if (NextWeapon == EWeapon_Type::Sword)
 	{
-		PlayerCharacter->GetSword()->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale , TEXT("Weapon_R"));
+		PlayerCharacter->GetWeapon()->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale , TEXT("Weapon_R"));
 		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
 		if (m_State == EEquip_State::None)
 		{
@@ -32,6 +32,18 @@ void UAnimNotify_EquipWeapon::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 		{
 			WeaponManagerComponent->SetEquipState(EEquip_State::Sword_Shield);
 		}
+	}
+	else if (NextWeapon == EWeapon_Type::Spear)
+	{
+		
+		PlayerCharacter->GetWeapon()->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_R"));
+		
+		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
+		
+		
+		WeaponManagerComponent->SetEquipState(EEquip_State::Spear);
+		
+		
 	}
 	else if (NextWeapon == EWeapon_Type::Bow)
 	{

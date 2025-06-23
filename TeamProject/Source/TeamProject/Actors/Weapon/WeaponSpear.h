@@ -22,7 +22,13 @@ public:
 	TArray<UAnimMontage*> Attack_Advance;
 	UPROPERTY(EditAnywhere, category = "Attack")
 	TArray<UAnimMontage*> Attack_Just;
-
+	UPROPERTY(EditAnywhere, category = "Equip")
+	UAnimMontage* Equip_Montage;
+	UPROPERTY(EditAnywhere, category = "Equip")
+	UAnimMontage* UnEquip_Montage;
+	
+	UPROPERTY(EditAnywhere, category = "Move")
+	UAnimMontage* Move_Upper;
 };
 
 /**
@@ -36,16 +42,37 @@ class TEAMPROJECT_API AWeaponSpear : public AWeaponBase
 	
 	AWeaponSpear();
 
+	virtual void BeginPlay() override;
 
+public:
 
+	UAnimMontage* GetMoveUpperMontage() { return DataAsset->Move_Upper; }
 
+	virtual void LeftClickAction();
+	virtual void RightClickAction();
 
+	virtual void Attack();
 
+	void EmptyDamagedActors();
 
+	void ComboReset() { mCombo = 0; }
 
 
 private:
 	UPROPERTY()
 	USpearAttackDataAsset* DataAsset;
+	UPROPERTY(EditDefaultsOnly, Category = "FX")
+	UParticleSystem* CascadeTrailFX;
 
+	UPROPERTY()
+	TObjectPtr<UParticleSystemComponent> HitEffectComponent;
+
+	UPROPERTY()
+	UParticleSystem* HitEffectFX;
+
+	TArray<TObjectPtr<AActor>> DamagedActors;
+
+
+	int32 mCombo = 0;
+	int32 MaxCombo = 3;
 };
