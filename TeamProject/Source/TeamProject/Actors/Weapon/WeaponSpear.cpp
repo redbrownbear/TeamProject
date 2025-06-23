@@ -123,7 +123,7 @@ void AWeaponSpear::Attack()
         ObjectTypes,
         false,
         ActorsToIgnore,
-        EDrawDebugTrace::ForDuration,
+        EDrawDebugTrace::None,
         OutHits,
         true,
         FLinearColor::Red,

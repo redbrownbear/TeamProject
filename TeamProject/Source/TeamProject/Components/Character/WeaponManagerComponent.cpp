@@ -34,6 +34,8 @@ UWeaponManagerComponent::UWeaponManagerComponent()
 	
 	Weapon->SetChildActorClass(AWeaponSword::StaticClass());
 
+
+
 	Bow = CreateDefaultSubobject<UWeaponChildActorComponent>(TEXT("Bow"));
 	
 	Bow->SetChildActorClass(AWeaponBow::StaticClass());
@@ -116,6 +118,8 @@ void UWeaponManagerComponent::BeginPlay()
 		}
 	}
 	NextWeapon = EWeapon_Type::None;
+
+	Weapon->GetChildActor()->SetActorEnableCollision(false);
 }
 
 
@@ -123,7 +127,7 @@ void UWeaponManagerComponent::BeginPlay()
 void UWeaponManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	// ...
 }
 
@@ -175,6 +179,8 @@ void UWeaponManagerComponent::SetWeaponStaticMesh(UStaticMesh* InMesh, EWeaponKi
 
 	}
 	AWeaponBase* WeaponBase = Cast<AWeaponBase>(Weapon->GetChildActor());
+	WeaponBase->SetOwner(GetOwner());
+	WeaponBase->SetActorEnableCollision(false);
 	WeaponBase->SetStaticMesh(InMesh);
 }
 
@@ -240,14 +246,14 @@ void UWeaponManagerComponent::TryEquipWeapon()
 			
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Weapon->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
+			SetWeaponSwapState(EWeapon_Swap_State::None);
 			AnimInstance->Montage_Play(EquipMontage);
 		}
 		else
 		{
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Weapon->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
+			SetWeaponSwapState(EWeapon_Swap_State::None);
 			AnimInstance->Montage_Play(EquipMontage);
 		}
 	}
@@ -265,7 +271,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
+			SetWeaponSwapState(EWeapon_Swap_State::None);
 			AnimInstance->Montage_Play(EquipMontage);
 
 		}
@@ -276,7 +282,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 			
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
+			SetWeaponSwapState(EWeapon_Swap_State::None);
 			AnimInstance->Montage_Play(EquipMontage);
 
 		}
@@ -286,9 +292,18 @@ void UWeaponManagerComponent::TryEquipWeapon()
 
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
+			SetWeaponSwapState(EWeapon_Swap_State::None);
 			AnimInstance->Montage_Play(EquipMontage);
 
+		}
+		else if (Equip_State == EEquip_State::Spear)
+		{
+			Weapon->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Sword_Socket"));
+
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			AnimInstance->Montage_Play(EquipMontage);
 		}
 		else
 		{
@@ -314,7 +329,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Shield->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
+			SetWeaponSwapState(EWeapon_Swap_State::None);
 			AnimInstance->Montage_Play(EquipMontage);
 
 		
@@ -325,7 +340,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Shield->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
+			SetWeaponSwapState(EWeapon_Swap_State::None);
 			AnimInstance->Montage_Play(EquipMontage);
 		}
 		else
@@ -345,15 +360,24 @@ void UWeaponManagerComponent::TryEquipWeapon()
 
 			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Weapon->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
+			SetWeaponSwapState(EWeapon_Swap_State::None);
 			AnimInstance->Montage_Play(EquipMontage);
 		}
 		else if(Equip_State == EEquip_State::Spear)
 		{
 			Weapon->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Sword_Socket"));
 			SetEquipState(EEquip_State::None);
-			Cast<UPlayerAnimInstance>(AnimInstance)->Equip_State = EEquip_State::None;
+			
 			SetWeaponSwapState(EWeapon_Swap_State::None);
+		}
+		else if (Equip_State == EEquip_State::Shield)
+		{
+			Shield->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Shield_Socket"));
+			
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Weapon->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			AnimInstance->Montage_Play(EquipMontage);
 		}
 		else if (Equip_State == EEquip_State::None)
 		{

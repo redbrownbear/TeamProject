@@ -348,6 +348,7 @@ void APC_InGame::OnMove(const FInputActionValue& InputActionValue)
 			Stemina -= DeltaTime * STEMINA_USE_SPEED;
 			PlayerManager->SetPlayerStamina(Stemina);
 		}
+		
 	}
 }
 

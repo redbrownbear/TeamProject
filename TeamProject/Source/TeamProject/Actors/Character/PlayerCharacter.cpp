@@ -192,6 +192,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	{
 		PlayerManager->TickStamina(CustumDeltaTime);
 	}
+	
 }
 
 // Called to bind functionality to input

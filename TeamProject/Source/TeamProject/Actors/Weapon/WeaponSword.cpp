@@ -250,7 +250,7 @@ void AWeaponSword::Attack()
         ObjectTypes,
         false,
         ActorsToIgnore,
-        COLLISION_HIDDEN_IN_GAME ? EDrawDebugTrace::None : EDrawDebugTrace::ForDuration,
+        COLLISION_HIDDEN_IN_GAME ? EDrawDebugTrace::None : EDrawDebugTrace::None,
         OutHits,
         true,
         FLinearColor::Red,

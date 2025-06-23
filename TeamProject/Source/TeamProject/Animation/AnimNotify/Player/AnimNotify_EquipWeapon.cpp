@@ -55,13 +55,14 @@ void UAnimNotify_EquipWeapon::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 		PlayerCharacter->GetShield()->AttachToComponent(MeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Weapon_L"));
 		EEquip_State m_State = WeaponManagerComponent->GetEquipState();
 
-		if (m_State == EEquip_State::None)
+		
+		if(m_State == EEquip_State::Sword)
 		{
-			WeaponManagerComponent->SetEquipState(EEquip_State::Shield);
+			WeaponManagerComponent->SetEquipState(EEquip_State::Sword_Shield);
 		}
 		else
 		{
-			WeaponManagerComponent->SetEquipState(EEquip_State::Sword_Shield);
+			WeaponManagerComponent->SetEquipState(EEquip_State::Shield);
 		}
 	}
 	
