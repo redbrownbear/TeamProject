@@ -988,7 +988,7 @@ void IMonsterInterface::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 
 	if (!FMath::IsNearlyZero(fDamage))
 	{
-		AddBaseColor(FVector(1.f, -0.3f, -0.3f));
+		AddBaseColor(FVector(0.4f, 0.f, 0.f));
 	}
 
 	FVector ZeroVector = FVector::Zero();
