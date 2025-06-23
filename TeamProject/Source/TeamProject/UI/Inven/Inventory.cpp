@@ -146,6 +146,15 @@ void UInventory::OnCreateItemInWorld(const FInputActionValue& InputActionValue)
 
     const FItemData& SelectedItem = BP_InvenScroll->GetCurItemData();
 
+    
+    const TArray<FItemData>& EquipAll = PlayerManager->GetAllEquipData();
+
+    for (FItemData equip : EquipAll)
+    {
+        if (SelectedItem.UniqueID == equip.UniqueID)
+            return;
+    }
+
     if (SelectedItem.GetParts() == eEquipParts::ARROWLEFT || SelectedItem.eItemCategory == EItemCategory::IT_Food || SelectedItem.eItemCategory == EItemCategory::IT_Material)
     {
         UUIManager* UIManager = GetGameInstance()->GetSubsystem<UUIManager>();
