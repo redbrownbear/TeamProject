@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Misc/Utils.h"
 #include "PlayerAnimInstance.generated.h"
 
 /**
@@ -23,7 +24,8 @@ public:
 	void SetPitch();
 	UFUNCTION()
 	void SetPlayRate(float _Rate) { PlayRate = _Rate; }
-
+	UFUNCTION()
+	void SetEquipState(EEquip_State _State);
 
 public:
 
@@ -60,4 +62,6 @@ public:
 	bool bIsGliding = false;
 	UPROPERTY(BlueprintReadOnly)
 	float PlayRate = 1.f;
+	UPROPERTY(BlueprintReadOnly)
+	EEquip_State Equip_State = EEquip_State::None;
 };

@@ -104,7 +104,7 @@ void UEndingCredits::PlayFade(UOverlay* Overlay, float From, float To, float Dur
 {
     if (!Overlay) return;
 
-    // ÁßÃ¸ ¹æÁö
+    // ï¿½ï¿½Ã¸ ï¿½ï¿½ï¿½ï¿½
     if (GetWorld()->GetTimerManager().IsTimerActive(FadeInHandle))
     {
         GetWorld()->GetTimerManager().ClearTimer(FadeInHandle);

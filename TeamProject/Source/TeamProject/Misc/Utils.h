@@ -458,24 +458,28 @@ inline bool AreTransformsNearlyEqual(const FTransform& A, const FTransform& B,
 UENUM()
 enum class EWeapon_Type
 {
-    Sword,
-    Shield,
-    Bow
+    None UMETA(DisplayName = "None"),
+    Sword UMETA(DisplayName = "Sword"), 
+    Shield UMETA(DisplayName = "Shield"), 
+    Bow UMETA(DisplayName = "Bow"),
+    Spear UMETA(DisplayName = "Spear"),
 };
 
-UENUM()
-enum class EEquip_State
+UENUM(BlueprintType)
+enum class EEquip_State :uint8
 {
     None,
     Sword,
     Shield,
     Sword_Shield,
     Bow,
+    Spear,
 
 };
 UENUM()
 enum class EMove_State
 {
+    None,
     Run,
     Glide,
     Climb,
@@ -486,6 +490,12 @@ enum class EMove_State
     Steping,
     BackFlip,
     Hit
+};
+UENUM()
+enum class EWeapon_Swap_State
+{
+    None,
+    Swaping,
 };
 
 UENUM()

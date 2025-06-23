@@ -12,10 +12,15 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 
 	APawn* Pawn = TryGetPawnOwner();
 	if (!Pawn) { return; }
+	
+	
+	APlayerCharacter* Player_C = Cast<APlayerCharacter>(Pawn);
+	Player_C->GetWeaponManagerComponent()->OnEquipStateUpdate.AddDynamic(this, &ThisClass::SetEquipState);
 
 	MovementComponent = Pawn->GetMovementComponent();
 	UTimeManagerSubsystem* TimeManager = GetOwningActor()->GetGameInstance()->GetSubsystem<UTimeManagerSubsystem>();
 	TimeManager->OnTimeScaleUpdated.AddDynamic(this, &ThisClass::SetPlayRate);
+
 }
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -65,4 +70,9 @@ void UPlayerAnimInstance::SetPitch()
 	Rotator = NewQuat.Rotator();
 
 
+}
+
+void UPlayerAnimInstance::SetEquipState(EEquip_State _State)
+{
+	Equip_State = _State;
 }

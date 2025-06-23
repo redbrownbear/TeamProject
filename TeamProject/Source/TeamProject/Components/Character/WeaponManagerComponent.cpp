@@ -7,6 +7,7 @@
 #include "Components/Character/PlayerMovementComponent.h"
 #include "Animation/AnimInstance/PlayerAnimInstance.h"
 #include "UI/HUD/MainHUD.h"
+#include "Actors/Weapon/WeaponSpear.h"
 #include "SubSystem/PlayerManager.h"
 // Sets default values for this component's properties
 UWeaponManagerComponent::UWeaponManagerComponent()
@@ -29,9 +30,11 @@ UWeaponManagerComponent::UWeaponManagerComponent()
 	
 	Shield->SetChildActorClass(AWeaponShield::StaticClass());
 
-	Sword = CreateDefaultSubobject<UWeaponChildActorComponent>(TEXT("Sword"));
+	Weapon = CreateDefaultSubobject<UWeaponChildActorComponent>(TEXT("Weapon"));
 	
-	Sword->SetChildActorClass(AWeaponSword::StaticClass());
+	Weapon->SetChildActorClass(AWeaponSword::StaticClass());
+
+
 
 	Bow = CreateDefaultSubobject<UWeaponChildActorComponent>(TEXT("Bow"));
 	
@@ -43,11 +46,12 @@ UWeaponManagerComponent::UWeaponManagerComponent()
 	
 	Glider = CreateDefaultSubobject<UWeaponChildActorComponent>(TEXT("Glider"));
 	
+
 	Glider->SetChildActorClass(AWeaponGlider::StaticClass());
 	if (Mesh)
 	{
 		Shield->SetupAttachment(Player_C->GetMesh(), TEXT("Shield_Socket"));
-		Sword->SetupAttachment(Player_C->GetMesh(), TEXT("Sword_Socket"));
+		Weapon->SetupAttachment(Player_C->GetMesh(), TEXT("Sword_Socket"));
 		Bow->SetupAttachment(Player_C->GetMesh(), TEXT("Bow_Socket"));
 		Arrow->SetupAttachment(Player_C->GetMesh(), TEXT("Arrow_Normal"));
 		Glider->SetupAttachment(Player_C->GetMesh(), TEXT("GliderSocket"));
@@ -74,7 +78,7 @@ UWeaponManagerComponent::UWeaponManagerComponent()
 void UWeaponManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	Sword->GetChildActor()->SetOwner(GetOwner());
+	Weapon->GetChildActor()->SetOwner(GetOwner());
 	Shield->GetChildActor()->SetOwner(GetOwner());
 	Bow->GetChildActor()->SetOwner(GetOwner());
 	Glider->GetChildActor()->SetOwner(GetOwner());
@@ -93,9 +97,10 @@ void UWeaponManagerComponent::BeginPlay()
 			case EWeaponKind::None:
 				break;
 			case EWeaponKind::SWORD:
-				SetSwordStaticMesh(Data.StaticMesh);
+				SetWeaponStaticMesh(Data.StaticMesh, EWeaponKind::SWORD);
 				break;
 			case EWeaponKind::SPEAR:
+				SetWeaponStaticMesh(Data.StaticMesh, EWeaponKind::SPEAR);
 				break;
 			case EWeaponKind::LSWORD:
 				break;
@@ -112,7 +117,9 @@ void UWeaponManagerComponent::BeginPlay()
 			SetShieldStaticMesh(Data.StaticMesh);
 		}
 	}
+	NextWeapon = EWeapon_Type::None;
 
+	Weapon->GetChildActor()->SetActorEnableCollision(false);
 }
 
 
@@ -120,8 +127,25 @@ void UWeaponManagerComponent::BeginPlay()
 void UWeaponManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	// ...
+}
+
+void UWeaponManagerComponent::WhatWeaponKind(EWeapon_Type InType)
+{
+	if (InType == EWeapon_Type::Sword)
+	{
+		InType = Cast<AWeaponBase>(Weapon->GetChildActor())->GetWeaponType();
+	}
+	SetNextWeaponType(InType);
+
+	TryEquipWeapon();
+}
+
+void UWeaponManagerComponent::SetEquipState(EEquip_State _State)
+{
+	Equip_State = _State;
+	OnEquipStateUpdate.Broadcast(_State);
 }
 
 void UWeaponManagerComponent::SetBowStaticMesh(UStaticMesh* InMesh)
@@ -130,9 +154,33 @@ void UWeaponManagerComponent::SetBowStaticMesh(UStaticMesh* InMesh)
 	WeaponBase->SetStaticMesh(InMesh);
 }
 
-void UWeaponManagerComponent::SetSwordStaticMesh(UStaticMesh* InMesh)
+void UWeaponManagerComponent::SetWeaponStaticMesh(UStaticMesh* InMesh, EWeaponKind WeaponKind)
 {
-	AWeaponBase* WeaponBase = Cast<AWeaponBase>(Sword->GetChildActor());
+	if (WeaponKind == EWeaponKind::SWORD)
+	{
+		GetWeapon()->SetChildActorClass(AWeaponSword::StaticClass());
+		if (Equip_State == EEquip_State::Spear)
+		{
+			SetEquipState(EEquip_State::Sword);
+		}
+	}
+	else if (WeaponKind == EWeaponKind::SPEAR)
+	{
+		GetWeapon()->SetChildActorClass(AWeaponSpear::StaticClass());
+
+		if (Equip_State == EEquip_State::Sword || Equip_State == EEquip_State::Sword_Shield || Equip_State == EEquip_State::Shield)
+		{
+
+			SetEquipState(EEquip_State::Spear);
+
+			USkeletalMeshComponent* CharacterRoot = Cast<ACharacter>(GetOwner())->GetMesh();
+			Shield->AttachToComponent(CharacterRoot, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Shield_Socket"));
+		}
+
+	}
+	AWeaponBase* WeaponBase = Cast<AWeaponBase>(Weapon->GetChildActor());
+	WeaponBase->SetOwner(GetOwner());
+	WeaponBase->SetActorEnableCollision(false);
 	WeaponBase->SetStaticMesh(InMesh);
 }
 
@@ -142,9 +190,16 @@ void UWeaponManagerComponent::SetShieldStaticMesh(UStaticMesh* InMesh)
 	WeaponBase->SetStaticMesh(InMesh);
 }
 
-void UWeaponManagerComponent::SetCanSwordAttack()
+void UWeaponManagerComponent::SetCanAttack()
 {
-	Cast<AWeaponSword>(Sword->GetChildActor())->SetCanAttack();
+	if (AWeaponSword* Sword = Cast<AWeaponSword>(Weapon->GetChildActor()))
+	{
+		Sword->SetCanAttack();
+	}
+	else if (AWeaponSpear* Spear = Cast<AWeaponSpear>(Weapon->GetChildActor()))
+	{
+
+	}
 }
 
 bool UWeaponManagerComponent::GetIsHoldingShield()
@@ -163,7 +218,7 @@ void UWeaponManagerComponent::TryEquipWeapon()
 
 	UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
 
-
+	UnEquipWeapons.Empty();
 	UAnimMontage* PlayingMontage = AnimInstance->GetCurrentActiveMontage();
 	if (PlayingMontage)
 		return;
@@ -172,41 +227,33 @@ void UWeaponManagerComponent::TryEquipWeapon()
 	{
 		return;
 	}
-	
+
+	SetWeaponSwapState(EWeapon_Swap_State::Swaping);
 
 	if (NextWeapon == EWeapon_Type::Sword)
 	{
 		if (Equip_State == EEquip_State::Sword || Equip_State == EEquip_State::Sword_Shield)
 		{
-			
-			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Sword->GetChildActor());
-			
-			UAnimMontage* UnEquipMontage = WeaponBaseWeapon->GetUnEquipMontage();
-			
-			UnEquipWeapons.Enqueue(EWeapon_Type::Sword);
+			Weapon->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Sword_Socket"));
+			SetWeaponSwapState(EWeapon_Swap_State::None);
 
-			AnimInstance->Montage_Play(UnEquipMontage);
+			Equip_State == EEquip_State::Sword ? SetEquipState(EEquip_State::None) : SetEquipState(EEquip_State::Shield);
+			
 		}
 		else if (Equip_State == EEquip_State::Bow)
 		{
+			Bow->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Bow_Socket"));
 			
-			UAnimMontage* UnEquipMontage = Cast<AWeaponBase>(Bow->GetChildActor())->GetUnEquipMontage();
-			AnimInstance->Montage_Play(UnEquipMontage);
-
-			UnEquipWeapons.Enqueue(EWeapon_Type::Bow);
-
-			FOnMontageEnded MontageEndedDelegate = FOnMontageEnded::CreateUObject<UWeaponManagerComponent>(
-				this,
-				&UWeaponManagerComponent::EquipWeapon
-			);
-			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, UnEquipMontage);
-
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Weapon->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			AnimInstance->Montage_Play(EquipMontage);
 		}
 		else
 		{
-			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Sword->GetChildActor());
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Weapon->GetChildActor());
 			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
+			SetWeaponSwapState(EWeapon_Swap_State::None);
 			AnimInstance->Montage_Play(EquipMontage);
 		}
 	}
@@ -214,57 +261,49 @@ void UWeaponManagerComponent::TryEquipWeapon()
 	{
 		if (Equip_State == EEquip_State::Bow)
 		{
-
-			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
-
-			UAnimMontage* UnEquipMontage = WeaponBaseWeapon->GetUnEquipMontage();
-
-			UnEquipWeapons.Enqueue(EWeapon_Type::Bow);
-
-			AnimInstance->Montage_Play(UnEquipMontage);
+			Bow->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Bow_Socket"));
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			SetEquipState(EEquip_State::None);
 		}
 		else if (Equip_State == EEquip_State::Sword)
 		{
+			Weapon->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Sword_Socket"));
 
-			UAnimMontage* UnEquipMontage = Cast<AWeaponBase>(Sword->GetChildActor())->GetUnEquipMontage();
-
-			UnEquipWeapons.Enqueue(EWeapon_Type::Sword);
-
-			AnimInstance->Montage_Play(UnEquipMontage);
-			FOnMontageEnded MontageEndedDelegate = FOnMontageEnded::CreateUObject<UWeaponManagerComponent>(
-				this,
-				&UWeaponManagerComponent::EquipWeapon
-			);
-			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, UnEquipMontage);
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			AnimInstance->Montage_Play(EquipMontage);
 
 		}
 		else if (Equip_State == EEquip_State::Sword_Shield)
 		{
-		
-
-			UnEquipWeapons.Enqueue(EWeapon_Type::Sword);
-			UnEquipWeapons.Enqueue(EWeapon_Type::Shield);
-			AnimInstance->Montage_Play(UnEquip_Sword_Shield);
-			FOnMontageEnded MontageEndedDelegate = FOnMontageEnded::CreateUObject<UWeaponManagerComponent>(
-				this,
-				&UWeaponManagerComponent::EquipWeapon
-			);
-			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, UnEquip_Sword_Shield);
-
+			Weapon->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Sword_Socket"));
+			Shield->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Shield_Socket"));
+			
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			AnimInstance->Montage_Play(EquipMontage);
 
 		}
 		else if (Equip_State == EEquip_State::Shield)
 		{
-			UAnimMontage* UnEquipMontage = Cast<AWeaponBase>(Shield->GetChildActor())->GetUnEquipMontage();
-			
-			UnEquipWeapons.Enqueue(EWeapon_Type::Shield);
-			AnimInstance->Montage_Play(UnEquipMontage);
-			FOnMontageEnded MontageEndedDelegate = FOnMontageEnded::CreateUObject<UWeaponManagerComponent>(
-				this,
-				&UWeaponManagerComponent::EquipWeapon
-			);
-			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, UnEquipMontage);
+			Shield->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Shield_Socket"));
 
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			AnimInstance->Montage_Play(EquipMontage);
+
+		}
+		else if (Equip_State == EEquip_State::Spear)
+		{
+			Weapon->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Sword_Socket"));
+
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			AnimInstance->Montage_Play(EquipMontage);
 		}
 		else
 		{
@@ -279,31 +318,30 @@ void UWeaponManagerComponent::TryEquipWeapon()
 		if (Equip_State == EEquip_State::Shield || Equip_State == EEquip_State::Sword_Shield)
 		{
 
-			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Shield->GetChildActor());
-
-			UAnimMontage* UnEquipMontage = WeaponBaseWeapon->GetUnEquipMontage();
-
-			UnEquipWeapons.Enqueue(EWeapon_Type::Shield);
-
-			AnimInstance->Montage_Play(UnEquipMontage);
+			Shield->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Shield_Socket"));
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			SetEquipState(EEquip_State::None);
 		}
 		else if (Equip_State == EEquip_State::Bow)
 		{
 
+			Bow->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Bow_Socket"));
 
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Shield->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			AnimInstance->Montage_Play(EquipMontage);
 
 		
-			UAnimMontage* UnEquipMontage = Cast<AWeaponBase>(Bow->GetChildActor())->GetUnEquipMontage();
-			AnimInstance->Montage_Play(UnEquipMontage);
+		}
+		else if (Equip_State == EEquip_State::Spear)
+		{
+			Weapon->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Sword_Socket"));
 
-			UnEquipWeapons.Enqueue(EWeapon_Type::Bow);
-
-			FOnMontageEnded MontageEndedDelegate = FOnMontageEnded::CreateUObject<UWeaponManagerComponent>(
-				this,
-				&UWeaponManagerComponent::EquipWeapon
-			);
-			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, UnEquipMontage);
-
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Shield->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			AnimInstance->Montage_Play(EquipMontage);
 		}
 		else
 		{
@@ -314,36 +352,44 @@ void UWeaponManagerComponent::TryEquipWeapon()
 		}
 	}
 
+	else if (NextWeapon == EWeapon_Type::Spear)
+	{
+		if (Equip_State == EEquip_State::Bow)
+		{
+			Bow->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Bow_Socket"));
+
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Weapon->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			AnimInstance->Montage_Play(EquipMontage);
+		}
+		else if(Equip_State == EEquip_State::Spear)
+		{
+			Weapon->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Sword_Socket"));
+			SetEquipState(EEquip_State::None);
+			
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+		}
+		else if (Equip_State == EEquip_State::Shield)
+		{
+			Shield->AttachToComponent(CRT->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Shield_Socket"));
+			
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Weapon->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+			SetWeaponSwapState(EWeapon_Swap_State::None);
+			AnimInstance->Montage_Play(EquipMontage);
+		}
+		else if (Equip_State == EEquip_State::None)
+		{
+			AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Weapon->GetChildActor());
+			UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
+
+			AnimInstance->Montage_Play(EquipMontage);
+		}
+	}
 }
 
-void UWeaponManagerComponent::EquipWeapon(UAnimMontage* Montage, bool bInterrupted)
-{
-	ACharacter* CRT = Cast<ACharacter>(GetOwner());
-	USkeletalMeshComponent* Mesh = CRT->GetMesh();
-	if (NextWeapon == EWeapon_Type::Bow)
-	{
-		AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Bow->GetChildActor());
-		UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
 
-		Mesh->GetAnimInstance()->Montage_Play(EquipMontage);
-	}
-	else if (NextWeapon == EWeapon_Type::Sword)
-	{
-		AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Sword->GetChildActor());
-		UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
-		Mesh->GetAnimInstance()->Montage_Play(EquipMontage);
-	}
-	else if (NextWeapon == EWeapon_Type::Shield)
-	{
-		AWeaponBase* WeaponBaseWeapon = Cast<AWeaponBase>(Shield->GetChildActor());
-		UAnimMontage* EquipMontage = WeaponBaseWeapon->GetEquipMontage();
-
-		Mesh->GetAnimInstance()->Montage_Play(EquipMontage);
-	}
-
-
-}
 
 void UWeaponManagerComponent::LeftClickAction()
 {
@@ -354,7 +400,7 @@ void UWeaponManagerComponent::LeftClickAction()
 			return;
 
 
-		AWeaponSword* SwordActor = Cast<AWeaponSword>(Sword->GetChildActor());
+		AWeaponSword* SwordActor = Cast<AWeaponSword>(Weapon->GetChildActor());
 
 		if (!SwordActor)
 		{
@@ -366,7 +412,25 @@ void UWeaponManagerComponent::LeftClickAction()
 		SwordActor->LeftClickAction();
 
 	}
-	
+	else if (Equip_State == EEquip_State::Spear)
+	{
+		if (Player_C->JumpCurrentCount == 1)
+			return;
+
+
+		AWeaponSpear* SpearActor = Cast<AWeaponSpear>(Weapon->GetChildActor());
+
+		if (!SpearActor)
+		{
+
+			UE_LOG(LogTemp, Warning, TEXT("SwordActor is not Valid"));
+			return;
+
+		}
+		SpearActor->LeftClickAction();
+
+	}
+
 	else if (Equip_State == EEquip_State::Bow)
 	{
 		if (!bCanShot)
@@ -406,7 +470,7 @@ void UWeaponManagerComponent::LeftClickAction()
 		}
 		else
 		{
-			AWeaponSword* SwordActor = Cast<AWeaponSword>(Sword->GetChildActor());
+			AWeaponSword* SwordActor = Cast<AWeaponSword>(Weapon->GetChildActor());
 
 			if (!SwordActor)
 			{
@@ -448,7 +512,7 @@ void UWeaponManagerComponent::RightClickAction()
 		return;
 	}
 
-	if (Equip_State == EEquip_State::None || Equip_State == EEquip_State::Sword)
+	if (Equip_State == EEquip_State::None || Equip_State == EEquip_State::Sword || Equip_State == EEquip_State::Spear)
 	{
 		return;
 	}
