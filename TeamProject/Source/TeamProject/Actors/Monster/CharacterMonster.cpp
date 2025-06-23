@@ -419,6 +419,10 @@ void ACharacterMonster::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	{
 		MaterialSlotIndex = 1;
 	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
+	{
+		MaterialSlotIndex = 1;
+	}
 
 	USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
 
@@ -684,6 +688,10 @@ void ACharacterMonster::SetData(const FName& MonsterName)
 		MaterialSlotIndex = 0;
 	}
 	else if (DataTableRowHandle.RowName.ToString() == TEXT("AssasinBoss"))
+	{
+		MaterialSlotIndex = 1;
+	}
+	else if (DataTableRowHandle.RowName.ToString() == TEXT("Lynel"))
 	{
 		MaterialSlotIndex = 1;
 	}

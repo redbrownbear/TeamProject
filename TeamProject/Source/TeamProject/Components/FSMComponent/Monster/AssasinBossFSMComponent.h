@@ -53,5 +53,4 @@ protected:
 	float StoneElapsedTime = 0.f;
 	float StunElapsedTime = 0.f;
 	float DamageElapsedTime = 0.f;
-
 };

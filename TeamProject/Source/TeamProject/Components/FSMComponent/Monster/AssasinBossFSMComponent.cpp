@@ -342,6 +342,9 @@ void UAssasinBossFSMComponent::UpdateDying(float DeltaTime)
 		{
 			EventManager->AssasinBossDead();
 		}
+
+		DeadAmount += DeltaTime * MONSTER_DEAD_AMOUNT_COEFFICIENT;
+		CharacterMonster->SetMaterialDeadAmount(DeadAmount);
 	}
 }
 
