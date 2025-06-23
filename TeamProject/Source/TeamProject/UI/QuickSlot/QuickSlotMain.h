@@ -7,6 +7,7 @@
 #include "UI/QuickSlot/QuickItemSlot.h"
 
 #include "Components/WrapBox.h"
+#include "Components/Scrollbox.h"
 #include "Data/ItemDataRow.h"
 
 #include "QuickSlotMain.generated.h"
@@ -68,5 +69,8 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	UWrapBox* ItemWrapBox;
+
+	UPROPERTY(meta = (BindWidget))
+	UScrollBox* ScrollBox;
 	
 };

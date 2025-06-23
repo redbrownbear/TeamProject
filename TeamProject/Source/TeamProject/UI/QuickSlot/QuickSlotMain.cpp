@@ -83,6 +83,7 @@ void UQuickSlotMain::MoveSelection(FIntPoint Direction)
 
     if (NextIndex != CurrentIndex)
     {
+        ScrollBox->ScrollWidgetIntoView(ActiveSlots[NextIndex], true, EDescendantScrollDestination::IntoView);
         ActiveSlots[CurrentIndex]->SetSelected(false);
         ActiveSlots[NextIndex]->SetSelected(true);
         CurrentIndex = NextIndex;
