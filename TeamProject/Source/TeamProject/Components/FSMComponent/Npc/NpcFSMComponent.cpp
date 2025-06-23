@@ -171,7 +171,7 @@ void UNpcFSMComponent::UpdateIdle(float DeltaTime)
 {
 	if (eCurrentState != ENpcState::Idle)
 	{
-		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Idle'"));
+		//UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Idle'"));
 		return;
 	}
 }
@@ -180,7 +180,7 @@ void UNpcFSMComponent::UpdateWalk(float DeltaTime)
 {
 	if (eCurrentState != ENpcState::Walk)
 	{
-		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Walk'"));
+		//UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Walk'"));
 		return;
 	}
 }
@@ -189,7 +189,7 @@ void UNpcFSMComponent::UpdateRun(float DeltaTime)
 {
 	if (eCurrentState != ENpcState::Run)
 	{
-		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Run'"));
+		//UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Run'"));
 		return;
 	}
 
@@ -199,7 +199,7 @@ void UNpcFSMComponent::UpdateTalk(float DeltaTime)
 {
 	if (eCurrentState != ENpcState::Talk)
 	{
-		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Talk'"));
+		//UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Talk'"));
 		return;
 	}
 
@@ -209,7 +209,7 @@ void UNpcFSMComponent::UpdateHide(float DeltaTime)
 {
 	if (eCurrentState != ENpcState::Hide)
 	{
-		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Hide'"));
+		//UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Hide'"));
 		return;
 	}
 }
@@ -218,7 +218,7 @@ void UNpcFSMComponent::UpdateSell(float DeltaTime)
 {
 	if (eCurrentState != ENpcState::Sell)
 	{
-		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Sell'"));
+		//UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::Sell'"));
 		return;
 	}
 }
@@ -227,7 +227,7 @@ void UNpcFSMComponent::UpdateEnd(float DeltaTime)
 {
 	if (eCurrentState != ENpcState::End)
 	{
-		UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::End'"));
+		//UE_LOG(LogTemp, Error, TEXT("eCurrentState is Not 'ENpcState::End'"));
 		return;
 	}
 }
@@ -246,7 +246,7 @@ void UNpcFSMComponent::MoveToLocation(const FVector& InLocation)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("NpcFSMComponent::MoveToLocation // No NpcController"));
+		//UE_LOG(LogTemp, Error, TEXT("NpcFSMComponent::MoveToLocation // No NpcController"));
 		check(false);
 	}
 }
@@ -255,7 +255,7 @@ void UNpcFSMComponent::HideFuriko()
 {
 	if (HidePoints.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HidePoints is nullptr"));
+		//UE_LOG(LogTemp, Warning, TEXT("HidePoints is nullptr"));
 		return;
 	}
 
@@ -279,8 +279,6 @@ void UNpcFSMComponent::SetHideLocation(FVector InLocation)
 
 	Owner->SetActorLocation(InLocation, false, nullptr, ETeleportType::TeleportPhysics);
 	Owner->SetIsHide(true);
-
-	//UE_LOG(LogTemp, Warning, TEXT("SetHideLocation �Ϸ�. Owner ��ġ: %s"), *Owner->GetActorLocation().ToString());
 
 	if (Owner->GetController()) Owner->GetController()->StopMovement();
 

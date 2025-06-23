@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Data/ItemDataRow.h"
 #include "TreasureBox.generated.h"
 
 class UBoxComponent;
@@ -99,6 +100,7 @@ private:
 	UPROPERTY()
 	bool bPlayerInRange = false;	
 
-	const FItemData* ItemDataPtr;
+	UPROPERTY()
+	FItemData ItemDataInfo;
 
 };
