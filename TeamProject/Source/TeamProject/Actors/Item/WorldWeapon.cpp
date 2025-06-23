@@ -114,7 +114,10 @@ void AWorldWeapon::SetDataWithHandle(const FDataTableRowHandle& InDataTableRowHa
 	if (DataTableRowHandle.IsNull()) { return; }
 	FItemData* Data = DataTableRowHandle.GetRow<FItemData>(DataTableRowHandle.RowName.ToString());
 	if (!Data) { return; }
-	ItemTableRow = Data;
+
+	ItemDataCopy = *Data;
+	ItemDataCopy.UniqueID = FGuid::NewGuid().ToString();
+	ItemTableRow = &ItemDataCopy;
 
 	if (!IsValid(CollisionComponent) && ItemTableRow->CollisionClass)
 	{
