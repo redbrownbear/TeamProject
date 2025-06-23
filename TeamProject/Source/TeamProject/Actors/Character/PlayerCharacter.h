@@ -54,7 +54,7 @@ public:
 	
 
 public:
-	UWeaponChildActorComponent* GetSword() { return WeaponManagerComponent->GetSword(); }
+	UWeaponChildActorComponent* GetWeapon() { return WeaponManagerComponent->GetWeapon(); }
 	UWeaponChildActorComponent* GetShield() { return WeaponManagerComponent->GetShield(); }
 	UWeaponChildActorComponent* GetBow() { return WeaponManagerComponent->GetBow(); }
 	
@@ -67,7 +67,7 @@ public:
 
 	
 	void SetBowStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetBowStaticMesh(InMesh); }
-	void SetSwordStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetSwordStaticMesh(InMesh); }
+	void SetWeaponStaticMesh(UStaticMesh* InMesh, EWeaponKind WeaponKind);
 	void SetShieldStaticMesh(UStaticMesh* InMesh) { WeaponManagerComponent->SetShieldStaticMesh(InMesh); }
 
 	bool GetIsParry() { return WeaponManagerComponent->GetIsParry(); }
@@ -78,6 +78,7 @@ public:
 	UFUNCTION()
 	void TimelineProgress(float Value);
 
+	void PlayMoveUpperMontage();
 
 	void ZoomIn();
 	void ZoomOut();
@@ -97,6 +98,7 @@ public:
 	void CamearaDetach() { Camera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform); }
 	void CameraAttach();
 	void SetCameraTransform(FTransform& _InTransform);
+	void EquipWeapon(EWeapon_Type Weapon_Type);
 protected:
 
 	/*UPROPERTY(EditAnywhere, Category="Weapon")

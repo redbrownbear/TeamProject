@@ -97,6 +97,7 @@ AWeaponSword::AWeaponSword()
             HitEffectFX = Asset.Object;
         }
     }
+    WeaponType = EWeapon_Type::Sword;
 }
 
 void AWeaponSword::BeginPlay()
@@ -128,7 +129,7 @@ void AWeaponSword::LeftClickAction()
         PrevComboIndex = CurrentComboIndex;
         CurrentComboIndex += 1;
         CurrentComboIndex = (MaxComboIndex <= CurrentComboIndex) ? 0 : CurrentComboIndex;
-        Player_C->GetCharacterMovement()->SetMovementMode(MOVE_None);
+        Cast<UPlayerMovementComponent>(Player_C->GetMovementComponent())->SetMoveState(EMove_State::None);
 
     }
 
@@ -249,7 +250,7 @@ void AWeaponSword::Attack()
         ObjectTypes,
         false,
         ActorsToIgnore,
-        COLLISION_HIDDEN_IN_GAME ? EDrawDebugTrace::None : EDrawDebugTrace::ForDuration,
+        COLLISION_HIDDEN_IN_GAME ? EDrawDebugTrace::None : EDrawDebugTrace::None,
         OutHits,
         true,
         FLinearColor::Red,

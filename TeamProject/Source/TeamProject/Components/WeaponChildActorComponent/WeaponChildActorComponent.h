@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ChildActorComponent.h"
+#include "Misc/Utils.h"
 #include "WeaponChildActorComponent.generated.h"
 
 /**
@@ -16,7 +17,9 @@ class TEAMPROJECT_API UWeaponChildActorComponent : public UChildActorComponent
 	
 protected:
 	virtual void BeginPlay() override;
+	EWeapon_Type Weapon_Type;
 
 public:
-	void SetData(FDataTableRowHandle InDataTableRowHandle);
+	
+	void SetWeaponKind(EWeapon_Type InType) { Weapon_Type = InType; }
 };
