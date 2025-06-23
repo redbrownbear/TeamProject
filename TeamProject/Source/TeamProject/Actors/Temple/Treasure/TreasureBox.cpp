@@ -85,6 +85,8 @@ void ATreasureBox::OnBeginOverlapWithPlayer(UPrimitiveComponent* OverlappedCompo
 
 			if (AMainHUD* HUD = Cast<AMainHUD>(PC->GetHUD()))
 			{
+				if (!bCanTakeItem) return;
+				
 				HUD->ShowInteractWidget(bPlayerInRange);
 			}
 		}
@@ -132,6 +134,11 @@ void ATreasureBox::GetTreasure()
 			DynamicMaterialInstance->SetScalarParameterValue("Color", 1.f); 
 			
 			EmptyBox();
+
+			if (AMainHUD* HUD = Cast<AMainHUD>(PC_InGame->GetHUD()))
+			{
+				HUD->ShowInteractWidget(bCanTakeItem);
+			}
 		}
 
 		PC_InGame->ChangeInputContext(EInputContext::IC_InGame);
