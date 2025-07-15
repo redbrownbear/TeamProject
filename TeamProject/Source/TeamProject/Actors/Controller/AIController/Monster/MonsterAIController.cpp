@@ -74,14 +74,9 @@ void AMonsterAIController::Tick(float DeltaTime)
 void AMonsterAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 {
 	APlayerCharacter* Player = nullptr;
-
 	for (AActor* SeenActor : UpdatedActors)
 	{
-		if (SeenActor->IsA<APlayerCharacter>())
-		{
-			Player = Cast<APlayerCharacter>(SeenActor);
-		}
-		else if (SeenActor->IsA<AWorldWeapon>())
+		if (SeenActor->IsA<AWorldWeapon>())
 		{
 			AWorldWeapon* WW = Cast<AWorldWeapon>(SeenActor);
 			if (MonsterFSMComponent->GetPlayer())

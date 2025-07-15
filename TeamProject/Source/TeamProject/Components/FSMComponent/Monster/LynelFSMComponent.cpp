@@ -763,10 +763,10 @@ void ULynelFSMComponent::UpdateAimingBow(float DeltaTime)
 
 
 	this->StopMove();
-	AimingBowElapsedTime += DeltaTime;
 	const FVector PlayerLocation = Player->GetActorLocation();
 	SmoothRotateActorToDirection(CharacterMonster, PlayerLocation, DeltaTime);
 
+	AimingBowElapsedTime += DeltaTime;
 	if (AimingBowElapsedTime > MONSTER_AIMINGBOW_MAX_TIME)
 	{
 		AimingBowElapsedTime = 0.f;
@@ -955,14 +955,6 @@ void ULynelFSMComponent::UpdateHornAttack(float DeltaTime)
 			CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_HORN_END);
 		}
 		return;
-		//const float fDist = FVector::Dist(PlayerLocation, MonsterLocation);
-		//if (fDist > LYNEL_HORN_ATTACK_MAX_PASS_LENGTH)
-		//{
-		//	// End
-		//	bHornAttackPassed = false;
-		//	CharacterMonster->PlayMontage(EMonsterMontage::ATTACK_HORN_END);
-		//	return;
-		//}
 	}
 
 	const bool bIsNear = FVector::PointsAreNear(MonsterLocation, PlayerLocation, MONSTER_DEFAULT_NEAR_DISTANCE);
